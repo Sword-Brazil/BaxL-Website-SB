@@ -377,7 +377,8 @@
   "LIBERATION": "ctp_liberation.png",
   "INSIGHT": "Ctp_insight.webp",
   "COMPETITION": "ctp_competition.png",
-  "JUDGEMENT": "Ctp_judgement.webp"
+  "JUDGEMENT": "Ctp_judgement.webp",
+  "ASCENT": "ctp_ascent.png"
  },
  "restrictions": [
   "alien",
