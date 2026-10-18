@@ -1,0 +1,126 @@
+{
+  "brand": {
+    "name": "Sword Brazil",
+    "tagline": "Alliance Battle Metas",
+    "title": "Sword Brazil · AB Metas"
+  },
+  "nav": {
+    "roster": "My roster",
+    "admin": "Admin",
+    "login": "Sign in",
+    "logout": "Sign out",
+    "menu": "Menu",
+    "account": "My account",
+    "battle": "Alliance Battle",
+    "stats": "Statistics"
+  },
+  "modes": {
+    "BAX": "Alliance Battle Extreme",
+    "BAL": "Alliance Battle Legend",
+    "BAI": "Alliance Battle Infinite"
+  },
+  "theme": {
+    "toggle": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "language": {
+    "label": "Language",
+    "pt-BR": "Português (BR)",
+    "en": "English",
+    "es": "Español"
+  },
+  "footer": {
+    "disclaimer": "Unofficial, non-commercial fan project. Marvel Future Fight is owned by Netmarble; characters are owned by Marvel.",
+    "alliance": "Made for the Sword Brazil alliance.",
+    "credit": "Base calendar and teams: Guia BAX/BAL/BAI (guiabaxbal.web.app), curated by Sword Brazil."
+  },
+  "team": {
+    "empty": "No team defined",
+    "primary": "Primary",
+    "alternative": "Alternative",
+    "updatedAt": "Updated {{date}}",
+    "unavailable": "Unavailable",
+    "slots": {
+      "SOLO": "Leader",
+      "SUPPORT_1": "Slot 1",
+      "SUPPORT_2": "Slot 2"
+    },
+    "owned": "Owned",
+    "notOwned": "Not owned"
+  },
+  "restriction": {
+    "none": "No restriction",
+    "label": "Restriction"
+  },
+  "attributes": {
+    "GENDER": "Gender",
+    "SIDE": "Side",
+    "SPECIES": "Species",
+    "ATTACK_TYPE": "Attack type"
+  },
+  "values": {
+    "MALE": "Male",
+    "FEMALE": "Female",
+    "NONE": "Genderless",
+    "HERO": "Hero",
+    "VILLAIN": "Villain",
+    "MUTANT": "Mutant",
+    "INHUMAN": "Inhuman",
+    "HUMAN": "Human",
+    "ALIEN": "Alien",
+    "NEO_HUMAN": "Neo-human",
+    "OTHER": "Other",
+    "COMBAT": "Combat",
+    "BLAST": "Blast",
+    "SPEED": "Speed",
+    "UNIVERSAL": "Universal",
+    "UNKNOWN": "Not set"
+  },
+  "ctp": {
+    "RAGE": "Rage",
+    "LIBERATION": "Liberation",
+    "INSIGHT": "Insight",
+    "COMPETITION": "Competition",
+    "JUDGEMENT": "Judgement",
+    "ASCENT": "Ascent"
+  },
+  "quality": {
+    "NORMAL": "Normal",
+    "MIGHTY": "Mighty",
+    "BRILLIANT": "Brilliant"
+  },
+  "weekdays": {
+    "QUI": "THU",
+    "SEX": "FRI",
+    "SÁB": "SAT",
+    "DOM": "SUN",
+    "SEG": "MON",
+    "TER": "TUE",
+    "QUA": "WED"
+  },
+  "day": "Day {{number}}",
+  "actions": {
+    "retry": "Try again",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "close": "Close",
+    "back": "Back",
+    "help": "Help",
+    "exportImage": "Export image"
+  },
+  "states": {
+    "loading": "Loading…",
+    "error": "Could not load the data.",
+    "notFound": "Page not found.",
+    "forbidden": "Access denied."
+  },
+  "sync": {
+    "title": "Choose which selections to keep",
+    "text": "This device and your account have different rosters/teams. Which version do you want to keep? The other will be replaced.",
+    "keepLocal": "Keep this device's",
+    "keepRemote": "Use the account's"
+  }
+}

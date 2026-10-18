@@ -1,0 +1,159 @@
+{
+  "title": "Administração",
+  "nav": {
+    "overview": "Visão geral",
+    "days": "Dias",
+    "metas": "Metas",
+    "catalog": "Catálogo",
+    "ctps": "CTPs",
+    "bai": "BAI",
+    "users": "Usuários",
+    "settings": "Configurações"
+  },
+  "guard": {
+    "forbidden": "Acesso negado",
+    "forbiddenText": "Esta área é exclusiva para curadores e administradores da Sword Brazil.",
+    "goHome": "Voltar ao início"
+  },
+  "overview": {
+    "welcome": "Olá, {{name}}",
+    "text": "Escolha o que deseja editar. Toda alteração publicada fica visível na hora, com data e autor.",
+    "days": "Restrições de cada dia de BAX e BAL.",
+    "metas": "Equipes Meta por dia, modo livre da BAL, BAI e listas de prioridade.",
+    "catalog": "Agentes, uniformes e imagens.",
+    "ctps": "Tipos, fotos e disponibilidade dos CTPs.",
+    "bai": "Sequência de chefes da BAI.",
+    "users": "Curadores e administradores.",
+    "settings": "Âncora do ciclo e horários de virada."
+  },
+  "common": {
+    "saved": "Alterações salvas",
+    "save": "Salvar",
+    "saving": "Salvando…",
+    "add": "Adicionar",
+    "remove": "Remover",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "cancel": "Cancelar",
+    "moveUp": "Subir",
+    "moveDown": "Descer",
+    "none": "Nenhum item",
+    "error": "Não foi possível salvar"
+  },
+  "days": {
+    "title": "Restrições dos dias",
+    "subtitle": "Defina a restrição de cada dia. Critérios diferentes são combinados com \"E\".",
+    "any": "Qualquer",
+    "day": "Dia",
+    "help": "Escolha um valor por atributo. Deixe \"Qualquer\" para não restringir aquele atributo. Os dias de BAI (3, 10, 17, 24) não aparecem aqui."
+  },
+  "metas": {
+    "title": "Equipes Meta",
+    "teamsTab": "Equipes",
+    "priorityTab": "Prioridades",
+    "scope": "Onde",
+    "scopes": {
+      "DAY": "Dia de BAX/BAL",
+      "BAL_FREE": "BAL modo livre",
+      "BAI": "BAI"
+    },
+    "mode": "Modo",
+    "day": "Dia",
+    "newTeam": "Nova equipe",
+    "editTeam": "Editar equipe",
+    "isPrimary": "Equipe principal",
+    "label": "Rótulo (ex.: alternativa sem uniforme X)",
+    "notes": "Observações",
+    "pickAgent": "Escolher agente…",
+    "pickCtp": "CTP",
+    "searchAgent": "Buscar agente…",
+    "noAgent": "Nenhum agente atende à restrição.",
+    "deleteConfirm": "Excluir esta equipe? Esta ação não pode ser desfeita.",
+    "deleted": "Equipe excluída",
+    "empty": "Nenhuma equipe cadastrada aqui.",
+    "help": "Só aparecem agentes ativos que atendem à restrição do dia. Marcar como principal desmarca a anterior."
+  },
+  "priority": {
+    "title": "Listas de prioridade",
+    "subtitle": "Ordem de preferência usada para sugerir equipes com o elenco de cada jogador.",
+    "solo": "Soladores",
+    "support": "Suportes",
+    "empty": "Lista vazia",
+    "help": "Arraste para reordenar (ou use os botões). O primeiro da lista tem prioridade."
+  },
+  "catalog": {
+    "title": "Catálogo de agentes",
+    "search": "Buscar por nome…",
+    "newAgent": "Novo agente",
+    "editAgent": "Editar agente",
+    "slug": "Identificador (slug)",
+    "name": "Nome oficial",
+    "active": "Ativo",
+    "inactive": "Inativo",
+    "uniforms": "Uniformes",
+    "addUniform": "Novo traje",
+    "uniformName": "Nome do uniforme",
+    "uniformSlug": "Slug do uniforme",
+    "image": "Imagem",
+    "upload": "Enviar imagem",
+    "uploaded": "Imagem enviada",
+    "uploadHint": "PNG, WebP ou JPEG, até 2 MB.",
+    "deactivateHint": "Desativar mantém o agente nas equipes antigas, marcado como indisponível.",
+    "help": "Nomes devem seguir o jogo. Use slugs em kebab-case (ex.: scarlet-witch).",
+    "changePhoto": "Trocar foto",
+    "addPhoto": "Enviar foto",
+    "removePhoto": "Remover foto",
+    "noPhoto": "Sem foto: aparecem as iniciais.",
+    "tooBig": "A imagem deve ter até 2 MB.",
+    "badType": "Use uma imagem PNG, WebP ou JPEG.",
+    "slugAuto": "Gerado a partir do nome; edite só se precisar.",
+    "photos": "{{n}}/{{total}} com foto",
+    "quickUniform": "Traje"
+  },
+  "ctps": {
+    "title": "Catálogo de CTPs",
+    "help": "Adicione e atualize fotos dos CTPs. Excluir desativa o item para preservar equipes e seleções antigas.",
+    "add": "Novo CTP",
+    "edit": "Editar CTP",
+    "type": "Tipo",
+    "quality": "Qualidade",
+    "remove": "Excluir",
+    "restore": "Reativar"
+  },
+  "bai": {
+    "title": "Chefes da BAI",
+    "subtitle": "Sequência única, válida para todas as semanas.",
+    "add": "Adicionar chefe",
+    "name": "Nome",
+    "image": "Imagem (caminho)",
+    "tips": "Dicas",
+    "help": "Os chefes aparecem nesta ordem na página da BAI."
+  },
+  "users": {
+    "title": "Usuários e papéis",
+    "search": "Buscar por e-mail ou apelido…",
+    "newStaff": "Novo administrador/curador",
+    "role": "Papel",
+    "roles": {
+      "USER": "Usuário",
+      "CURATOR": "Curador",
+      "ADMIN": "Administrador"
+    },
+    "changeRoleConfirm": "Alterar o papel de {{email}} para {{role}}?",
+    "resetPassword": "Redefinir senha",
+    "verified": "Confirmado",
+    "unverified": "Não confirmado",
+    "created": "Conta criada",
+    "passwordReset": "Senha redefinida",
+    "lastAdmin": "Não é possível rebaixar o último administrador.",
+    "help": "Administradores promovem e removem curadores. Sempre deve existir ao menos um administrador."
+  },
+  "settings": {
+    "title": "Configurações do calendário",
+    "anchor": "Início do Dia 1 (data e hora de Brasília)",
+    "anchorHelp": "Quinta-feira às 12h em que começou um ciclo de 28 dias.",
+    "turnover": "Virada do dia (hora, Brasília)",
+    "reset": "Reset semanal (hora, Brasília)",
+    "help": "Ajuste a âncora se o \"Dia atual\" estiver diferente do jogo."
+  }
+}

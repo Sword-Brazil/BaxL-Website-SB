@@ -1,0 +1,395 @@
+{
+ "$comment": "Retratos de img/Chars → personagem e traje. traje null = retrato do personagem (usado nos trajes sem foto). Identificação dos trajes por nome do arquivo e aparência; revise se necessário.",
+ "chars": [
+  {
+   "file": "ancientone2.webp",
+   "agent": "Ancião",
+   "uniform": "Mística Liberada"
+  },
+  {
+   "file": "ares1.webp",
+   "agent": "Ares",
+   "uniform": "Justiceiro"
+  },
+  {
+   "file": "athena.webp",
+   "agent": "Athena",
+   "uniform": "Padrão"
+  },
+  {
+   "file": "blackbolt4.webp",
+   "agent": "Raio Negro",
+   "uniform": "Alma Caída"
+  },
+  {
+   "file": "blackcat3.webp",
+   "agent": "Gata Negra",
+   "uniform": null
+  },
+  {
+   "file": "blackcat4.webp",
+   "agent": "Gata Negra",
+   "uniform": "Criminoso de Inverno"
+  },
+  {
+   "file": "bullseye3.webp",
+   "agent": "Mercenário",
+   "uniform": "Wastelanders"
+  },
+  {
+   "file": "crescent3.webp",
+   "agent": "Crescente",
+   "uniform": "Tripulação B-Girl"
+  },
+  {
+   "file": "crystal3.webp",
+   "agent": "Crystalys",
+   "uniform": "Mulher da Primavera"
+  },
+  {
+   "file": "cyclops3.webp",
+   "agent": "Ciclope",
+   "uniform": "Quinteto Fênix"
+  },
+  {
+   "file": "cyclops5.webp",
+   "agent": "Ciclope",
+   "uniform": "X-MEN' 97"
+  },
+  {
+   "file": "dazzler.webp",
+   "agent": "Crystal",
+   "uniform": "Canção-X"
+  },
+  {
+   "file": "dazzler1.webp",
+   "agent": "Crystal",
+   "uniform": null
+  },
+  {
+   "file": "doctorstrange3.webp",
+   "agent": "Doutor Estranho",
+   "uniform": "Traje Espacial"
+  },
+  {
+   "file": "doctorstrange6.webp",
+   "agent": "Doutor Estranho",
+   "uniform": "E se... Zumbis?!"
+  },
+  {
+   "file": "doctorvoodoo2.webp",
+   "agent": "Dr. Voodoo",
+   "uniform": null
+  },
+  {
+   "file": "echo.webp",
+   "agent": "Maya Lopez (Echo)",
+   "uniform": "Padrão"
+  },
+  {
+   "file": "enchantress2.webp",
+   "agent": "Encantor",
+   "uniform": "Guerra Entre Reinos"
+  },
+  {
+   "file": "gambit2.webp",
+   "agent": "Gambit",
+   "uniform": "Réveillon dos X-MEN"
+  },
+  {
+   "file": "gamora5.webp",
+   "agent": "Gamora",
+   "uniform": "Wastelanders"
+  },
+  {
+   "file": "ghostpanther.webp",
+   "agent": "Ghost Panther",
+   "uniform": "Padrão"
+  },
+  {
+   "file": "ghostrider5.webp",
+   "agent": "Motoqueiro Fantasma",
+   "uniform": "Vingadores Selvagens"
+  },
+  {
+   "file": "gladiator1.webp",
+   "agent": "Gladiador",
+   "uniform": "Thanos: Revelação Infinita"
+  },
+  {
+   "file": "greengoblin4.webp",
+   "agent": "Duende Verde",
+   "uniform": "Duende Vermelho"
+  },
+  {
+   "file": "greengoblin5.webp",
+   "agent": "Duende Verde",
+   "uniform": "Gold Goblin"
+  },
+  {
+   "file": "groot6.webp",
+   "agent": "Groot",
+   "uniform": null
+  },
+  {
+   "file": "gwenpool4.webp",
+   "agent": "Gwenpool",
+   "uniform": null
+  },
+  {
+   "file": "hades.webp",
+   "agent": "Hades",
+   "uniform": "Padrão"
+  },
+  {
+   "file": "hela3.webp",
+   "agent": "Hela",
+   "uniform": "Padrão"
+  },
+  {
+   "file": "hulk8.webp",
+   "agent": "Hulk",
+   "uniform": "Titã"
+  },
+  {
+   "file": "hulk9.webp",
+   "agent": "Hulk",
+   "uniform": "Brand New Day"
+  },
+  {
+   "file": "jeangrey4.webp",
+   "agent": "Jean Grey",
+   "uniform": "Sinalizador de Verão da Fênix"
+  },
+  {
+   "file": "kamalakhan5.webp",
+   "agent": "Kamala Khan",
+   "uniform": "Marvel Zombies"
+  },
+  {
+   "file": "leader.webp",
+   "agent": "Líder",
+   "uniform": null
+  },
+  {
+   "file": "loki8.webp",
+   "agent": "Loki",
+   "uniform": "Jovens Vingadores"
+  },
+  {
+   "file": "lunasnow2.webp",
+   "agent": "Luna Snow",
+   "uniform": "Mirae 2099"
+  },
+  {
+   "file": "lunasnow5.webp",
+   "agent": "Luna Snow",
+   "uniform": "Série Estilo de Vida 1"
+  },
+  {
+   "file": "magneto4.webp",
+   "agent": "Magneto",
+   "uniform": "X-Men 97 da Marvel Animation"
+  },
+  {
+   "file": "mbaku1.webp",
+   "agent": "MBaku",
+   "uniform": "Padrão"
+  },
+  {
+   "file": "medusa3.webp",
+   "agent": "Medusa",
+   "uniform": "Maldição Antiga"
+  },
+  {
+   "file": "mephisto1.webp",
+   "agent": "Mephisto",
+   "uniform": "Mestre do Inferno"
+  },
+  {
+   "file": "milesmorales5.webp",
+   "agent": "Miles Morales",
+   "uniform": "Maldição Antiga"
+  },
+  {
+   "file": "mistyknight.webp",
+   "agent": "Misty Knight",
+   "uniform": "Padrão"
+  },
+  {
+   "file": "morganlefay1.webp",
+   "agent": "Morgana LeFay",
+   "uniform": "Clássico"
+  },
+  {
+   "file": "mysterio2.webp",
+   "agent": "Mysterio",
+   "uniform": "Mistério de Verão"
+  },
+  {
+   "file": "mystique1.webp",
+   "agent": "Mística",
+   "uniform": "Baile de Gala do Inferno"
+  },
+  {
+   "file": "nickfury4.webp",
+   "agent": "Nick Fury",
+   "uniform": "Vingadores Secretos"
+  },
+  {
+   "file": "nova1.webp",
+   "agent": "Nova",
+   "uniform": "Cosmic Invasion"
+  },
+  {
+   "file": "odin3.webp",
+   "agent": "Odin",
+   "uniform": "Senhor de Asgard"
+  },
+  {
+   "file": "philcoulson.webp",
+   "agent": "Coulson",
+   "uniform": null
+  },
+  {
+   "file": "philcoulson2.webp",
+   "agent": "Coulson",
+   "uniform": "Operação de Inverno"
+  },
+  {
+   "file": "phylavell1.webp",
+   "agent": "Phyla-Vell",
+   "uniform": null
+  },
+  {
+   "file": "polaris1.webp",
+   "agent": "Polaris",
+   "uniform": "Fabulosos X-MEN"
+  },
+  {
+   "file": "proximamidnight2.webp",
+   "agent": "Próxima Midnight",
+   "uniform": "Armadura de Obsidian Negra"
+  },
+  {
+   "file": "redhulk3.webp",
+   "agent": "Red Hulk",
+   "uniform": "Capitão América: Admirável Mundo Novo"
+  },
+  {
+   "file": "redshehulk.webp",
+   "agent": "Red She Hulk",
+   "uniform": "Padrão"
+  },
+  {
+   "file": "redskull3.webp",
+   "agent": "Caveira Vermelha",
+   "uniform": "OUTONO ESCARLATE"
+  },
+  {
+   "file": "ronan3.webp",
+   "agent": "Ronan",
+   "uniform": "Aniquiladores"
+  },
+  {
+   "file": "satana2.webp",
+   "agent": "Satana",
+   "uniform": "A Ascendida"
+  },
+  {
+   "file": "scarletspider2.webp",
+   "agent": "Aranha Escarlate",
+   "uniform": "Entregador de Presentes"
+  },
+  {
+   "file": "scarletwitch7.webp",
+   "agent": "Wanda",
+   "uniform": "Marvel Zombies"
+  },
+  {
+   "file": "shehulk1.webp",
+   "agent": "She-Hulk",
+   "uniform": null
+  },
+  {
+   "file": "sin1.webp",
+   "agent": "Pecado",
+   "uniform": "Retorno da Pecado"
+  },
+  {
+   "file": "sistergrimm3.webp",
+   "agent": "Irmã Grimm",
+   "uniform": "PRINCESA DA LUA"
+  },
+  {
+   "file": "storm5.webp",
+   "agent": "Storm",
+   "uniform": "X-MEN' 97"
+  },
+  {
+   "file": "taskmaster1.webp",
+   "agent": "Treinador(a)",
+   "uniform": "Thunderbolts"
+  },
+  {
+   "file": "thor10.webp",
+   "agent": "Thor",
+   "uniform": null
+  },
+  {
+   "file": "thor9.webp",
+   "agent": "Thor",
+   "uniform": "Love and Thunder"
+  },
+  {
+   "file": "valkyrie3.webp",
+   "agent": "Valquíria",
+   "uniform": "Love and Thunder"
+  },
+  {
+   "file": "whitefox3.webp",
+   "agent": "White Fox",
+   "uniform": "Série Estilo de Vida 2"
+  },
+  {
+   "file": "wintersoldier5.webp",
+   "agent": "Bucky",
+   "uniform": "Revolução"
+  },
+  {
+   "file": "wolverine7.webp",
+   "agent": "Wolverine",
+   "uniform": "Padrão"
+  },
+  {
+   "file": "yondu3.webp",
+   "agent": "Yondu",
+   "uniform": "Férias de Verão"
+  }
+ ],
+ "ignored": [
+  "gorgon.webp",
+  "kidkaiju1.webp",
+  "philcoulson2 (1).webp"
+ ],
+ "ctps": {
+  "RAGE": "Ctp_rage.webp",
+  "LIBERATION": "ctp_liberation.png",
+  "INSIGHT": "Ctp_insight.webp",
+  "COMPETITION": "ctp_competition.png",
+  "JUDGEMENT": "Ctp_judgement.webp"
+ },
+ "restrictions": [
+  "alien",
+  "blast",
+  "combat",
+  "female",
+  "hero",
+  "human",
+  "male",
+  "mutant",
+  "speed",
+  "universal",
+  "villain"
+ ]
+}

@@ -1,0 +1,33 @@
+{
+  "title": "My roster",
+  "subtitle": "Mark the agents and uniforms you own. This powers your team builder and suggestions.",
+  "search": "Search agent…",
+  "filters": "Filters",
+  "clearFilters": "Clear filters",
+  "owned": "{{owned}} of {{total}} agents",
+  "markAgent": "Mark all uniforms",
+  "unmarkAgent": "Unmark",
+  "empty": "No agent found.",
+  "localNote": "Your selections are saved on this device. Sign in to sync across devices.",
+  "backup": {
+    "title": "Backup",
+    "export": "Export backup",
+    "import": "Import backup",
+    "imported": "Backup imported",
+    "invalid": "Invalid backup file"
+  },
+  "reset": {
+    "title": "Reset selections",
+    "text": "Deletes the teams built for the chosen mode. Roster and other modes are kept.",
+    "confirm": "Delete the {{mode}} teams?",
+    "done": "{{mode}} teams deleted"
+  },
+  "help": {
+    "title": "My roster",
+    "text1": "Tap a uniform to mark or unmark it. An agent counts as owned if you own at least one of its uniforms.",
+    "text2": "Use the backup to move your selections to another device without an account."
+  },
+  "ctpTitle": "Equip CTPs",
+  "ctpDrop": "Drag or tap a CTP to equip",
+  "ctpArmed": "CTP selected: tap one of your characters to equip it."
+}

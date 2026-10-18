@@ -1,0 +1,126 @@
+{
+  "brand": {
+    "name": "Sword Brazil",
+    "tagline": "Metas da Batalha de Aliança",
+    "title": "Sword Brazil · Metas BA"
+  },
+  "nav": {
+    "roster": "Meu elenco",
+    "admin": "Admin",
+    "login": "Entrar",
+    "logout": "Sair",
+    "menu": "Menu",
+    "account": "Minha conta",
+    "battle": "Batalha de Aliança",
+    "stats": "Estatísticas"
+  },
+  "modes": {
+    "BAX": "Batalha de Aliança Extrema",
+    "BAL": "Batalha de Aliança Lenda",
+    "BAI": "Batalha de Aliança Infinita"
+  },
+  "theme": {
+    "toggle": "Alternar tema",
+    "light": "Claro",
+    "dark": "Escuro",
+    "system": "Sistema"
+  },
+  "language": {
+    "label": "Idioma",
+    "pt-BR": "Português (BR)",
+    "en": "English",
+    "es": "Español"
+  },
+  "footer": {
+    "disclaimer": "Projeto de fã, não oficial e sem fins comerciais. Marvel Future Fight é propriedade da Netmarble; personagens são propriedade da Marvel.",
+    "alliance": "Feito para a aliança Sword Brazil.",
+    "credit": "Calendário e equipes de base: Guia BAX/BAL/BAI (guiabaxbal.web.app), com curadoria da Sword Brazil."
+  },
+  "team": {
+    "empty": "Sem equipe definida",
+    "primary": "Principal",
+    "alternative": "Alternativa",
+    "updatedAt": "Atualizado em {{date}}",
+    "unavailable": "Indisponível",
+    "slots": {
+      "SOLO": "Líder",
+      "SUPPORT_1": "Pos. 1",
+      "SUPPORT_2": "Pos. 2"
+    },
+    "owned": "Possuído",
+    "notOwned": "Não possuído"
+  },
+  "restriction": {
+    "none": "Sem restrição",
+    "label": "Restrição"
+  },
+  "attributes": {
+    "GENDER": "Gênero",
+    "SIDE": "Lado",
+    "SPECIES": "Espécie",
+    "ATTACK_TYPE": "Tipo de ataque"
+  },
+  "values": {
+    "MALE": "Masculino",
+    "FEMALE": "Feminino",
+    "NONE": "Sem gênero",
+    "HERO": "Herói",
+    "VILLAIN": "Vilão",
+    "MUTANT": "Mutante",
+    "INHUMAN": "Inumano",
+    "HUMAN": "Humano",
+    "ALIEN": "Alienígena",
+    "NEO_HUMAN": "Neo-humano",
+    "OTHER": "Outro",
+    "COMBAT": "Combate",
+    "BLAST": "Explosão",
+    "SPEED": "Velocidade",
+    "UNIVERSAL": "Universal",
+    "UNKNOWN": "Não informado"
+  },
+  "ctp": {
+    "RAGE": "Fúria",
+    "LIBERATION": "Liberação",
+    "INSIGHT": "Percepção",
+    "COMPETITION": "Competição",
+    "JUDGEMENT": "Julgamento",
+    "ASCENT": "Salto"
+  },
+  "quality": {
+    "NORMAL": "Normal",
+    "MIGHTY": "Poderoso",
+    "BRILLIANT": "Brilhante"
+  },
+  "weekdays": {
+    "QUI": "QUI",
+    "SEX": "SEX",
+    "SÁB": "SÁB",
+    "DOM": "DOM",
+    "SEG": "SEG",
+    "TER": "TER",
+    "QUA": "QUA"
+  },
+  "day": "Dia {{number}}",
+  "actions": {
+    "retry": "Tentar novamente",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "close": "Fechar",
+    "back": "Voltar",
+    "help": "Ajuda",
+    "exportImage": "Exportar imagem"
+  },
+  "states": {
+    "loading": "Carregando…",
+    "error": "Não foi possível carregar os dados.",
+    "notFound": "Página não encontrada.",
+    "forbidden": "Acesso negado."
+  },
+  "sync": {
+    "title": "Escolha quais seleções manter",
+    "text": "Este aparelho e a sua conta têm elencos/equipes diferentes. Qual versão você quer manter? A outra será substituída.",
+    "keepLocal": "Manter as deste aparelho",
+    "keepRemote": "Usar as da conta"
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "today": {
+    "title": "Today",
+    "currentDay": "Current day",
+    "dayOfCycle": "Day {{day}} of 28 · {{weekday}}",
+    "week": "Week {{week}}",
+    "seeDay": "See day details",
+    "seeAllDays": "All days",
+    "baiToday": "Today is BAI day",
+    "baiTodayText": "There is no BAX or BAL today. Every agent is allowed and bosses appear one after another.",
+    "goToBai": "Open BAI",
+    "nextBai": "Next BAI: {{date}}",
+    "resetBefore": "Today is the weekly reset day: until 10 PM (Brasília) the score still counts for the current week.",
+    "resetAfter": "Weekly reset done at 10 PM (Brasília): the score now counts for the new week.",
+    "help": {
+      "title": "How to use",
+      "text1": "The battle day turns over at 12 PM (Brasília). The weekly score reset happens at 10 PM on the last day of the week.",
+      "text2": "Tap BAX or BAL and then a day to see the full Meta team."
+    }
+  },
+  "grid": {
+    "title": "{{mode}} · Cycle days",
+    "subtitle": "24 days per cycle. Days 3, 10, 17 and 24 belong to BAI.",
+    "current": "Today",
+    "freeMode": "Free mode",
+    "help": {
+      "title": "Day grid",
+      "text1": "Each card shows the day restriction and the Solo of the primary Meta team.",
+      "text2": "The current day is highlighted."
+    }
+  },
+  "detail": {
+    "title": "{{mode}} · Day {{day}}",
+    "meta": "Meta team",
+    "prev": "Previous day",
+    "next": "Next day",
+    "alternatives": "Alternatives",
+    "notes": "Notes",
+    "notFound": "This day does not exist for BAX/BAL (days 3, 10, 17 and 24 belong to BAI).",
+    "help": {
+      "title": "Day team",
+      "text1": "The restriction defines which agents can be used. Criteria joined by \"+\" must all apply.",
+      "text2": "Each agent shows the Meta uniform and the recommended CTP with its quality."
+    }
+  },
+  "free": {
+    "title": "BAL · Free mode",
+    "subtitle": "Best performing teams with no character restriction.",
+    "help": {
+      "title": "Free mode",
+      "text1": "Any agent can be used in free BAL. These teams change rarely."
+    }
+  },
+  "myTeam": {
+    "title": "My team",
+    "subtitle": "Build your team with the agents you own that meet the restriction.",
+    "pick": "Pick agent…",
+    "search": "Search your roster…",
+    "noCandidates": "No agent from your roster meets this day's restriction.",
+    "goRoster": "Mark my roster",
+    "clear": "Clear slot",
+    "status": {
+      "MATCH": "Same as Meta",
+      "DIFFERENT": "Different from Meta",
+      "NOT_OWNED": "Meta agent not owned",
+      "UNIFORM_NOT_OWNED": "Meta uniform not owned"
+    },
+    "ctpStatus": {
+      "MATCH": "CTP matches Meta",
+      "CTP_DIFFERENT": "CTP differs from Meta",
+      "NONE": "No CTP"
+    },
+    "metaWas": "Meta: {{name}}",
+    "suggestion": {
+      "title": "Suggestion for your roster",
+      "text": "Best possible team with what you own, using the Sword Brazil priority list.",
+      "apply": "Apply suggestion",
+      "none": "No suggestion yet: none of your agents is in this day's priority list.",
+      "applied": "Suggestion applied"
+    },
+    "help": {
+      "title": "My team",
+      "text1": "Green: same as Meta. Amber: different. Red: you don't own the Meta agent or uniform.",
+      "text2": "Your choices are saved on this device (and in your account, if you sign in)."
+    },
+    "palette": {
+      "title": "CTPs",
+      "open": "Pick CTP",
+      "hint": "Drag a CTP onto an agent of your team, or tap the CTP and then the agent.",
+      "armed": "CTP selected: tap an agent to apply.",
+      "remove": "Remove CTP"
+    },
+    "dnd": {
+      "instructions": "To pick up a CTP, press space or enter. Use the arrow keys to move and space or enter to drop it on an agent. Esc cancels.",
+      "pickup": "Picked up CTP {{name}}.",
+      "over": "Over {{target}}.",
+      "overNone": "Not over an agent.",
+      "drop": "CTP {{name}} applied to {{target}}.",
+      "dropNone": "CTP {{name}} dropped outside an agent. Nothing changed.",
+      "cancel": "Dragging cancelled."
+    },
+    "change": "Change agent…",
+    "copyMeta": "Copy Meta",
+    "copyAlt": "Copy Alternative",
+    "copied": "{{count}} agent(s) copied from your roster",
+    "copyNone": "You don't own any agent of this team. Build it with your roster."
+  }
+}

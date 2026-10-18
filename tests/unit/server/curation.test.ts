@@ -1,0 +1,117 @@
+import { beforeEach, describe, expect, it } from "vitest";
+import { prisma } from "@/server/db";
+import { HttpError } from "@/server/http";
+import { deleteMetaTeam, saveMetaTeam } from "@/server/services/metaTeamService";
+import { setRestriction } from "@/server/services/restrictionService";
+import { savePriority } from "@/server/services/priorityService";
+import { changeRole, createStaff } from "@/server/services/usersService";
+import { createAgent, createUser, ctpId, dayId, seedBase } from "./fixtures";
+
+const status = (s: number) => (e: unknown) => e instanceof HttpError && e.status === s;
+
+describe("curadoria", () => {
+  let curatorId: string;
+  let fem: string[];
+  let maleMutant: string;
+  let ctp: string;
+
+  beforeEach(async () => {
+    await seedBase();
+    curatorId = (await createUser("CURATOR")).id;
+    ctp = await ctpId();
+    fem = [];
+    for (const s of ["f1", "f2", "f3"]) fem.push((await createAgent(s, { gender: "FEMALE", species: "MUTANT" })).uniform.id);
+    maleMutant = (await createAgent("m1", { gender: "MALE", species: "MUTANT" })).uniform.id;
+    await setRestriction("BAX", 6, [
+      { attribute: "GENDER", value: "FEMALE" },
+      { attribute: "SPECIES", value: "MUTANT" },
+    ]);
+  });
+
+  const team = (uniforms: string[], extra: object = {}) => ({
+    scope: "DAY" as const,
+    mode: "BAX" as const,
+    number: 6,
+    isPrimary: true,
+    members: (["SOLO", "SUPPORT_1", "SUPPORT_2"] as const).map((slot, i) => ({ slot, uniformId: uniforms[i], ctpId: ctp })),
+    ...extra,
+  });
+
+  it("publicar com agente fora da restrição gera 422 RESTRICTION_VIOLATION", async () => {
+    const err = await saveMetaTeam(team([maleMutant, fem[1], fem[2]]), curatorId).catch((e) => e);
+    expect(err).toBeInstanceOf(HttpError);
+    expect(err.status).toBe(422);
+    expect(err.code).toBe("RESTRICTION_VIOLATION");
+  });
+
+  it("publicar com uniforme inativo gera 400", async () => {
+    await prisma.uniform.update({ where: { id: fem[0] }, data: { active: false } });
+    await expect(saveMetaTeam(team(fem), curatorId)).rejects.toSatisfy(status(400));
+  });
+
+  it("o mesmo agente em dois slots gera 400", async () => {
+    const extra = await prisma.uniform.create({
+      data: { agentId: (await prisma.uniform.findUniqueOrThrow({ where: { id: fem[0] } })).agentId, slug: "alt", name: "Alt", imagePath: "/x.png" },
+    });
+    await expect(saveMetaTeam(team([fem[0], extra.id, fem[2]]), curatorId)).rejects.toSatisfy(status(400));
+  });
+
+  it("grava autor e data, e só uma principal por dia", async () => {
+    const a = await saveMetaTeam(team(fem), curatorId);
+    expect(a.updatedBy).toBe("curator");
+    const b = await saveMetaTeam(team([fem[2], fem[1], fem[0]]), curatorId);
+    const day = await dayId("BAX", 6);
+    const rows = await prisma.metaTeam.findMany({ where: { battleDayId: day } });
+    expect(rows).toHaveLength(2);
+    expect(rows.filter((r) => r.isPrimary).map((r) => r.id)).toEqual([b.id]);
+    expect(rows.every((r) => r.updatedById === curatorId)).toBe(true);
+  });
+
+  it("editar e excluir uma MetaTeam", async () => {
+    const a = await saveMetaTeam(team(fem), curatorId);
+    const edited = await saveMetaTeam(team(fem, { notes: "nova nota" }), curatorId, a.id);
+    expect(edited.id).toBe(a.id);
+    expect(edited.notes).toBe("nova nota");
+    await deleteMetaTeam(a.id);
+    expect(await prisma.metaTeam.count()).toBe(0);
+  });
+
+  it("restrição: dia de BAI gera 404", async () => {
+    await expect(setRestriction("BAX", 3, [])).rejects.toSatisfy(status(404));
+  });
+
+  it("prioridade da BAI não aceita uniforme fora do catálogo e grava ranks em ordem", async () => {
+    await expect(savePriority({ scope: "BAI" }, { solo: [{ uniformId: "nao-existe" }], support: [] })).rejects.toSatisfy(status(400));
+    await savePriority({ scope: "BAI" }, { solo: [{ uniformId: fem[1] }, { uniformId: fem[0] }], support: [{ uniformId: fem[2] }] });
+    const rows = await prisma.priorityEntry.findMany({ where: { scope: "BAI" }, orderBy: [{ role: "asc" }, { rank: "asc" }] });
+    expect(rows.map((r) => [r.role, r.rank, r.uniformId])).toEqual([
+      ["SOLO", 1, fem[1]],
+      ["SOLO", 2, fem[0]],
+      ["SUPPORT", 1, fem[2]],
+    ]);
+  });
+
+  it("prioridade de dia respeita a restrição", async () => {
+    await expect(
+      savePriority({ scope: "DAY", mode: "BAX", number: 6 }, { solo: [{ uniformId: maleMutant }], support: [] }),
+    ).rejects.toSatisfy(status(422));
+  });
+
+  describe("usuários", () => {
+    it("createStaff cria conta verificada com o papel pedido; e-mail repetido gera 409", async () => {
+      const u = await createStaff({ email: "novo@sword.br", password: "senha1234", role: "ADMIN" });
+      expect(u.role).toBe("ADMIN");
+      const row = await prisma.user.findUniqueOrThrow({ where: { id: u.id } });
+      expect(row.emailVerifiedAt).not.toBeNull();
+      expect(row.passwordHash).not.toBe("senha1234");
+      await expect(createStaff({ email: "NOVO@sword.br", password: "senha1234", role: "CURATOR" })).rejects.toSatisfy(status(409));
+    });
+
+    it("rebaixar o último ADMIN gera 409", async () => {
+      const admin = await createUser("ADMIN");
+      await expect(changeRole(admin.id, "USER")).rejects.toSatisfy(status(409));
+      await createUser("ADMIN", "outro@sword.br");
+      await expect(changeRole(admin.id, "CURATOR")).resolves.toMatchObject({ role: "CURATOR" });
+    });
+  });
+});

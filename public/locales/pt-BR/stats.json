@@ -1,0 +1,26 @@
+{
+  "title": "Estatísticas",
+  "subtitle": "Quem mais aparece nas equipes do ciclo e os CTPs equipados nos seus personagens.",
+  "chart": "Gráfico",
+  "table": "Tabela",
+  "total": "Total",
+  "showAll": "Ver todos ({{n}})",
+  "showTop": "Ver só os {{n}} primeiros",
+  "repetition": {
+    "title": "Repetição de personagens",
+    "subtitle": "Quantas vezes cada personagem aparece nas equipes do ciclo de 28 dias, por semana.",
+    "mode": "Modo",
+    "withAlt": "Incluir alternativas",
+    "agent": "Personagem"
+  },
+  "ctp": {
+    "title": "Meus CTPs equipados",
+    "subtitle": "{{equipped}} CTP(s) equipado(s) em {{owned}} personagem(ns) possuído(s), por tipo e qualidade.",
+    "empty": "Você ainda não equipou CTPs. Equipe em Meu elenco.",
+    "agents": "Personagens"
+  },
+  "help": {
+    "text1": "A repetição conta uma aparição por equipe. Personagens que se repetem muito são bons investimentos.",
+    "text2": "Os CTPs são lidos do que você equipou em Meu elenco (salvo no aparelho e na conta, se entrar)."
+  }
+}

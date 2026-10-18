@@ -1,0 +1,33 @@
+{
+  "title": "Meu elenco",
+  "subtitle": "Marque os agentes e uniformes que você possui. Isso alimenta a montagem da sua equipe e as sugestões.",
+  "search": "Buscar agente…",
+  "filters": "Filtros",
+  "clearFilters": "Limpar filtros",
+  "owned": "{{owned}} de {{total}} agentes",
+  "markAgent": "Marcar todos os uniformes",
+  "unmarkAgent": "Desmarcar",
+  "empty": "Nenhum agente encontrado.",
+  "localNote": "Suas seleções ficam salvas neste aparelho. Entre na sua conta para sincronizar entre aparelhos.",
+  "backup": {
+    "title": "Backup",
+    "export": "Exportar backup",
+    "import": "Importar backup",
+    "imported": "Backup importado",
+    "invalid": "Arquivo de backup inválido"
+  },
+  "reset": {
+    "title": "Redefinir seleções",
+    "text": "Apaga as equipes montadas do modo escolhido. O elenco e os outros modos são mantidos.",
+    "confirm": "Apagar as equipes de {{mode}}?",
+    "done": "Equipes de {{mode}} apagadas"
+  },
+  "help": {
+    "title": "Meu elenco",
+    "text1": "Toque em um uniforme para marcar ou desmarcar. Um agente conta como possuído se você tiver ao menos um uniforme dele.",
+    "text2": "Use o backup para levar suas seleções para outro aparelho sem criar conta."
+  },
+  "ctpTitle": "Equipar CTPs",
+  "ctpDrop": "Arraste ou toque um CTP para equipar",
+  "ctpArmed": "CTP selecionado: toque em um personagem seu para equipar."
+}

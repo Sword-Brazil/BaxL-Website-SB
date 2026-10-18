@@ -1,0 +1,26 @@
+{
+  "title": "Statistics",
+  "subtitle": "Who appears most in the cycle's teams and the CTPs equipped on your characters.",
+  "chart": "Chart",
+  "table": "Table",
+  "total": "Total",
+  "showAll": "Show all ({{n}})",
+  "showTop": "Show only the top {{n}}",
+  "repetition": {
+    "title": "Character repetition",
+    "subtitle": "How many times each character appears in the 28-day cycle's teams, by week.",
+    "mode": "Mode",
+    "withAlt": "Include alternatives",
+    "agent": "Character"
+  },
+  "ctp": {
+    "title": "My equipped CTPs",
+    "subtitle": "{{equipped}} CTP(s) equipped across {{owned}} owned character(s), by type and quality.",
+    "empty": "You haven't equipped any CTP yet. Equip them in My roster.",
+    "agents": "Characters"
+  },
+  "help": {
+    "text1": "Repetition counts one appearance per team. Characters that repeat a lot are good investments.",
+    "text2": "CTPs come from what you equipped in My roster (saved on this device and in your account, if signed in)."
+  }
+}

@@ -1,0 +1,159 @@
+{
+  "title": "Administration",
+  "nav": {
+    "overview": "Overview",
+    "days": "Days",
+    "metas": "Metas",
+    "catalog": "Catalog",
+    "ctps": "CTPs",
+    "bai": "BAI",
+    "users": "Users",
+    "settings": "Settings"
+  },
+  "guard": {
+    "forbidden": "Access denied",
+    "forbiddenText": "This area is restricted to Sword Brazil curators and administrators.",
+    "goHome": "Back to home"
+  },
+  "overview": {
+    "welcome": "Hi, {{name}}",
+    "text": "Choose what to edit. Every published change is visible immediately, with date and author.",
+    "days": "Restrictions for each BAX and BAL day.",
+    "metas": "Meta teams per day, BAL free mode, BAI and priority lists.",
+    "catalog": "Agents, uniforms and images.",
+    "ctps": "CTP types, photos and availability.",
+    "bai": "BAI boss sequence.",
+    "users": "Curators and administrators.",
+    "settings": "Cycle anchor and turnover times."
+  },
+  "common": {
+    "saved": "Changes saved",
+    "save": "Save",
+    "saving": "Saving…",
+    "add": "Add",
+    "remove": "Remove",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "none": "No items",
+    "error": "Could not save"
+  },
+  "days": {
+    "title": "Day restrictions",
+    "subtitle": "Set each day's restriction. Different criteria are combined with \"AND\".",
+    "any": "Any",
+    "day": "Day",
+    "help": "Pick one value per attribute. Leave \"Any\" to not restrict that attribute. BAI days (3, 10, 17, 24) are not listed."
+  },
+  "metas": {
+    "title": "Meta teams",
+    "teamsTab": "Teams",
+    "priorityTab": "Priorities",
+    "scope": "Where",
+    "scopes": {
+      "DAY": "BAX/BAL day",
+      "BAL_FREE": "BAL free mode",
+      "BAI": "BAI"
+    },
+    "mode": "Mode",
+    "day": "Day",
+    "newTeam": "New team",
+    "editTeam": "Edit team",
+    "isPrimary": "Primary team",
+    "label": "Label (e.g. alternative without uniform X)",
+    "notes": "Notes",
+    "pickAgent": "Pick agent…",
+    "pickCtp": "CTP",
+    "searchAgent": "Search agent…",
+    "noAgent": "No agent meets the restriction.",
+    "deleteConfirm": "Delete this team? This cannot be undone.",
+    "deleted": "Team deleted",
+    "empty": "No team registered here.",
+    "help": "Only active agents that meet the day restriction are listed. Marking as primary unmarks the previous one."
+  },
+  "priority": {
+    "title": "Priority lists",
+    "subtitle": "Preference order used to suggest teams from each player's roster.",
+    "solo": "Solos",
+    "support": "Supports",
+    "empty": "Empty list",
+    "help": "Drag to reorder (or use the buttons). The first item has priority."
+  },
+  "catalog": {
+    "title": "Agent catalog",
+    "search": "Search by name…",
+    "newAgent": "New agent",
+    "editAgent": "Edit agent",
+    "slug": "Identifier (slug)",
+    "name": "Official name",
+    "active": "Active",
+    "inactive": "Inactive",
+    "uniforms": "Uniforms",
+    "addUniform": "New uniform",
+    "uniformName": "Uniform name",
+    "uniformSlug": "Uniform slug",
+    "image": "Image",
+    "upload": "Upload image",
+    "uploaded": "Image uploaded",
+    "uploadHint": "PNG, WebP or JPEG, up to 2 MB.",
+    "deactivateHint": "Deactivating keeps the agent in old teams, marked as unavailable.",
+    "help": "Names must match the game. Use kebab-case slugs (e.g. scarlet-witch).",
+    "changePhoto": "Change photo",
+    "addPhoto": "Upload photo",
+    "removePhoto": "Remove photo",
+    "noPhoto": "No photo: initials are shown.",
+    "tooBig": "The image must be up to 2 MB.",
+    "badType": "Use a PNG, WebP or JPEG image.",
+    "slugAuto": "Generated from the name; edit only if needed.",
+    "photos": "{{n}}/{{total}} with photo",
+    "quickUniform": "Uniform"
+  },
+  "ctps": {
+    "title": "CTP catalog",
+    "help": "Add CTPs and update their photos. Deleting deactivates an item to preserve existing teams and selections.",
+    "add": "New CTP",
+    "edit": "Edit CTP",
+    "type": "Type",
+    "quality": "Quality",
+    "remove": "Delete",
+    "restore": "Restore"
+  },
+  "bai": {
+    "title": "BAI bosses",
+    "subtitle": "Single sequence, valid for every week.",
+    "add": "Add boss",
+    "name": "Name",
+    "image": "Image (path)",
+    "tips": "Tips",
+    "help": "Bosses appear in this order on the BAI page."
+  },
+  "users": {
+    "title": "Users and roles",
+    "search": "Search by email or nickname…",
+    "newStaff": "New administrator/curator",
+    "role": "Role",
+    "roles": {
+      "USER": "User",
+      "CURATOR": "Curator",
+      "ADMIN": "Administrator"
+    },
+    "changeRoleConfirm": "Change {{email}} role to {{role}}?",
+    "resetPassword": "Reset password",
+    "verified": "Confirmed",
+    "unverified": "Not confirmed",
+    "created": "Account created",
+    "passwordReset": "Password reset",
+    "lastAdmin": "The last administrator cannot be demoted.",
+    "help": "Administrators promote and remove curators. There must always be at least one administrator."
+  },
+  "settings": {
+    "title": "Calendar settings",
+    "anchor": "Start of Day 1 (Brasília date and time)",
+    "anchorHelp": "A Thursday at 12 PM when a 28-day cycle started.",
+    "turnover": "Day turnover (hour, Brasília)",
+    "reset": "Weekly reset (hour, Brasília)",
+    "help": "Adjust the anchor if the \"Current day\" differs from the game."
+  }
+}

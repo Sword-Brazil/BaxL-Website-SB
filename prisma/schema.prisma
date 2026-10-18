@@ -1,0 +1,198 @@
+// Modelo de dados: specs/001-alliance-battle-metas/data-model.md
+// "Enums" são String validadas por Zod (src/models/schemas).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Catálogo ----------
+
+model Agent {
+  id         String    @id @default(cuid())
+  slug       String    @unique
+  name       String
+  gender     String
+  side       String
+  species    String
+  attackType String
+  active     Boolean   @default(true)
+  uniforms   Uniform[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model Uniform {
+  id              String           @id @default(cuid())
+  agentId         String
+  agent           Agent            @relation(fields: [agentId], references: [id])
+  slug            String
+  name            String
+  imagePath       String
+  active          Boolean          @default(true)
+  metaMembers     MetaTeamMember[]
+  priorityEntries PriorityEntry[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@unique([agentId, slug])
+}
+
+model Ctp {
+  id              String           @id @default(cuid())
+  type            String
+  quality         String
+  imagePath       String
+  active          Boolean          @default(true)
+  metaMembers     MetaTeamMember[]
+  priorityEntries PriorityEntry[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@unique([type, quality])
+}
+
+// ---------- Calendário e restrições ----------
+
+model Settings {
+  id              Int      @id @default(1)
+  cycleAnchor     DateTime
+  dayTurnoverHour Int      @default(12)
+  weeklyResetHour Int      @default(22)
+  baiWeekday      Int      @default(3)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model BattleDay {
+  id              String                 @id @default(cuid())
+  mode            String
+  number          Int
+  criteria        RestrictionCriterion[]
+  metaTeams       MetaTeam[]
+  priorityEntries PriorityEntry[]
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+
+  @@unique([mode, number])
+}
+
+model RestrictionCriterion {
+  id          String    @id @default(cuid())
+  battleDayId String
+  battleDay   BattleDay @relation(fields: [battleDayId], references: [id], onDelete: Cascade)
+  attribute   String
+  value       String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([battleDayId, attribute])
+}
+
+// ---------- Equipes curadas ----------
+
+model MetaTeam {
+  id          String           @id @default(cuid())
+  scope       String
+  battleDayId String?
+  battleDay   BattleDay?       @relation(fields: [battleDayId], references: [id])
+  isPrimary   Boolean          @default(false)
+  label       String?
+  notes       String?
+  members     MetaTeamMember[]
+  updatedById String?
+  updatedBy   User?            @relation(fields: [updatedById], references: [id])
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([scope, battleDayId])
+}
+
+model MetaTeamMember {
+  id         String   @id @default(cuid())
+  metaTeamId String
+  metaTeam   MetaTeam @relation(fields: [metaTeamId], references: [id], onDelete: Cascade)
+  slot       String
+  uniformId  String
+  uniform    Uniform  @relation(fields: [uniformId], references: [id])
+  ctpId      String?
+  ctp        Ctp?     @relation(fields: [ctpId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([metaTeamId, slot])
+}
+
+model PriorityEntry {
+  id          String     @id @default(cuid())
+  scope       String
+  battleDayId String?
+  battleDay   BattleDay? @relation(fields: [battleDayId], references: [id])
+  role        String
+  rank        Int
+  uniformId   String
+  uniform     Uniform    @relation(fields: [uniformId], references: [id])
+  ctpId       String?
+  ctp         Ctp?       @relation(fields: [ctpId], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // battleDayId nulo (BAI) não é coberto pela unicidade no SQLite: o priorityService garante.
+  @@unique([scope, battleDayId, role, rank])
+}
+
+model BaiBoss {
+  id        String   @id @default(cuid())
+  position  Int      @unique
+  name      String
+  imagePath String?
+  tips      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ---------- Usuários e autenticação ----------
+
+model User {
+  id              String             @id @default(cuid())
+  email           String             @unique
+  passwordHash    String
+  nickname        String?
+  role            String             @default("USER")
+  emailVerifiedAt DateTime?
+  tokens          AuthToken[]
+  selections      UserSelectionsDoc?
+  metaTeams       MetaTeam[]
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+}
+
+model AuthToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind      String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model LoginAttempt {
+  key         String    @id
+  failedCount Int       @default(0)
+  firstFailAt DateTime?
+  lockedUntil DateTime?
+  updatedAt   DateTime  @updatedAt
+}
+
+model UserSelectionsDoc {
+  userId    String   @id
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  json      String
+  updatedAt DateTime @updatedAt
+}
