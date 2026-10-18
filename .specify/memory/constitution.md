@@ -1,11 +1,11 @@
 <!--
 Sync Impact Report
 ==================
-Version change: 1.1.0 → 1.2.0 (MINOR: workflow section expanded, no principle removed)
+Version change: 1.2.0 → 1.3.0 (MINOR: workflow section expanded, no principle removed)
 Modified principles: none
 Modified sections:
-  - Fluxo de Desenvolvimento e Qualidade: branches e commits separados para mudanças grandes
-    e para correções de bugs (a partir de 2026-10-18)
+  - Fluxo de Desenvolvimento e Qualidade: branch de integração `Dev` (testes de toda nova
+    implementação) e PR para `master` com o template do repositório
 Added/removed sections: none
 Templates: not modified.
 Follow-up TODOs: none
@@ -127,6 +127,11 @@ significa tempo e pontuação perdidos.
   `chore/` (manutenção). Cada bug encontrado DEVE ser corrigido numa branch `fix/<assunto>`,
   com um commit por correção e, quando possível, um teste que reproduz o bug. Nada é
   commitado direto na `master`.
+- **Branch `Dev` (integração)**: toda branch de trabalho nasce da `Dev` e volta para ela
+  (merge sem fast-forward, preservando a divisão). Na `Dev` toda nova implementação é testada
+  (`npm test`, `npm run lint`, `npm run check:locales`, `npm run build` e a interface no
+  celular). Só depois a `Dev` vai para a `master`, por **pull request** que segue o template
+  `.github/pull_request_template.md` e lista as issues encerradas.
 
 ## Governance
 
@@ -140,4 +145,4 @@ significa tempo e pontuação perdidos.
 - Revisões de código e de spec DEVEM apontar violações; exceções exigem justificativa
   escrita no plano da feature.
 
-**Version**: 1.2.0 | **Ratified**: 2026-10-17 | **Last Amended**: 2026-10-18
+**Version**: 1.3.0 | **Ratified**: 2026-10-17 | **Last Amended**: 2026-10-18
