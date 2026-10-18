@@ -14,13 +14,14 @@ import {
   speciesSchema,
   teamScopeSchema,
 } from "./common";
+import { VALIDATION } from "./messages";
 
 const distinct = <T>(items: T[], key: (t: T) => unknown) => new Set(items.map(key)).size === items.length;
 
 export const CriterionSchema = z
   .object({ attribute: criterionAttributeSchema, value: z.string() })
   .refine((c) => (CRITERION_VALUES[c.attribute] as readonly string[]).includes(c.value), {
-    message: "Valor inválido para o atributo",
+    message: VALIDATION.attributeValue,
     path: ["value"],
   });
 
@@ -28,7 +29,7 @@ export const RestrictionSchema = z.object({
   criteria: z
     .array(CriterionSchema)
     .max(4)
-    .refine((cs) => distinct(cs, (c) => c.attribute), { message: "Atributo repetido" }),
+    .refine((cs) => distinct(cs, (c) => c.attribute), { message: VALIDATION.attributeRepeated }),
 });
 export type RestrictionInput = z.infer<typeof RestrictionSchema>;
 
@@ -44,12 +45,12 @@ export const MetaTeamSchema = z
     notes: z.string().trim().max(500).optional().nullable(),
     members: z
       .array(MetaTeamMemberSchema)
-      .length(SLOTS.length, { message: "A equipe precisa de exatamente 3 membros" })
-      .refine((ms) => distinct(ms, (m) => m.slot), { message: "Slots repetidos" })
-      .refine((ms) => distinct(ms, (m) => m.uniformId), { message: "Agente repetido" }),
+      .length(SLOTS.length, { message: VALIDATION.teamSize })
+      .refine((ms) => distinct(ms, (m) => m.slot), { message: VALIDATION.slotsRepeated })
+      .refine((ms) => distinct(ms, (m) => m.uniformId), { message: VALIDATION.agentRepeated }),
   })
   .refine((t) => t.scope !== "DAY" || (t.mode && t.number), {
-    message: "Dia obrigatório para equipes de dia",
+    message: VALIDATION.dayRequired,
     path: ["number"],
   });
 export type MetaTeamInput = z.infer<typeof MetaTeamSchema>;
@@ -58,7 +59,7 @@ const PriorityItemSchema = z.object({ uniformId: idSchema, ctpId: idSchema.optio
 const PriorityListSchema = z
   .array(PriorityItemSchema)
   .max(30)
-  .refine((items) => distinct(items, (i) => i.uniformId), { message: "Uniforme repetido na lista" });
+  .refine((items) => distinct(items, (i) => i.uniformId), { message: VALIDATION.uniformRepeatedInList });
 
 export const PrioritySchema = z.object({ solo: PriorityListSchema, support: PriorityListSchema });
 export type PriorityInput = z.infer<typeof PrioritySchema>;
@@ -78,10 +79,10 @@ export const BaiBossSchema = z.object({
 export const BaiBossesSchema = z
   .array(BaiBossSchema)
   .max(50)
-  .refine((bs) => distinct(bs, (b) => b.position), { message: "Posição repetida" });
+  .refine((bs) => distinct(bs, (b) => b.position), { message: VALIDATION.positionRepeated });
 export type BaiBossesInput = z.infer<typeof BaiBossesSchema>;
 
-const slugSchema = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, { message: "Use kebab-case (ex.: scarlet-witch)" }).max(80);
+const slugSchema = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, { message: VALIDATION.slugFormat }).max(80);
 
 export const UniformInputSchema = z.object({
   id: idSchema.optional(),
@@ -106,8 +107,8 @@ export const AgentSchema = z.object({
   active: z.boolean().optional(),
   uniforms: z
     .array(UniformInputSchema)
-    .min(1, { message: "Cadastre ao menos um uniforme" })
-    .refine((us) => distinct(us, (u) => u.slug), { message: "Uniforme repetido" }),
+    .min(1, { message: VALIDATION.uniformRequired })
+    .refine((us) => distinct(us, (u) => u.slug), { message: VALIDATION.uniformRepeated }),
 });
 export type AgentInput = z.infer<typeof AgentSchema>;
 

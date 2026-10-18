@@ -25,6 +25,7 @@ import { UNKNOWN } from "@/models/domain/enums";
 import type { Agent } from "@/models/domain/types";
 import { useCatalogEditorViewModel } from "@/viewmodels/admin/useCatalogEditorViewModel";
 import { QueryState } from "@/views/shared/QueryState";
+import { useValidationMessage } from "@/views/shared/useValidationMessage";
 import { ATTRIBUTE_FIELDS, AttributeBadgePicker } from "./AttributeBadgePicker";
 
 type Vm = ReturnType<typeof useCatalogEditorViewModel>;
@@ -201,6 +202,7 @@ export function CatalogEditorView() {
   const { form } = vm;
   const rootError = form.formState.errors.root?.message;
   const uniformsError = form.formState.errors.uniforms?.root?.message ?? form.formState.errors.uniforms?.message;
+  const translate = useValidationMessage();
 
   return (
     <div className="flex flex-col gap-4">
@@ -364,7 +366,7 @@ export function CatalogEditorView() {
                   </Button>
                 </div>
                 <FieldDescription>{t("admin:catalog.inheritedHint")}</FieldDescription>
-                {uniformsError && <p className="text-sm text-destructive">{uniformsError}</p>}
+                {uniformsError && <p className="text-sm text-destructive">{translate(uniformsError)}</p>}
                 <ul className="grid gap-3 md:grid-cols-2">
                   {vm.uniforms.fields.map((u, index) => (
                     <UniformCard key={u.id} index={index} vm={vm} />
