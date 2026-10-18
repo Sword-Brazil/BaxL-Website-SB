@@ -1,5 +1,5 @@
 import type { Role, TeamScope } from "@/models/domain/enums";
-import type { BaiBoss, Criterion, MetaTeam, PriorityLists, SessionUser, Settings } from "@/models/domain/types";
+import type { BaiBoss, Ctp, Criterion, MetaTeam, PriorityLists, SessionUser, Settings } from "@/models/domain/types";
 import type {
   AgentInput,
   CtpInput,
@@ -41,8 +41,8 @@ export const adminApi = {
 
   createAgent: (body: AgentInput) => apiFetch<unknown>("/api/admin/agents", { method: "POST", body }),
   updateAgent: (id: string, body: AgentInput) => apiFetch<unknown>(`/api/admin/agents/${id}`, { method: "PUT", body }),
-  createCtp: (body: CtpInput) => apiFetch<unknown>("/api/admin/ctps", { method: "POST", body }),
-  updateCtp: (id: string, body: CtpInput) => apiFetch<unknown>(`/api/admin/ctps/${id}`, { method: "PUT", body }),
+  createCtp: (body: CtpInput) => apiFetch<Ctp>("/api/admin/ctps", { method: "POST", body }),
+  updateCtp: (id: string, body: CtpInput) => apiFetch<Ctp>(`/api/admin/ctps/${id}`, { method: "PUT", body }),
   uploadAsset: (body: AssetUploadInput) => apiFetch<{ imagePath: string }>("/api/admin/assets", { method: "POST", body }),
 
   getSettings: () => apiFetch<Settings>("/api/admin/settings"),

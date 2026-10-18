@@ -286,7 +286,7 @@ export function TeamBuilderPanel(props: { teamKey: TeamKey; criteria: Criterion[
               <CardDescription>{t("days:myTeam.palette.hint")}</CardDescription>
             </CardHeader>
             <CardContent>
-              <CtpPalette ctps={vm.catalog.ctps} armedCtp={vm.armedCtp} onArm={vm.armCtp} idPrefix="ctp-aside" />
+              <CtpPalette ctps={vm.catalog.ctps.filter((ctp) => ctp.active)} armedCtp={vm.armedCtp} onArm={vm.armCtp} idPrefix="ctp-aside" />
             </CardContent>
           </Card>
           {vm.suggestion && (
@@ -321,7 +321,7 @@ export function TeamBuilderPanel(props: { teamKey: TeamKey; criteria: Criterion[
       {/* Celular/tablet: paleta numa barra fixa embaixo, com rolagem horizontal */}
       <div className="sticky bottom-0 -mx-4 mt-4 border-t border-energy/20 bg-popover/95 px-4 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-md sm:-mx-6 sm:px-6 lg:hidden">
         <p className="mb-1 text-[0.7rem] text-muted-foreground">{t("days:myTeam.palette.hint")}</p>
-        <CtpPalette ctps={vm.catalog.ctps} armedCtp={vm.armedCtp} onArm={vm.armCtp} idPrefix="ctp-bar" layout="row" />
+        <CtpPalette ctps={vm.catalog.ctps.filter((ctp) => ctp.active)} armedCtp={vm.armedCtp} onArm={vm.armCtp} idPrefix="ctp-bar" layout="row" />
       </div>
     </DndContext>
   );

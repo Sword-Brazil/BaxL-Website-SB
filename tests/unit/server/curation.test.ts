@@ -6,6 +6,7 @@ import { setRestriction } from "@/server/services/restrictionService";
 import { savePriority } from "@/server/services/priorityService";
 import { changeRole, createStaff } from "@/server/services/usersService";
 import { createAgent, createUser, ctpId, dayId, seedBase } from "./fixtures";
+import { saveCtp } from "@/server/services/catalogAdminService";
 
 const status = (s: number) => (e: unknown) => e instanceof HttpError && e.status === s;
 
@@ -74,6 +75,16 @@ describe("curadoria", () => {
     expect(edited.notes).toBe("nova nota");
     await deleteMetaTeam(a.id);
     expect(await prisma.metaTeam.count()).toBe(0);
+  });
+
+  it("salva a foto de um CTP e preserva o registro ao desativá-lo", async () => {
+    const id = await ctpId("RAGE", "NORMAL");
+    const edited = await saveCtp({ type: "RAGE", quality: "NORMAL", imagePath: "/uploads/rage.png" }, id);
+    expect(edited).toMatchObject({ id, imagePath: "/uploads/rage.png", active: true });
+
+    const removed = await saveCtp({ type: "RAGE", quality: "NORMAL", imagePath: "/uploads/rage.png", active: false }, id);
+    expect(removed).toMatchObject({ id, active: false });
+    expect(await prisma.ctp.findUnique({ where: { id } })).not.toBeNull();
   });
 
   it("restrição: dia de BAI gera 404", async () => {

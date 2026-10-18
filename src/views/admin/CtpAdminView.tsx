@@ -11,7 +11,7 @@ import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CTP_QUALITIES, CTP_TYPES, type CtpQuality, type CtpType } from "@/models/domain/enums";
-import type { Ctp } from "@/models/domain/types";
+import type { Catalog, Ctp } from "@/models/domain/types";
 import { adminApi } from "@/models/api/admin";
 import { ASSET_MAX_BYTES } from "@/models/schemas/admin";
 import { useCatalogViewModel } from "@/viewmodels/useCatalogViewModel";
@@ -37,7 +37,16 @@ export function CtpAdminView() {
       const { id, ...body } = value;
       return id ? adminApi.updateCtp(id, body) : adminApi.createCtp(body);
     },
-    onSuccess: async () => { await qc.invalidateQueries({ queryKey: ["catalog"] }); setDraft(null); toast.success(t("admin:common.saved")); },
+    onSuccess: (saved) => {
+      qc.setQueryData<Catalog>(["catalog"], (current) => current && {
+        ...current,
+        ctps: current.ctps.some((ctp) => ctp.id === saved.id)
+          ? current.ctps.map((ctp) => ctp.id === saved.id ? saved : ctp)
+          : [...current.ctps, saved].sort((a, b) => CTP_TYPES.indexOf(a.type) - CTP_TYPES.indexOf(b.type) || CTP_QUALITIES.indexOf(a.quality) - CTP_QUALITIES.indexOf(b.quality)),
+      });
+      setDraft(null);
+      toast.success(t("admin:common.saved"));
+    },
     onError: (e: Error) => toast.error(e.message),
   });
   const edit = (ctp?: Ctp) => setDraft(ctp ? { id: ctp.id, type: ctp.type, quality: ctp.quality, imagePath: ctp.imagePath, active: ctp.active } : { ...blank });
