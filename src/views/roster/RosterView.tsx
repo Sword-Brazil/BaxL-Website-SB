@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { DndContext, KeyboardSensor, PointerSensor, TouchSensor, useDroppable, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { useTranslation } from "next-i18next/pages";
-import { CheckIcon, DownloadIcon, SearchIcon, UploadIcon, XIcon, ZapIcon } from "lucide-react";
+import { CheckIcon, DownloadIcon, SearchIcon, SlidersHorizontalIcon, UploadIcon, XIcon, ZapIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   AlertDialog,
@@ -21,7 +21,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Toggle } from "@/components/ui/toggle";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -32,6 +31,7 @@ import { useRosterViewModel } from "@/viewmodels/useRosterViewModel";
 import { CtpPalette } from "@/views/day/CtpPalette";
 import { CtpBadge } from "@/views/shared/CtpBadge";
 import { CtpDragOverlay } from "@/views/shared/CtpDragOverlay";
+import { CtpPicker } from "@/views/shared/CtpPicker";
 import { HelpHint } from "@/views/layout/HelpHint";
 import { QueryState } from "@/views/shared/QueryState";
 
@@ -112,34 +112,38 @@ function AgentRosterCard({ agent, vm, dragging }: { agent: Agent; vm: RosterVm; 
             })}
           </div>
           {isOwned && (
-            <div className="flex min-h-9 items-center justify-between gap-2 rounded-md border border-dashed border-energy/30 px-2 py-1">
-              {ctp ? (
-                <>
-                  <span className="flex min-w-0 items-center gap-2 text-xs">
-                    <CtpBadge
-                      key={ctp.id}
-                      ctp={ctp}
-                      size="sm"
-                      className="motion-safe:animate-in motion-safe:zoom-in-50 motion-safe:fade-in motion-safe:duration-300"
-                    />
-                    <span className="truncate">
-                      {t(`common:ctp.${ctp.type}`)} · {t(`common:quality.${ctp.quality}`)}
-                    </span>
-                  </span>
-                  <Button
-                    size="icon-sm"
-                    variant="ghost"
-                    aria-label={t("days:myTeam.palette.remove")}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      vm.equip(agent.id, null);
-                    }}
-                  >
-                    <XIcon />
-                  </Button>
-                </>
-              ) : (
-                <span className="text-xs text-muted-foreground">{t("roster:ctpDrop")}</span>
+            <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+              <CtpPicker ctps={vm.ctps} value={ctp?.id ?? null} onChange={(id) => vm.equip(agent.id, id)} targetName={agent.name}>
+                <button
+                  type="button"
+                  className="flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-md border border-dashed border-energy/40 px-2 py-1 text-left text-xs transition-colors hover:bg-energy/10 active:bg-energy/15"
+                >
+                  {ctp ? (
+                    <>
+                      <CtpBadge
+                        key={ctp.id}
+                        ctp={ctp}
+                        size="sm"
+                        className="motion-safe:animate-in motion-safe:zoom-in-50 motion-safe:fade-in motion-safe:duration-300"
+                      />
+                      <span className="min-w-0 flex-1 truncate">
+                        {t(`common:ctp.${ctp.type}`)} · {t(`common:quality.${ctp.quality}`)}
+                      </span>
+                      <span className="shrink-0 text-energy">{t("common:ctpPicker.change")}</span>
+                    </>
+                  ) : (
+                    <>
+                      <ZapIcon className="size-4 shrink-0 text-energy" />
+                      <span className="min-w-0 flex-1 truncate font-medium text-energy">{t("common:ctpPicker.choose")}</span>
+                      <span className="hidden truncate text-muted-foreground lg:inline">{t("roster:ctpDrop")}</span>
+                    </>
+                  )}
+                </button>
+              </CtpPicker>
+              {ctp && (
+                <Button size="icon-touch" variant="ghost" aria-label={t("common:ctpPicker.remove")} onClick={() => vm.equip(agent.id, null)}>
+                  <XIcon />
+                </Button>
               )}
             </div>
           )}
@@ -162,6 +166,8 @@ export function RosterView() {
     useSensor(KeyboardSensor),
   );
   const [draggingCtp, setDraggingCtp] = useState<string | null>(null);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const activeFilters = Object.values(vm.filters).filter(Boolean).length;
   const onDragEnd = ({ active, over }: DragEndEvent) => {
     setDraggingCtp(null);
     if (over) vm.equip(String(over.id).replace("agent:", ""), String(active.data.current?.ctpId ?? ""));
@@ -181,7 +187,7 @@ export function RosterView() {
       <div className="flex flex-col gap-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div className="min-w-0">
-            <h1 className="font-heading text-3xl font-bold">{t("roster:title")}</h1>
+            <h1 className="font-heading text-2xl font-bold sm:text-3xl">{t("roster:title")}</h1>
             <p className="text-sm text-muted-foreground">{t("roster:subtitle")}</p>
           </div>
           <div className="flex items-center gap-2">
@@ -208,7 +214,18 @@ export function RosterView() {
                 aria-label={t("roster:search")}
               />
             </InputGroup>
-            <div className="flex flex-col gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="self-start sm:hidden"
+              aria-expanded={filtersOpen}
+              onClick={() => setFiltersOpen((o) => !o)}
+            >
+              <SlidersHorizontalIcon data-icon="inline-start" />
+              {t("roster:filters")}
+              {activeFilters > 0 && <Badge variant="energy">{activeFilters}</Badge>}
+            </Button>
+            <div className={cn("flex-col gap-2 sm:flex", filtersOpen ? "flex" : "hidden")}>
               {CRITERION_ATTRIBUTES.map((attr) => (
                 <div key={attr} className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
                   <span className="text-xs text-muted-foreground sm:w-28 sm:shrink-0">{t(`common:attributes.${attr}`)}</span>
@@ -286,22 +303,6 @@ export function RosterView() {
             </Card>
           </aside>
         </div>
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="energy" size="touch" className="fixed right-4 bottom-4 z-40 shadow-lg lg:hidden">
-              <ZapIcon data-icon="inline-start" />
-              {t("roster:ctpTitle")}
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="bottom" className="max-h-[70dvh] overflow-y-auto">
-            <SheetHeader>
-              <SheetTitle>{t("roster:ctpTitle")}</SheetTitle>
-              <SheetDescription>{t("days:myTeam.palette.hint")}</SheetDescription>
-            </SheetHeader>
-            <div className="px-4 pb-6">{palette("ctp-sheet")}</div>
-          </SheetContent>
-        </Sheet>
-
         <div className="grid gap-4 md:grid-cols-2">
           <Card>
             <CardHeader>

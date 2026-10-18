@@ -3,9 +3,9 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next/pages";
 import { ShieldAlertIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthViewModel } from "@/viewmodels/useAuthViewModel";
 import { AppLayout } from "@/views/layout/AppLayout";
@@ -74,27 +74,30 @@ export function AdminLayout({
   return (
     <AppLayout title={`${t("title")} · ${title}`} wide>
       <AdminGuard adminOnly={adminOnly}>
-        <div className="flex flex-col gap-6">
-          <ScrollArea className="w-full whitespace-nowrap">
-            <nav className="flex gap-1 pb-2" aria-label={t("title")}>
-              {NAV.filter((n) => !("adminOnly" in n) || isAdmin).map((n) => (
-                <Button
-                  key={n.href}
-                  asChild
-                  size="sm"
-                  variant={pathname === n.href ? "secondary" : "ghost"}
-                  className="font-heading tracking-wider uppercase"
-                >
-                  <Link href={n.href}>{t(`nav.${n.key}`)}</Link>
-                </Button>
-              ))}
-            </nav>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
+        <div className="flex flex-col gap-4 sm:gap-6">
+          {/* Todas as seções sempre visíveis: quebram em linhas no celular, sem rolagem escondida. */}
+          <nav className="-mx-1 flex flex-wrap gap-1" aria-label={t("title")}>
+            {NAV.filter((n) => !("adminOnly" in n) || isAdmin).map((n) => (
+              <Button
+                key={n.href}
+                asChild
+                size="sm"
+                variant={pathname === n.href ? "secondary" : "ghost"}
+                className={cn(
+                  "h-9 font-heading tracking-wider uppercase",
+                  pathname === n.href && "text-energy ring-1 ring-energy/40",
+                )}
+              >
+                <Link href={n.href} aria-current={pathname === n.href ? "page" : undefined}>
+                  {t(`nav.${n.key}`)}
+                </Link>
+              </Button>
+            ))}
+          </nav>
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <p className="font-heading text-xs tracking-[0.3em] text-energy uppercase">{t("title")}</p>
-              <h1 className="font-heading text-3xl font-bold">{title}</h1>
+              <h1 className="font-heading text-2xl font-bold sm:text-3xl">{title}</h1>
               {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
             </div>
             {help && (

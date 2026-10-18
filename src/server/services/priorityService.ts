@@ -8,6 +8,7 @@ async function resolve(target: PriorityTarget) {
   return target.scope === "DAY" ? await findBattleDay(target.mode, target.number) : null;
 }
 
+/** Reservas cadastradas (sem as equipes). */
 export async function getPriority(target: PriorityTarget): Promise<PriorityLists> {
   const day = await resolve(target);
   const rows = await prisma.priorityEntry.findMany({ where: { scope: target.scope, battleDayId: day?.id ?? null } });
@@ -15,7 +16,8 @@ export async function getPriority(target: PriorityTarget): Promise<PriorityLists
 }
 
 /**
- * Substitui as listas de prioridade de um dia (ou da BAI). O rank vem da ordem da lista.
+ * Substitui as reservas de um dia (ou da BAI): personagens além das equipes, usados na sugestão
+ * depois da Meta e das Alternativas (ver effectivePriority). O rank vem da ordem da lista.
  * Apagar e reinserir garante a unicidade de rank também na BAI (battleDayId nulo).
  */
 export async function savePriority(target: PriorityTarget, input: PriorityInput): Promise<PriorityLists> {

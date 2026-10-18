@@ -93,9 +93,10 @@ export function useMetaTeamEditorViewModel(scopeVm: MetaScopeViewModel, messages
     draft,
     error,
     isSaving: save.isPending,
-    startNew: () => {
+    /** Sem `isPrimary`: vira principal se o escopo ainda não tem equipes. */
+    startNew: (isPrimary = teams.length === 0) => {
       setError(null);
-      setDraft(emptyDraft(teams.length === 0));
+      setDraft(emptyDraft(isPrimary));
     },
     startEdit: (t: MetaTeam) => {
       setError(null);

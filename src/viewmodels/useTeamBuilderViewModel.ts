@@ -38,8 +38,12 @@ export function useTeamBuilderViewModel({
   const candidates = useMemo<UniformRef[]>(
     () =>
       catalog.agents
-        .filter((a) => a.active && matchesRestriction(a, criteria))
-        .flatMap((agent) => agent.uniforms.filter((u) => u.active && owned.has(u.id)).map((uniform) => ({ agent, uniform }))),
+        .filter((a) => a.active)
+        .flatMap((agent) =>
+          agent.uniforms
+            .filter((u) => u.active && owned.has(u.id) && matchesRestriction(u, criteria))
+            .map((uniform) => ({ agent, uniform })),
+        ),
     [catalog.agents, criteria, owned],
   );
 

@@ -73,7 +73,7 @@
     "NEO_HUMAN": "Neo-humano",
     "OTHER": "Outro",
     "COMBAT": "Combate",
-    "BLAST": "Explosão",
+    "BLAST": "Energia",
     "SPEED": "Velocidade",
     "UNIVERSAL": "Universal",
     "UNKNOWN": "Não informado"
@@ -122,5 +122,31 @@
     "text": "Este aparelho e a sua conta têm elencos/equipes diferentes. Qual versão você quer manter? A outra será substituída.",
     "keepLocal": "Manter as deste aparelho",
     "keepRemote": "Usar as da conta"
+  },
+  "ctpPicker": {
+    "choose": "Escolher CTP",
+    "change": "Trocar",
+    "title": "Escolher CTP",
+    "hint": "Toque em um CTP para equipar em {{name}}.",
+    "remove": "Remover CTP"
+  },
+  "dev": {
+    "badge": "Em desenvolvimento",
+    "toastTitle": "Em desenvolvimento",
+    "toastText": "Esta funcionalidade ainda está sendo desenvolvida.",
+    "toastFeature": "{{feature}}: ainda em desenvolvimento.",
+    "pageTitle": "Em desenvolvimento",
+    "pageText": "Esta área ainda está sendo construída pela Sword Brazil. Volte em breve."
+  },
+  "notFound": {
+    "title": "Página não encontrada",
+    "text": "O endereço não existe ou mudou. Se você chegou por um link do app, esta área pode estar em desenvolvimento.",
+    "home": "Ir para a Batalha de Aliança",
+    "back": "Voltar"
+  },
+  "metaUpdates": {
+    "title": "Metas atualizadas",
+    "text": "Mudaram desde a sua última visita: {{list}}",
+    "more": "e mais {{n}}"
   }
 }

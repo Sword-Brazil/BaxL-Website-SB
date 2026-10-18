@@ -35,6 +35,16 @@ describe("daysService", () => {
     expect(d4.updatedAt).toBeTruthy();
   });
 
+  it("getDay: a sugestão usa as equipes do dia e depois as reservas", async () => {
+    const id = await dayId("BAX", 5);
+    await createMetaTeam({ scope: "DAY", battleDayId: id, isPrimary: true, uniformIds: uniforms });
+    const reserve = (await createAgent("r")).uniform.id;
+    await prisma.priorityEntry.create({ data: { scope: "DAY", battleDayId: id, role: "SUPPORT", rank: 1, uniformId: reserve } });
+    const { priority } = await getDay("BAX", 5);
+    expect(priority.solo.map((i) => i.uniformId)).toEqual([uniforms[0]]);
+    expect(priority.support.map((i) => i.uniformId)).toEqual([uniforms[1], uniforms[2], reserve]);
+  });
+
   it("getDay de um dia de BAI gera 404", async () => {
     await expect(getDay("BAX", 3)).rejects.toSatisfy((e) => e instanceof HttpError && e.status === 404);
   });

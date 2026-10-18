@@ -11,7 +11,12 @@
     "subtitle": "How many times each character appears in the 28-day cycle's teams, by week.",
     "mode": "Mode",
     "withAlt": "Include alternatives",
-    "agent": "Character"
+    "agent": "Character",
+    "source": "Source",
+    "sourceMeta": "Metas",
+    "sourceMine": "My teams",
+    "subtitleMine": "How many times each character appears in the teams you built, by week.",
+    "emptyMine": "You haven't built any teams yet."
   },
   "ctp": {
     "title": "My equipped CTPs",
@@ -22,5 +27,13 @@
   "help": {
     "text1": "Repetition counts one appearance per team. Characters that repeat a lot are good investments.",
     "text2": "CTPs come from what you equipped in My roster (saved on this device and in your account, if signed in)."
+  },
+  "myTeams": {
+    "title": "My teams",
+    "subtitle": "Every team you built, from most to least repeated.",
+    "times_one": "{{count}} time",
+    "times_other": "{{count}} times",
+    "empty": "You haven't built teams for AB days yet.",
+    "build": "Build teams"
   }
 }

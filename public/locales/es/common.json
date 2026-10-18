@@ -122,5 +122,31 @@
     "text": "Este dispositivo y tu cuenta tienen plantillas/equipos distintos. ¿Qué versión quieres mantener? La otra será reemplazada.",
     "keepLocal": "Mantener las de este dispositivo",
     "keepRemote": "Usar las de la cuenta"
+  },
+  "ctpPicker": {
+    "choose": "Elegir CTP",
+    "change": "Cambiar",
+    "title": "Elegir CTP",
+    "hint": "Toca un CTP para equiparlo en {{name}}.",
+    "remove": "Quitar CTP"
+  },
+  "dev": {
+    "badge": "En desarrollo",
+    "toastTitle": "En desarrollo",
+    "toastText": "Esta función aún se está desarrollando.",
+    "toastFeature": "{{feature}}: aún en desarrollo.",
+    "pageTitle": "En desarrollo",
+    "pageText": "Sword Brazil aún está construyendo esta área. Vuelve pronto."
+  },
+  "notFound": {
+    "title": "Página no encontrada",
+    "text": "La dirección no existe o cambió. Si llegaste desde un enlace de la app, esta área puede estar en desarrollo.",
+    "home": "Ir a la Batalla de Alianza",
+    "back": "Volver"
+  },
+  "metaUpdates": {
+    "title": "Metas actualizadas",
+    "text": "Cambiaron desde tu última visita: {{list}}",
+    "more": "y {{n}} más"
   }
 }

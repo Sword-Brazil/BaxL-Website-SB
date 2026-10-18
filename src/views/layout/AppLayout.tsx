@@ -30,6 +30,32 @@ const NAV = [
   { href: "/estatisticas", key: "stats" },
 ] as const;
 
+/** Menu ☰ do celular: inclui a Administração para curadores (no PC ela fica no menu da conta). */
+function MobileNav({ pathname }: { pathname: string }) {
+  const { t } = useTranslation("common");
+  const { isCurator } = useAuthViewModel();
+  const items = [...NAV, ...(isCurator ? [{ href: "/admin", key: "admin" } as const] : [])];
+  return (
+    <nav className="flex flex-col gap-1 px-4">
+      {items.map((item) => (
+        <SheetClose asChild key={item.href}>
+          <Button
+            asChild
+            variant={isActive(pathname, item.href) ? "secondary" : "ghost"}
+            size="touch"
+            className="justify-start font-heading tracking-wider uppercase"
+          >
+            <Link href={item.href}>
+              {item.key === "admin" && <ShieldIcon data-icon="inline-start" />}
+              {t(`nav.${item.key}`)}
+            </Link>
+          </Button>
+        </SheetClose>
+      ))}
+    </nav>
+  );
+}
+
 function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
 }
@@ -152,20 +178,7 @@ export function AppLayout({ title, children, wide = false }: { title?: string; c
                   <BrandMark />
                 </SheetHeader>
                 <Separator />
-                <nav className="flex flex-col gap-1 px-4">
-                  {NAV.map((item) => (
-                    <SheetClose asChild key={item.href}>
-                      <Button
-                        asChild
-                        variant={isActive(pathname, item.href) ? "secondary" : "ghost"}
-                        size="touch"
-                        className="justify-start font-heading tracking-wider uppercase"
-                      >
-                        <Link href={item.href}>{t(`nav.${item.key}`)}</Link>
-                      </Button>
-                    </SheetClose>
-                  ))}
-                </nav>
+                <MobileNav pathname={pathname} />
                 <Separator />
                 <div className="flex items-center gap-1 px-4">
                   <LanguageMenu />

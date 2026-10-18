@@ -1,6 +1,6 @@
 import { isBaiDay, type DayMode } from "@/models/domain/enums";
-import type { Criterion } from "@/models/domain/types";
-import { matchesRestriction } from "@/models/rules/restriction";
+import type { Criterion, RestrictableAttributes, UniformOverrides } from "@/models/domain/types";
+import { matchesRestriction, resolveAttributes } from "@/models/rules/restriction";
 import { prisma } from "@/server/db";
 import { HttpError } from "@/server/http";
 import { toCriteria } from "./mappers";
@@ -34,7 +34,7 @@ export async function assertCtpsExist(ctpIds: string[]) {
   if (count !== unique.length) throw new HttpError(400, "VALIDATION_ERROR", "CTP não encontrado");
 }
 
-/** 422 se algum agente não atender à restrição do dia. */
+/** 422 se algum traje (com seus atributos próprios ou herdados) não atender à restrição do dia. */
 export function assertRestriction(
   uniforms: Awaited<ReturnType<typeof loadActiveUniforms>>,
   criteria: Criterion[],
@@ -42,7 +42,7 @@ export function assertRestriction(
   const offenders = uniforms.filter(
     (u) =>
       !matchesRestriction(
-        { gender: u.agent.gender, side: u.agent.side, species: u.agent.species, attackType: u.agent.attackType } as never,
+        resolveAttributes(u.agent as RestrictableAttributes, u as Partial<UniformOverrides>),
         criteria,
       ),
   );
@@ -50,7 +50,7 @@ export function assertRestriction(
     throw new HttpError(
       422,
       "RESTRICTION_VIOLATION",
-      `Não atende à restrição do dia: ${offenders.map((u) => u.agent.name).join(", ")}`,
+      `Não atende à restrição do dia: ${offenders.map((u) => `${u.agent.name} (${u.name})`).join(", ")}`,
     );
   }
 }

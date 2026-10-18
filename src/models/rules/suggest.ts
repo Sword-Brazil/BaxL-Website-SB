@@ -4,7 +4,7 @@ import { matchesRestriction } from "./restriction";
 
 /**
  * Melhor equipe possível com o elenco do usuário, seguindo as listas de prioridade dos curadores:
- * Solador possuído de menor rank que atende à restrição; depois 2 Suportes de agentes distintos.
+ * Solador possuído de menor rank cujo traje atende à restrição; depois 2 Suportes de agentes distintos.
  * Retorna `null` se nenhum slot puder ser preenchido.
  */
 export function suggestTeam(
@@ -23,7 +23,7 @@ export function suggestTeam(
       !!uniform?.active &&
       ownedUniformIds.has(item.uniformId) &&
       !usedAgents.has(agent.id) &&
-      matchesRestriction(agent, criteria)
+      matchesRestriction(uniform, criteria)
     );
   };
   const take = (list: PriorityItem[]) => {

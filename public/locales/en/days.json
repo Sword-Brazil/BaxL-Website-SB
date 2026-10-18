@@ -73,9 +73,9 @@
     "metaWas": "Meta: {{name}}",
     "suggestion": {
       "title": "Suggestion for your roster",
-      "text": "Best possible team with what you own, using the Sword Brazil priority list.",
+      "text": "Best possible team with what you own: Sword Brazil's Meta, Alternatives and reserves, in that order.",
       "apply": "Apply suggestion",
-      "none": "No suggestion yet: none of your agents is in this day's priority list.",
+      "none": "No suggestion yet: none of your agents is in this day's teams or reserves.",
       "applied": "Suggestion applied"
     },
     "help": {

@@ -19,7 +19,6 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ROLES, type Role } from "@/models/domain/enums";
 import { useUsersAdminViewModel } from "@/viewmodels/admin/useUsersAdminViewModel";
 import { useAuthViewModel } from "@/viewmodels/useAuthViewModel";
@@ -41,7 +40,7 @@ export function UsersAdminView() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <InputGroup className="max-w-sm">
+        <InputGroup className="w-full sm:max-w-sm">
           <InputGroupAddon>
             <SearchIcon />
           </InputGroupAddon>
@@ -52,64 +51,46 @@ export function UsersAdminView() {
             aria-label={t("admin:users.search")}
           />
         </InputGroup>
-        <Button variant="energy" onClick={() => vm.setCreateOpen(true)}>
+        <Button variant="energy" className="w-full sm:w-auto" onClick={() => vm.setCreateOpen(true)}>
           <PlusIcon data-icon="inline-start" />
           {t("admin:users.newStaff")}
         </Button>
       </div>
 
       <QueryState isLoading={vm.isLoading} isError={vm.isError} retry={vm.retry}>
-        <div className="overflow-x-auto rounded-xl ring-1 ring-foreground/10">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t("auth:fields.email")}</TableHead>
-                <TableHead>{t("admin:users.role")}</TableHead>
-                <TableHead className="sr-only">{t("admin:users.resetPassword")}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {vm.users.map((u) => (
-                <TableRow key={u.id}>
-                  <TableCell>
-                    <div className="flex flex-col">
-                      <span className="font-medium">{u.email}</span>
-                      <span className="flex items-center gap-2 text-xs text-muted-foreground">
-                        {u.nickname}
-                        <Badge variant={u.emailVerified ? "brazil" : "outline"}>
-                          {u.emailVerified ? t("admin:users.verified") : t("admin:users.unverified")}
-                        </Badge>
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Select
-                      value={u.role}
-                      onValueChange={(role) => setPendingRole({ id: u.id, email: u.email, role: role as Role })}
-                    >
-                      <SelectTrigger className="w-40" aria-label={`${t("admin:users.role")} · ${u.email}`}>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {ROLES.map((r) => (
-                          <SelectItem key={r} value={r}>
-                            {t(`admin:users.roles.${r}`)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  <TableCell>
-                    <Button size="sm" variant="ghost" onClick={() => vm.setResetUserId(u.id)} disabled={u.id === me?.id}>
-                      <KeyRoundIcon data-icon="inline-start" />
-                      {t("admin:users.resetPassword")}
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <ul className="flex flex-col divide-y divide-foreground/10 rounded-xl ring-1 ring-foreground/10">
+          {vm.users.map((u) => (
+            <li key={u.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 p-3">
+              <div className="flex min-w-0 flex-1 basis-56 flex-col">
+                <span className="truncate font-medium">{u.email}</span>
+                <span className="flex items-center gap-2 text-xs text-muted-foreground">
+                  {u.nickname}
+                  <Badge variant={u.emailVerified ? "brazil" : "outline"}>
+                    {u.emailVerified ? t("admin:users.verified") : t("admin:users.unverified")}
+                  </Badge>
+                </span>
+              </div>
+              <div className="flex w-full items-center gap-2 sm:w-auto">
+                <Select value={u.role} onValueChange={(role) => setPendingRole({ id: u.id, email: u.email, role: role as Role })}>
+                  <SelectTrigger className="flex-1 sm:w-40 sm:flex-none" aria-label={`${t("admin:users.role")} · ${u.email}`}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ROLES.map((r) => (
+                      <SelectItem key={r} value={r}>
+                        {t(`admin:users.roles.${r}`)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button size="sm" variant="ghost" onClick={() => vm.setResetUserId(u.id)} disabled={u.id === me?.id}>
+                  <KeyRoundIcon data-icon="inline-start" />
+                  {t("admin:users.resetPassword")}
+                </Button>
+              </div>
+            </li>
+          ))}
+        </ul>
         {vm.pageCount > 1 && (
           <div className="flex items-center justify-end gap-2 text-sm">
             <Button size="sm" variant="outline" disabled={vm.page <= 1} onClick={() => vm.setPage(vm.page - 1)}>

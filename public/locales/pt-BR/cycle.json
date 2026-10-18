@@ -30,5 +30,7 @@
   },
   "youAreHere": "Você está aqui · dia atual da BA",
   "endsIn": "Vira em {{time}} (12h de Brasília)",
-  "cycleDays": "Dias do ciclo"
+  "cycleDays": "Dias do ciclo",
+  "metaUpdated": "Meta atualizada",
+  "metaUpdatedShort": "Atualizada"
 }

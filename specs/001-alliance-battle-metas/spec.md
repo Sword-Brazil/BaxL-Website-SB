@@ -24,7 +24,7 @@ definir tecnologia."
   **restrição**, formada por um ou mais critérios combinados com "E" (ex.: Vilão; Feminino +
   Mutante; ou "Sem restrição"), que define quais agentes podem ser usados. Os critérios
   possíveis incluem Herói, Vilão, Masculino, Feminino, Mutante, Inumano, Humano, Alienígena,
-  Universal, Combate, Explosão e Velocidade. Na BAL existe também o modo livre, sem restrição.
+  Universal, Combate, Energia e Velocidade. Na BAL existe também o modo livre, sem restrição.
 - **Equipe**: 3 agentes — **1 Solador** (agente principal de dano) e **2 Suportes**.
 - **Uniforme**: variação de um agente; a equipe Meta pode exigir um uniforme específico.
 - **CTP**: item equipável. Os principais para PVE são **Fúria, Liberação, Percepção,
@@ -85,6 +85,17 @@ definir tecnologia."
   restrições; o que faltar fica "não informado" e não bloqueia filtros. As equipes do guia trazem só o
   **tipo** do CTP (sem qualidade).
 - Posições exibidas como **Líder / Pos. 1 / Pos. 2** (como no guia e no jogo).
+- Cada **traje** pode ter atributos próprios (gênero, lado, espécie, tipo de ataque) que substituem os
+  do personagem nas restrições (ex.: Jean Grey "Fênix Negra" é vilã; "Sinalizador de Verão" é heroína).
+- A sugestão de equipe usa, nesta ordem, a **Meta, as Alternativas e as reservas** do dia; a lista
+  é gerada na hora a partir das equipes, e os curadores cadastram só as reservas.
+- Estatísticas: o gráfico de repetição alterna entre os personagens das **Metas** e os das
+  **equipes do usuário**, e há a lista de **todas as equipes do usuário**, agrupadas pelas que mais
+  se repetem (mesmo Líder e mesmos Suportes), com os dias em que cada uma foi usada.
+- **Avisos de desenvolvimento e de mudanças** (ver FR-031 a FR-034): toda funcionalidade ainda em
+  desenvolvimento, todo campo ainda não funcional e toda mudança nas Metas atuais de um dia são
+  indicados ao usuário por **toast**; áreas inexistentes ou ainda não liberadas usam a **tela de
+  404 / em desenvolvimento**.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -325,8 +336,8 @@ com a nova data de atualização, sem alteração de código.
 **Curadoria**
 
 - **FR-023**: Somente curadores autorizados da Sword Brazil MUST poder criar, editar e publicar
-  metas, equipes do modo livre, conteúdo da BAI, listas de prioridade para sugestões e o catálogo
-  de agentes, uniformes e CTPs.
+  metas, equipes do modo livre, conteúdo da BAI, reservas para as sugestões e o catálogo de
+  agentes, uniformes e CTPs.
 - **FR-024**: Somente Administradores MUST poder promover e remover Curadores e
   Administradores, e a plataforma MUST impedir a remoção do último Administrador.
 - **FR-025**: Curadores MUST poder cadastrar, separadamente para BAX e para BAL, a restrição de
@@ -349,10 +360,28 @@ com a nova data de atualização, sem alteração de código.
 - **FR-030**: Cada tela MUST ter um texto curto de ajuda explicando como usá-la (ex.: legenda de
   cores de comparação e instrução do arrastar e soltar).
 
+**Avisos de desenvolvimento e de mudanças**
+
+- **FR-031**: Toda funcionalidade ainda em desenvolvimento MUST ser indicada ao usuário: ao tentar
+  usá-la, um **toast** "Em desenvolvimento" explica que ainda não está pronta. Uma área (página)
+  inteira ainda não liberada MUST abrir a **tela de em desenvolvimento**, com o mesmo visual da
+  tela de 404, e disparar o mesmo toast. Nenhuma funcionalidade pela metade pode falhar em
+  silêncio.
+- **FR-032**: Todo campo, botão ou opção visível que ainda não funciona MUST aparecer
+  desabilitado, com o selo "Em desenvolvimento", e avisar por toast quando tocado.
+- **FR-033**: Toda implementação ou mudança nas Metas atuais de um dia (equipe Meta ou
+  Alternativa de BAX, BAL ou BAI criada, editada ou excluída) MUST ser indicada ao usuário por
+  toast na próxima visita à tela central, listando os dias alterados desde a visita anterior
+  daquele aparelho, e por um selo **"Meta atualizada"** no dia (mesmo estilo do selo do dia
+  atual) e no modo alterado, que permanece durante a sessão. Na primeira visita não há aviso.
+- **FR-034**: Endereços inexistentes MUST abrir a tela de **404** da Sword Brazil (no tema e no
+  idioma da plataforma), com opções de voltar e de ir para a Batalha de Aliança, e com o aviso
+  de que a área pode estar em desenvolvimento.
+
 ### Key Entities
 
 - **Agente**: personagem jogável. Atributos: nome, imagem, gênero, lado (herói/vilão), espécie
-  (mutante, inumano, humano, alienígena, …), tipo de ataque (combate, explosão, velocidade,
+  (mutante, inumano, humano, alienígena, …), tipo de ataque (combate, energia, velocidade,
   universal). Possui um ou mais Uniformes.
 - **Uniforme**: variação de um Agente. Atributos: nome, imagem e o Agente ao qual pertence.
 - **CTP**: tipo (Fúria, Liberação, Percepção, Competição, Julgamento, Salto) ×
@@ -410,13 +439,37 @@ com a nova data de atualização, sem alteração de código.
 - A virada de dia é às 12h (BRT) e o reset semanal da pontuação é às 22h (BRT). A data de
   referência do início do ciclo (qual quinta-feira é o Dia 1) é cadastrada pelos curadores.
 - Equipes têm 3 agentes (1 Solador + 2 Suportes), como nas referências.
-- Os "principais CTPs para PVE" são os 7 listados, cada um com 3 qualidades.
+- Os "principais CTPs para PVE" são os 6 listados, cada um com 3 qualidades.
 - O catálogo de agentes, uniformes e CTPs é mantido manualmente pelos curadores. Não há integração
   com o jogo nem com as contas dos jogadores (Constituição, Restrições de Domínio).
 - A visão pública das metas e a personalização local não exigem login. A conta (e-mail e senha)
   é opcional, só para sincronizar, e a curadoria exige login com papel de Curador.
 - O conteúdo da BAI é único e vale para todas as semanas. Não há histórico por semana.
-- As sugestões seguem as listas de prioridade dos curadores. Não há cálculo de dano nem
-  simulação de batalha.
+- As sugestões seguem a Meta, as Alternativas e as reservas cadastradas pelos curadores, nessa
+  ordem. Não há cálculo de dano nem simulação de batalha.
 - Fora de escopo nesta feature: rankings, chat, calculadora de dano e outros modos de jogo além
   da Batalha de Aliança.
+
+## Futuro (fora do escopo atual)
+
+### Padrão de notificações de segurança (Notification pattern)
+
+Registrado em 2026-10-18 para implementação futura; **não implementar agora**. O sistema deve
+continuar simples: um único ponto de entrada (`notify(evento)`) decide o canal pela gravidade do
+evento, sem filas, serviços externos novos ou infraestrutura além do serviço de e-mail que já
+existe.
+
+- **FN-001**: As questões de segurança MUST ser notificadas por **3 canais**, conforme a gravidade:
+  1. **Informativo → toast**: efêmero, na sessão atual (ex.: sessão expirada, dados sincronizados,
+     senha alterada com sucesso nesta tela).
+  2. **Atenção → aviso persistente na tela** (faixa/alerta que só some quando o usuário dispensa
+     ou resolve): ex. e-mail ainda não confirmado, papel da conta alterado, login em outro
+     aparelho, muitas tentativas de login falhas.
+  3. **Crítico → fora do app (e-mail) + aviso persistente**: ex. senha redefinida, conta promovida
+     ou rebaixada (Curador/Administrador), conta bloqueada temporariamente.
+- **FN-002**: Cada evento de segurança MUST ter gravidade fixa num catálogo único (tipo do evento →
+  canal), para que telas e serviços não escolham o canal por conta própria.
+- **FN-003**: Os avisos MUST seguir o idioma e o tema da plataforma e nunca expor dados sensíveis
+  (senha, token, e-mail completo de terceiros).
+- **FN-004**: A implementação MUST reaproveitar o toast atual (sonner), o padrão de avisos da
+  plataforma e o `MailService` existente.

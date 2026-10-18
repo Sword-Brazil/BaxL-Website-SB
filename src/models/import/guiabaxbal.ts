@@ -41,6 +41,8 @@ export interface ImportedAgent {
   slug: string;
   attributes: Record<CriterionAttribute, string>;
   uniforms: string[];
+  /** Atributos de cada traje deduzidos só das equipes em que ele aparece (sem conflito). */
+  uniformAttributes: Record<string, Partial<Record<CriterionAttribute, string>>>;
 }
 
 export interface ImportedDay {
@@ -107,13 +109,15 @@ const teamsOf = (row: Row) => [parseTeam(row, ""), parseTeam(row, "Alt ")].filte
 /**
  * Converte o snapshot. Atributos dos agentes são deduzidos das restrições dos dias em que eles
  * aparecem (equipes e listas do dia); valor ausente ou conflitante (trajes que mudam atributos)
- * vira "não informado" (UNKNOWN), que não bloqueia restrições.
+ * vira "não informado" (UNKNOWN), que não bloqueia restrições. Os atributos de cada traje vêm só
+ * das equipes, onde o traje é conhecido.
  */
 export function convertSnapshot(snap: GuiaSnapshot) {
   const days: ImportedDay[] = [];
   let bai: ImportedTeam[] = [];
   const seen = new Map<string, Map<CriterionAttribute, Set<string>>>();
   const uniformsOf = new Map<string, Set<string>>();
+  const seenUniform = new Map<string, Map<CriterionAttribute, Set<string>>>(); // "agente|traje"
 
   const touch = (agent: string) => {
     if (!seen.has(agent)) seen.set(agent, new Map(CRITERION_ATTRIBUTES.map((a) => [a, new Set<string>()])));
@@ -134,6 +138,11 @@ export function convertSnapshot(snap: GuiaSnapshot) {
       }
       const criteria = parseRestriction(row["Restrição"] ?? "");
       days.push({ mode, number, criteria, teams });
+      for (const m of teams.flatMap((t) => t.members)) {
+        const key = `${m.agent}|${m.uniform || DEFAULT_UNIFORM}`;
+        if (!seenUniform.has(key)) seenUniform.set(key, new Map(CRITERION_ATTRIBUTES.map((a) => [a, new Set<string>()])));
+        for (const c of criteria) seenUniform.get(key)!.get(c.attribute)!.add(c.value);
+      }
       const listed = Object.values(snap.customLists[`${mode.toLowerCase()}-${number}`] ?? {}).flat();
       for (const agent of [...teams.flatMap((t) => t.members.map((m) => m.agent)), ...listed]) {
         const attrs = touch(agent);
@@ -154,30 +163,30 @@ export function convertSnapshot(snap: GuiaSnapshot) {
     for (const c of costumes) if (c.trim()) uniformsOf.get(name)!.add(c.trim());
   }
 
+  const single = (attrs: Map<CriterionAttribute, Set<string>>) =>
+    CRITERION_ATTRIBUTES.flatMap((a) => (attrs.get(a)!.size === 1 ? [[a, [...attrs.get(a)!][0]] as const] : []));
+
   const agents: ImportedAgent[] = [...seen.entries()]
-    .map(([name, attrs]) => ({
-      name,
-      slug: slugify(name),
-      attributes: Object.fromEntries(
-        CRITERION_ATTRIBUTES.map((a) => {
-          const values = attrs.get(a)!;
-          return [a, values.size === 1 ? [...values][0] : UNKNOWN];
-        }),
-      ) as Record<CriterionAttribute, string>,
-      uniforms: [...uniformsOf.get(name)!],
-    }))
+    .map(([name, attrs]) => {
+      const known = Object.fromEntries(single(attrs));
+      const uniforms = [...uniformsOf.get(name)!];
+      return {
+        name,
+        slug: slugify(name),
+        attributes: Object.fromEntries(CRITERION_ATTRIBUTES.map((a) => [a, known[a] ?? UNKNOWN])) as Record<
+          CriterionAttribute,
+          string
+        >,
+        uniforms,
+        uniformAttributes: Object.fromEntries(
+          uniforms.flatMap((u) => {
+            const attrs = seenUniform.get(`${name}|${u}`);
+            return attrs ? [[u, Object.fromEntries(single(attrs))]] : [];
+          }),
+        ),
+      };
+    })
     .sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
 
   return { agents, days, bai };
-}
-
-/** Listas de prioridade derivadas das equipes: Líder da Meta e da Alternativa; depois as posições. */
-export function derivePriority(teams: ImportedTeam[]) {
-  const ordered = [...teams].sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary));
-  const unique = (members: ImportedMember[]) =>
-    members.filter((m, i, all) => all.findIndex((x) => x.agent === m.agent) === i);
-  return {
-    solo: unique(ordered.flatMap((t) => t.members.filter((m) => m.slot === "SOLO"))),
-    support: unique(ordered.flatMap((t) => t.members.filter((m) => m.slot !== "SOLO"))),
-  };
 }

@@ -33,6 +33,11 @@ model Uniform {
   slug            String
   name            String
   imagePath       String
+  // Atributos próprios do traje (ex.: Fênix Negra é vilã); null = herda do personagem.
+  gender          String?
+  side            String?
+  species         String?
+  attackType      String?
   active          Boolean          @default(true)
   metaMembers     MetaTeamMember[]
   priorityEntries PriorityEntry[]

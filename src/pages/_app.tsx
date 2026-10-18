@@ -1,15 +1,33 @@
 import "@/styles/globals.css";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { AppProps } from "next/app";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { appWithTranslation } from "next-i18next/pages";
+import { appWithTranslation, useTranslation } from "next-i18next/pages";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useSelectionsStore } from "@/viewmodels/stores/selectionsStore";
 import { bodyFont, displayFont } from "@/styles/fonts";
 
+type I18nStore = Record<string, Record<string, object>>;
+
+/**
+ * O next-i18next só adiciona um namespace na primeira página que o usa; nas navegações seguintes
+ * ignora as traduções novas que vêm do servidor (ex.: textos adicionados com a aba aberta, que
+ * apareciam como "metas.addAlt"). Aqui elas são sempre mescladas antes de a página renderizar.
+ */
+function useMergeTranslations(store: I18nStore | undefined) {
+  const { i18n } = useTranslation();
+  // Uma vez por página recebida, e antes de ela renderizar (num efeito, o 1º quadro sairia errado).
+  useMemo(() => {
+    for (const [locale, namespaces] of Object.entries(store ?? {})) {
+      for (const [ns, resources] of Object.entries(namespaces)) i18n.addResourceBundle(locale, ns, resources, true, true);
+    }
+  }, [store, i18n]);
+}
+
 function App({ Component, pageProps }: AppProps) {
+  useMergeTranslations(pageProps._nextI18Next?.initialI18nStore);
   const [queryClient] = useState(
     () => new QueryClient({ defaultOptions: { queries: { staleTime: 60_000, refetchOnWindowFocus: false } } }),
   );

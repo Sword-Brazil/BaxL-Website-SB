@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 @keyframes roster-ctp-glow {
-  0%, 100% { box-shadow: 0 0 9px 1px var(--ctp-neon), 0 0 20px 3px color-mix(in srgb, var(--ctp-neon) 55%, transparent); }
-  50% { box-shadow: 0 0 14px 3px var(--ctp-neon), 0 0 30px 7px color-mix(in srgb, var(--ctp-neon) 68%, transparent); }
+  0%, 100% { box-shadow: 0 0 5px 1px color-mix(in srgb, var(--ctp-neon) 65%, transparent), 0 0 11px 2px color-mix(in srgb, var(--ctp-neon) 35%, transparent); }
+  50% { box-shadow: 0 0 7px 1px color-mix(in srgb, var(--ctp-neon) 72%, transparent), 0 0 15px 3px color-mix(in srgb, var(--ctp-neon) 42%, transparent); }
 }
 
 .roster-ctp-neon {
@@ -16,7 +16,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .roster-ctp-neon { animation: none; box-shadow: 0 0 11px 2px var(--ctp-neon), 0 0 24px 5px color-mix(in srgb, var(--ctp-neon) 60%, transparent); }
+  .roster-ctp-neon { animation: none; box-shadow: 0 0 6px 1px color-mix(in srgb, var(--ctp-neon) 65%, transparent), 0 0 13px 2px color-mix(in srgb, var(--ctp-neon) 40%, transparent); }
 }
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";

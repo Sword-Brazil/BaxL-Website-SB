@@ -15,7 +15,21 @@ import type {
   Weekday,
 } from "./enums";
 
-export interface Uniform {
+/** Atributos que contam para as restrições dos dias. */
+export interface RestrictableAttributes {
+  gender: Gender | Unknown;
+  side: Side | Unknown;
+  species: Species | Unknown;
+  attackType: AttackType | Unknown;
+}
+
+/** Atributos próprios de um traje; null = herda do personagem. */
+export type UniformOverrides = {
+  [K in keyof RestrictableAttributes]: Exclude<RestrictableAttributes[K], Unknown> | null;
+};
+
+/** Traje com os atributos já resolvidos (próprios do traje ou herdados do personagem). */
+export interface Uniform extends RestrictableAttributes {
   id: string;
   agentId: string;
   slug: string;
@@ -24,16 +38,14 @@ export interface Uniform {
   /** Imagem a exibir: a do traje ou, se ele não tiver, o retrato do personagem ("" = iniciais). */
   portrait: string;
   active: boolean;
+  overrides: UniformOverrides;
 }
 
-export interface Agent {
+/** Os atributos do personagem valem para todos os trajes que não tiverem os seus. */
+export interface Agent extends RestrictableAttributes {
   id: string;
   slug: string;
   name: string;
-  gender: Gender | Unknown;
-  side: Side | Unknown;
-  species: Species | Unknown;
-  attackType: AttackType | Unknown;
   active: boolean;
   uniforms: Uniform[];
 }
@@ -162,7 +174,10 @@ export interface CycleModeDay {
   criteria: Criterion[];
   /** Equipe Meta (principal) primeiro, depois as alternativas. */
   metaTeams: MetaTeam[];
+  /** Usada na sugestão: gerada das equipes, seguida das reservas. */
   priority: PriorityLists;
+  /** Reservas cadastradas pelos curadores (além das equipes). */
+  reserves: PriorityLists;
 }
 
 export interface CycleDay {
@@ -178,5 +193,5 @@ export interface CycleDay {
 /** O ciclo inteiro de 28 dias para a tela central, mais o conteúdo único da BAI. */
 export interface CycleOverview {
   days: CycleDay[];
-  bai: { metaTeams: MetaTeam[]; bosses: BaiBoss[]; priority: PriorityLists };
+  bai: { metaTeams: MetaTeam[]; bosses: BaiBoss[]; priority: PriorityLists; reserves: PriorityLists };
 }

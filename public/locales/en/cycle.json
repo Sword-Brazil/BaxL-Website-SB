@@ -30,5 +30,7 @@
   },
   "youAreHere": "You are here · current AB day",
   "endsIn": "Turns over in {{time}} (12 PM Brasília)",
-  "cycleDays": "Cycle days"
+  "cycleDays": "Cycle days",
+  "metaUpdated": "Meta updated",
+  "metaUpdatedShort": "Updated"
 }

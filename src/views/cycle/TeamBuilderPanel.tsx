@@ -32,6 +32,7 @@ import { useTeamBuilderViewModel, type TeamBuilderViewModel } from "@/viewmodels
 import { CtpPalette } from "@/views/day/CtpPalette";
 import { CtpBadge } from "@/views/shared/CtpBadge";
 import { CtpDragOverlay } from "@/views/shared/CtpDragOverlay";
+import { CtpPicker } from "@/views/shared/CtpPicker";
 import { ExportImageButton } from "@/views/shared/ExportImageButton";
 import { MemberChip } from "@/views/shared/MemberChip";
 import { UniformPicker } from "@/views/shared/UniformPicker";
@@ -127,6 +128,36 @@ function SlotRow({
             disabled={!!vm.armedCtp && !!slot.pick}
           />
         </div>
+        {slot.pick && ref && (
+          <div onClick={(e) => e.stopPropagation()}>
+            <CtpPicker
+              ctps={vm.catalog.ctps.filter((c) => c.active)}
+              value={slot.ctp?.id ?? null}
+              onChange={(id) => (id ? vm.dropCtp(slot.slot, id) : vm.removeCtp(slot.slot))}
+              targetName={ref.agent.name}
+            >
+              <button
+                type="button"
+                className="flex min-h-11 w-full min-w-0 items-center gap-2 rounded-md border border-dashed border-energy/40 px-2 py-1 text-left text-xs transition-colors hover:bg-energy/10 active:bg-energy/15"
+              >
+                {slot.ctp ? (
+                  <>
+                    <CtpBadge ctp={slot.ctp} size="sm" />
+                    <span className="min-w-0 flex-1 truncate">
+                      {t(`common:ctp.${slot.ctp.type}`)} · {t(`common:quality.${slot.ctp.quality}`)}
+                    </span>
+                    <span className="shrink-0 text-energy">{t("common:ctpPicker.change")}</span>
+                  </>
+                ) : (
+                  <>
+                    <ZapIcon className="size-4 shrink-0 text-energy" />
+                    <span className="min-w-0 flex-1 truncate font-medium text-energy">{t("common:ctpPicker.choose")}</span>
+                  </>
+                )}
+              </button>
+            </CtpPicker>
+          </div>
+        )}
         {(slot.comparison || slot.pick) && (
           <div className="flex flex-wrap items-center gap-1">
             {slot.comparison && (
@@ -318,11 +349,6 @@ export function TeamBuilderPanel(props: { teamKey: TeamKey; criteria: Criterion[
 
       <CtpDragOverlay ctp={vm.catalog.ctpById(draggingCtp)} />
 
-      {/* Celular/tablet: paleta numa barra fixa embaixo, com rolagem horizontal */}
-      <div className="sticky bottom-0 -mx-4 mt-4 border-t border-energy/20 bg-popover/95 px-4 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-md sm:-mx-6 sm:px-6 lg:hidden">
-        <p className="mb-1 text-[0.7rem] text-muted-foreground">{t("days:myTeam.palette.hint")}</p>
-        <CtpPalette ctps={vm.catalog.ctps.filter((ctp) => ctp.active)} armedCtp={vm.armedCtp} onArm={vm.armCtp} idPrefix="ctp-bar" layout="row" />
-      </div>
     </DndContext>
   );
 }

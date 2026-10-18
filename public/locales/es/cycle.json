@@ -30,5 +30,7 @@
   },
   "youAreHere": "Estás aquí · día actual de la BA",
   "endsIn": "Cambia en {{time}} (12 h de Brasilia)",
-  "cycleDays": "Días del ciclo"
+  "cycleDays": "Días del ciclo",
+  "metaUpdated": "Meta actualizada",
+  "metaUpdatedShort": "Actualizada"
 }

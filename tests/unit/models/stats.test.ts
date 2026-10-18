@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { CycleOverview, MetaTeam } from "@/models/domain/types";
-import { agentRepetition, ctpUsage } from "@/models/rules/stats";
+import { agentRepetition, ctpUsage, myAgentRepetition, myTeamCompositions } from "@/models/rules/stats";
 
 const team = (isPrimary: boolean, uniforms: [string, string, string]): MetaTeam => ({
   id: uniforms.join(),
@@ -14,7 +14,8 @@ const team = (isPrimary: boolean, uniforms: [string, string, string]): MetaTeam 
   updatedBy: null,
   members: (["SOLO", "SUPPORT_1", "SUPPORT_2"] as const).map((slot, i) => ({ slot, uniformId: uniforms[i], ctpId: null })),
 });
-const modeDay = (teams: MetaTeam[]) => ({ criteria: [], metaTeams: teams, priority: { solo: [], support: [] } });
+const EMPTY = { solo: [], support: [] };
+const modeDay = (teams: MetaTeam[]) => ({ criteria: [], metaTeams: teams, priority: EMPTY, reserves: EMPTY });
 
 const cycle: CycleOverview = {
   days: [
@@ -22,7 +23,7 @@ const cycle: CycleOverview = {
     { number: 3, weekday: "SÁB", week: 1, isBai: true, bax: null, bal: null },
     { number: 8, weekday: "QUI", week: 2, isBai: false, bax: modeDay([team(true, ["a", "b", "z"])]), bal: modeDay([]) },
   ],
-  bai: { metaTeams: [team(true, ["b", "q", "w"])], bosses: [], priority: { solo: [], support: [] } },
+  bai: { metaTeams: [team(true, ["b", "q", "w"])], bosses: [], priority: EMPTY, reserves: EMPTY },
 };
 const agentOf = (u: string) => ({ id: u, name: u.toUpperCase() });
 
@@ -54,5 +55,31 @@ describe("ctpUsage", () => {
     expect(rage.agents.map((a) => a.name)).toEqual(["wanda", "storm"]);
     expect(rows.find((r) => r.type === "INSIGHT")?.total).toBe(1);
     expect(rows).toHaveLength(6);
+  });
+});
+
+describe("minhas equipes", () => {
+  const pick = (uniformId: string) => ({ uniformId, ctpId: null });
+  const teams = {
+    "BAX-1": { SOLO: pick("a"), SUPPORT_1: pick("b"), SUPPORT_2: pick("c") },
+    "BAL-8": { SOLO: pick("a"), SUPPORT_1: pick("c"), SUPPORT_2: pick("b") }, // mesma equipe, suportes trocados
+    "BAX-9": { SOLO: pick("d") },
+    BAI: { SOLO: pick("a"), SUPPORT_1: pick("x"), SUPPORT_2: pick("y") },
+    "BAX-2": {},
+  };
+
+  it("conta os personagens por semana; a equipe da BAI vale para as 4 semanas", () => {
+    const rows = myAgentRepetition(teams, agentOf, "ALL");
+    expect(rows[0]).toEqual({ agentId: "a", name: "A", weeks: [2, 2, 1, 1], total: 6 });
+    expect(myAgentRepetition(teams, agentOf, "BAL").map((r) => r.agentId)).toEqual(["a", "b", "c"]);
+  });
+
+  it("agrupa equipes com o mesmo Líder e os mesmos Suportes, as mais repetidas primeiro", () => {
+    const groups = myTeamCompositions(teams, agentOf, "ALL");
+    expect(groups[0].usages).toEqual([
+      { mode: "BAX", day: 1 },
+      { mode: "BAL", day: 8 },
+    ]);
+    expect(groups).toHaveLength(3); // a+b+c, d sozinho e a da BAI; a vazia é ignorada
   });
 });

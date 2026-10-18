@@ -63,6 +63,7 @@ export function useCycleViewModel() {
   const teamKeyOf = (mode: DayMode | "BAI", day: number) => (mode === "BAI" ? "BAI" : `${mode}-${day}`);
 
   return {
+    cycle: query.data,
     days,
     allDays: query.data?.days ?? [],
     goToDay,

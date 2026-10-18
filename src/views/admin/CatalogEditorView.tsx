@@ -1,6 +1,16 @@
 import { useTranslation } from "next-i18next/pages";
 import { Controller } from "react-hook-form";
-import { ImageMinusIcon, ImageUpIcon, LoaderIcon, PencilIcon, PlusIcon, SearchIcon, Trash2Icon, TriangleAlertIcon } from "lucide-react";
+import {
+  ImageMinusIcon,
+  ImageUpIcon,
+  LoaderIcon,
+  PencilIcon,
+  PlusIcon,
+  SearchIcon,
+  Trash2Icon,
+  TriangleAlertIcon,
+  Undo2Icon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -10,20 +20,12 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ATTACK_TYPES, GENDERS, SIDES, SPECIES, UNKNOWN } from "@/models/domain/enums";
+import { UNKNOWN } from "@/models/domain/enums";
 import type { Agent } from "@/models/domain/types";
 import { useCatalogEditorViewModel } from "@/viewmodels/admin/useCatalogEditorViewModel";
 import { QueryState } from "@/views/shared/QueryState";
-
-const ENUM_FIELDS = [
-  { name: "gender", attr: "GENDER", values: GENDERS },
-  { name: "side", attr: "SIDE", values: SIDES },
-  { name: "species", attr: "SPECIES", values: SPECIES },
-  { name: "attackType", attr: "ATTACK_TYPE", values: ATTACK_TYPES },
-] as const;
+import { ATTRIBUTE_FIELDS, AttributeBadgePicker } from "./AttributeBadgePicker";
 
 type Vm = ReturnType<typeof useCatalogEditorViewModel>;
 
@@ -46,7 +48,48 @@ function AgentThumb({ agent }: { agent: Agent }) {
   );
 }
 
-/** Cartão de um traje: prévia da foto, trocar/remover foto, nome, identificador e ativo. */
+/** Atributos do traje: herdados do personagem (tracejados) ou próprios do traje. */
+function UniformAttributes({ index, vm }: { index: number; vm: Vm }) {
+  const { t } = useTranslation("admin");
+  const { form } = vm;
+  const own = form.watch(ATTRIBUTE_FIELDS.map((f) => `uniforms.${index}.${f.name}` as const));
+  const base = form.watch(ATTRIBUTE_FIELDS.map((f) => f.name));
+  const customized = own.some((v) => v != null);
+
+  return (
+    <div className="flex flex-col gap-2 rounded-md border border-dashed border-energy/20 p-2.5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="text-xs font-semibold tracking-wider uppercase">{t("catalog.uniformAttributes")}</span>
+        {customized && (
+          <div className="flex items-center gap-1">
+            <Badge variant="energy">{t("catalog.customized")}</Badge>
+            <Button
+              type="button"
+              size="icon-sm"
+              variant="ghost"
+              onClick={() => ATTRIBUTE_FIELDS.forEach((f) => vm.setUniformAttribute(index, f.name, null))}
+              aria-label={t("catalog.resetAttributes")}
+              title={t("catalog.resetAttributes")}
+            >
+              <Undo2Icon />
+            </Button>
+          </div>
+        )}
+      </div>
+      {ATTRIBUTE_FIELDS.map((f, i) => (
+        <AttributeBadgePicker
+          key={f.name}
+          field={f}
+          value={own[i] ?? null}
+          inherited={base[i]}
+          onChange={(v) => vm.setUniformAttribute(index, f.name, v)}
+        />
+      ))}
+    </div>
+  );
+}
+
+/** Cartão de um traje: prévia da foto, trocar/remover foto, nome, identificador, atributos e ativo. */
 function UniformCard({ index, vm }: { index: number; vm: Vm }) {
   const { t } = useTranslation("admin");
   const { form } = vm;
@@ -125,6 +168,7 @@ function UniformCard({ index, vm }: { index: number; vm: Vm }) {
           </Field>
         )}
       />
+      <UniformAttributes index={index} vm={vm} />
       <div className="flex items-center justify-between gap-2">
         <Controller
           control={form.control}
@@ -161,7 +205,7 @@ export function CatalogEditorView() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <InputGroup className="max-w-sm">
+        <InputGroup className="w-full sm:max-w-sm">
           <InputGroupAddon>
             <SearchIcon />
           </InputGroupAddon>
@@ -172,73 +216,65 @@ export function CatalogEditorView() {
             aria-label={t("admin:catalog.search")}
           />
         </InputGroup>
-        <Button variant="energy" onClick={vm.openNew}>
+        <Button variant="energy" className="w-full sm:w-auto" onClick={vm.openNew}>
           <PlusIcon data-icon="inline-start" />
           {t("admin:catalog.newAgent")}
         </Button>
       </div>
 
       <QueryState isLoading={vm.catalog.isLoading} isError={vm.catalog.isError} retry={vm.catalog.refetch}>
-        <div className="overflow-x-auto rounded-xl ring-1 ring-foreground/10">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t("admin:catalog.name")}</TableHead>
-                {ENUM_FIELDS.map((f) => (
-                  <TableHead key={f.name} className="hidden md:table-cell">
-                    {t(`common:attributes.${f.attr}`)}
-                  </TableHead>
-                ))}
-                <TableHead>{t("admin:catalog.uniforms")}</TableHead>
-                <TableHead className="text-right">{t("admin:common.edit")}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {vm.agents.map((a) => {
-                const withPhoto = a.uniforms.filter((u) => u.imagePath).length;
-                return (
-                  <TableRow key={a.id} className={cn(!a.active && "opacity-60")}>
-                    <TableCell>
-                      <div className="flex min-w-40 items-center gap-3">
-                        <AgentThumb agent={a} />
-                        <div className="min-w-0">
-                          <p className="truncate font-medium">{a.name}</p>
-                          {a.side !== UNKNOWN && (
-                            <Badge variant={a.side === "HERO" ? "hero" : "villain"}>{t(`common:values.${a.side}`)}</Badge>
-                          )}
-                        </div>
-                      </div>
-                    </TableCell>
-                    {ENUM_FIELDS.map((f) => (
-                      <TableCell key={f.name} className="hidden md:table-cell">
-                        <span className={cn(a[f.name] === UNKNOWN && "text-spark")}>{t(`common:values.${a[f.name]}`)}</span>
-                      </TableCell>
+        {/* Lista (não tabela): cabe no celular com nome, atributos e ações sempre visíveis. */}
+        <ul className="flex flex-col divide-y divide-foreground/10 rounded-xl ring-1 ring-foreground/10">
+          {vm.agents.map((a) => {
+            const withPhoto = a.uniforms.filter((u) => u.imagePath).length;
+            const customized = a.uniforms.filter((u) => Object.values(u.overrides).some((v) => v != null)).length;
+            return (
+              <li key={a.id} className={cn("flex items-center gap-3 p-3", !a.active && "opacity-60")}>
+                <AgentThumb agent={a} />
+                <button type="button" className="min-w-0 flex-1 text-left" onClick={() => vm.openEdit(a)}>
+                  <span className="flex min-w-0 flex-wrap items-center gap-1.5">
+                    <span className="truncate font-medium">{a.name}</span>
+                    {a.side !== UNKNOWN && (
+                      <Badge variant={a.side === "HERO" ? "hero" : "villain"}>{t(`common:values.${a.side}`)}</Badge>
+                    )}
+                    {!a.active && <Badge variant="outline">{t("admin:catalog.inactive")}</Badge>}
+                  </span>
+                  <span className="mt-0.5 block truncate text-xs text-muted-foreground">
+                    {ATTRIBUTE_FIELDS.filter((f) => f.name !== "side").map((f, i) => (
+                      <span key={f.name} className={cn(a[f.name] === UNKNOWN && "text-spark")}>
+                        {i > 0 && " · "}
+                        {t(`common:values.${a[f.name]}`)}
+                      </span>
                     ))}
-                    <TableCell className="whitespace-nowrap">
-                      {t("admin:catalog.photos", { n: withPhoto, total: a.uniforms.length })}
-                      {!a.active && (
-                        <Badge variant="outline" className="ml-2">
-                          {t("admin:catalog.inactive")}
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex justify-end gap-1">
-                        <Button size="sm" variant="ghost" onClick={() => vm.openEdit(a, true)}>
-                          <PlusIcon data-icon="inline-start" />
-                          {t("admin:catalog.quickUniform")}
-                        </Button>
-                        <Button size="icon-sm" variant="ghost" onClick={() => vm.openEdit(a)} aria-label={t("admin:common.edit")}>
-                          <PencilIcon />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </div>
+                  </span>
+                  <span className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                    {t("admin:catalog.photos", { n: withPhoto, total: a.uniforms.length })}
+                    {customized > 0 && (
+                      <Badge variant="energy">
+                        {customized} {t("admin:catalog.customized")}
+                      </Badge>
+                    )}
+                  </span>
+                </button>
+                <div className="flex shrink-0 gap-1">
+                  <Button
+                    size="icon-touch"
+                    variant="ghost"
+                    className="sm:w-auto sm:px-3"
+                    onClick={() => vm.openEdit(a, true)}
+                    aria-label={t("admin:catalog.addUniform")}
+                  >
+                    <PlusIcon />
+                    <span className="hidden sm:inline">{t("admin:catalog.quickUniform")}</span>
+                  </Button>
+                  <Button size="icon-touch" variant="ghost" onClick={() => vm.openEdit(a)} aria-label={t("admin:common.edit")}>
+                    <PencilIcon />
+                  </Button>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
       </QueryState>
 
       <Dialog open={vm.isOpen} onOpenChange={(open) => !open && vm.close()}>
@@ -290,32 +326,23 @@ export function CatalogEditorView() {
                     </Field>
                   )}
                 />
-                {ENUM_FIELDS.map((f) => (
-                  <Controller
-                    key={f.name}
-                    control={form.control}
-                    name={f.name}
-                    render={({ field }) => (
-                      <Field>
-                        <FieldLabel>{t(`common:attributes.${f.attr}`)}</FieldLabel>
-                        <Select value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger className="w-full">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value={UNKNOWN}>{t("common:values.UNKNOWN")}</SelectItem>
-                            {f.values.map((v) => (
-                              <SelectItem key={v} value={v}>
-                                {t(`common:values.${v}`)}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </Field>
-                    )}
-                  />
-                ))}
               </div>
+              <FieldSet>
+                <FieldLegend>{t("admin:catalog.baseAttributes")}</FieldLegend>
+                <FieldDescription>{t("admin:catalog.baseAttributesHint")}</FieldDescription>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {ATTRIBUTE_FIELDS.map((f) => (
+                    <Controller
+                      key={f.name}
+                      control={form.control}
+                      name={f.name}
+                      render={({ field }) => (
+                        <AttributeBadgePicker field={f} value={field.value} onChange={(v) => field.onChange(v ?? UNKNOWN)} />
+                      )}
+                    />
+                  ))}
+                </div>
+              </FieldSet>
               <Controller
                 control={form.control}
                 name="active"
@@ -336,6 +363,7 @@ export function CatalogEditorView() {
                     {t("admin:catalog.addUniform")}
                   </Button>
                 </div>
+                <FieldDescription>{t("admin:catalog.inheritedHint")}</FieldDescription>
                 {uniformsError && <p className="text-sm text-destructive">{uniformsError}</p>}
                 <ul className="grid gap-3 md:grid-cols-2">
                   {vm.uniforms.fields.map((u, index) => (
@@ -345,7 +373,7 @@ export function CatalogEditorView() {
               </FieldSet>
             </FieldGroup>
           </form>
-          <DialogFooter className="shrink-0 border-t border-energy/15 px-4 py-3 sm:px-6">
+          <DialogFooter className="mx-0 mb-0 shrink-0 flex-row justify-end rounded-none border-t border-energy/15 px-4 py-3 sm:px-6">
             <Button variant="outline" onClick={vm.close}>
               {t("admin:common.cancel")}
             </Button>

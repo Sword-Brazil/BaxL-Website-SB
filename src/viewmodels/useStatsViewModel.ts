@@ -1,29 +1,45 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getCycle } from "@/models/api/cycle";
-import { agentRepetition, ctpUsage, type StatsMode } from "@/models/rules/stats";
+import { agentRepetition, ctpUsage, myAgentRepetition, myTeamCompositions, type StatsMode } from "@/models/rules/stats";
 import { useSelectionsStore } from "./stores/selectionsStore";
 import { useCatalogViewModel } from "./useCatalogViewModel";
 
 const TOP = 15;
 
-/** Estatísticas: repetição dos personagens nas equipes do ciclo e CTPs equipados pelo usuário. */
+/** Origem da repetição: equipes Meta dos curadores ou equipes montadas pelo usuário. */
+export type RepetitionSource = "META" | "MINE";
+
+/**
+ * Estatísticas: repetição dos personagens (nas Metas ou nas equipes do usuário), as equipes do
+ * usuário agrupadas pelas que mais se repetem e os CTPs equipados.
+ */
 export function useStatsViewModel() {
   const cycle = useQuery({ queryKey: ["cycle"], queryFn: getCycle });
   const catalog = useCatalogViewModel();
   const { doc, hydrated } = useSelectionsStore();
   const [mode, setMode] = useState<StatsMode>("ALL");
+  const [source, setSource] = useState<RepetitionSource>("META");
   const [includeAlternatives, setIncludeAlternatives] = useState(false);
   const [showAll, setShowAll] = useState(false);
 
+  const agentOf = (u: string) => catalog.uniformById(u)?.agent;
   const repetition = useMemo(
     () =>
-      cycle.data
-        ? agentRepetition(cycle.data, (u) => catalog.uniformById(u)?.agent, { mode, includeAlternatives })
-        : [],
-    // catalog.uniformById é derivado de catalog.agents
+      source === "MINE"
+        ? myAgentRepetition(doc.teams, agentOf, mode)
+        : cycle.data
+          ? agentRepetition(cycle.data, agentOf, { mode, includeAlternatives })
+          : [],
+    // agentOf é derivado de catalog.agents
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [cycle.data, catalog.agents, mode, includeAlternatives],
+    [source, doc.teams, cycle.data, catalog.agents, mode, includeAlternatives],
+  );
+
+  const compositions = useMemo(
+    () => myTeamCompositions(doc.teams, agentOf, mode),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [doc.teams, catalog.agents, mode],
   );
 
   const usage = useMemo(
@@ -43,8 +59,12 @@ export function useStatsViewModel() {
   const equipped = usage.reduce((n, r) => n + r.total, 0);
 
   return {
+    catalog,
     mode,
     setMode,
+    source,
+    setSource,
+    compositions,
     includeAlternatives,
     setIncludeAlternatives,
     showAll,

@@ -2,17 +2,31 @@ import { describe, expect, it } from "vitest";
 import type { Agent, Criterion, PriorityLists } from "@/models/domain/types";
 import { suggestTeam } from "@/models/rules/suggest";
 
-const agent = (id: string, side: "HERO" | "VILLAIN" = "HERO"): Agent => ({
-  id,
-  slug: id,
-  name: id,
-  gender: "MALE",
-  side,
-  species: "HUMAN",
-  attackType: "COMBAT",
-  active: true,
-  uniforms: [{ id: `${id}-u`, agentId: id, slug: "padrao", name: "Padrão", imagePath: "", portrait: "", active: true }],
-});
+const NO_OVERRIDES = { gender: null, side: null, species: null, attackType: null };
+
+const agent = (id: string, side: "HERO" | "VILLAIN" = "HERO"): Agent => {
+  const attrs = { gender: "MALE", side, species: "HUMAN", attackType: "COMBAT" } as const;
+  return {
+    id,
+    slug: id,
+    name: id,
+    ...attrs,
+    active: true,
+    uniforms: [
+      {
+        id: `${id}-u`,
+        agentId: id,
+        slug: "padrao",
+        name: "Padrão",
+        imagePath: "",
+        portrait: "",
+        active: true,
+        ...attrs,
+        overrides: NO_OVERRIDES,
+      },
+    ],
+  };
+};
 
 const AGENTS = Object.fromEntries(
   [agent("a"), agent("b"), agent("c"), agent("d"), agent("v", "VILLAIN")].map((a) => [a.uniforms[0].id, a]),

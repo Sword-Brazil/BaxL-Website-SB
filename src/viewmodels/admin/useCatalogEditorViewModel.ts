@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { adminApi } from "@/models/api/admin";
-import type { Agent } from "@/models/domain/types";
+import type { Agent, RestrictableAttributes } from "@/models/domain/types";
 import { slugify } from "@/models/rules/slug";
 import { AgentSchema, ASSET_MAX_BYTES, type AgentInput, type AssetUploadInput } from "@/models/schemas/admin";
 import { useCatalogViewModel } from "@/viewmodels/useCatalogViewModel";
@@ -20,6 +20,7 @@ const blank: AgentInput = {
   uniforms: [{ slug: "padrao", name: "Padrão", imagePath: "", active: true }],
 };
 
+/** Traje novo herda todos os atributos do personagem. */
 const newUniform = () => ({ slug: "", name: "", imagePath: "", active: true });
 
 const toInput = (a: Agent): AgentInput => ({
@@ -30,7 +31,14 @@ const toInput = (a: Agent): AgentInput => ({
   species: a.species,
   attackType: a.attackType,
   active: a.active,
-  uniforms: a.uniforms.map((u) => ({ id: u.id, slug: u.slug, name: u.name, imagePath: u.imagePath, active: u.active })),
+  uniforms: a.uniforms.map((u) => ({
+    id: u.id,
+    slug: u.slug,
+    name: u.name,
+    imagePath: u.imagePath,
+    active: u.active,
+    ...u.overrides,
+  })),
 });
 
 const MIME: Record<string, AssetUploadInput["mimeType"]> = { "image/png": "image/png", "image/webp": "image/webp", "image/jpeg": "image/jpeg" };
@@ -112,6 +120,9 @@ export function useCatalogEditorViewModel(messages: { saved: string; uploaded: s
       setEditingId(a.id);
     },
     addUniform: () => uniforms.prepend(newUniform()),
+    /** null = o traje volta a herdar o atributo do personagem. */
+    setUniformAttribute: (index: number, name: keyof RestrictableAttributes, value: string | null) =>
+      form.setValue(`uniforms.${index}.${name}`, value as never, { shouldDirty: true }),
     removeImage: (index: number) => form.setValue(`uniforms.${index}.imagePath`, "", { shouldDirty: true }),
     onAgentNameChange: (name: string) => syncSlug("slug", name, form.getValues("name")),
     onUniformNameChange: (index: number, name: string) =>

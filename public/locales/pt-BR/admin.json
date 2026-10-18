@@ -19,7 +19,7 @@
     "welcome": "Olá, {{name}}",
     "text": "Escolha o que deseja editar. Toda alteração publicada fica visível na hora, com data e autor.",
     "days": "Restrições de cada dia de BAX e BAL.",
-    "metas": "Equipes Meta por dia, modo livre da BAL, BAI e listas de prioridade.",
+    "metas": "Equipes Meta e reservas por dia, modo livre da BAL e BAI.",
     "catalog": "Agentes, uniformes e imagens.",
     "ctps": "Tipos, fotos e disponibilidade dos CTPs.",
     "bai": "Sequência de chefes da BAI.",
@@ -50,15 +50,12 @@
   "metas": {
     "title": "Equipes Meta",
     "teamsTab": "Equipes",
-    "priorityTab": "Prioridades",
     "scope": "Onde",
     "scopes": {
       "DAY": "Dia de BAX/BAL",
       "BAL_FREE": "BAL modo livre",
       "BAI": "BAI"
     },
-    "mode": "Modo",
-    "day": "Dia",
     "newTeam": "Nova equipe",
     "editTeam": "Editar equipe",
     "isPrimary": "Equipe principal",
@@ -71,15 +68,22 @@
     "deleteConfirm": "Excluir esta equipe? Esta ação não pode ser desfeita.",
     "deleted": "Equipe excluída",
     "empty": "Nenhuma equipe cadastrada aqui.",
-    "help": "Só aparecem agentes ativos que atendem à restrição do dia. Marcar como principal desmarca a anterior."
+    "help": "Só aparecem agentes ativos que atendem à restrição do dia. Marcar como principal desmarca a anterior.",
+    "addMeta": "Meta",
+    "addAlt": "Alternativa",
+    "bothModes": "BAX + BAL",
+    "boardHint": "O ciclo inteiro numa tela: edite, adicione ou exclua equipes direto no dia.",
+    "teamOf": "{{mode}} · Dia {{day}}",
+    "allWeeks": "Todas",
+    "week": "Sem. {{n}}",
+    "reserves": "Reservas",
+    "reservesHint": "Personagens extras para a sugestão de quem não tem os da Meta e das Alternativas. Ordem usada: Meta → Alternativas → reservas.",
+    "addReserve": "+ Adicionar reserva"
   },
   "priority": {
-    "title": "Listas de prioridade",
-    "subtitle": "Ordem de preferência usada para sugerir equipes com o elenco de cada jogador.",
     "solo": "Soladores",
     "support": "Suportes",
-    "empty": "Lista vazia",
-    "help": "Arraste para reordenar (ou use os botões). O primeiro da lista tem prioridade."
+    "empty": "Lista vazia"
   },
   "catalog": {
     "title": "Catálogo de agentes",
@@ -108,14 +112,19 @@
     "badType": "Use uma imagem PNG, WebP ou JPEG.",
     "slugAuto": "Gerado a partir do nome; edite só se precisar.",
     "photos": "{{n}}/{{total}} com foto",
-    "quickUniform": "Traje"
+    "quickUniform": "Traje",
+    "baseAttributes": "Atributos do personagem",
+    "baseAttributesHint": "Valem para todos os trajes, exceto os que tiverem atributos próprios.",
+    "uniformAttributes": "Atributos deste traje",
+    "inheritedHint": "Tracejado = herdado do personagem. Toque em outro valor para personalizar só este traje.",
+    "customized": "Personalizado",
+    "resetAttributes": "Herdar tudo do personagem"
   },
   "ctps": {
     "title": "Catálogo de CTPs",
     "help": "Adicione e atualize fotos dos CTPs. Excluir desativa o item para preservar equipes e seleções antigas.",
     "add": "Novo CTP",
     "edit": "Editar CTP",
-    "type": "Tipo",
     "quality": "Qualidade",
     "remove": "Excluir",
     "restore": "Reativar"

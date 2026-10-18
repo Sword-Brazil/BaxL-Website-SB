@@ -1,6 +1,5 @@
-import Link from "next/link";
 import { useTranslation } from "next-i18next/pages";
-import { CalendarClockIcon, InfinityIcon, PencilIcon, PlusIcon, SwordsIcon, TimerResetIcon } from "lucide-react";
+import { CalendarClockIcon, InfinityIcon, PencilIcon, PlusIcon, SparklesIcon, SwordsIcon, TimerResetIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +11,7 @@ import { SLOTS, type DayMode, type Slot } from "@/models/domain/enums";
 import type { CycleDay, CycleModeDay, MetaTeam } from "@/models/domain/types";
 import type { UserTeam } from "@/models/schemas/selections";
 import { useCycleViewModel, type CycleViewModel, type WeekFilter } from "@/viewmodels/useCycleViewModel";
+import { useMetaUpdatesNotice } from "@/viewmodels/useMetaUpdatesNotice";
 import { HelpHint } from "@/views/layout/HelpHint";
 import { TeamStrip as SharedTeamStrip, type TeamTone } from "@/views/shared/TeamStrip";
 import { QueryState } from "@/views/shared/QueryState";
@@ -44,16 +44,42 @@ function userMembers(team: UserTeam | null) {
 }
 
 /** Coluna de um modo (BAX ou BAL) dentro de um dia. */
-function ModePanel({ mode, day, data, vm }: { mode: DayMode; day: number; data: CycleModeDay | null; vm: Vm }) {
+/** Selo de Meta alterada desde a última visita (mesmo estilo do selo "Hoje"). */
+function MetaUpdatedBadge({ short = false, className }: { short?: boolean; className?: string }) {
+  const { t } = useTranslation("cycle");
+  return (
+    <Badge className={cn("animate-pulse bg-spark text-primary-foreground", className)}>
+      <SparklesIcon />
+      {short ? t("metaUpdatedShort") : t("metaUpdated")}
+    </Badge>
+  );
+}
+
+function ModePanel({
+  mode,
+  day,
+  data,
+  vm,
+  updated,
+}: {
+  mode: DayMode;
+  day: number;
+  data: CycleModeDay | null;
+  vm: Vm;
+  updated: boolean;
+}) {
   const { t } = useTranslation(["cycle", "common"]);
   const [meta, ...alts] = data?.metaTeams ?? [];
   const mine = userMembers(vm.userTeam(mode, day));
   return (
     <div className="flex min-w-0 flex-col gap-2 p-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <Badge variant="energy" className="h-6 px-2.5 font-heading text-sm">
-          {mode}
-        </Badge>
+        <span className="flex items-center gap-1.5">
+          <Badge variant="energy" className="h-6 px-2.5 font-heading text-sm">
+            {mode}
+          </Badge>
+          {updated && <MetaUpdatedBadge short />}
+        </span>
         <RestrictionBadges criteria={data?.criteria ?? []} />
       </div>
       {meta ? (
@@ -118,9 +144,11 @@ function BaiPanel({ day, vm }: { day: number; vm: Vm }) {
   );
 }
 
-function DayRow({ day, vm }: { day: CycleDay; vm: Vm }) {
+function DayRow({ day, vm, updated }: { day: CycleDay; vm: Vm; updated: ReadonlySet<string> }) {
   const { t } = useTranslation(["cycle", "common"]);
   const isToday = vm.currentDay === day.number;
+  const isUpdated = (mode: string) => updated.has(day.isBai ? "BAI" : `${mode} ${day.number}`);
+  const anyUpdated = day.isBai ? isUpdated("BAI") : isUpdated("BAX") || isUpdated("BAL");
   return (
     <section
       id={`dia-${day.number}`}
@@ -137,8 +165,9 @@ function DayRow({ day, vm }: { day: CycleDay; vm: Vm }) {
           {t(`common:weekdays.${day.weekday}`)}
         </span>
         {day.isBai && <Badge variant="energy">BAI</Badge>}
+        {anyUpdated && <MetaUpdatedBadge className="ml-auto" />}
         {isToday && (
-          <Badge className="ml-auto animate-pulse bg-energy text-primary-foreground">
+          <Badge className={cn("animate-pulse bg-energy text-primary-foreground", !anyUpdated && "ml-auto")}>
             <CalendarClockIcon />
             {t("cycle:today")}
           </Badge>
@@ -160,8 +189,8 @@ function DayRow({ day, vm }: { day: CycleDay; vm: Vm }) {
         <BaiPanel day={day.number} vm={vm} />
       ) : (
         <div className="grid divide-y md:grid-cols-2 md:divide-x md:divide-y-0">
-          <ModePanel mode="BAX" day={day.number} data={day.bax} vm={vm} />
-          <ModePanel mode="BAL" day={day.number} data={day.bal} vm={vm} />
+          <ModePanel mode="BAX" day={day.number} data={day.bax} vm={vm} updated={isUpdated("BAX")} />
+          <ModePanel mode="BAL" day={day.number} data={day.bal} vm={vm} updated={isUpdated("BAL")} />
         </div>
       )}
     </section>
@@ -237,6 +266,7 @@ function DayStrip({ vm }: { vm: Vm }) {
 export function CycleView() {
   const { t } = useTranslation(["cycle", "common", "days"]);
   const vm = useCycleViewModel();
+  const updated = useMetaUpdatesNotice(vm.cycle);
   const resetNotice = vm.clock?.isResetDay ? (vm.clock.beforeWeeklyReset ? "before" : "after") : null;
 
   return (
@@ -282,9 +312,6 @@ export function CycleView() {
             </ToggleGroupItem>
           ))}
         </ToggleGroup>
-        <Button asChild variant="ghost" size="sm" className="ml-auto">
-          <Link href="/bal/livre">{t("cycle:freeMode")}</Link>
-        </Button>
       </div>
 
       {resetNotice && (
@@ -308,7 +335,7 @@ export function CycleView() {
       >
         <div className="flex flex-col gap-4">
           {vm.days.map((day) => (
-            <DayRow key={day.number} day={day} vm={vm} />
+            <DayRow key={day.number} day={day} vm={vm} updated={updated} />
           ))}
         </div>
       </QueryState>

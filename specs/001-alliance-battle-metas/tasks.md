@@ -486,6 +486,33 @@ para a próxima BAI nos outros dias.
 
 ---
 
+## Phase 12: Ajustes de 2026-10-18 (restrições, trajes, celular, metas, estatísticas)
+
+- [X] T129 Restrições dos dias conferidas com a lista oficial (paralisar = BAX, choque = BAL); BAL 13 → Vilão + Mutante, com Meta/Alternativa da BAX 14
+- [X] T130 Atributos por traje (gênero, lado, espécie, tipo de ataque; vazio = herda do personagem) em badges no catálogo; restrições checadas pelo traje; importador deduz atributos por traje
+- [X] T131 Admin no celular: menu de seções visível, catálogo/restrições/usuários em listas e cartões, diálogos em tela cheia com rodapé fixo
+- [X] T132 CTP no celular: gaveta `CtpPicker` com os 18 CTPs (elenco, "Minha equipe", metas e reservas); filtros do elenco recolhíveis
+- [X] T133 CTPs (admin): sem o campo Tipo; adicionar pelo grupo do tipo, só qualidades livres
+- [X] T134 Metas (admin): quadro do ciclo inteiro (BAX e BAL lado a lado, filtros por semana e modo) com edição no próprio dia
+- [X] T135 Sugestão = Meta → Alternativas → reservas, gerada na hora; aba Prioridades substituída por "Reservas" por dia/BAI
+- [X] T136 Traduções sempre mescladas na navegação (textos novos não ficam como chave crua)
+- [X] T137 Estatísticas: gráfico alterna Metas / Minhas equipes; lista de todas as equipes do usuário agrupadas pelas que mais se repetem
+- [X] T138 Tela 404, componentes de "em desenvolvimento" (toast, selo e página) e aviso de Metas atualizadas (toast + selo no dia e no modo) — FR-031 a FR-034
+
+---
+
+## Phase 13: Futuro — padrão de notificações de segurança (FN-001 a FN-004)
+
+Não implementar agora; manter o sistema simples.
+
+- [ ] T139 Catálogo de eventos de segurança com gravidade fixa (informativo / atenção / crítico) e o canal de cada um, em `src/models/domain` (FN-002)
+- [ ] T140 Ponto único `notify(evento)` (padrão Notification) que despacha para os 3 canais, com testes da escolha de canal (FN-001, FN-002)
+- [ ] T141 Canal "atenção": aviso persistente na tela (faixa dispensável) para e-mail não confirmado, papel alterado, login em outro aparelho e tentativas falhas (FN-001)
+- [ ] T142 Canal "crítico": e-mails de segurança pelo `MailService` (senha redefinida, papel alterado, conta bloqueada) + aviso persistente (FN-001, FN-004)
+- [ ] T143 Ligar os eventos existentes (login, bloqueio, redefinição de senha, troca de papel) ao `notify`, nos 3 idiomas, sem expor dados sensíveis (FN-003)
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies

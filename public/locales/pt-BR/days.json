@@ -73,9 +73,9 @@
     "metaWas": "Meta: {{name}}",
     "suggestion": {
       "title": "Sugestão para seu elenco",
-      "text": "Melhor equipe possível com o que você tem, pela lista de prioridade da Sword Brazil.",
+      "text": "Melhor equipe possível com o que você tem: Meta, Alternativas e reservas da Sword Brazil, nessa ordem.",
       "apply": "Aplicar sugestão",
-      "none": "Ainda não há sugestão: nenhum agente seu está na lista de prioridade deste dia.",
+      "none": "Ainda não há sugestão: nenhum agente seu está nas equipes ou reservas deste dia.",
       "applied": "Sugestão aplicada"
     },
     "help": {

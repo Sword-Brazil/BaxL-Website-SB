@@ -3,6 +3,7 @@ import type { DayDetail, DaySummary, MetaTeam } from "@/models/domain/types";
 import { HttpError } from "@/server/http";
 import { daysRepository } from "@/server/repositories/daysRepository";
 import { metaTeamRepository } from "@/server/repositories/metaTeamRepository";
+import { effectivePriority } from "@/models/rules/priority";
 import { toCriteria, toMetaTeam, toPriority } from "./mappers";
 
 export async function listDays(mode: DayMode): Promise<DaySummary[]> {
@@ -24,13 +25,14 @@ export async function listDays(mode: DayMode): Promise<DaySummary[]> {
 export async function getDay(mode: DayMode, number: number): Promise<DayDetail> {
   const day = isBaiDay(number) ? null : await daysRepository.find(mode, number);
   if (!day) throw new HttpError(404, "NOT_FOUND", "Dia não encontrado");
+  const metaTeams = day.metaTeams.map(toMetaTeam);
   return {
     mode,
     number,
     weekday: weekdayOf(number),
     criteria: toCriteria(day.criteria),
-    metaTeams: day.metaTeams.map(toMetaTeam),
-    priority: toPriority(day.priorityEntries),
+    metaTeams,
+    priority: effectivePriority(metaTeams, toPriority(day.priorityEntries)),
   };
 }
 

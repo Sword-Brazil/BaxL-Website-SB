@@ -40,15 +40,14 @@ function PaletteItem({ ctp, armed, onArm, idPrefix }: { ctp: Ctp; armed: boolean
 
 /**
  * Paleta de CTPs PVE (6 tipos × 3 qualidades) só com ícones, para caber em qualquer largura:
- * arrastar até um personagem, ou tocar para "armar" e depois tocar no personagem.
- * `layout="row"`: uma linha com rolagem horizontal (barra inferior no celular).
+ * arrastar até um personagem, ou tocar para "armar" e depois tocar no personagem. Usada no PC;
+ * no celular, cada personagem abre o CtpPicker.
  */
 export function CtpPalette({
   ctps,
   armedCtp,
   onArm,
   idPrefix,
-  layout = "grid",
   className,
 }: {
   ctps: Ctp[];
@@ -56,7 +55,6 @@ export function CtpPalette({
   onArm: (ctpId: string) => void;
   /** Prefixo dos ids de arraste: a paleta pode aparecer em dois lugares ao mesmo tempo. */
   idPrefix: string;
-  layout?: "grid" | "row";
   className?: string;
 }) {
   const { t } = useTranslation("common");
@@ -64,19 +62,6 @@ export function CtpPalette({
     ctps
       .filter((c) => c.type === type)
       .map((ctp) => <PaletteItem key={ctp.id} ctp={ctp} armed={armedCtp === ctp.id} onArm={onArm} idPrefix={idPrefix} />);
-
-  if (layout === "row") {
-    return (
-      <div className={cn("flex gap-3 overflow-x-auto pb-1 [scrollbar-width:thin]", className)}>
-        {CTP_TYPES.map((type) => (
-          <div key={type} className="flex shrink-0 flex-col gap-1">
-            <span className="font-heading text-[0.6rem] tracking-wider text-muted-foreground uppercase">{t(`ctp.${type}`)}</span>
-            <div className="flex gap-1">{group(type)}</div>
-          </div>
-        ))}
-      </div>
-    );
-  }
 
   return (
     <div className={cn("grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1.5", className)}>

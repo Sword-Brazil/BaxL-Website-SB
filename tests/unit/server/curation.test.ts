@@ -45,6 +45,19 @@ describe("curadoria", () => {
     expect(err.code).toBe("RESTRICTION_VIOLATION");
   });
 
+  it("a restrição usa os atributos próprios do traje, não só os do personagem", async () => {
+    const agentId = (await prisma.uniform.findUniqueOrThrow({ where: { id: maleMutant } })).agentId;
+    const female = await prisma.uniform.create({
+      data: { agentId, slug: "feminino", name: "Feminino", imagePath: "", gender: "FEMALE" },
+    });
+    await expect(saveMetaTeam(team([female.id, fem[1], fem[2]]), curatorId)).resolves.toBeTruthy();
+
+    const male = await prisma.uniform.findUniqueOrThrow({ where: { id: fem[0] } });
+    await prisma.uniform.update({ where: { id: male.id }, data: { gender: "MALE" } });
+    const err = await saveMetaTeam(team([male.id, fem[1], fem[2]]), curatorId).catch((e) => e);
+    expect(err.code).toBe("RESTRICTION_VIOLATION");
+  });
+
   it("publicar com uniforme inativo gera 400", async () => {
     await prisma.uniform.update({ where: { id: fem[0] }, data: { active: false } });
     await expect(saveMetaTeam(team(fem), curatorId)).rejects.toSatisfy(status(400));

@@ -19,7 +19,7 @@
     "welcome": "Hi, {{name}}",
     "text": "Choose what to edit. Every published change is visible immediately, with date and author.",
     "days": "Restrictions for each BAX and BAL day.",
-    "metas": "Meta teams per day, BAL free mode, BAI and priority lists.",
+    "metas": "Meta teams and reserves per day, BAL free mode and BAI.",
     "catalog": "Agents, uniforms and images.",
     "ctps": "CTP types, photos and availability.",
     "bai": "BAI boss sequence.",
@@ -50,15 +50,12 @@
   "metas": {
     "title": "Meta teams",
     "teamsTab": "Teams",
-    "priorityTab": "Priorities",
     "scope": "Where",
     "scopes": {
       "DAY": "BAX/BAL day",
       "BAL_FREE": "BAL free mode",
       "BAI": "BAI"
     },
-    "mode": "Mode",
-    "day": "Day",
     "newTeam": "New team",
     "editTeam": "Edit team",
     "isPrimary": "Primary team",
@@ -71,15 +68,22 @@
     "deleteConfirm": "Delete this team? This cannot be undone.",
     "deleted": "Team deleted",
     "empty": "No team registered here.",
-    "help": "Only active agents that meet the day restriction are listed. Marking as primary unmarks the previous one."
+    "help": "Only active agents that meet the day restriction are listed. Marking as primary unmarks the previous one.",
+    "addMeta": "Meta",
+    "addAlt": "Alternative",
+    "bothModes": "BAX + BAL",
+    "boardHint": "The whole cycle on one screen: edit, add or delete teams right on the day.",
+    "teamOf": "{{mode}} · Day {{day}}",
+    "allWeeks": "All",
+    "week": "Wk {{n}}",
+    "reserves": "Reserves",
+    "reservesHint": "Extra characters for the suggestion when players lack the Meta and Alternative ones. Order used: Meta → Alternatives → reserves.",
+    "addReserve": "+ Add reserve"
   },
   "priority": {
-    "title": "Priority lists",
-    "subtitle": "Preference order used to suggest teams from each player's roster.",
     "solo": "Solos",
     "support": "Supports",
-    "empty": "Empty list",
-    "help": "Drag to reorder (or use the buttons). The first item has priority."
+    "empty": "Empty list"
   },
   "catalog": {
     "title": "Agent catalog",
@@ -108,14 +112,19 @@
     "badType": "Use a PNG, WebP or JPEG image.",
     "slugAuto": "Generated from the name; edit only if needed.",
     "photos": "{{n}}/{{total}} with photo",
-    "quickUniform": "Uniform"
+    "quickUniform": "Uniform",
+    "baseAttributes": "Character attributes",
+    "baseAttributesHint": "Apply to every uniform, except those with their own attributes.",
+    "uniformAttributes": "This uniform's attributes",
+    "inheritedHint": "Dashed = inherited from the character. Tap another value to customize this uniform only.",
+    "customized": "Customized",
+    "resetAttributes": "Inherit all from character"
   },
   "ctps": {
     "title": "CTP catalog",
     "help": "Add CTPs and update their photos. Deleting deactivates an item to preserve existing teams and selections.",
     "add": "New CTP",
     "edit": "Edit CTP",
-    "type": "Type",
     "quality": "Quality",
     "remove": "Delete",
     "restore": "Restore"

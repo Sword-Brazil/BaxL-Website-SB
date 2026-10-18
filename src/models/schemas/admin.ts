@@ -89,6 +89,11 @@ export const UniformInputSchema = z.object({
   name: z.string().trim().min(1).max(80),
   imagePath: z.string().max(300), // vazio = sem imagem (mostra as iniciais)
   active: z.boolean().optional(),
+  // Atributos próprios do traje; null/ausente = herda do personagem.
+  gender: genderSchema.nullable().optional(),
+  side: sideSchema.nullable().optional(),
+  species: speciesSchema.nullable().optional(),
+  attackType: attackTypeSchema.nullable().optional(),
 });
 
 export const AgentSchema = z.object({

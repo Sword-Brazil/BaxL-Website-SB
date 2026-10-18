@@ -122,5 +122,31 @@
     "text": "This device and your account have different rosters/teams. Which version do you want to keep? The other will be replaced.",
     "keepLocal": "Keep this device's",
     "keepRemote": "Use the account's"
+  },
+  "ctpPicker": {
+    "choose": "Choose CTP",
+    "change": "Change",
+    "title": "Choose CTP",
+    "hint": "Tap a CTP to equip it on {{name}}.",
+    "remove": "Remove CTP"
+  },
+  "dev": {
+    "badge": "In development",
+    "toastTitle": "In development",
+    "toastText": "This feature is still being built.",
+    "toastFeature": "{{feature}}: still in development.",
+    "pageTitle": "In development",
+    "pageText": "Sword Brazil is still building this area. Come back soon."
+  },
+  "notFound": {
+    "title": "Page not found",
+    "text": "This address doesn't exist or has changed. If you came from a link in the app, this area may still be in development.",
+    "home": "Go to Alliance Battle",
+    "back": "Back"
+  },
+  "metaUpdates": {
+    "title": "Metas updated",
+    "text": "Changed since your last visit: {{list}}",
+    "more": "and {{n}} more"
   }
 }

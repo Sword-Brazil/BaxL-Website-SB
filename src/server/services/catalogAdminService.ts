@@ -12,6 +12,17 @@ const agentData = (input: AgentInput) => ({
   active: input.active ?? true,
 });
 
+const uniformData = (u: AgentInput["uniforms"][number]) => ({
+  slug: u.slug,
+  name: u.name,
+  imagePath: u.imagePath,
+  active: u.active ?? true,
+  gender: u.gender ?? null,
+  side: u.side ?? null,
+  species: u.species ?? null,
+  attackType: u.attackType ?? null,
+});
+
 async function assertSlugFree(slug: string, exceptId?: string) {
   const other = await prisma.agent.findUnique({ where: { slug } });
   if (other && other.id !== exceptId) throw new HttpError(409, "CONFLICT", "Já existe um agente com esse slug");
@@ -23,7 +34,7 @@ export async function createAgent(input: AgentInput) {
     data: {
       ...agentData(input),
       uniforms: {
-        create: input.uniforms.map((u) => ({ slug: u.slug, name: u.name, imagePath: u.imagePath, active: u.active ?? true })),
+        create: input.uniforms.map(uniformData),
       },
     },
     include: { uniforms: true },
@@ -44,7 +55,7 @@ export async function updateAgent(id: string, input: AgentInput) {
     const keep = new Set<string>();
     for (const u of input.uniforms) {
       const existing = agent.uniforms.find((x) => x.id === u.id) ?? agent.uniforms.find((x) => x.slug === u.slug);
-      const data = { slug: u.slug, name: u.name, imagePath: u.imagePath, active: u.active ?? true };
+      const data = uniformData(u);
       if (existing) {
         await tx.uniform.update({ where: { id: existing.id }, data });
         keep.add(existing.id);

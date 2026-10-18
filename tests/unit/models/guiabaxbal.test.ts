@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { convertSnapshot, derivePriority, parseRestriction, slugify, type GuiaSnapshot } from "@/models/import/guiabaxbal";
+import { convertSnapshot, parseRestriction, slugify, type GuiaSnapshot } from "@/models/import/guiabaxbal";
 
 const row = (dia: number, restr: string, meta: [string, string, string][], alt?: [string, string, string][]) => {
   const r: Record<string, string> = { Dia: String(dia), "Restrição": restr };
@@ -64,10 +64,11 @@ describe("importação do Guia BAX/BAL", () => {
     expect(by["Luna Snow"].uniforms).toEqual(["Padrão", "Mirae 2099", "Série Estilo de Vida 1"]);
   });
 
-  it("prioridade derivada: Líderes primeiro (Meta antes da Alternativa), sem repetir agente", () => {
-    const { days } = convertSnapshot(snap);
-    const p = derivePriority(days[0].teams);
-    expect(p.solo.map((m) => m.agent)).toEqual(["Misty Knight"]);
-    expect(p.support.map((m) => m.agent)).toEqual(["Luna Snow", "White Fox", "Gamora"]);
+  it("deduz atributos por traje só a partir das equipes em que o traje aparece", () => {
+    const luna = convertSnapshot(snap).agents.find((a) => a.name === "Luna Snow")!;
+    expect(luna.attributes.ATTACK_TYPE).toBe("UNKNOWN");
+    expect(luna.uniformAttributes["Mirae 2099"]).toEqual({ ATTACK_TYPE: "SPEED", SIDE: "HERO", GENDER: "FEMALE" });
+    expect(luna.uniformAttributes["Padrão"]).toEqual({ ATTACK_TYPE: "COMBAT", GENDER: "MALE" });
+    expect(luna.uniformAttributes["Série Estilo de Vida 1"]).toBeUndefined();
   });
 });

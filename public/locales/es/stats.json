@@ -11,7 +11,12 @@
     "subtitle": "Cuántas veces aparece cada personaje en los equipos del ciclo de 28 días, por semana.",
     "mode": "Modo",
     "withAlt": "Incluir alternativas",
-    "agent": "Personaje"
+    "agent": "Personaje",
+    "source": "Origen",
+    "sourceMeta": "Metas",
+    "sourceMine": "Mis equipos",
+    "subtitleMine": "Cuántas veces aparece cada personaje en los equipos que armaste, por semana.",
+    "emptyMine": "Aún no armaste equipos."
   },
   "ctp": {
     "title": "Mis CTPs equipados",
@@ -22,5 +27,13 @@
   "help": {
     "text1": "La repetición cuenta una aparición por equipo. Los personajes que se repiten mucho son buenas inversiones.",
     "text2": "Los CTPs salen de lo que equipaste en Mi plantilla (guardado en el dispositivo y en tu cuenta, si entras)."
+  },
+  "myTeams": {
+    "title": "Mis equipos",
+    "subtitle": "Todos los equipos que armaste, de los más repetidos a los menos.",
+    "times_one": "{{count}} vez",
+    "times_other": "{{count}} veces",
+    "empty": "Aún no armaste equipos en los días de BA.",
+    "build": "Armar equipos"
   }
 }
