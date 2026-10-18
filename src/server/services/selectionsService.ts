@@ -20,7 +20,7 @@ export async function putSelections(userId: string, doc: UserSelections, baseUpd
   }
   // updatedAt sempre avança, mesmo em gravações no mesmo milissegundo.
   const updatedAt = new Date(Math.max(Date.now(), (current?.updatedAt.getTime() ?? 0) + 1));
-  const json = JSON.stringify({ version: doc.version, roster: doc.roster, teams: doc.teams });
+  const json = JSON.stringify({ version: doc.version, roster: doc.roster, teams: doc.teams, equipment: doc.equipment });
   const row = await prisma.userSelectionsDoc.upsert({
     where: { userId },
     update: { json, updatedAt },
