@@ -1,6 +1,7 @@
 // Seed idempotente: CTPs, dias de BAX/BAL, Settings e as contas ADMIN e USER do dono do projeto.
 // Uso: npx prisma db seed  (lê .env.local)
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import path from "node:path";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { BATTLE_DAY_NUMBERS, CTP_QUALITIES, CTP_TYPES, DAY_MODES, type Role } from "../src/models/domain/enums";
@@ -32,13 +33,17 @@ async function seedUser(email: string | undefined, password: string | undefined,
   console.log(`✔ Conta ${role}: ${normalized}`);
 }
 
+/** Ícone de cada tipo de CTP, com a extensão do arquivo em public/assets/ctp (manifesto de imagens). */
+const CTP_IMAGES: Record<string, string> = JSON.parse(readFileSync(path.join("prisma", "data", "images.json"), "utf8")).ctps;
+const ctpImagePath = (type: string) => `/assets/ctp/${type.toLowerCase()}${path.extname(CTP_IMAGES[type] ?? ".png")}`;
+
 async function main() {
   for (const type of CTP_TYPES) {
     for (const quality of CTP_QUALITIES) {
       await prisma.ctp.upsert({
         where: { type_quality: { type, quality } },
         update: {},
-        create: { type, quality, imagePath: `/assets/ctp/${type.toLowerCase()}.png` },
+        create: { type, quality, imagePath: ctpImagePath(type) },
       });
     }
   }
