@@ -1,6 +1,7 @@
 import "@/styles/globals.css";
 import { useEffect, useMemo, useState } from "react";
 import type { AppProps } from "next/app";
+import { useRouter } from "next/router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { appWithTranslation, useTranslation } from "next-i18next/pages";
 import { ThemeProvider } from "next-themes";
@@ -8,6 +9,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useSelectionsStore } from "@/viewmodels/stores/selectionsStore";
 import { bodyFont, displayFont } from "@/styles/fonts";
+import { setZodLocale } from "@/lib/zodLocale";
 
 type I18nStore = Record<string, Record<string, object>>;
 
@@ -28,6 +30,9 @@ function useMergeTranslations(store: I18nStore | undefined) {
 
 function App({ Component, pageProps }: AppProps) {
   useMergeTranslations(pageProps._nextI18Next?.initialI18nStore);
+  const { locale } = useRouter();
+  // Antes de renderizar a página: as validações dos formulários usam o idioma escolhido.
+  useMemo(() => setZodLocale(locale), [locale]);
   const [queryClient] = useState(
     () => new QueryClient({ defaultOptions: { queries: { staleTime: 60_000, refetchOnWindowFocus: false } } }),
   );

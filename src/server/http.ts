@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { z, type ZodType } from "zod";
+import "@/lib/zodLocale";
 
 export type ErrorCode =
   | "VALIDATION_ERROR"
