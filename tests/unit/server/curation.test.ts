@@ -58,6 +58,14 @@ describe("curadoria", () => {
     expect(err.code).toBe("RESTRICTION_VIOLATION");
   });
 
+  it("publicar equipe ou reserva com CTP desativado gera 400", async () => {
+    await prisma.ctp.update({ where: { id: ctp }, data: { active: false } });
+    await expect(saveMetaTeam(team(fem), curatorId)).rejects.toSatisfy(status(400));
+    await expect(savePriority({ scope: "BAI" }, { solo: [{ uniformId: fem[0], ctpId: ctp }], support: [] })).rejects.toSatisfy(
+      status(400),
+    );
+  });
+
   it("publicar com uniforme inativo gera 400", async () => {
     await prisma.uniform.update({ where: { id: fem[0] }, data: { active: false } });
     await expect(saveMetaTeam(team(fem), curatorId)).rejects.toSatisfy(status(400));

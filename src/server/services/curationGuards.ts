@@ -28,10 +28,11 @@ export async function loadActiveUniforms(uniformIds: string[]) {
   return uniformIds.map((id) => byId.get(id)!);
 }
 
+/** CTPs existentes e ativos: um CTP desativado não pode ser recomendado (o jogador não o encontra). */
 export async function assertCtpsExist(ctpIds: string[]) {
   const unique = [...new Set(ctpIds)];
-  const count = await prisma.ctp.count({ where: { id: { in: unique } } });
-  if (count !== unique.length) throw new HttpError(400, "VALIDATION_ERROR", "CTP não encontrado");
+  const count = await prisma.ctp.count({ where: { id: { in: unique }, active: true } });
+  if (count !== unique.length) throw new HttpError(400, "VALIDATION_ERROR", "CTP não encontrado ou desativado");
 }
 
 /** 422 se algum traje (com seus atributos próprios ou herdados) não atender à restrição do dia. */
