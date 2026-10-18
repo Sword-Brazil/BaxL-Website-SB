@@ -46,15 +46,19 @@ function AgentRosterCard({ agent, vm, dragging }: { agent: Agent; vm: RosterVm; 
   const ctp = vm.equippedCtpOf(agent.id);
   const { setNodeRef, isOver } = useDroppable({ id: `agent:${agent.id}`, disabled: !isOwned });
   return (
-    <li ref={setNodeRef} className="min-w-0">
+    <li
+      ref={setNodeRef}
+      className={cn("min-w-0", ctp && "roster-ctp-neon")}
+      style={ctp ? ({ "--ctp-neon": ctpColor(ctp) } as React.CSSProperties) : undefined}
+    >
       <Card
         size="sm"
         variant={isOwned ? "panel" : "default"}
-        // Personagem "pintado" com a cor do CTP equipado.
-        style={ctp ? ({ "--ctp-neon": ctpColor(ctp), backgroundColor: `color-mix(in oklch, ${ctpColor(ctp)} 10%, transparent)` } as React.CSSProperties) : undefined}
+        // A sombra fica no <li>, fora do Card que usa overflow-hidden.
+        style={ctp ? ({ borderColor: ctpColor(ctp), backgroundColor: `color-mix(in oklch, ${ctpColor(ctp)} 10%, transparent)` } as React.CSSProperties) : undefined}
         className={cn(
           "h-full border transition-[transform,box-shadow,background-color] duration-200",
-          ctp && "roster-ctp-neon",
+          ctp && "roster-ctp-card",
           isOwned && (vm.armedCtp || dragging) && "cursor-copy ring-2 ring-energy/70 motion-safe:animate-pulse",
           isOver && "scale-[1.02] bg-energy/15 ring-4 ring-energy motion-safe:animate-none",
         )}

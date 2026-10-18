@@ -1,17 +1,22 @@
 @import "tailwindcss";
 
 @keyframes roster-ctp-glow {
-  0%, 100% { box-shadow: 0 0 7px -3px var(--ctp-neon), 0 0 15px -8px var(--ctp-neon); }
-  50% { box-shadow: 0 0 12px -2px var(--ctp-neon), 0 0 25px -5px var(--ctp-neon); }
+  0%, 100% { box-shadow: 0 0 9px 1px var(--ctp-neon), 0 0 20px 3px color-mix(in srgb, var(--ctp-neon) 55%, transparent); }
+  50% { box-shadow: 0 0 14px 3px var(--ctp-neon), 0 0 30px 7px color-mix(in srgb, var(--ctp-neon) 68%, transparent); }
 }
 
 .roster-ctp-neon {
-  border-color: var(--ctp-neon);
+  border-radius: 0.75rem;
   animation: roster-ctp-glow 3.6s ease-in-out infinite;
 }
 
+.roster-ctp-card[data-variant="panel"] {
+  clip-path: none;
+  border-radius: 0.75rem;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .roster-ctp-neon { animation: none; box-shadow: 0 0 9px -3px var(--ctp-neon), 0 0 17px -7px var(--ctp-neon); }
+  .roster-ctp-neon { animation: none; box-shadow: 0 0 11px 2px var(--ctp-neon), 0 0 24px 5px color-mix(in srgb, var(--ctp-neon) 60%, transparent); }
 }
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
