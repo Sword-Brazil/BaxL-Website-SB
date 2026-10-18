@@ -148,5 +148,26 @@
     "title": "Metas actualizadas",
     "text": "Cambiaron desde tu última visita: {{list}}",
     "more": "y {{n}} más"
+  },
+  "validation": {
+    "passwordRequired": "Ingresa la contraseña",
+    "emailInvalid": "Correo inválido",
+    "passwordMin": "Mínimo de 8 caracteres",
+    "passwordLetter": "Debe contener una letra",
+    "passwordDigit": "Debe contener un número",
+    "baiDay": "Día reservado para la BAI",
+    "teamKey": "Clave de equipo inválida",
+    "sameAgentTwoSlots": "El mismo agente no puede ocupar dos posiciones",
+    "attributeValue": "Valor inválido para el atributo",
+    "attributeRepeated": "Atributo repetido",
+    "teamSize": "El equipo necesita exactamente 3 miembros",
+    "slotsRepeated": "Posiciones repetidas",
+    "agentRepeated": "Agente repetido",
+    "dayRequired": "Día obligatorio para equipos de día",
+    "uniformRepeatedInList": "Uniforme repetido en la lista",
+    "positionRepeated": "Posición repetida",
+    "slugFormat": "Usa kebab-case (ej.: scarlet-witch)",
+    "uniformRequired": "Registra al menos un uniforme",
+    "uniformRepeated": "Uniforme repetido"
   }
 }

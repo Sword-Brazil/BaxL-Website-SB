@@ -148,5 +148,26 @@
     "title": "Metas updated",
     "text": "Changed since your last visit: {{list}}",
     "more": "and {{n}} more"
+  },
+  "validation": {
+    "passwordRequired": "Enter your password",
+    "emailInvalid": "Invalid e-mail",
+    "passwordMin": "At least 8 characters",
+    "passwordLetter": "Must contain a letter",
+    "passwordDigit": "Must contain a number",
+    "baiDay": "Day reserved for BAI",
+    "teamKey": "Invalid team key",
+    "sameAgentTwoSlots": "The same agent can't take two slots",
+    "attributeValue": "Invalid value for the attribute",
+    "attributeRepeated": "Repeated attribute",
+    "teamSize": "The team needs exactly 3 members",
+    "slotsRepeated": "Repeated positions",
+    "agentRepeated": "Repeated agent",
+    "dayRequired": "Day required for day teams",
+    "uniformRepeatedInList": "Uniform repeated in the list",
+    "positionRepeated": "Repeated position",
+    "slugFormat": "Use kebab-case (e.g. scarlet-witch)",
+    "uniformRequired": "Add at least one uniform",
+    "uniformRepeated": "Repeated uniform"
   }
 }
