@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { z, type ZodType } from "zod";
+import { stalePrismaClientHint } from "./prismaFreshness";
 
 export type ErrorCode =
   | "VALIDATION_ERROR"
@@ -62,7 +63,10 @@ export function handler(handlers: Partial<Record<Method, Handler>>) {
     } catch (e) {
       if (e instanceof HttpError) return sendError(res, e.status, e.code, e.message, e.fields);
       console.error(e);
-      return sendError(res, 500, "INTERNAL_ERROR", "Erro interno");
+      // Em desenvolvimento, explica a causa mais comum de 500 depois de uma migração.
+      const hint = stalePrismaClientHint();
+      if (hint) console.error(`\n⚠️  ${hint}\n`);
+      return sendError(res, 500, "INTERNAL_ERROR", hint ?? "Erro interno");
     }
   };
 }
