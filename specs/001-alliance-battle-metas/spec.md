@@ -94,7 +94,9 @@ definir tecnologia."
   se repetem (mesmo Líder e mesmos Suportes), com os dias em que cada uma foi usada.
 - **Fluxo de trabalho** (Constituição 1.2.0): a partir de 2026-10-18, toda modificação grande é
   dividida e feita numa branch própria (`feat/`, `docs/`, `chore/`) com commits separados por
-  assunto, e cada bug é corrigido numa branch `fix/<assunto>`, com um commit por correção.
+  assunto, e cada bug é corrigido numa branch `fix/<assunto>`, com um commit por correção. As
+  branches nascem da `Dev` e voltam para ela, onde tudo é testado; a `master` só recebe a `Dev`
+  por pull request (template em `.github/pull_request_template.md`).
 - **Avisos de desenvolvimento e de mudanças** (ver FR-031 a FR-034): toda funcionalidade ainda em
   desenvolvimento, todo campo ainda não funcional e toda mudança nas Metas atuais de um dia são
   indicados ao usuário por **toast**; áreas inexistentes ou ainda não liberadas usam a **tela de
