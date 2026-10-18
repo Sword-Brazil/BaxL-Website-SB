@@ -30,6 +30,12 @@ describe("selectionsService", () => {
     expect((await getSelections(u.id))?.updatedAt).toBe(saved.updatedAt);
   });
 
+  it("os CTPs equipados nos personagens são salvos e voltam da conta", async () => {
+    const u = await createUser();
+    await putSelections(u.id, { ...emptySelections(), equipment: { ctpByAgent: { agente1: "ctp1" } } });
+    expect((await getSelections(u.id))?.equipment).toEqual({ ctpByAgent: { agente1: "ctp1" } });
+  });
+
   it("PUT com baseUpdatedAt divergente gera 409", async () => {
     const u = await createUser();
     const first = await putSelections(u.id, emptySelections());
