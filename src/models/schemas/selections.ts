@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { BATTLE_DAY_NUMBERS, SLOTS } from "@/models/domain/enums";
 import { idSchema } from "./common";
+import { VALIDATION } from "./messages";
 
 /** Chaves de equipe: "BAX-<n>" / "BAL-<n>" (dias válidos de BAX/BAL) ou "BAI". */
 export const TEAM_KEY_RE = /^(BAX|BAL)-(\d{1,2})$/;
@@ -10,7 +11,7 @@ export const teamKeySchema = z.string().refine(
     const m = TEAM_KEY_RE.exec(k);
     return !!m && BATTLE_DAY_NUMBERS.includes(Number(m[2]));
   },
-  { message: "Chave de equipe inválida" },
+  { message: VALIDATION.teamKey },
 );
 export type TeamKey = string;
 
@@ -23,7 +24,7 @@ export const UserTeamSchema = z
       const ids = SLOTS.flatMap((s) => (t[s] ? [t[s]!.uniformId] : []));
       return new Set(ids).size === ids.length;
     },
-    { message: "O mesmo agente não pode ocupar dois slots" },
+    { message: VALIDATION.sameAgentTwoSlots },
   );
 export type UserTeam = z.infer<typeof UserTeamSchema>;
 

@@ -16,6 +16,7 @@ import {
   SPECIES,
   TEAM_SCOPES,
 } from "@/models/domain/enums";
+import { VALIDATION } from "./messages";
 
 export const modeSchema = z.enum(MODES);
 export const dayModeSchema = z.enum(DAY_MODES);
@@ -37,19 +38,19 @@ export const dayNumberSchema = z
   .int()
   .min(1)
   .max(CYCLE_LENGTH)
-  .refine((n) => !isBaiDay(n), { message: "Dia reservado à BAI" });
+  .refine((n) => !isBaiDay(n), { message: VALIDATION.baiDay });
 
 /** Mesmo que dayNumberSchema, mas aceitando string (parâmetros de rota). */
 export const dayNumberParamSchema = z.coerce.number().pipe(dayNumberSchema);
 
-export const emailSchema = z.string().trim().toLowerCase().pipe(z.email({ message: "E-mail inválido" }));
+export const emailSchema = z.string().trim().toLowerCase().pipe(z.email({ message: VALIDATION.emailInvalid }));
 
 export const passwordSchema = z
   .string()
-  .min(8, { message: "Mínimo de 8 caracteres" })
+  .min(8, { message: VALIDATION.passwordMin })
   .max(128)
-  .regex(/[A-Za-z]/, { message: "Precisa conter uma letra" })
-  .regex(/\d/, { message: "Precisa conter um número" });
+  .regex(/[A-Za-z]/, { message: VALIDATION.passwordLetter })
+  .regex(/\d/, { message: VALIDATION.passwordDigit });
 
 export const idSchema = z.string().min(1).max(64);
 
