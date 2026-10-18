@@ -49,6 +49,16 @@ describe("authService.login", () => {
     await expect(login({ email: "jogador@sword.br", password: "senha1234", ip: IP, now: after })).resolves.toBeTruthy();
   });
 
+  it("falhas em paralelo contam todas: não dá para escapar do bloqueio com requisições simultâneas", async () => {
+    await createUser();
+    const attempts = Array.from({ length: 10 }, () => login({ email: "jogador@sword.br", password: "errada123", ip: IP }).catch((e) => e));
+    await Promise.all(attempts);
+    const row = await prisma.loginAttempt.findUniqueOrThrow({ where: { key: `jogador@sword.br|${IP}` } });
+    expect(row.failedCount).toBeGreaterThanOrEqual(5);
+    expect(row.lockedUntil).not.toBeNull();
+    await expectHttpError(login({ email: "jogador@sword.br", password: "senha1234", ip: IP }), 429);
+  });
+
   it("falhas espalhadas por mais de 15 min não bloqueiam", async () => {
     await createUser();
     const t0 = Date.parse("2026-10-17T12:00:00Z");

@@ -38,13 +38,7 @@ export async function login(input: { email: string; password: string; ip: string
   const ok = await bcrypt.compare(input.password, user?.passwordHash ?? DUMMY_HASH);
 
   if (!user || !ok) {
-    const windowOpen = attempt?.firstFailAt && now.getTime() - attempt.firstFailAt.getTime() < FAILURE_WINDOW_MS;
-    const failedCount = windowOpen ? attempt.failedCount + 1 : 1;
-    await userRepository.saveAttempt(key, {
-      failedCount,
-      firstFailAt: windowOpen ? attempt.firstFailAt! : now,
-      lockedUntil: failedCount >= MAX_FAILURES ? new Date(now.getTime() + LOCK_MS) : null,
-    });
+    await userRepository.recordFailure(key, now, { windowMs: FAILURE_WINDOW_MS, maxFailures: MAX_FAILURES, lockMs: LOCK_MS });
     throw invalidCredentials();
   }
 
