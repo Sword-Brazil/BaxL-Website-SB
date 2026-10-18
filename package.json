@@ -1,0 +1,67 @@
+{
+  "name": "mff-system",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "seed:demo": "tsx prisma/seed-demo.ts",
+    "assets:import": "tsx scripts/import-assets.ts",
+    "check:locales": "tsx scripts/check-locales.ts",
+    "import:guiabaxbal": "tsx scripts/import-guiabaxbal.ts",
+    "import:images": "tsx scripts/import-images.ts"
+  },
+  "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@hookform/resolvers": "^5.9.2",
+    "@prisma/client": "^6.19.3",
+    "@tanstack/react-query": "^5.104.4",
+    "bcryptjs": "^3.0.3",
+    "class-variance-authority": "^0.7.1",
+    "cmdk": "^1.1.1",
+    "cn": "^0.5.0",
+    "html-to-image": "^1.11.13",
+    "i18next": "^26.5.2",
+    "iron-session": "^9.0.1",
+    "lucide-react": "^1.59.0",
+    "next": "16.4.2",
+    "next-i18next": "^16.4.1",
+    "next-themes": "^0.4.6",
+    "radix-ui": "^1.8.1",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-hook-form": "^7.90.0",
+    "react-i18next": "^17.1.0",
+    "recharts": "^3.8.0",
+    "shadcn": "^4.22.0",
+    "sonner": "^2.0.8",
+    "tw-animate-css": "^1.4.0",
+    "zod": "^4.6.7",
+    "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "@tailwindcss/turbopack": "^4",
+    "@types/node": "^22.20.5",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.2",
+    "prisma": "^6.19.3",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.15",
+    "typescript": "^5",
+    "vitest": "^5.0.5"
+  },
+  "overrides": {
+    "@typeschema/zod": {
+      "zod": "$zod"
+    }
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  }
+}

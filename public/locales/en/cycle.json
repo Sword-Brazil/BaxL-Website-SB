@@ -1,0 +1,36 @@
+{
+  "title": "Alliance Battle",
+  "subtitle": "28-day cycle: BAX and BAL side by side. On BAI days only BAI happens.",
+  "today": "Today",
+  "todayLine": "Day {{day}} · {{weekday}} · Week {{week}}",
+  "goToday": "Go to today",
+  "weeks": "Weeks",
+  "all": "All",
+  "week": "Week {{n}}",
+  "meta": "Meta",
+  "alternative": "Alternative",
+  "mine": "My team",
+  "build": "Build my team",
+  "edit": "Edit my team",
+  "builderTitle": "{{mode}} · Day {{day}} · My team",
+  "noTeam": "No team defined",
+  "bai": {
+    "title": "BAI · Alliance Battle Infinite",
+    "text": "Every agent allowed. Bosses appear in sequence: defeat as many as you can.",
+    "bosses": "Bosses"
+  },
+  "freeMode": "BAL free mode",
+  "legend": {
+    "title": "Legend",
+    "owned": "Green mark: you own the agent (mark it in My roster).",
+    "dim": "Faded: you don't own the agent.",
+    "ctp": "Icon on the portrait corner: recommended CTP (type only for Meta).",
+    "hero": "Blue frame: hero. Red: villain.",
+    "reset": "The day turns over at 12 PM and the weekly score resets at 10 PM (Brasília)."
+  },
+  "youAreHere": "You are here · current AB day",
+  "endsIn": "Turns over in {{time}} (12 PM Brasília)",
+  "cycleDays": "Cycle days",
+  "metaUpdated": "Meta updated",
+  "metaUpdatedShort": "Updated"
+}

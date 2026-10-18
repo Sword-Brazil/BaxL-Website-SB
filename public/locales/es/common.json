@@ -1,0 +1,173 @@
+{
+  "brand": {
+    "name": "Sword Brazil",
+    "tagline": "Metas de la Batalla de Alianza",
+    "title": "Sword Brazil · Metas BA"
+  },
+  "nav": {
+    "roster": "Mi plantilla",
+    "admin": "Admin",
+    "login": "Entrar",
+    "logout": "Salir",
+    "menu": "Menú",
+    "account": "Mi cuenta",
+    "battle": "Batalla de Alianza",
+    "stats": "Estadísticas"
+  },
+  "modes": {
+    "BAX": "Batalla de Alianza Extrema",
+    "BAL": "Batalla de Alianza Leyenda",
+    "BAI": "Batalla de Alianza Infinita"
+  },
+  "theme": {
+    "toggle": "Cambiar tema",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Sistema"
+  },
+  "language": {
+    "label": "Idioma",
+    "pt-BR": "Português (BR)",
+    "en": "English",
+    "es": "Español"
+  },
+  "footer": {
+    "disclaimer": "Proyecto de fans, no oficial y sin fines comerciales. Marvel Future Fight es propiedad de Netmarble; los personajes son propiedad de Marvel.",
+    "alliance": "Hecho para la alianza Sword Brazil.",
+    "credit": "Calendario y equipos base: Guia BAX/BAL/BAI (guiabaxbal.web.app), con curaduría de Sword Brazil."
+  },
+  "team": {
+    "empty": "Sin equipo definido",
+    "primary": "Principal",
+    "alternative": "Alternativa",
+    "updatedAt": "Actualizado el {{date}}",
+    "unavailable": "No disponible",
+    "slots": {
+      "SOLO": "Líder",
+      "SUPPORT_1": "Pos. 1",
+      "SUPPORT_2": "Pos. 2"
+    },
+    "owned": "Tienes",
+    "notOwned": "No lo tienes"
+  },
+  "restriction": {
+    "none": "Sin restricción",
+    "label": "Restricción"
+  },
+  "attributes": {
+    "GENDER": "Género",
+    "SIDE": "Bando",
+    "SPECIES": "Especie",
+    "ATTACK_TYPE": "Tipo de ataque"
+  },
+  "values": {
+    "MALE": "Masculino",
+    "FEMALE": "Femenino",
+    "NONE": "Sin género",
+    "HERO": "Héroe",
+    "VILLAIN": "Villano",
+    "MUTANT": "Mutante",
+    "INHUMAN": "Inhumano",
+    "HUMAN": "Humano",
+    "ALIEN": "Alienígena",
+    "NEO_HUMAN": "Neohumano",
+    "OTHER": "Otro",
+    "COMBAT": "Combate",
+    "BLAST": "Explosión",
+    "SPEED": "Velocidad",
+    "UNIVERSAL": "Universal",
+    "UNKNOWN": "No informado"
+  },
+  "ctp": {
+    "RAGE": "Furia",
+    "LIBERATION": "Liberación",
+    "INSIGHT": "Percepción",
+    "COMPETITION": "Competición",
+    "JUDGEMENT": "Juicio",
+    "ASCENT": "Ascenso"
+  },
+  "quality": {
+    "NORMAL": "Normal",
+    "MIGHTY": "Poderoso",
+    "BRILLIANT": "Brillante"
+  },
+  "weekdays": {
+    "QUI": "JUE",
+    "SEX": "VIE",
+    "SÁB": "SÁB",
+    "DOM": "DOM",
+    "SEG": "LUN",
+    "TER": "MAR",
+    "QUA": "MIÉ"
+  },
+  "day": "Día {{number}}",
+  "actions": {
+    "retry": "Reintentar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "close": "Cerrar",
+    "back": "Volver",
+    "help": "Ayuda",
+    "exportImage": "Exportar imagen"
+  },
+  "states": {
+    "loading": "Cargando…",
+    "error": "No se pudieron cargar los datos.",
+    "notFound": "Página no encontrada.",
+    "forbidden": "Acceso denegado."
+  },
+  "sync": {
+    "title": "Elige qué selecciones mantener",
+    "text": "Este dispositivo y tu cuenta tienen plantillas/equipos distintos. ¿Qué versión quieres mantener? La otra será reemplazada.",
+    "keepLocal": "Mantener las de este dispositivo",
+    "keepRemote": "Usar las de la cuenta"
+  },
+  "ctpPicker": {
+    "choose": "Elegir CTP",
+    "change": "Cambiar",
+    "title": "Elegir CTP",
+    "hint": "Toca un CTP para equiparlo en {{name}}.",
+    "remove": "Quitar CTP"
+  },
+  "dev": {
+    "badge": "En desarrollo",
+    "toastTitle": "En desarrollo",
+    "toastText": "Esta función aún se está desarrollando.",
+    "toastFeature": "{{feature}}: aún en desarrollo.",
+    "pageTitle": "En desarrollo",
+    "pageText": "Sword Brazil aún está construyendo esta área. Vuelve pronto."
+  },
+  "notFound": {
+    "title": "Página no encontrada",
+    "text": "La dirección no existe o cambió. Si llegaste desde un enlace de la app, esta área puede estar en desarrollo.",
+    "home": "Ir a la Batalla de Alianza",
+    "back": "Volver"
+  },
+  "metaUpdates": {
+    "title": "Metas actualizadas",
+    "text": "Cambiaron desde tu última visita: {{list}}",
+    "more": "y {{n}} más"
+  },
+  "validation": {
+    "passwordRequired": "Ingresa la contraseña",
+    "emailInvalid": "Correo inválido",
+    "passwordMin": "Mínimo de 8 caracteres",
+    "passwordLetter": "Debe contener una letra",
+    "passwordDigit": "Debe contener un número",
+    "baiDay": "Día reservado para la BAI",
+    "teamKey": "Clave de equipo inválida",
+    "sameAgentTwoSlots": "El mismo agente no puede ocupar dos posiciones",
+    "attributeValue": "Valor inválido para el atributo",
+    "attributeRepeated": "Atributo repetido",
+    "teamSize": "El equipo necesita exactamente 3 miembros",
+    "slotsRepeated": "Posiciones repetidas",
+    "agentRepeated": "Agente repetido",
+    "dayRequired": "Día obligatorio para equipos de día",
+    "uniformRepeatedInList": "Uniforme repetido en la lista",
+    "positionRepeated": "Posición repetida",
+    "slugFormat": "Usa kebab-case (ej.: scarlet-witch)",
+    "uniformRequired": "Registra al menos un uniforme",
+    "uniformRepeated": "Uniforme repetido"
+  }
+}

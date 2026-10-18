@@ -1,0 +1,59 @@
+import type { Role, TeamScope } from "@/models/domain/enums";
+import type { BaiBoss, Ctp, Criterion, MetaTeam, PriorityLists, SessionUser, Settings } from "@/models/domain/types";
+import type {
+  AgentInput,
+  CtpInput,
+  AssetUploadInput,
+  BaiBossesInput,
+  CreateStaffInput,
+  MetaTeamInput,
+  PriorityInput,
+  PriorityTarget,
+  SettingsInput,
+} from "@/models/schemas/admin";
+import { apiFetch } from "./client";
+
+const priorityPath = (t: PriorityTarget) =>
+  t.scope === "DAY" ? `/api/admin/priority/DAY/${t.mode}/${t.number}` : "/api/admin/priority/BAI";
+
+export interface AdminUser extends SessionUser {
+  emailVerified: boolean;
+  createdAt: string;
+}
+
+export const adminApi = {
+  setRestriction: (mode: string, number: number, criteria: Criterion[]) =>
+    apiFetch<{ criteria: Criterion[] }>(`/api/admin/days/${mode}/${number}/restriction`, { method: "PUT", body: { criteria } }),
+
+  listMetaTeams: (scope: TeamScope, mode?: string, number?: number) => {
+    const qs = new URLSearchParams({ scope, ...(mode ? { mode } : {}), ...(number ? { number: String(number) } : {}) });
+    return apiFetch<MetaTeam[]>(`/api/admin/meta-teams?${qs}`);
+  },
+  createMetaTeam: (body: MetaTeamInput) => apiFetch<MetaTeam>("/api/admin/meta-teams", { method: "POST", body }),
+  updateMetaTeam: (id: string, body: MetaTeamInput) => apiFetch<MetaTeam>(`/api/admin/meta-teams/${id}`, { method: "PUT", body }),
+  deleteMetaTeam: (id: string) => apiFetch<void>(`/api/admin/meta-teams/${id}`, { method: "DELETE" }),
+
+  getPriority: (t: PriorityTarget) => apiFetch<PriorityLists>(priorityPath(t)),
+  savePriority: (t: PriorityTarget, body: PriorityInput) => apiFetch<PriorityLists>(priorityPath(t), { method: "PUT", body }),
+
+  getBosses: () => apiFetch<BaiBoss[]>("/api/admin/bai/bosses"),
+  saveBosses: (body: BaiBossesInput) => apiFetch<BaiBoss[]>("/api/admin/bai/bosses", { method: "PUT", body }),
+
+  createAgent: (body: AgentInput) => apiFetch<unknown>("/api/admin/agents", { method: "POST", body }),
+  updateAgent: (id: string, body: AgentInput) => apiFetch<unknown>(`/api/admin/agents/${id}`, { method: "PUT", body }),
+  createCtp: (body: CtpInput) => apiFetch<Ctp>("/api/admin/ctps", { method: "POST", body }),
+  updateCtp: (id: string, body: CtpInput) => apiFetch<Ctp>(`/api/admin/ctps/${id}`, { method: "PUT", body }),
+  uploadAsset: (body: AssetUploadInput) => apiFetch<{ imagePath: string }>("/api/admin/assets", { method: "POST", body }),
+
+  getSettings: () => apiFetch<Settings>("/api/admin/settings"),
+  saveSettings: (body: SettingsInput) => apiFetch<Settings>("/api/admin/settings", { method: "PUT", body }),
+
+  listUsers: (q = "", page = 1) =>
+    apiFetch<{ total: number; page: number; pageSize: number; users: AdminUser[] }>(
+      `/api/admin/users?${new URLSearchParams({ ...(q ? { q } : {}), page: String(page) })}`,
+    ),
+  createStaff: (body: CreateStaffInput) => apiFetch<SessionUser>("/api/admin/users", { method: "POST", body }),
+  changeRole: (id: string, role: Role) => apiFetch<SessionUser>(`/api/admin/users/${id}/role`, { method: "PATCH", body: { role } }),
+  resetPassword: (id: string, password: string) =>
+    apiFetch<void>(`/api/admin/users/${id}/reset-password`, { method: "POST", body: { password } }),
+};

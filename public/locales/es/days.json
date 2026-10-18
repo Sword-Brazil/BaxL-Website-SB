@@ -1,0 +1,108 @@
+{
+  "today": {
+    "title": "Hoy",
+    "currentDay": "Día actual",
+    "dayOfCycle": "Día {{day}} de 28 · {{weekday}}",
+    "week": "Semana {{week}}",
+    "seeDay": "Ver detalles del día",
+    "seeAllDays": "Todos los días",
+    "baiToday": "Hoy es día de BAI",
+    "baiTodayText": "Hoy no hay BAX ni BAL. Todos los agentes están permitidos y los jefes aparecen uno tras otro.",
+    "goToBai": "Abrir la BAI",
+    "nextBai": "Próxima BAI: {{date}}",
+    "resetBefore": "Hoy es el día del reinicio semanal: hasta las 22 h (Brasilia) la puntuación cuenta para la semana actual.",
+    "resetAfter": "Reinicio semanal hecho a las 22 h (Brasilia): la puntuación ahora cuenta para la nueva semana.",
+    "help": {
+      "title": "Cómo usar",
+      "text1": "El día de batalla cambia a las 12 h (Brasilia). El reinicio semanal de puntuación ocurre a las 22 h del último día de la semana.",
+      "text2": "Toca BAX o BAL y luego un día para ver el equipo Meta completo."
+    }
+  },
+  "grid": {
+    "title": "{{mode}} · Días del ciclo",
+    "subtitle": "24 días por ciclo. Los días 3, 10, 17 y 24 son de la BAI.",
+    "current": "Hoy",
+    "freeMode": "Modo libre",
+    "help": {
+      "title": "Cuadrícula de días",
+      "text1": "Cada tarjeta muestra la restricción del día y el Solista del equipo Meta principal.",
+      "text2": "El día actual aparece destacado."
+    }
+  },
+  "detail": {
+    "title": "{{mode}} · Día {{day}}",
+    "meta": "Equipo Meta",
+    "prev": "Día anterior",
+    "next": "Día siguiente",
+    "alternatives": "Alternativas",
+    "notes": "Observaciones",
+    "notFound": "Este día no existe para BAX/BAL (los días 3, 10, 17 y 24 son de la BAI).",
+    "help": {
+      "title": "Equipo del día",
+      "text1": "La restricción define qué agentes se pueden usar. Los criterios unidos con \"+\" deben cumplirse a la vez.",
+      "text2": "Cada agente muestra el uniforme Meta y el CTP recomendado con su calidad."
+    }
+  },
+  "free": {
+    "title": "BAL · Modo libre",
+    "subtitle": "Equipos con mejor rendimiento sin restricción de personaje.",
+    "help": {
+      "title": "Modo libre",
+      "text1": "En la BAL libre se puede usar cualquier agente. Estos equipos cambian con poca frecuencia."
+    }
+  },
+  "myTeam": {
+    "title": "Mi equipo",
+    "subtitle": "Arma tu equipo con los agentes que tienes y que cumplen la restricción.",
+    "pick": "Elegir agente…",
+    "search": "Buscar en tu plantilla…",
+    "noCandidates": "Ningún agente de tu plantilla cumple la restricción de este día.",
+    "goRoster": "Marcar mi plantilla",
+    "clear": "Vaciar slot",
+    "status": {
+      "MATCH": "Igual a la Meta",
+      "DIFFERENT": "Distinto de la Meta",
+      "NOT_OWNED": "No tienes el agente Meta",
+      "UNIFORM_NOT_OWNED": "No tienes el uniforme Meta"
+    },
+    "ctpStatus": {
+      "MATCH": "CTP igual a la Meta",
+      "CTP_DIFFERENT": "CTP distinto de la Meta",
+      "NONE": "Sin CTP"
+    },
+    "metaWas": "Meta: {{name}}",
+    "suggestion": {
+      "title": "Sugerencia para tu plantilla",
+      "text": "El mejor equipo posible con lo que tienes: Meta, Alternativas y reservas de Sword Brazil, en ese orden.",
+      "apply": "Aplicar sugerencia",
+      "none": "Aún no hay sugerencia: ninguno de tus agentes está en los equipos o reservas de este día.",
+      "applied": "Sugerencia aplicada"
+    },
+    "help": {
+      "title": "Mi equipo",
+      "text1": "Verde: igual a la Meta. Ámbar: distinto. Rojo: no tienes el agente o el uniforme Meta.",
+      "text2": "Tus elecciones se guardan en este dispositivo (y en tu cuenta, si entras)."
+    },
+    "palette": {
+      "title": "CTPs",
+      "open": "Elegir CTP",
+      "hint": "Arrastra un CTP hasta un agente de tu equipo, o toca el CTP y luego el agente.",
+      "armed": "CTP seleccionado: toca un agente para aplicarlo.",
+      "remove": "Quitar CTP"
+    },
+    "dnd": {
+      "instructions": "Para tomar un CTP, pulsa espacio o enter. Usa las flechas para moverlo y espacio o enter para soltarlo sobre un agente. Esc cancela.",
+      "pickup": "CTP {{name}} tomado.",
+      "over": "Sobre {{target}}.",
+      "overNone": "Fuera de un agente.",
+      "drop": "CTP {{name}} aplicado a {{target}}.",
+      "dropNone": "CTP {{name}} soltado fuera de un agente. No cambió nada.",
+      "cancel": "Arrastre cancelado."
+    },
+    "change": "Cambiar agente…",
+    "copyMeta": "Copiar Meta",
+    "copyAlt": "Copiar Alternativa",
+    "copied": "{{count}} agente(s) copiado(s) de tu plantilla",
+    "copyNone": "No tienes ningún agente de este equipo. Ármalo con tu plantilla."
+  }
+}

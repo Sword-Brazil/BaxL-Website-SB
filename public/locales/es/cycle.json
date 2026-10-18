@@ -1,0 +1,36 @@
+{
+  "title": "Batalla de Alianza",
+  "subtitle": "Ciclo de 28 días: BAX y BAL lado a lado. En los días de BAI solo hay BAI.",
+  "today": "Hoy",
+  "todayLine": "Día {{day}} · {{weekday}} · Semana {{week}}",
+  "goToday": "Ir a hoy",
+  "weeks": "Semanas",
+  "all": "Todas",
+  "week": "Semana {{n}}",
+  "meta": "Meta",
+  "alternative": "Alternativa",
+  "mine": "Mi equipo",
+  "build": "Armar mi equipo",
+  "edit": "Editar mi equipo",
+  "builderTitle": "{{mode}} · Día {{day}} · Mi equipo",
+  "noTeam": "Sin equipo definido",
+  "bai": {
+    "title": "BAI · Batalla de Alianza Infinita",
+    "text": "Todos los agentes permitidos. Los jefes aparecen en secuencia: derrota a todos los que puedas.",
+    "bosses": "Jefes"
+  },
+  "freeMode": "BAL modo libre",
+  "legend": {
+    "title": "Leyenda",
+    "owned": "Marca verde: tienes el agente (márcalo en Mi plantilla).",
+    "dim": "Atenuado: no tienes el agente.",
+    "ctp": "Icono en la esquina del retrato: CTP recomendado (en la Meta, solo el tipo).",
+    "hero": "Marco azul: héroe. Rojo: villano.",
+    "reset": "El día cambia a las 12 h y la puntuación semanal se reinicia a las 22 h (Brasilia)."
+  },
+  "youAreHere": "Estás aquí · día actual de la BA",
+  "endsIn": "Cambia en {{time}} (12 h de Brasilia)",
+  "cycleDays": "Días del ciclo",
+  "metaUpdated": "Meta actualizada",
+  "metaUpdatedShort": "Actualizada"
+}

@@ -1,0 +1,29 @@
+{
+  "$comment": "Imagens de referência (assets de Marvel Future Fight hospedados pelo thanosvibs). 'dest' é relativo a public/assets/. Para agentes use dest 'agents/<agente>/<uniforme>.png'.",
+  "items": [
+    {
+      "url": "https://thanosvibs.money/static/assets/items/ctp_rage.png",
+      "dest": "ctp/rage.png"
+    },
+    {
+      "url": "https://thanosvibs.money/static/assets/items/ctp_liberation.png",
+      "dest": "ctp/liberation.png"
+    },
+    {
+      "url": "https://thanosvibs.money/static/assets/items/ctp_insight.png",
+      "dest": "ctp/insight.png"
+    },
+    {
+      "url": "https://thanosvibs.money/static/assets/items/ctp_competition.png",
+      "dest": "ctp/competition.png"
+    },
+    {
+      "url": "https://thanosvibs.money/static/assets/items/ctp_judgement.png",
+      "dest": "ctp/judgement.png"
+    },
+    {
+      "url": "https://thanosvibs.money/static/assets/items/ctp_ascent.png",
+      "dest": "ctp/ascent.png"
+    }
+  ]
+}
