@@ -154,7 +154,8 @@ function DayRow({ day, vm, updated }: { day: CycleDay; vm: Vm; updated: Readonly
       id={`dia-${day.number}`}
       aria-label={t("common:day", { number: day.number })}
       className={cn(
-        "scroll-mt-20 overflow-hidden rounded-xl md:scroll-mt-32 bg-card ring-1 ring-foreground/10",
+        // overflow-clip (e não hidden): hidden cria um contêiner de rolagem e o navegador ignora o scroll-mt.
+        "scroll-mt-20 overflow-clip rounded-xl md:scroll-mt-32 bg-card ring-1 ring-foreground/10",
         isToday && "energy-glow ring-2 ring-energy",
         day.isBai && "bg-linear-to-r from-card via-energy/5 to-card",
       )}
