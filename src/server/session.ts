@@ -7,6 +7,10 @@ import { HttpError } from "@/server/http";
 
 export interface SessionData {
   userId?: string;
+  /** Identifica esta sessão (avisos de "novo login" não aparecem na sessão que entrou). */
+  sid?: string;
+  /** Início da sessão (ISO): avisos de "novo login" anteriores a ele não aparecem. */
+  loginAt?: string;
 }
 
 function sessionOptions(): SessionOptions {

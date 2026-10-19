@@ -6,12 +6,15 @@ import { prisma } from "@/server/db";
 import { HttpError } from "@/server/http";
 import { userRepository } from "@/server/repositories/userRepository";
 import { toSessionUser } from "@/server/session";
-import { getMailService, type MailKind } from "./mailService";
+import { appUrl, getMailService, type TokenMailKind } from "./mailService";
+import { notify, notifyInBackground, resolveNotice } from "./notificationService";
 
 const BCRYPT_COST = 12;
 const MAX_FAILURES = 5;
 const FAILURE_WINDOW_MS = 15 * 60_000;
 const LOCK_MS = 15 * 60_000;
+/** A partir de quantas falhas seguidas o dono da conta recebe o aviso de tentativas. */
+const WARN_FAILURES = 3;
 
 /** Hash usado quando o e-mail não existe, para o tempo de resposta não revelar contas. */
 const DUMMY_HASH = bcrypt.hashSync("dummy-password-0", BCRYPT_COST);
@@ -23,8 +26,10 @@ const invalidCredentials = () => new HttpError(401, "UNAUTHENTICATED", "E-mail o
 /**
  * Login por e-mail e senha com limite de tentativas por `email|ip`:
  * 5 falhas em 15 min → bloqueio de 15 min. Contas não confirmadas podem entrar.
+ * Avisa o dono da conta: 3 falhas → aviso de tentativas; bloqueio → e-mail + aviso;
+ * login certo → aviso de "novo login" nas outras sessões (`sessionId` é a sessão que entrou).
  */
-export async function login(input: { email: string; password: string; ip: string; now?: Date }): Promise<SessionUser> {
+export async function login(input: { email: string; password: string; ip: string; sessionId?: string; now?: Date }): Promise<SessionUser> {
   const now = input.now ?? new Date();
   const email = input.email.trim().toLowerCase();
   const key = `${email}|${input.ip}`;
@@ -38,24 +43,30 @@ export async function login(input: { email: string; password: string; ip: string
   const ok = await bcrypt.compare(input.password, user?.passwordHash ?? DUMMY_HASH);
 
   if (!user || !ok) {
-    await userRepository.recordFailure(key, now, { windowMs: FAILURE_WINDOW_MS, maxFailures: MAX_FAILURES, lockMs: LOCK_MS });
+    const { failedCount } = await userRepository.recordFailure(key, now, {
+      windowMs: FAILURE_WINDOW_MS,
+      maxFailures: MAX_FAILURES,
+      lockMs: LOCK_MS,
+    });
+    if (user && failedCount === WARN_FAILURES) notifyInBackground({ type: "FAILED_LOGINS", userId: user.id });
+    if (user && failedCount === MAX_FAILURES) notifyInBackground({ type: "ACCOUNT_LOCKED", userId: user.id });
     throw invalidCredentials();
   }
 
   await userRepository.clearAttempt(key);
+  await notify({ type: "NEW_LOGIN", userId: user.id, originSessionId: input.sessionId });
   return toSessionUser(user);
 }
 
 // ---------- Cadastro, confirmação de e-mail e recuperação de senha ----------
 
-const TOKEN_TTL_MS: Record<MailKind, number> = { VERIFY_EMAIL: 24 * 3_600_000, RESET_PASSWORD: 3_600_000 };
-const LINK_PATH: Record<MailKind, string> = { VERIFY_EMAIL: "/verificar-email", RESET_PASSWORD: "/redefinir-senha" };
+const TOKEN_TTL_MS: Record<TokenMailKind, number> = { VERIFY_EMAIL: 24 * 3_600_000, RESET_PASSWORD: 3_600_000 };
+const LINK_PATH: Record<TokenMailKind, string> = { VERIFY_EMAIL: "/verificar-email", RESET_PASSWORD: "/redefinir-senha" };
 
 const sha256 = (token: string) => createHash("sha256").update(token).digest("hex");
-const appUrl = () => process.env.APP_URL ?? "http://localhost:3000";
 
 /** Gera um token de uso único (só o hash fica no banco) e envia o link. */
-async function issueToken(user: { id: string; email: string }, kind: MailKind) {
+async function issueToken(user: { id: string; email: string }, kind: TokenMailKind) {
   const token = randomBytes(32).toString("base64url");
   await prisma.authToken.create({
     data: { userId: user.id, kind, tokenHash: sha256(token), expiresAt: new Date(Date.now() + TOKEN_TTL_MS[kind]) },
@@ -64,7 +75,7 @@ async function issueToken(user: { id: string; email: string }, kind: MailKind) {
 }
 
 /** Consome um token válido (não usado e não expirado) do tipo pedido. */
-async function consumeToken(token: string, kind: MailKind) {
+async function consumeToken(token: string, kind: TokenMailKind) {
   const row = await prisma.authToken.findUnique({ where: { tokenHash: sha256(token) } });
   if (!row || row.kind !== kind || row.usedAt || row.expiresAt <= new Date()) {
     throw new HttpError(400, "VALIDATION_ERROR", "Link inválido ou expirado");
@@ -85,6 +96,7 @@ export async function register(input: RegisterInput) {
       data: { email, passwordHash, nickname: input.nickname || null, role: "USER" },
     });
     await issueToken(user, "VERIFY_EMAIL");
+    await notify({ type: "EMAIL_UNVERIFIED", userId: user.id });
   }
   return { ok: true as const };
 }
@@ -92,6 +104,7 @@ export async function register(input: RegisterInput) {
 export async function verifyEmail(token: string) {
   const userId = await consumeToken(token, "VERIFY_EMAIL");
   await prisma.user.update({ where: { id: userId }, data: { emailVerifiedAt: new Date() } });
+  await resolveNotice(userId, "EMAIL_UNVERIFIED");
   return { ok: true as const };
 }
 
@@ -105,5 +118,6 @@ export async function forgotPassword(rawEmail: string) {
 export async function resetPassword(token: string, password: string) {
   const userId = await consumeToken(token, "RESET_PASSWORD");
   await prisma.user.update({ where: { id: userId }, data: { passwordHash: await hashPassword(password) } });
+  await notify({ type: "PASSWORD_RESET", userId });
   return { ok: true as const };
 }

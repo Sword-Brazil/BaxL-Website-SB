@@ -22,6 +22,7 @@ import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useAuthViewModel } from "@/viewmodels/useAuthViewModel";
 import { BrandMark } from "./BrandMark";
+import { SecurityNotices } from "./SecurityNotices";
 import { SelectionsSyncDialog } from "./SelectionsSyncDialog";
 
 const NAV = [
@@ -216,7 +217,10 @@ export function AppLayout({ title, children, wide = false }: { title?: string; c
           </div>
         </header>
 
-        <main className={cn("mx-auto w-full flex-1 px-4 py-6", wide ? "max-w-7xl" : "max-w-6xl")}>{children}</main>
+        <main className={cn("mx-auto w-full flex-1 px-4 py-6", wide ? "max-w-7xl" : "max-w-6xl")}>
+          <SecurityNotices />
+          {children}
+        </main>
 
         <footer className="border-t border-energy/10 py-6">
           <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 text-xs text-muted-foreground">

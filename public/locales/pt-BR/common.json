@@ -169,5 +169,46 @@
     "slugFormat": "Use kebab-case (ex.: scarlet-witch)",
     "uniformRequired": "Cadastre ao menos um uniforme",
     "uniformRepeated": "Uniforme repetido"
+  },
+  "security": {
+    "label": "Avisos de segurança da conta",
+    "dismiss": "Dispensar aviso",
+    "notMe": "Não foi você? Redefina a senha.",
+    "roles": {
+      "USER": "Usuário",
+      "CURATOR": "Curador",
+      "ADMIN": "Administrador"
+    },
+    "toast": {
+      "SESSION_EXPIRED": "Sua sessão expirou. Entre de novo para continuar sincronizando.",
+      "SELECTIONS_SYNCED": "Elenco e equipes sincronizados com a sua conta.",
+      "PASSWORD_CHANGED": "Senha alterada com sucesso."
+    },
+    "notices": {
+      "EMAIL_UNVERIFIED": {
+        "title": "E-mail ainda não confirmado",
+        "text": "Abra o link que enviamos para o seu e-mail para confirmar a conta."
+      },
+      "NEW_LOGIN": {
+        "title": "Novo login na sua conta",
+        "text": "Sua conta foi acessada em outro aparelho ou navegador em {{date}}."
+      },
+      "FAILED_LOGINS": {
+        "title": "Tentativas de login com senha errada",
+        "text": "Houve várias tentativas de entrar na sua conta com a senha errada em {{date}}."
+      },
+      "PASSWORD_RESET": {
+        "title": "Senha redefinida",
+        "text": "A senha da sua conta foi redefinida em {{date}}. Também enviamos um aviso por e-mail."
+      },
+      "ROLE_CHANGED": {
+        "title": "Papel da conta alterado",
+        "text": "Sua conta agora tem o papel {{role}} (alterado em {{date}}). Também enviamos um aviso por e-mail."
+      },
+      "ACCOUNT_LOCKED": {
+        "title": "Conta bloqueada temporariamente",
+        "text": "O login foi bloqueado por alguns minutos em {{date}} depois de muitas tentativas com a senha errada. Também enviamos um aviso por e-mail."
+      }
+    }
   }
 }

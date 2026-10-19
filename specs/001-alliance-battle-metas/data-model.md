@@ -169,6 +169,15 @@ O texto explicativo da BAI fica no i18n.
 | failedCount | int | |
 | lockedUntil | datetime? | 5 falhas em 15 min geram bloqueio de 15 min |
 
+### SecurityNotice
+| Campo | Tipo | Regras |
+|-------|------|--------|
+| userId | FK User | cascade |
+| type | evento de atenção/crítico do catálogo (`securityEvents.ts`) | um aberto por tipo e usuário |
+| params | JSON? | só dados não sensíveis (ex.: `{"role":"CURATOR"}`) |
+| originSessionId | string? | sessão que fez o login (o "novo login" não aparece nela) |
+| dismissedAt | datetime? | dispensado pelo usuário ou resolvido (ex.: e-mail confirmado) |
+
 ## Dados do usuário
 
 ### UserSelections (documento versionado)

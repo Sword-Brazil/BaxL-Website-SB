@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { getRemoteSelections, putRemoteSelections } from "@/models/api/auth";
 import { ApiError } from "@/models/api/client";
 import { mergeDecision } from "@/models/rules/selectionsSync";
 import type { UserSelections } from "@/models/schemas/selections";
 import { useSelectionsStore } from "./stores/selectionsStore";
 import { useAuthViewModel } from "./useAuthViewModel";
+import { useNotify } from "./useNotify";
 
 const DEBOUNCE_MS = 2000;
 
@@ -17,6 +19,8 @@ const DEBOUNCE_MS = 2000;
  */
 export function useSelectionsSyncViewModel() {
   const { user } = useAuthViewModel();
+  const qc = useQueryClient();
+  const notify = useNotify();
   const { doc, hydrated, syncUserId, syncBase, syncedLocalAt, replaceAll, markSynced } = useSelectionsStore();
   const [conflict, setConflict] = useState<UserSelections | null>(null);
   const checkedFor = useRef<string | null>(null);
@@ -35,6 +39,7 @@ export function useSelectionsSyncViewModel() {
       if (linked && remote && remote.updatedAt !== state.syncBase && !localDirty) {
         replaceAll(remote);
         markSynced(remote.updatedAt, user.id);
+        notify("SELECTIONS_SYNCED");
         return;
       }
       if (linked && (!remote || remote.updatedAt === state.syncBase)) return;
@@ -43,11 +48,13 @@ export function useSelectionsSyncViewModel() {
         case "UPLOAD_LOCAL": {
           const saved = await putRemoteSelections(state.doc, remote?.updatedAt ?? null);
           markSynced(saved.updatedAt, user.id);
+          notify("SELECTIONS_SYNCED");
           break;
         }
         case "USE_REMOTE":
           replaceAll(remote!);
           markSynced(remote!.updatedAt, user.id);
+          notify("SELECTIONS_SYNCED");
           break;
         case "IN_SYNC":
           markSynced(remote?.updatedAt ?? null, user.id);
@@ -57,7 +64,7 @@ export function useSelectionsSyncViewModel() {
           break;
       }
     })();
-  }, [hydrated, user, replaceAll, markSynced]);
+  }, [hydrated, user, replaceAll, markSynced, notify]);
 
   // Envio das mudanças locais (debounce).
   const dirty = doc.updatedAt !== syncedLocalAt;
@@ -71,11 +78,14 @@ export function useSelectionsSyncViewModel() {
         if (e instanceof ApiError && e.status === 409) {
           const remote = await getRemoteSelections().catch(() => null);
           if (remote) setConflict(remote);
+        } else if (e instanceof ApiError && e.status === 401) {
+          qc.setQueryData(["me"], null);
+          notify("SESSION_EXPIRED");
         }
       }
     }, DEBOUNCE_MS);
     return () => clearTimeout(id);
-  }, [user, syncUserId, syncBase, dirty, doc, conflict, markSynced]);
+  }, [user, syncUserId, syncBase, dirty, doc, conflict, markSynced, qc, notify]);
 
   return {
     conflict: !!conflict,
@@ -85,6 +95,7 @@ export function useSelectionsSyncViewModel() {
       const saved = await putRemoteSelections(useSelectionsStore.getState().doc, conflict.updatedAt);
       markSynced(saved.updatedAt, user.id);
       setConflict(null);
+      notify("SELECTIONS_SYNCED");
     },
     /** Usa o que está na conta e substitui o aparelho. */
     keepRemote: () => {
@@ -92,6 +103,7 @@ export function useSelectionsSyncViewModel() {
       replaceAll(conflict);
       markSynced(conflict.updatedAt, user.id);
       setConflict(null);
+      notify("SELECTIONS_SYNCED");
     },
   };
 }
