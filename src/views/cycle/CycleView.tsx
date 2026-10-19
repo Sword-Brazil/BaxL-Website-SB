@@ -15,6 +15,7 @@ import { useMetaUpdatesNotice } from "@/viewmodels/useMetaUpdatesNotice";
 import { HelpHint } from "@/views/layout/HelpHint";
 import { TeamStrip as SharedTeamStrip, type StripMember, type TeamTone } from "@/views/shared/TeamStrip";
 import { QueryState } from "@/views/shared/QueryState";
+import { MODE_VISUALS } from "@/views/shared/modeVisuals";
 import { RestrictionBadges } from "@/views/shared/RestrictionBadges";
 import { TeamBuilderPanel } from "./TeamBuilderPanel";
 
@@ -76,11 +77,13 @@ function ModePanel({
   const { t } = useTranslation(["cycle", "common"]);
   const [meta, ...alts] = data?.metaTeams ?? [];
   const mine = userMembers(vm.userTeam(mode, day));
+  const look = MODE_VISUALS[mode];
   return (
-    <div className="flex min-w-0 flex-col gap-2 p-3">
+    // Faixa e fundo na cor do modo (BAX azul, BAL laranja), como no jogo.
+    <div className={cn("flex min-w-0 flex-col gap-2 border-t-2 p-3", look.accentBar, look.tint)}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="flex items-center gap-1.5">
-          <Badge variant="energy" className="h-6 px-2.5 font-heading text-sm">
+          <Badge variant={look.badge} className="h-6 px-2.5 font-heading text-sm">
             {mode}
           </Badge>
           {updated && <MetaUpdatedBadge short />}
@@ -110,10 +113,10 @@ function BaiPanel({ day, vm }: { day: number; vm: Vm }) {
   const [meta, ...alts] = vm.bai?.metaTeams ?? [];
   const mine = userMembers(vm.userTeam("BAI", day));
   return (
-    <div className="flex flex-col gap-3 p-3">
+    <div className={cn("flex flex-col gap-3 border-t-2 p-3", MODE_VISUALS.BAI.accentBar, MODE_VISUALS.BAI.tint)}>
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="flex items-center gap-2 font-heading text-lg font-bold text-energy">
+          <p className="flex items-center gap-2 font-heading text-lg font-bold text-bai">
             <InfinityIcon className="size-5 shrink-0" />
             {t("cycle:bai.title")}
           </p>
@@ -161,8 +164,9 @@ function DayRow({ day, vm, updated }: { day: CycleDay; vm: Vm; updated: Readonly
       className={cn(
         // overflow-clip (e não hidden): hidden cria um contêiner de rolagem e o navegador ignora o scroll-mt.
         "scroll-mt-20 overflow-clip rounded-xl md:scroll-mt-32 bg-card ring-1 ring-foreground/10",
+        day.isBai && "bg-linear-to-r from-card via-bai/8 to-card ring-bai/30",
+        // Depois da BAI: o destaque de "Hoje" vale mesmo num dia de BAI.
         isToday && "energy-glow ring-2 ring-energy",
-        day.isBai && "bg-linear-to-r from-card via-energy/5 to-card",
       )}
     >
       <header className={cn("flex items-center gap-3 border-b px-3 py-2", isToday ? "bg-energy/10" : "bg-muted/40")}>
@@ -170,7 +174,7 @@ function DayRow({ day, vm, updated }: { day: CycleDay; vm: Vm; updated: Readonly
         <span className="font-heading text-sm tracking-widest text-muted-foreground uppercase">
           {t(`common:weekdays.${day.weekday}`)}
         </span>
-        {day.isBai && <Badge variant="energy">BAI</Badge>}
+        {day.isBai && <Badge variant="bai">BAI</Badge>}
         {anyUpdated && <MetaUpdatedBadge className="ml-auto" />}
         {isToday && (
           <Badge className={cn("animate-pulse bg-energy text-primary-foreground", !anyUpdated && "ml-auto")}>
@@ -215,7 +219,14 @@ function BuilderDialog({ vm }: { vm: Vm }) {
       {/* Celular: tela cheia. Notebook/PC: até 72rem, com rolagem interna. */}
       <DialogContent className="top-0 left-0 flex h-dvh max-h-dvh w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-0 overflow-hidden rounded-none p-0 sm:top-1/2 sm:left-1/2 sm:h-[min(92dvh,60rem)] sm:w-[calc(100vw-3rem)] sm:max-w-6xl sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-xl">
         <DialogHeader className="shrink-0 gap-1 border-b border-energy/15 px-4 py-3 pr-12 text-left sm:px-6">
-          <DialogTitle className="font-heading text-lg sm:text-xl">{b ? t("cycle:builderTitle", { mode: b.mode, day: b.day }) : ""}</DialogTitle>
+          <DialogTitle className="flex items-center gap-2 font-heading text-lg sm:text-xl">
+            {b && (
+              <Badge variant={MODE_VISUALS[b.mode].badge} className="font-heading">
+                {b.mode}
+              </Badge>
+            )}
+            {b ? t("cycle:builderTitle", { mode: b.mode, day: b.day }) : ""}
+          </DialogTitle>
           <DialogDescription className="text-xs sm:text-sm">{t("days:myTeam.subtitle")}</DialogDescription>
           {data && <RestrictionBadges criteria={data.criteria} />}
         </DialogHeader>
@@ -253,7 +264,7 @@ function DayStrip({ vm }: { vm: Vm }) {
                 className={cn(
                   "flex h-11 w-9 flex-col items-center justify-center rounded-md border text-xs leading-none transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
                   d.number % 7 === 1 && d.number > 1 && "ml-2",
-                  d.isBai ? "border-energy/40 bg-energy/10 text-energy" : "border-border bg-card",
+                  d.isBai ? "border-bai/50 bg-bai/10 text-bai" : "border-border bg-card",
                   isPast && !isToday && "opacity-50",
                   isToday && "scale-110 border-energy bg-energy font-bold text-primary-foreground shadow-[0_0_14px_-2px_var(--glow)]",
                 )}

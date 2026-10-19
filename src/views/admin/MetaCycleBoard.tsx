@@ -22,6 +22,8 @@ import type { useMetaTeamEditorViewModel } from "@/viewmodels/admin/useMetaTeamE
 import { QueryState } from "@/views/shared/QueryState";
 import { RestrictionBadges } from "@/views/shared/RestrictionBadges";
 import { TeamStrip } from "@/views/shared/TeamStrip";
+import { Badge } from "@/components/ui/badge";
+import { MODE_VISUALS } from "@/views/shared/modeVisuals";
 import { ReservesEditor } from "./ReservesEditor";
 
 type EditorVm = ReturnType<typeof useMetaTeamEditorViewModel>;
@@ -81,9 +83,11 @@ function ModeCell({
   };
 
   return (
-    <div className="flex min-w-0 flex-col gap-2">
+    <div className={cn("flex min-w-0 flex-col gap-2 rounded-md border-t-2 p-2", MODE_VISUALS[mode].accentBar, MODE_VISUALS[mode].tint)}>
       <div className="flex flex-wrap items-center gap-2">
-        <span className="font-heading text-sm font-bold tracking-wider text-energy">{mode}</span>
+        <Badge variant={MODE_VISUALS[mode].badge} className="font-heading">
+          {mode}
+        </Badge>
         <RestrictionBadges criteria={data?.criteria ?? []} />
       </div>
       {teams.map((team) => (
