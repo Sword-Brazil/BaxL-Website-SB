@@ -38,37 +38,19 @@ describe("curadoria", () => {
     ...extra,
   });
 
-  it("cada Causador de Dano, em qualquer posição, tem a própria rotação (salva na forma canônica)", async () => {
-    const withDealers = (dealers: Partial<Record<"SOLO" | "SUPPORT_1" | "SUPPORT_2", object>>) => {
-      const base = team(fem);
-      return { ...base, members: base.members.map((m) => ({ ...m, ...dealers[m.slot] })) };
-    };
+  it("qualquer posição pode ser Causador de Dano, um ou mais por equipe", async () => {
+    const base = team(fem);
     const saved = await saveMetaTeam(
-      withDealers({
-        SUPPORT_1: {
-          isDamageDealer: true,
-          rotation: "1C > 2dc (3, 4) 6",
-          rotationNotes: "Guarde o 6 para a fase 2",
-          rotationVideoUrl: "https://youtu.be/dQw4w9WgXcQ?t=42",
-        },
-        SUPPORT_2: { isDamageDealer: true, rotation: "3 1qc 6" },
-        SOLO: { isDamageDealer: false, rotation: "1 2 3", rotationNotes: "ignorada", rotationVideoUrl: "https://youtu.be/dQw4w9WgXcQ" },
-      }),
+      { ...base, members: base.members.map((m) => ({ ...m, isDamageDealer: m.slot !== "SOLO" })) },
       curatorId,
     );
-    const bySlot = Object.fromEntries(saved.members.map((m) => [m.slot, m]));
-    expect(bySlot.SUPPORT_1).toMatchObject({
-      isDamageDealer: true,
-      rotation: "1c 2dc (3 4) 6",
-      rotationNotes: "Guarde o 6 para a fase 2",
-      rotationVideoUrl: "https://youtu.be/dQw4w9WgXcQ?t=42",
+    expect(Object.fromEntries(saved.members.map((m) => [m.slot, m.isDamageDealer]))).toEqual({
+      SOLO: false,
+      SUPPORT_1: true,
+      SUPPORT_2: true,
     });
-    expect(bySlot.SUPPORT_2).toMatchObject({ isDamageDealer: true, rotation: "3 1qc 6", rotationNotes: null });
-    expect(bySlot.SOLO).toMatchObject({ isDamageDealer: false, rotation: null, rotationNotes: null, rotationVideoUrl: null });
-
-    const cleared = await saveMetaTeam(withDealers({ SUPPORT_1: { isDamageDealer: true, rotation: "", rotationNotes: "x" } }), curatorId, saved.id);
-    expect(cleared.members.find((m) => m.slot === "SUPPORT_1")).toMatchObject({ isDamageDealer: true, rotation: null, rotationNotes: null });
   });
+
 
   it("publicar com agente fora da restrição gera 422 RESTRICTION_VIOLATION", async () => {
     const err = await saveMetaTeam(team([maleMutant, fem[1], fem[2]]), curatorId).catch((e) => e);

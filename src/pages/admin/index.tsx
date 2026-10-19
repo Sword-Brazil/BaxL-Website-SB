@@ -11,6 +11,7 @@ const SECTIONS = [
   { href: "/admin/dias", key: "days" },
   { href: "/admin/metas", key: "metas" },
   { href: "/admin/catalogo", key: "catalog" },
+  { href: "/admin/rotacoes", key: "rotations" },
   { href: "/admin/ctps", key: "ctps", adminOnly: true },
   { href: "/admin/bai", key: "bai" },
   { href: "/admin/usuarios", key: "users", adminOnly: true },

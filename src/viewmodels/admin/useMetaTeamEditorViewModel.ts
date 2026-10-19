@@ -11,11 +11,8 @@ import type { MetaScopeViewModel } from "./useMetaScopeViewModel";
 export interface MemberDraft {
   uniformId: string | null;
   ctpId: string | null;
-  /** Causador de Dano: só ele tem rotação e descrição. */
+  /** Causador de Dano: o jogador toca na foto e vê as rotações do personagem. */
   isDamageDealer: boolean;
-  rotation: string;
-  rotationNotes: string;
-  rotationVideoUrl: string;
 }
 
 export interface TeamDraft {
@@ -26,7 +23,7 @@ export interface TeamDraft {
   members: Record<Slot, MemberDraft>;
 }
 
-const emptyMember = (): MemberDraft => ({ uniformId: null, ctpId: null, isDamageDealer: false, rotation: "", rotationNotes: "", rotationVideoUrl: "" });
+const emptyMember = (): MemberDraft => ({ uniformId: null, ctpId: null, isDamageDealer: false });
 
 const emptyDraft = (isPrimary: boolean): TeamDraft => ({
   isPrimary,
@@ -47,9 +44,6 @@ const fromTeam = (t: MetaTeam): TeamDraft => ({
         uniformId: m.uniformId,
         ctpId: m.ctpId,
         isDamageDealer: m.isDamageDealer,
-        rotation: m.rotation ?? "",
-        rotationNotes: m.rotationNotes ?? "",
-        rotationVideoUrl: m.rotationVideoUrl ?? "",
       },
     ]),
   ) as TeamDraft["members"],
@@ -92,9 +86,6 @@ export function useMetaTeamEditorViewModel(scopeVm: MetaScopeViewModel, messages
             uniformId: m.uniformId ?? "",
             ctpId: m.ctpId ?? null,
             isDamageDealer: m.isDamageDealer,
-            rotation: m.isDamageDealer ? m.rotation || null : null,
-            rotationNotes: m.isDamageDealer ? m.rotationNotes || null : null,
-            rotationVideoUrl: m.isDamageDealer ? m.rotationVideoUrl || null : null,
           };
         }),
       };

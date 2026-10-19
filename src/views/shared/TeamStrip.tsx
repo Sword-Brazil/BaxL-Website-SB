@@ -1,21 +1,24 @@
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useTranslation } from "next-i18next/pages";
 import { cn } from "@/lib/utils";
 import { DISPLAY_SLOTS, type Slot } from "@/models/domain/enums";
 import type { Ctp, MetaTeamMember } from "@/models/domain/types";
 import type { CatalogViewModel } from "@/viewmodels/useCatalogViewModel";
 import { MemberChip } from "./MemberChip";
-import { RotationPanel, RotationToggle } from "./RotationSequence";
 
 export type TeamTone = "meta" | "alt" | "mine";
 
 export type StripMember = { slot: Slot; uniformId: string; ctpId?: string | null } & Partial<
-  Pick<MetaTeamMember, "isDamageDealer" | "rotation" | "rotationNotes" | "rotationVideoUrl">
+  Pick<MetaTeamMember, "isDamageDealer">
 >;
+
+/** Tela de rotações do personagem, abrindo no traje usado na equipe. */
+export const rotationHref = (agentSlug: string, uniformSlug: string) =>
+  `/rotacoes/${agentSlug}?traje=${encodeURIComponent(uniformSlug)}`;
 
 /**
  * Uma equipe (Meta, Alternativa ou a do usuário) em 3 colunas compactas: Esquerda · Líder · Direita.
- * Equipes curadas com Causador de Dano que tem rotação ganham o botão "Rotação".
+ * Na Meta/Alternativa, a foto do Causador de Dano leva à tela de rotações dele.
  */
 export function TeamStrip({
   label,
@@ -38,13 +41,6 @@ export function TeamStrip({
 }) {
   const { t } = useTranslation("common");
   const isMine = tone === "mine";
-  const [showRotation, setShowRotation] = useState(false);
-  const rotations = DISPLAY_SLOTS.flatMap((slot) => {
-    const m = members.find((x) => x.slot === slot);
-    if (!m?.isDamageDealer || !(m.rotation || m.rotationNotes)) return [];
-    const name = catalog.uniformById(m.uniformId)?.agent.name ?? t(`team.slots.${slot}`);
-    return [{ slot, name, rotation: m.rotation ?? null, notes: m.rotationNotes ?? null, videoUrl: m.rotationVideoUrl ?? null }];
-  });
   return (
     <div
       className={cn(
@@ -64,12 +60,7 @@ export function TeamStrip({
           <span aria-hidden className="h-3 w-0.5 shrink-0 rounded-full bg-current" />
           <span className="truncate">{label}</span>
         </p>
-        {(rotations.length > 0 || action) && (
-          <div className="flex shrink-0 items-center gap-1">
-            {rotations.length > 0 && <RotationToggle open={showRotation} onToggle={() => setShowRotation((v) => !v)} />}
-            {action}
-          </div>
-        )}
+        {action && <div className="flex shrink-0 items-center gap-1">{action}</div>}
       </div>
       <ul className="mt-3.5 grid grid-cols-3 items-stretch gap-1.5 sm:gap-2">
         {DISPLAY_SLOTS.map((slot) => {
@@ -86,12 +77,13 @@ export function TeamStrip({
                 slotLabel={t(`team.slots.${slot}`)}
                 leader={slot === "SOLO"}
                 damageDealer={!isMine && !!m?.isDamageDealer}
+                // Causador de Dano da Meta/Alternativa: tocar leva às rotações do personagem.
+                href={!isMine && m?.isDamageDealer && ref ? rotationHref(ref.agent.slug, ref.uniform.slug) : undefined}
               />
             </li>
           );
         })}
       </ul>
-      {rotations.length > 0 && showRotation && <RotationPanel rotations={rotations} />}
     </div>
   );
 }

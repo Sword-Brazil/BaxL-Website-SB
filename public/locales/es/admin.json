@@ -8,7 +8,8 @@
     "ctps": "CTPs",
     "bai": "BAI",
     "users": "Usuarios",
-    "settings": "Configuración"
+    "settings": "Configuración",
+    "rotations": "Rotaciones"
   },
   "guard": {
     "forbidden": "Acceso denegado",
@@ -24,7 +25,8 @@
     "ctps": "Tipos, fotos y disponibilidad de los CTPs.",
     "bai": "Secuencia de jefes de la BAI.",
     "users": "Curadores y administradores.",
-    "settings": "Ancla del ciclo y horarios de cambio."
+    "settings": "Ancla del ciclo y horarios de cambio.",
+    "rotations": "Rotaciones de los personajes (causantes de daño), por traje, con descripción y vídeo."
   },
   "common": {
     "saved": "Cambios guardados",
@@ -79,26 +81,12 @@
     "reserves": "Reservas",
     "reservesHint": "Personajes extra para la sugerencia de quien no tiene los de la Meta y las Alternativas. Orden usado: Meta → Alternativas → reservas.",
     "addReserve": "+ Añadir reserva",
-    "rotation": {
-      "label": "Rotación",
-      "legendTitle": "Notación de la rotación",
-      "example": "Ejemplo: 1 2c (3dc 4) 6",
-      "hint": "Opcional. Usa 1–6, c / dc / qc y ( ) para tramos opcionales.",
-      "notes": "Descripción de la rotación",
-      "notesPlaceholder": "Cuándo usarla, qué observar, alternativas…",
-      "errors": {
-        "empty": "Indica al menos una habilidad.",
-        "token": "\"{{token}}\" no es un paso válido: usa 1–6, opcionalmente seguido de c, dc o qc.",
-        "unclosedGroup": "Falta cerrar un paréntesis.",
-        "unopenedGroup": "Hay un paréntesis de cierre sin apertura.",
-        "nestedGroup": "No uses paréntesis dentro de paréntesis.",
-        "emptyGroup": "Paréntesis vacíos.",
-        "tooLong": "Rotación demasiado larga (máximo 30 pasos)."
-      },
-      "video": "Vídeo de referencia (opcional)",
-      "videoHint": "Enlace de YouTube (vídeo o Shorts; usa ?t= para empezar en el momento justo) o de un archivo .mp4/.webm. Se reproduce sin sonido y en bucle en la consulta de la rotación; el vídeo no se guarda en el sistema."
-    },
-    "damageDealer": "Causante de daño (necesita rotación)"
+    "damageDealer": "Causante de daño",
+    "rotationsCount_one": "{{name}} tiene {{count}} rotación registrada.",
+    "rotationsCount_other": "{{name}} tiene {{count}} rotaciones registradas.",
+    "noRotations": "{{name}} aún no tiene rotación registrada.",
+    "manageRotations": "Gestionar rotaciones",
+    "addRotations": "Registrar rotación"
   },
   "priority": {
     "solo": "Solistas",
@@ -182,5 +170,32 @@
     "turnover": "Cambio de día (hora, Brasilia)",
     "reset": "Reinicio semanal (hora, Brasilia)",
     "help": "Ajusta el ancla si el \"Día actual\" difiere del juego."
+  },
+  "rotations": {
+    "subtitle": "Rotaciones de cada personaje: por traje o para todos, en texto libre, con descripción y vídeo.",
+    "help": "En Metas, marca quién es el causante de daño del equipo; aquí quedan las rotaciones del personaje. El jugador toca la foto del causante de daño y las ve.",
+    "onlyWith": "Solo con rotación",
+    "count_one": "{{count}} rotación",
+    "count_other": "{{count}} rotaciones",
+    "none": "Sin rotación",
+    "editTitle": "Rotaciones de {{name}}",
+    "editHelp": "Una rotación por situación o traje. Este orden es el que ve el jugador.",
+    "item": "Rotación {{n}}",
+    "moveUp": "Subir",
+    "moveDown": "Bajar",
+    "uniform": "Traje",
+    "allUniforms": "Todos los trajes",
+    "titleLabel": "Título (opcional)",
+    "titlePlaceholder": "Ej.: Apertura, Fase 2, Contra jefes",
+    "sequence": "Rotación",
+    "sequencePlaceholder": "Ej.: 1 2c (3dc 4) 6 — o escríbela a tu manera",
+    "sequenceHint": "Texto libre. Si usas la notación de la comunidad (1–6, c, dc, qc, paréntesis), aparece en bloques.",
+    "legendTitle": "Notación de la comunidad",
+    "legendFree": "La notación es opcional: escribe como mejor se explique.",
+    "description": "Descripción",
+    "descriptionPlaceholder": "Cuándo usarla, cuánto esperar en cada delay, qué observar…",
+    "video": "Vídeo de referencia (opcional)",
+    "videoHint": "Enlace de YouTube (vídeo o Shorts; usa ?t= para empezar en el momento justo) o de un archivo .mp4/.webm. Se reproduce sin sonido y en bucle; el vídeo no se guarda en el sistema.",
+    "add": "Añadir rotación"
   }
 }

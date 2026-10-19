@@ -23,7 +23,7 @@ export const VALIDATION = {
   uniformRequired: "Cadastre ao menos um uniforme",
   uniformRepeated: "Uniforme repetido",
   rotationVideo: "Link de vídeo inválido: use um link https do YouTube ou de um arquivo .mp4/.webm",
-  rotationFormat: "Rotação inválida: use 1–6 com c, dc ou qc e ( ) para trechos opcionais",
+  rotationRequired: "Escreva a rotação",
 } as const;
 
 export type ValidationCode = keyof typeof VALIDATION;

@@ -520,6 +520,7 @@ para a próxima BAI nos outros dias.
 - [X] T149 Posições Esquerda · Líder · Direita (antes Pos. 1 / Pos. 2), Líder no meio e em destaque em todas as telas (FR-036)
 - [X] T150 Atributos (gênero, lado, espécie, ataque) só no traje: removidos do personagem (migração copia para os trajes); editor de catálogo, importador, elenco e selo herói/vilão pelo traje
 - [X] T151 Vídeo de referência da rotação (YouTube sem cookies ou .mp4/.webm externo), mudo e em loop, carregado só ao abrir o painel
+- [X] T152 Rotações por personagem/traje (aba "Rotações" no admin, texto livre, descrição e vídeo); equipe só marca o Causador de Dano; foto do Causador de Dano leva a `/rotacoes/[personagem]` (por traje, com prévia); `/rotacoes` lista os personagens
 - [ ] T148 Rotações de exemplo pré-cadastradas a partir de vídeos de jogadores experientes (aguarda as fontes)
 
 ---

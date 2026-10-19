@@ -13,13 +13,14 @@ datasource db {
 // ---------- Catálogo ----------
 
 model Agent {
-  id        String    @id @default(cuid())
-  slug      String    @unique
+  id        String     @id @default(cuid())
+  slug      String     @unique
   name      String
-  active    Boolean   @default(true)
+  active    Boolean    @default(true)
   uniforms  Uniform[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  rotations Rotation[]
 }
 
 model Uniform {
@@ -37,6 +38,7 @@ model Uniform {
   active          Boolean          @default(true)
   metaMembers     MetaTeamMember[]
   priorityEntries PriorityEntry[]
+  rotations       Rotation[]
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
@@ -114,24 +116,40 @@ model MetaTeam {
 }
 
 model MetaTeamMember {
-  id               String   @id @default(cuid())
-  metaTeamId       String
-  metaTeam         MetaTeam @relation(fields: [metaTeamId], references: [id], onDelete: Cascade)
-  slot             String
-  uniformId        String
-  uniform          Uniform  @relation(fields: [uniformId], references: [id])
-  ctpId            String?
-  ctp              Ctp?     @relation(fields: [ctpId], references: [id])
-  // Causador de Dano (qualquer posição): só ele tem rotação, na notação "1 2c (3dc 4) 6".
-  isDamageDealer   Boolean  @default(false)
-  rotation         String?
-  rotationNotes    String?
-  // Vídeo de referência (link do YouTube ou .mp4/.webm externo): o sistema não hospeda vídeo.
-  rotationVideoUrl String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id             String   @id @default(cuid())
+  metaTeamId     String
+  metaTeam       MetaTeam @relation(fields: [metaTeamId], references: [id], onDelete: Cascade)
+  slot           String
+  uniformId      String
+  uniform        Uniform  @relation(fields: [uniformId], references: [id])
+  ctpId          String?
+  ctp            Ctp?     @relation(fields: [ctpId], references: [id])
+  // Causador de Dano (qualquer posição): as rotações dele ficam em Rotation (por personagem/traje).
+  isDamageDealer Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   @@unique([metaTeamId, slot])
+}
+
+// Rotação de um personagem (Causador de Dano), em texto livre, com descrição e vídeo opcional.
+// uniformId null = vale para todos os trajes do personagem.
+model Rotation {
+  id          String   @id @default(cuid())
+  agentId     String
+  agent       Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  uniformId   String?
+  uniform     Uniform? @relation(fields: [uniformId], references: [id], onDelete: Cascade)
+  position    Int
+  title       String?
+  sequence    String
+  description String?
+  // Link do YouTube ou de um .mp4/.webm externo: o sistema não hospeda vídeo.
+  videoUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([agentId, position])
 }
 
 model PriorityEntry {

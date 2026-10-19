@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { useTranslation } from "next-i18next/pages";
-import { PencilIcon, PlusIcon, SwordIcon, Trash2Icon, TriangleAlertIcon } from "lucide-react";
+import { ExternalLinkIcon, PencilIcon, PlusIcon, SwordIcon, Trash2Icon, TriangleAlertIcon } from "lucide-react";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import {
   AlertDialog,
@@ -15,16 +16,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { Toggle } from "@/components/ui/toggle";
 import { Textarea } from "@/components/ui/textarea";
-import { DISPLAY_SLOTS, type Slot } from "@/models/domain/enums";
-import { parseRotation } from "@/models/rules/rotation";
-import { parseRotationVideo } from "@/models/rules/rotationVideo";
+import { DISPLAY_SLOTS } from "@/models/domain/enums";
+import type { Agent } from "@/models/domain/types";
 import type { MetaScopeViewModel } from "@/viewmodels/admin/useMetaScopeViewModel";
 import { useMetaTeamEditorViewModel } from "@/viewmodels/admin/useMetaTeamEditorViewModel";
-import { HelpHint } from "@/views/layout/HelpHint";
+import { useRotationsViewModel } from "@/viewmodels/useRotationsViewModel";
 import { MetaCycleBoard } from "./MetaCycleBoard";
 import { ReservesEditor } from "./ReservesEditor";
 import { TeamStrip } from "@/views/shared/TeamStrip";
@@ -33,85 +34,41 @@ import { CtpSelect } from "@/views/shared/CtpSelect";
 import { EmptyTeam } from "@/views/shared/EmptyTeam";
 import { QueryState } from "@/views/shared/QueryState";
 import { RestrictionBadges } from "@/views/shared/RestrictionBadges";
-import { RotationLegend, RotationSequence, RotationVideoPlayer } from "@/views/shared/RotationSequence";
 import { UniformPicker } from "@/views/shared/UniformPicker";
 
-/** Rotação de um Causador de Dano: sequência com prévia ao vivo e descrição. */
-function RotationFields({
-  slot,
-  rotation,
-  notes,
-  videoUrl,
+/** Ligado: o personagem é Causador de Dano nesta equipe e mostra quantas rotações ele já tem. */
+function DamageDealerToggle({
+  pressed,
   onChange,
+  agent,
+  rotationCount,
 }: {
-  slot: Slot;
-  rotation: string;
-  notes: string;
-  videoUrl: string;
-  onChange: (patch: { rotation?: string; rotationNotes?: string; rotationVideoUrl?: string }) => void;
+  pressed: boolean;
+  onChange: (pressed: boolean) => void;
+  agent: Agent | null;
+  rotationCount: number;
 }) {
-  const { t } = useTranslation(["admin", "common"]);
-  const parsed = rotation.trim() ? parseRotation(rotation) : null;
-  const videoInvalid = !!videoUrl.trim() && !parseRotationVideo(videoUrl);
+  const { t } = useTranslation("admin");
   return (
-    <div className="flex flex-col gap-3">
-      <Field data-invalid={parsed && !parsed.ok ? true : undefined}>
-        <div className="flex items-center gap-1">
-          <FieldLabel htmlFor={`rotation-${slot}`}>{t("admin:metas.rotation.label")}</FieldLabel>
-          <HelpHint title={t("admin:metas.rotation.legendTitle")}>
-            <RotationLegend />
-            <p>{t("admin:metas.rotation.example")}</p>
-          </HelpHint>
-        </div>
-        <Input
-          id={`rotation-${slot}`}
-          maxLength={120}
-          className="font-mono"
-          placeholder="1 2c (3dc 4) 6"
-          value={rotation}
-          aria-invalid={parsed && !parsed.ok ? true : undefined}
-          onChange={(e) => onChange({ rotation: e.target.value })}
-        />
-        {parsed?.ok ? (
-          <RotationSequence parts={parsed.parts} />
-        ) : parsed ? (
-          <FieldDescription className="text-destructive">
-            {t(`admin:metas.rotation.errors.${parsed.error}`, { token: parsed.token })}
-          </FieldDescription>
-        ) : (
-          <FieldDescription>{t("admin:metas.rotation.hint")}</FieldDescription>
-        )}
-      </Field>
-      {parsed?.ok && (
-        <Field>
-          <FieldLabel htmlFor={`rotationNotes-${slot}`}>{t("admin:metas.rotation.notes")}</FieldLabel>
-          <Textarea
-            id={`rotationNotes-${slot}`}
-            maxLength={500}
-            placeholder={t("admin:metas.rotation.notesPlaceholder")}
-            value={notes}
-            onChange={(e) => onChange({ rotationNotes: e.target.value })}
-          />
-        </Field>
-      )}
-      {parsed?.ok && (
-        <Field data-invalid={videoInvalid || undefined}>
-          <FieldLabel htmlFor={`rotationVideo-${slot}`}>{t("admin:metas.rotation.video")}</FieldLabel>
-          <Input
-            id={`rotationVideo-${slot}`}
-            type="url"
-            inputMode="url"
-            maxLength={300}
-            placeholder="https://youtu.be/…?t=42"
-            value={videoUrl}
-            aria-invalid={videoInvalid || undefined}
-            onChange={(e) => onChange({ rotationVideoUrl: e.target.value })}
-          />
-          <FieldDescription className={videoInvalid ? "text-destructive" : undefined}>
-            {videoInvalid ? t("common:validation.rotationVideo") : t("admin:metas.rotation.videoHint")}
-          </FieldDescription>
-          {!videoInvalid && videoUrl.trim() && <RotationVideoPlayer url={videoUrl} title={t("admin:metas.rotation.video")} />}
-        </Field>
+    <div className="flex flex-col gap-1.5 sm:col-span-2">
+      <Toggle
+        variant="outline"
+        size="sm"
+        pressed={pressed}
+        onPressedChange={onChange}
+        className="self-start data-[state=on]:border-spark data-[state=on]:bg-spark/15 data-[state=on]:text-spark"
+      >
+        <SwordIcon />
+        {t("metas.damageDealer")}
+      </Toggle>
+      {pressed && agent && (
+        <p className="flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
+          {rotationCount ? t("metas.rotationsCount", { count: rotationCount, name: agent.name }) : t("metas.noRotations", { name: agent.name })}
+          <Link href={`/admin/rotacoes?personagem=${agent.slug}`} target="_blank" className="flex items-center gap-1 text-energy hover:underline">
+            {rotationCount ? t("metas.manageRotations") : t("metas.addRotations")}
+            <ExternalLinkIcon className="size-3" />
+          </Link>
+        </p>
       )}
     </div>
   );
@@ -122,6 +79,7 @@ export function MetaTeamEditorView({ scopeVm }: { scopeVm: MetaScopeViewModel })
   const { t } = useTranslation(["admin", "common"]);
   const vm = useMetaTeamEditorViewModel(scopeVm, { saved: t("admin:common.saved"), deleted: t("admin:metas.deleted") });
   const { catalog } = scopeVm;
+  const rotations = useRotationsViewModel();
 
   return (
     <div className="flex flex-col gap-4">
@@ -226,6 +184,7 @@ export function MetaTeamEditorView({ scopeVm }: { scopeVm: MetaScopeViewModel })
                       className={cn(
                         "grid gap-2 rounded-lg border p-3 sm:grid-cols-[1fr_14rem]",
                         slot === "SOLO" ? "energy-glow border-energy/40 bg-energy/5" : "border-energy/10",
+                        member.isDamageDealer && "border-spark/50",
                       )}
                     >
                       <Field>
@@ -254,28 +213,14 @@ export function MetaTeamEditorView({ scopeVm }: { scopeVm: MetaScopeViewModel })
                           targetName={member.uniformId ? catalog.uniformById(member.uniformId)?.agent.name : undefined}
                         />
                       </Field>
-                      <div className="flex flex-col gap-3 border-t border-energy/10 pt-3 sm:col-span-2">
-                        <Field orientation="horizontal">
-                          <Switch
-                            id={`damageDealer-${slot}`}
-                            checked={member.isDamageDealer}
-                            onCheckedChange={(isDamageDealer) => vm.setMember(slot, { isDamageDealer })}
-                          />
-                          <FieldLabel htmlFor={`damageDealer-${slot}`} className="flex items-center gap-1.5">
-                            <SwordIcon className="size-3.5 text-spark" />
-                            {t("admin:metas.damageDealer")}
-                          </FieldLabel>
-                        </Field>
-                        {member.isDamageDealer && (
-                          <RotationFields
-                            slot={slot}
-                            rotation={member.rotation}
-                            notes={member.rotationNotes}
-                            videoUrl={member.rotationVideoUrl}
-                            onChange={(patch) => vm.setMember(slot, patch)}
-                          />
-                        )}
-                      </div>
+                      <DamageDealerToggle
+                        pressed={member.isDamageDealer}
+                        onChange={(isDamageDealer) => vm.setMember(slot, { isDamageDealer })}
+                        agent={member.uniformId ? (catalog.uniformById(member.uniformId)?.agent ?? null) : null}
+                        rotationCount={
+                          member.uniformId ? rotations.rotationsOf(catalog.uniformById(member.uniformId)?.agent.id ?? "").length : 0
+                        }
+                      />
                     </div>
                   );
                 })}

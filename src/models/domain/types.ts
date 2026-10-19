@@ -61,14 +61,24 @@ export interface MetaTeamMember {
   uniformId: string;
   /** CTP recomendado. As equipes importadas trazem só o tipo; null = sem recomendação. */
   ctpId: string | null;
-  /** Causador de Dano (qualquer posição): é quem tem rotação. */
+  /** Causador de Dano (qualquer posição): leva às rotações do personagem. */
   isDamageDealer: boolean;
-  /** Rotação na forma canônica (ver src/models/rules/rotation.ts); só para Causador de Dano. */
-  rotation: string | null;
-  /** Descrição da rotação (quando usar, o que observar). */
-  rotationNotes: string | null;
-  /** Vídeo de referência da rotação (YouTube ou .mp4/.webm externo). */
-  rotationVideoUrl: string | null;
+}
+
+/** Rotação de um personagem, em texto livre. `uniformId` null = vale para todos os trajes. */
+export interface Rotation {
+  id: string;
+  agentId: string;
+  uniformId: string | null;
+  position: number;
+  title: string | null;
+  /** Sequência em texto livre (a notação 1–6 / c / dc / qc vira "chips" quando reconhecida). */
+  sequence: string;
+  /** Quando usar, os delays, o que observar. */
+  description: string | null;
+  /** Vídeo de referência (YouTube ou .mp4/.webm externo). */
+  videoUrl: string | null;
+  updatedAt: string;
 }
 
 export interface MetaTeam {

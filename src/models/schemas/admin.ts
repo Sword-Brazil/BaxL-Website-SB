@@ -14,7 +14,6 @@ import {
   speciesSchema,
   teamScopeSchema,
 } from "./common";
-import { parseRotation } from "@/models/rules/rotation";
 import { parseRotationVideo } from "@/models/rules/rotationVideo";
 import { VALIDATION } from "./messages";
 
@@ -39,23 +38,8 @@ export const MetaTeamMemberSchema = z.object({
   slot: slotSchema,
   uniformId: idSchema,
   ctpId: idSchema.nullable().optional(),
-  /** Causador de Dano: pode ter rotação (notação 1–6, c/dc/qc e parênteses). */
+  /** Causador de Dano: o jogador toca na foto e vê as rotações do personagem. */
   isDamageDealer: z.boolean().optional(),
-  rotation: z
-    .string()
-    .trim()
-    .max(120)
-    .refine((v) => !v || parseRotation(v).ok, { message: VALIDATION.rotationFormat })
-    .optional()
-    .nullable(),
-  rotationNotes: z.string().trim().max(500).optional().nullable(),
-  rotationVideoUrl: z
-    .string()
-    .trim()
-    .max(300)
-    .refine((v) => !v || !!parseRotationVideo(v), { message: VALIDATION.rotationVideo })
-    .optional()
-    .nullable(),
 });
 
 export const MetaTeamSchema = z
@@ -165,3 +149,22 @@ export const AssetUploadSchema = z.object({
   base64: z.string().min(4).max(Math.ceil((ASSET_MAX_BYTES * 4) / 3) + 8),
 });
 export type AssetUploadInput = z.infer<typeof AssetUploadSchema>;
+
+/** Rotação em texto livre (sem formato obrigatório); o vídeo precisa ser YouTube ou .mp4/.webm. */
+export const RotationInputSchema = z.object({
+  uniformId: idSchema.nullable(),
+  title: z.string().trim().max(80).optional().nullable(),
+  sequence: z.string().trim().min(1, { message: VALIDATION.rotationRequired }).max(1000),
+  description: z.string().trim().max(3000).optional().nullable(),
+  videoUrl: z
+    .string()
+    .trim()
+    .max(300)
+    .refine((v) => !v || !!parseRotationVideo(v), { message: VALIDATION.rotationVideo })
+    .optional()
+    .nullable(),
+});
+export type RotationInput = z.infer<typeof RotationInputSchema>;
+
+export const AgentRotationsSchema = z.object({ rotations: z.array(RotationInputSchema).max(40) });
+export type AgentRotationsInput = z.infer<typeof AgentRotationsSchema>;

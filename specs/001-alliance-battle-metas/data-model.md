@@ -45,6 +45,17 @@ Relações: 1–N `Uniform`. O personagem não tem atributos: eles são de cada 
 | gender, side, species, attackType | enum ou `UNKNOWN` | atributos do traje (ex.: Fênix Negra vilã); restrições e o selo herói/vilão usam o traje |
 | active | boolean | |
 
+### Rotation
+| Campo | Tipo | Regras |
+|-------|------|--------|
+| agentId | FK Agent | cascade |
+| uniformId | FK Uniform? | traje do próprio personagem; null = vale para todos os trajes |
+| position | int | ordem na tela do jogador |
+| title | string? | ≤ 80 caracteres |
+| sequence | string | texto livre, 1–1000 caracteres (sem formato obrigatório) |
+| description | string? | ≤ 3000 caracteres |
+| videoUrl | string? | link https do YouTube (com `?t=` opcional) ou de arquivo .mp4/.webm externo; o sistema não hospeda vídeo |
+
 ### Ctp (catálogo fixo: 6 tipos × 3 qualidades = 18 linhas, criadas pelo seed)
 | Campo | Tipo | Regras |
 |-------|------|--------|
@@ -108,10 +119,7 @@ aba Admin.
 | slot | Slot | (metaTeamId, slot) único: exatamente 3 membros |
 | uniformId | FK Uniform | o agente é derivado do uniforme |
 | ctpId | FK Ctp | obrigatório |
-| isDamageDealer | boolean | Causador de Dano (qualquer slot); default false |
-| rotation | string? | só para Causador de Dano; ≤ 120 caracteres, notação validada por `src/models/rules/rotation.ts` (salva canônica) |
-| rotationNotes | string? | descrição da rotação, ≤ 500 caracteres; descartada se não houver rotação |
-| rotationVideoUrl | string? | link https do YouTube (com `?t=` opcional) ou de arquivo .mp4/.webm externo; o sistema não hospeda vídeo; descartado sem rotação |
+| isDamageDealer | boolean | Causador de Dano (qualquer slot); default false. As rotações ficam em `Rotation` |
 
 **Validações ao publicar** (FR-026):
 - Três slots preenchidos, sem agente repetido.

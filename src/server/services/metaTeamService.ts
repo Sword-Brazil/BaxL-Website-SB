@@ -1,7 +1,6 @@
 import type { MetaTeam } from "@/models/domain/types";
 import type { MetaTeamInput } from "@/models/schemas/admin";
 import { prisma } from "@/server/db";
-import { normalizeRotation } from "@/models/rules/rotation";
 import { HttpError } from "@/server/http";
 import { metaTeamInclude } from "@/server/repositories/metaTeamRepository";
 import { assertCtpsExist, assertRestriction, findBattleDay, loadActiveUniforms } from "./curationGuards";
@@ -31,19 +30,12 @@ export async function saveMetaTeam(input: MetaTeamInput, userId: string, id?: st
     notes: input.notes || null,
     updatedById: userId,
   };
-  const members = input.members.map((m) => {
-    // Rotação só para Causador de Dano; descrição e vídeo só existem junto com uma rotação.
-    const rotation = m.isDamageDealer ? normalizeRotation(m.rotation) : null;
-    return {
-      slot: m.slot,
-      uniformId: m.uniformId,
-      ctpId: m.ctpId ?? null,
-      isDamageDealer: !!m.isDamageDealer,
-      rotation,
-      rotationNotes: rotation ? m.rotationNotes || null : null,
-      rotationVideoUrl: rotation ? m.rotationVideoUrl || null : null,
-    };
-  });
+  const members = input.members.map((m) => ({
+    slot: m.slot,
+    uniformId: m.uniformId,
+    ctpId: m.ctpId ?? null,
+    isDamageDealer: !!m.isDamageDealer,
+  }));
 
   const saved = await prisma.$transaction(async (tx) => {
     if (input.isPrimary) {
