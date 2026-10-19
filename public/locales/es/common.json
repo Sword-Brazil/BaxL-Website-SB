@@ -71,7 +71,8 @@
       "dc": "Delayed Cancel: espera una fracción de segundo (el efecto del golpe o el fin de la animación) antes de cancelar y pulsar la siguiente.",
       "qc": "Quick Cancel: cancelación rápida justo después del comando.",
       "optional": "Tramo opcional o \"relleno\" del combo antes del bono principal."
-    }
+    },
+    "openVideo": "Abrir el vídeo"
   },
   "restriction": {
     "none": "Sin restricción",
@@ -192,7 +193,8 @@
     "slugFormat": "Usa kebab-case (ej.: scarlet-witch)",
     "uniformRequired": "Registra al menos un uniforme",
     "uniformRepeated": "Uniforme repetido",
-    "rotationFormat": "Rotación inválida: usa 1–6 con c, dc o qc y ( ) para tramos opcionales"
+    "rotationFormat": "Rotación inválida: usa 1–6 con c, dc o qc y ( ) para tramos opcionales",
+    "rotationVideo": "Enlace de vídeo inválido: usa un enlace https de YouTube o de un archivo .mp4/.webm"
   },
   "security": {
     "label": "Avisos de seguridad de la cuenta",

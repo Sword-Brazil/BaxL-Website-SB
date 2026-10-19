@@ -162,5 +162,11 @@ describe("MetaTeamSchema: rotação", () => {
     const bad = MetaTeamSchema.safeParse(withRotation("1 2x"));
     expect(bad.success).toBe(false);
     expect(bad.error?.issues[0].message).toBe(VALIDATION.rotationFormat);
+    const video = (rotationVideoUrl: string) => ({
+      ...base,
+      members: base.members.map((m) => (m.slot === "SOLO" ? { ...m, isDamageDealer: true, rotation: "1 6", rotationVideoUrl } : m)),
+    });
+    expect(MetaTeamSchema.safeParse(video("https://www.youtube.com/watch?v=dQw4w9WgXcQ")).success).toBe(true);
+    expect(MetaTeamSchema.safeParse(video("https://exemplo.com/pagina")).error?.issues[0].message).toBe(VALIDATION.rotationVideo);
   });
 });

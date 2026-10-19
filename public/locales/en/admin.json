@@ -94,7 +94,9 @@
         "nestedGroup": "Do not nest parentheses.",
         "emptyGroup": "Empty parentheses.",
         "tooLong": "Rotation too long (30 steps max)."
-      }
+      },
+      "video": "Reference video (optional)",
+      "videoHint": "YouTube link (video or Shorts; add ?t= to start at the right moment) or a .mp4/.webm file. It plays muted and looped in the rotation view; the video is not stored in the system."
     },
     "damageDealer": "Damage dealer (needs a rotation)"
   },

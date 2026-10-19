@@ -45,16 +45,26 @@ describe("curadoria", () => {
     };
     const saved = await saveMetaTeam(
       withDealers({
-        SUPPORT_1: { isDamageDealer: true, rotation: "1C > 2dc (3, 4) 6", rotationNotes: "Guarde o 6 para a fase 2" },
+        SUPPORT_1: {
+          isDamageDealer: true,
+          rotation: "1C > 2dc (3, 4) 6",
+          rotationNotes: "Guarde o 6 para a fase 2",
+          rotationVideoUrl: "https://youtu.be/dQw4w9WgXcQ?t=42",
+        },
         SUPPORT_2: { isDamageDealer: true, rotation: "3 1qc 6" },
-        SOLO: { isDamageDealer: false, rotation: "1 2 3", rotationNotes: "ignorada" },
+        SOLO: { isDamageDealer: false, rotation: "1 2 3", rotationNotes: "ignorada", rotationVideoUrl: "https://youtu.be/dQw4w9WgXcQ" },
       }),
       curatorId,
     );
     const bySlot = Object.fromEntries(saved.members.map((m) => [m.slot, m]));
-    expect(bySlot.SUPPORT_1).toMatchObject({ isDamageDealer: true, rotation: "1c 2dc (3 4) 6", rotationNotes: "Guarde o 6 para a fase 2" });
+    expect(bySlot.SUPPORT_1).toMatchObject({
+      isDamageDealer: true,
+      rotation: "1c 2dc (3 4) 6",
+      rotationNotes: "Guarde o 6 para a fase 2",
+      rotationVideoUrl: "https://youtu.be/dQw4w9WgXcQ?t=42",
+    });
     expect(bySlot.SUPPORT_2).toMatchObject({ isDamageDealer: true, rotation: "3 1qc 6", rotationNotes: null });
-    expect(bySlot.SOLO).toMatchObject({ isDamageDealer: false, rotation: null, rotationNotes: null });
+    expect(bySlot.SOLO).toMatchObject({ isDamageDealer: false, rotation: null, rotationNotes: null, rotationVideoUrl: null });
 
     const cleared = await saveMetaTeam(withDealers({ SUPPORT_1: { isDamageDealer: true, rotation: "", rotationNotes: "x" } }), curatorId, saved.id);
     expect(cleared.members.find((m) => m.slot === "SUPPORT_1")).toMatchObject({ isDamageDealer: true, rotation: null, rotationNotes: null });

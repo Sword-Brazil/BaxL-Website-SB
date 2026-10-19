@@ -15,6 +15,7 @@ export interface MemberDraft {
   isDamageDealer: boolean;
   rotation: string;
   rotationNotes: string;
+  rotationVideoUrl: string;
 }
 
 export interface TeamDraft {
@@ -25,7 +26,7 @@ export interface TeamDraft {
   members: Record<Slot, MemberDraft>;
 }
 
-const emptyMember = (): MemberDraft => ({ uniformId: null, ctpId: null, isDamageDealer: false, rotation: "", rotationNotes: "" });
+const emptyMember = (): MemberDraft => ({ uniformId: null, ctpId: null, isDamageDealer: false, rotation: "", rotationNotes: "", rotationVideoUrl: "" });
 
 const emptyDraft = (isPrimary: boolean): TeamDraft => ({
   isPrimary,
@@ -48,6 +49,7 @@ const fromTeam = (t: MetaTeam): TeamDraft => ({
         isDamageDealer: m.isDamageDealer,
         rotation: m.rotation ?? "",
         rotationNotes: m.rotationNotes ?? "",
+        rotationVideoUrl: m.rotationVideoUrl ?? "",
       },
     ]),
   ) as TeamDraft["members"],
@@ -92,6 +94,7 @@ export function useMetaTeamEditorViewModel(scopeVm: MetaScopeViewModel, messages
             isDamageDealer: m.isDamageDealer,
             rotation: m.isDamageDealer ? m.rotation || null : null,
             rotationNotes: m.isDamageDealer ? m.rotationNotes || null : null,
+            rotationVideoUrl: m.isDamageDealer ? m.rotationVideoUrl || null : null,
           };
         }),
       };

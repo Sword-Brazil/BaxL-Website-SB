@@ -21,6 +21,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { DISPLAY_SLOTS, type Slot } from "@/models/domain/enums";
 import { parseRotation } from "@/models/rules/rotation";
+import { parseRotationVideo } from "@/models/rules/rotationVideo";
 import type { MetaScopeViewModel } from "@/viewmodels/admin/useMetaScopeViewModel";
 import { useMetaTeamEditorViewModel } from "@/viewmodels/admin/useMetaTeamEditorViewModel";
 import { HelpHint } from "@/views/layout/HelpHint";
@@ -32,7 +33,7 @@ import { CtpSelect } from "@/views/shared/CtpSelect";
 import { EmptyTeam } from "@/views/shared/EmptyTeam";
 import { QueryState } from "@/views/shared/QueryState";
 import { RestrictionBadges } from "@/views/shared/RestrictionBadges";
-import { RotationLegend, RotationSequence } from "@/views/shared/RotationSequence";
+import { RotationLegend, RotationSequence, RotationVideoPlayer } from "@/views/shared/RotationSequence";
 import { UniformPicker } from "@/views/shared/UniformPicker";
 
 /** Rotação de um Causador de Dano: sequência com prévia ao vivo e descrição. */
@@ -40,15 +41,18 @@ function RotationFields({
   slot,
   rotation,
   notes,
+  videoUrl,
   onChange,
 }: {
   slot: Slot;
   rotation: string;
   notes: string;
-  onChange: (patch: { rotation?: string; rotationNotes?: string }) => void;
+  videoUrl: string;
+  onChange: (patch: { rotation?: string; rotationNotes?: string; rotationVideoUrl?: string }) => void;
 }) {
   const { t } = useTranslation(["admin", "common"]);
   const parsed = rotation.trim() ? parseRotation(rotation) : null;
+  const videoInvalid = !!videoUrl.trim() && !parseRotationVideo(videoUrl);
   return (
     <div className="flex flex-col gap-3">
       <Field data-invalid={parsed && !parsed.ok ? true : undefined}>
@@ -88,6 +92,25 @@ function RotationFields({
             value={notes}
             onChange={(e) => onChange({ rotationNotes: e.target.value })}
           />
+        </Field>
+      )}
+      {parsed?.ok && (
+        <Field data-invalid={videoInvalid || undefined}>
+          <FieldLabel htmlFor={`rotationVideo-${slot}`}>{t("admin:metas.rotation.video")}</FieldLabel>
+          <Input
+            id={`rotationVideo-${slot}`}
+            type="url"
+            inputMode="url"
+            maxLength={300}
+            placeholder="https://youtu.be/…?t=42"
+            value={videoUrl}
+            aria-invalid={videoInvalid || undefined}
+            onChange={(e) => onChange({ rotationVideoUrl: e.target.value })}
+          />
+          <FieldDescription className={videoInvalid ? "text-destructive" : undefined}>
+            {videoInvalid ? t("common:validation.rotationVideo") : t("admin:metas.rotation.videoHint")}
+          </FieldDescription>
+          {!videoInvalid && videoUrl.trim() && <RotationVideoPlayer url={videoUrl} title={t("admin:metas.rotation.video")} />}
         </Field>
       )}
     </div>
@@ -248,6 +271,7 @@ export function MetaTeamEditorView({ scopeVm }: { scopeVm: MetaScopeViewModel })
                             slot={slot}
                             rotation={member.rotation}
                             notes={member.rotationNotes}
+                            videoUrl={member.rotationVideoUrl}
                             onChange={(patch) => vm.setMember(slot, patch)}
                           />
                         )}

@@ -15,6 +15,7 @@ import {
   teamScopeSchema,
 } from "./common";
 import { parseRotation } from "@/models/rules/rotation";
+import { parseRotationVideo } from "@/models/rules/rotationVideo";
 import { VALIDATION } from "./messages";
 
 const distinct = <T>(items: T[], key: (t: T) => unknown) => new Set(items.map(key)).size === items.length;
@@ -48,6 +49,13 @@ export const MetaTeamMemberSchema = z.object({
     .optional()
     .nullable(),
   rotationNotes: z.string().trim().max(500).optional().nullable(),
+  rotationVideoUrl: z
+    .string()
+    .trim()
+    .max(300)
+    .refine((v) => !v || !!parseRotationVideo(v), { message: VALIDATION.rotationVideo })
+    .optional()
+    .nullable(),
 });
 
 export const MetaTeamSchema = z

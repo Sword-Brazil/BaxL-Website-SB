@@ -67,6 +67,8 @@ export interface MetaTeamMember {
   rotation: string | null;
   /** Descrição da rotação (quando usar, o que observar). */
   rotationNotes: string | null;
+  /** Vídeo de referência da rotação (YouTube ou .mp4/.webm externo). */
+  rotationVideoUrl: string | null;
 }
 
 export interface MetaTeam {

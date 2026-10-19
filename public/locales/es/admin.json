@@ -94,7 +94,9 @@
         "nestedGroup": "No uses paréntesis dentro de paréntesis.",
         "emptyGroup": "Paréntesis vacíos.",
         "tooLong": "Rotación demasiado larga (máximo 30 pasos)."
-      }
+      },
+      "video": "Vídeo de referencia (opcional)",
+      "videoHint": "Enlace de YouTube (vídeo o Shorts; usa ?t= para empezar en el momento justo) o de un archivo .mp4/.webm. Se reproduce sin sonido y en bucle en la consulta de la rotación; el vídeo no se guarda en el sistema."
     },
     "damageDealer": "Causante de daño (necesita rotación)"
   },

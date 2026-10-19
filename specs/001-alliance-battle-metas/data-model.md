@@ -111,6 +111,7 @@ aba Admin.
 | isDamageDealer | boolean | Causador de Dano (qualquer slot); default false |
 | rotation | string? | só para Causador de Dano; ≤ 120 caracteres, notação validada por `src/models/rules/rotation.ts` (salva canônica) |
 | rotationNotes | string? | descrição da rotação, ≤ 500 caracteres; descartada se não houver rotação |
+| rotationVideoUrl | string? | link https do YouTube (com `?t=` opcional) ou de arquivo .mp4/.webm externo; o sistema não hospeda vídeo; descartado sem rotação |
 
 **Validações ao publicar** (FR-026):
 - Três slots preenchidos, sem agente repetido.
