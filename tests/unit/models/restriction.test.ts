@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { matchesRestriction, resolveAttributes } from "@/models/rules/restriction";
+import { matchesRestriction } from "@/models/rules/restriction";
 
 const agent = (gender: string, species: string, side = "HERO", attackType = "COMBAT") =>
   ({ gender, species, side, attackType }) as Parameters<typeof matchesRestriction>[0];
@@ -44,14 +44,9 @@ describe("atributos por traje", () => {
   const jean = agent("FEMALE", "MUTANT", "HERO", "UNIVERSAL");
   const villain = [{ attribute: "SIDE", value: "VILLAIN" }] as const;
 
-  it("sem atributos próprios, o traje herda os do personagem", () => {
-    expect(resolveAttributes(jean, {})).toEqual(jean);
-    expect(matchesRestriction(resolveAttributes(jean, { side: null }), [...villain])).toBe(false);
-  });
-
-  it("o atributo próprio do traje substitui o do personagem só naquele traje", () => {
-    const fenixNegra = resolveAttributes(jean, { side: "VILLAIN" });
-    expect(fenixNegra).toEqual({ ...jean, side: "VILLAIN" });
+  it("cada traje do mesmo personagem é conferido pelos próprios atributos", () => {
+    const fenixNegra = { ...jean, side: "VILLAIN" } as typeof jean;
+    expect(matchesRestriction(jean, [...villain])).toBe(false);
     expect(matchesRestriction(fenixNegra, [...villain])).toBe(true);
   });
 });

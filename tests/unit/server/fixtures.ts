@@ -21,12 +21,18 @@ export async function createAgent(
     data: {
       slug,
       name: slug,
-      gender: attrs.gender ?? "MALE",
-      side: attrs.side ?? "HERO",
-      species: attrs.species ?? "HUMAN",
-      attackType: attrs.attackType ?? "COMBAT",
       active: attrs.active ?? true,
-      uniforms: { create: { slug: "padrao", name: "Padrão", imagePath: `/assets/agents/${slug}/padrao.png` } },
+      uniforms: {
+        create: {
+          slug: "padrao",
+          name: "Padrão",
+          imagePath: `/assets/agents/${slug}/padrao.png`,
+          gender: attrs.gender ?? "MALE",
+          side: attrs.side ?? "HERO",
+          species: attrs.species ?? "HUMAN",
+          attackType: attrs.attackType ?? "COMBAT",
+        },
+      },
     },
     include: { uniforms: true },
   });

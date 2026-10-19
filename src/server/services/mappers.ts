@@ -18,6 +18,7 @@ type DbMetaTeam = {
     isDamageDealer: boolean;
     rotation: string | null;
     rotationNotes: string | null;
+    rotationVideoUrl: string | null;
   }[];
 };
 
@@ -39,6 +40,7 @@ export function toMetaTeam(t: DbMetaTeam): MetaTeam {
         isDamageDealer: m.isDamageDealer,
         rotation: m.rotation,
         rotationNotes: m.rotationNotes,
+        rotationVideoUrl: m.rotationVideoUrl,
       })),
     updatedAt: t.updatedAt.toISOString(),
     updatedBy: t.updatedBy?.nickname ?? null,

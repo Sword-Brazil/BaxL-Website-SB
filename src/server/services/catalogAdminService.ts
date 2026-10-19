@@ -5,10 +5,6 @@ import { HttpError } from "@/server/http";
 const agentData = (input: AgentInput) => ({
   slug: input.slug,
   name: input.name,
-  gender: input.gender,
-  side: input.side,
-  species: input.species,
-  attackType: input.attackType,
   active: input.active ?? true,
 });
 
@@ -17,10 +13,10 @@ const uniformData = (u: AgentInput["uniforms"][number]) => ({
   name: u.name,
   imagePath: u.imagePath,
   active: u.active ?? true,
-  gender: u.gender ?? null,
-  side: u.side ?? null,
-  species: u.species ?? null,
-  attackType: u.attackType ?? null,
+  gender: u.gender,
+  side: u.side,
+  species: u.species,
+  attackType: u.attackType,
 });
 
 async function assertSlugFree(slug: string, exceptId?: string) {

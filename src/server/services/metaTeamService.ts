@@ -32,7 +32,7 @@ export async function saveMetaTeam(input: MetaTeamInput, userId: string, id?: st
     updatedById: userId,
   };
   const members = input.members.map((m) => {
-    // Rotação só para Causador de Dano; a descrição só existe junto com uma rotação.
+    // Rotação só para Causador de Dano; descrição e vídeo só existem junto com uma rotação.
     const rotation = m.isDamageDealer ? normalizeRotation(m.rotation) : null;
     return {
       slot: m.slot,
@@ -41,6 +41,7 @@ export async function saveMetaTeam(input: MetaTeamInput, userId: string, id?: st
       isDamageDealer: !!m.isDamageDealer,
       rotation,
       rotationNotes: rotation ? m.rotationNotes || null : null,
+      rotationVideoUrl: rotation ? m.rotationVideoUrl || null : null,
     };
   });
 

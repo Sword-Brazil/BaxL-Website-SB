@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { CycleOverview, MetaTeam } from "@/models/domain/types";
 
-const NO_ROTATION = { isDamageDealer: false, rotation: null, rotationNotes: null };
+const NO_ROTATION = { isDamageDealer: false, rotation: null, rotationNotes: null, rotationVideoUrl: null };
 import { agentRepetition, ctpUsage, myAgentRepetition, myTeamCompositions } from "@/models/rules/stats";
 
 const team = (isPrimary: boolean, uniforms: [string, string, string]): MetaTeam => ({

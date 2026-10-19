@@ -30,13 +30,9 @@ conteúdo têm `createdAt` e `updatedAt`.
 | id | string | PK |
 | slug | string | único, kebab-case |
 | name | string | 1–80 caracteres, nome oficial do jogo |
-| gender | Gender | obrigatório |
-| side | Side | obrigatório |
-| species | Species | obrigatório |
-| attackType | AttackType | obrigatório |
 | active | boolean | `false` = "indisponível" (nunca apagar se houver referências) |
 
-Relações: 1–N `Uniform`.
+Relações: 1–N `Uniform`. O personagem não tem atributos: eles são de cada traje.
 
 ### Uniform
 | Campo | Tipo | Regras |
@@ -46,6 +42,7 @@ Relações: 1–N `Uniform`.
 | slug | string | único por agente |
 | name | string | 1–80 caracteres; "Padrão" para o visual base |
 | imagePath | string | caminho em `public/assets/agents/...` |
+| gender, side, species, attackType | enum ou `UNKNOWN` | atributos do traje (ex.: Fênix Negra vilã); restrições e o selo herói/vilão usam o traje |
 | active | boolean | |
 
 ### Ctp (catálogo fixo: 6 tipos × 3 qualidades = 18 linhas, criadas pelo seed)
@@ -114,6 +111,7 @@ aba Admin.
 | isDamageDealer | boolean | Causador de Dano (qualquer slot); default false |
 | rotation | string? | só para Causador de Dano; ≤ 120 caracteres, notação validada por `src/models/rules/rotation.ts` (salva canônica) |
 | rotationNotes | string? | descrição da rotação, ≤ 500 caracteres; descartada se não houver rotação |
+| rotationVideoUrl | string? | link https do YouTube (com `?t=` opcional) ou de arquivo .mp4/.webm externo; o sistema não hospeda vídeo; descartado sem rotação |
 
 **Validações ao publicar** (FR-026):
 - Três slots preenchidos, sem agente repetido.

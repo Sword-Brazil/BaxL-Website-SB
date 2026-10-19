@@ -23,12 +23,7 @@ export interface RestrictableAttributes {
   attackType: AttackType | Unknown;
 }
 
-/** Atributos próprios de um traje; null = herda do personagem. */
-export type UniformOverrides = {
-  [K in keyof RestrictableAttributes]: Exclude<RestrictableAttributes[K], Unknown> | null;
-};
-
-/** Traje com os atributos já resolvidos (próprios do traje ou herdados do personagem). */
+/** Traje: os atributos (gênero, lado, espécie, ataque) são de cada traje, não do personagem. */
 export interface Uniform extends RestrictableAttributes {
   id: string;
   agentId: string;
@@ -38,11 +33,9 @@ export interface Uniform extends RestrictableAttributes {
   /** Imagem a exibir: a do traje ou, se ele não tiver, o retrato do personagem ("" = iniciais). */
   portrait: string;
   active: boolean;
-  overrides: UniformOverrides;
 }
 
-/** Os atributos do personagem valem para todos os trajes que não tiverem os seus. */
-export interface Agent extends RestrictableAttributes {
+export interface Agent {
   id: string;
   slug: string;
   name: string;
@@ -74,6 +67,8 @@ export interface MetaTeamMember {
   rotation: string | null;
   /** Descrição da rotação (quando usar, o que observar). */
   rotationNotes: string | null;
+  /** Vídeo de referência da rotação (YouTube ou .mp4/.webm externo). */
+  rotationVideoUrl: string | null;
 }
 
 export interface MetaTeam {

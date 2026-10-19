@@ -390,7 +390,9 @@ com a nova data de atualização, sem alteração de código.
   opcional/"recheio" antes do bônus principal (ex.: `1 2c (3dc 4) 6`). Notação inválida é
   recusada com a explicação do erro; a rotação é salva na forma canônica. Na visão pública, a
   equipe mostra o selo de Causador de Dano no personagem e o botão "Rotação", que abre a
-  sequência e a descrição de cada um, e a legenda da notação.
+  sequência e a descrição de cada um, e a legenda da notação. Cada rotação pode ter um **vídeo de
+  referência** (link do YouTube ou de um arquivo .mp4/.webm hospedado fora), que toca mudo e em
+  loop só quando o painel abre; o sistema não armazena vídeo.
 - **FR-036**: As equipes MUST aparecer na ordem **Esquerda · Líder · Direita**, com o Líder no meio
   e em destaque (um pouco maior, com brilho), em todas as telas.
 

@@ -87,7 +87,7 @@ export function MemberChip({
       <SlotTag label={slotLabel} leader={leader} />
       <div className="relative">
         <div
-          className={cn("chamfer-sm", tinted ? "p-[3px]" : "p-[2px]", !tinted && (FRAME_BY_SIDE[agent.side] ?? "bg-border"))}
+          className={cn("chamfer-sm", tinted ? "p-[3px]" : "p-[2px]", !tinted && (FRAME_BY_SIDE[uniform.side] ?? "bg-border"))}
           style={tinted ? { background: ctpColor(ctp) ?? undefined } : undefined}
         >
           <Avatar className={cn("chamfer-sm rounded-none after:hidden", size, (unavailable || owned === false) && "grayscale")}>

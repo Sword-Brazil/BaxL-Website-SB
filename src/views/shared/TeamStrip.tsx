@@ -10,7 +10,7 @@ import { RotationPanel, RotationToggle } from "./RotationSequence";
 export type TeamTone = "meta" | "alt" | "mine";
 
 export type StripMember = { slot: Slot; uniformId: string; ctpId?: string | null } & Partial<
-  Pick<MetaTeamMember, "isDamageDealer" | "rotation" | "rotationNotes">
+  Pick<MetaTeamMember, "isDamageDealer" | "rotation" | "rotationNotes" | "rotationVideoUrl">
 >;
 
 /**
@@ -43,7 +43,7 @@ export function TeamStrip({
     const m = members.find((x) => x.slot === slot);
     if (!m?.isDamageDealer || !(m.rotation || m.rotationNotes)) return [];
     const name = catalog.uniformById(m.uniformId)?.agent.name ?? t(`team.slots.${slot}`);
-    return [{ slot, name, rotation: m.rotation ?? null, notes: m.rotationNotes ?? null }];
+    return [{ slot, name, rotation: m.rotation ?? null, notes: m.rotationNotes ?? null, videoUrl: m.rotationVideoUrl ?? null }];
   });
   return (
     <div

@@ -109,16 +109,24 @@ describe("AgentSchema", () => {
     const ok = {
       slug: "scarlet-witch",
       name: "Scarlet Witch",
-      gender: "FEMALE",
-      side: "HERO",
-      species: "MUTANT",
-      attackType: "UNIVERSAL",
-      uniforms: [{ slug: "padrao", name: "Padrão", imagePath: "/assets/agents/scarlet-witch/padrao.png" }],
+      uniforms: [
+        {
+          slug: "padrao",
+          name: "Padrão",
+          imagePath: "/assets/agents/scarlet-witch/padrao.png",
+          gender: "FEMALE",
+          side: "HERO",
+          species: "MUTANT",
+          attackType: "UNIVERSAL",
+        },
+      ],
     };
     expect(AgentSchema.safeParse(ok).success).toBe(true);
     expect(AgentSchema.safeParse({ ...ok, slug: "Scarlet Witch" }).success).toBe(false);
     expect(AgentSchema.safeParse({ ...ok, name: "" }).success).toBe(false);
     expect(AgentSchema.safeParse({ ...ok, uniforms: [] }).success).toBe(false);
+    // Atributos são do traje: valor inválido no traje é recusado.
+    expect(AgentSchema.safeParse({ ...ok, uniforms: [{ ...ok.uniforms[0], side: "NEUTRO" }] }).success).toBe(false);
   });
 });
 
@@ -154,5 +162,11 @@ describe("MetaTeamSchema: rotação", () => {
     const bad = MetaTeamSchema.safeParse(withRotation("1 2x"));
     expect(bad.success).toBe(false);
     expect(bad.error?.issues[0].message).toBe(VALIDATION.rotationFormat);
+    const video = (rotationVideoUrl: string) => ({
+      ...base,
+      members: base.members.map((m) => (m.slot === "SOLO" ? { ...m, isDamageDealer: true, rotation: "1 6", rotationVideoUrl } : m)),
+    });
+    expect(MetaTeamSchema.safeParse(video("https://www.youtube.com/watch?v=dQw4w9WgXcQ")).success).toBe(true);
+    expect(MetaTeamSchema.safeParse(video("https://exemplo.com/pagina")).error?.issues[0].message).toBe(VALIDATION.rotationVideo);
   });
 });

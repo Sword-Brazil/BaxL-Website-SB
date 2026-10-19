@@ -13,17 +13,13 @@ datasource db {
 // ---------- Catálogo ----------
 
 model Agent {
-  id         String    @id @default(cuid())
-  slug       String    @unique
-  name       String
-  gender     String
-  side       String
-  species    String
-  attackType String
-  active     Boolean   @default(true)
-  uniforms   Uniform[]
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id        String    @id @default(cuid())
+  slug      String    @unique
+  name      String
+  active    Boolean   @default(true)
+  uniforms  Uniform[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Uniform {
@@ -33,11 +29,11 @@ model Uniform {
   slug            String
   name            String
   imagePath       String
-  // Atributos próprios do traje (ex.: Fênix Negra é vilã); null = herda do personagem.
-  gender          String?
-  side            String?
-  species         String?
-  attackType      String?
+  // Atributos são do traje (ex.: Fênix Negra é vilã), não do personagem. UNKNOWN = não informado.
+  gender          String           @default("UNKNOWN")
+  side            String           @default("UNKNOWN")
+  species         String           @default("UNKNOWN")
+  attackType      String           @default("UNKNOWN")
   active          Boolean          @default(true)
   metaMembers     MetaTeamMember[]
   priorityEntries PriorityEntry[]
@@ -118,20 +114,22 @@ model MetaTeam {
 }
 
 model MetaTeamMember {
-  id             String   @id @default(cuid())
-  metaTeamId     String
-  metaTeam       MetaTeam @relation(fields: [metaTeamId], references: [id], onDelete: Cascade)
-  slot           String
-  uniformId      String
-  uniform        Uniform  @relation(fields: [uniformId], references: [id])
-  ctpId          String?
-  ctp            Ctp?     @relation(fields: [ctpId], references: [id])
+  id               String   @id @default(cuid())
+  metaTeamId       String
+  metaTeam         MetaTeam @relation(fields: [metaTeamId], references: [id], onDelete: Cascade)
+  slot             String
+  uniformId        String
+  uniform          Uniform  @relation(fields: [uniformId], references: [id])
+  ctpId            String?
+  ctp              Ctp?     @relation(fields: [ctpId], references: [id])
   // Causador de Dano (qualquer posição): só ele tem rotação, na notação "1 2c (3dc 4) 6".
-  isDamageDealer Boolean  @default(false)
-  rotation       String?
-  rotationNotes  String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  isDamageDealer   Boolean  @default(false)
+  rotation         String?
+  rotationNotes    String?
+  // Vídeo de referência (link do YouTube ou .mp4/.webm externo): o sistema não hospeda vídeo.
+  rotationVideoUrl String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   @@unique([metaTeamId, slot])
 }

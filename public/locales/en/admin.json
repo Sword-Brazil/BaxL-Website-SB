@@ -94,7 +94,9 @@
         "nestedGroup": "Do not nest parentheses.",
         "emptyGroup": "Empty parentheses.",
         "tooLong": "Rotation too long (30 steps max)."
-      }
+      },
+      "video": "Reference video (optional)",
+      "videoHint": "YouTube link (video or Shorts; add ?t= to start at the right moment) or a .mp4/.webm file. It plays muted and looped in the rotation view; the video is not stored in the system."
     },
     "damageDealer": "Damage dealer (needs a rotation)"
   },
@@ -131,12 +133,10 @@
     "slugAuto": "Generated from the name; edit only if needed.",
     "photos": "{{n}}/{{total}} with photo",
     "quickUniform": "Uniform",
-    "baseAttributes": "Character attributes",
-    "baseAttributesHint": "Apply to every uniform, except those with their own attributes.",
     "uniformAttributes": "This uniform's attributes",
-    "inheritedHint": "Dashed = inherited from the character. Tap another value to customize this uniform only.",
-    "customized": "Customized",
-    "resetAttributes": "Inherit all from character"
+    "uniformsHint": "Each uniform has its own attributes (gender, side, species and attack): day restrictions are checked against the uniform used. A new uniform starts with the first uniform's attributes.",
+    "variedUniforms_one": "{{count}} uniform with different attributes",
+    "variedUniforms_other": "{{count}} uniforms with different attributes"
   },
   "ctps": {
     "title": "CTP catalog",

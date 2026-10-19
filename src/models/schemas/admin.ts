@@ -15,6 +15,7 @@ import {
   teamScopeSchema,
 } from "./common";
 import { parseRotation } from "@/models/rules/rotation";
+import { parseRotationVideo } from "@/models/rules/rotationVideo";
 import { VALIDATION } from "./messages";
 
 const distinct = <T>(items: T[], key: (t: T) => unknown) => new Set(items.map(key)).size === items.length;
@@ -48,6 +49,13 @@ export const MetaTeamMemberSchema = z.object({
     .optional()
     .nullable(),
   rotationNotes: z.string().trim().max(500).optional().nullable(),
+  rotationVideoUrl: z
+    .string()
+    .trim()
+    .max(300)
+    .refine((v) => !v || !!parseRotationVideo(v), { message: VALIDATION.rotationVideo })
+    .optional()
+    .nullable(),
 });
 
 export const MetaTeamSchema = z
@@ -105,20 +113,16 @@ export const UniformInputSchema = z.object({
   name: z.string().trim().min(1).max(80),
   imagePath: z.string().max(300), // vazio = sem imagem (mostra as iniciais)
   active: z.boolean().optional(),
-  // Atributos próprios do traje; null/ausente = herda do personagem.
-  gender: genderSchema.nullable().optional(),
-  side: sideSchema.nullable().optional(),
-  species: speciesSchema.nullable().optional(),
-  attackType: attackTypeSchema.nullable().optional(),
+  // Atributos são de cada traje (UNKNOWN = não informado; não bloqueia restrições).
+  gender: genderSchema.or(z.literal(UNKNOWN)),
+  side: sideSchema.or(z.literal(UNKNOWN)),
+  species: speciesSchema.or(z.literal(UNKNOWN)),
+  attackType: attackTypeSchema.or(z.literal(UNKNOWN)),
 });
 
 export const AgentSchema = z.object({
   slug: slugSchema,
   name: z.string().trim().min(1).max(80),
-  gender: genderSchema.or(z.literal(UNKNOWN)),
-  side: sideSchema.or(z.literal(UNKNOWN)),
-  species: speciesSchema.or(z.literal(UNKNOWN)),
-  attackType: attackTypeSchema.or(z.literal(UNKNOWN)),
   active: z.boolean().optional(),
   uniforms: z
     .array(UniformInputSchema)

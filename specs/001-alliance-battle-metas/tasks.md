@@ -518,6 +518,8 @@ para a próxima BAI nos outros dias.
 - [X] T146 Editor de equipe (admin): interruptor "Causador de Dano" em cada posição e rotação com prévia ao vivo, erros explicados e legenda
 - [X] T147 Visão pública: selo de Causador de Dano e botão "Rotação" no TeamStrip com a rotação de cada um (ciclo, BAI, BAL livre e quadro do admin)
 - [X] T149 Posições Esquerda · Líder · Direita (antes Pos. 1 / Pos. 2), Líder no meio e em destaque em todas as telas (FR-036)
+- [X] T150 Atributos (gênero, lado, espécie, ataque) só no traje: removidos do personagem (migração copia para os trajes); editor de catálogo, importador, elenco e selo herói/vilão pelo traje
+- [X] T151 Vídeo de referência da rotação (YouTube sem cookies ou .mp4/.webm externo), mudo e em loop, carregado só ao abrir o painel
 - [ ] T148 Rotações de exemplo pré-cadastradas a partir de vídeos de jogadores experientes (aguarda as fontes)
 
 ---

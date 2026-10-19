@@ -86,7 +86,7 @@ function SlotRow({
         <Avatar
           className={cn(
             "chamfer-sm size-16 rounded-none ring-2 after:hidden sm:size-20",
-            ref?.agent.side === "HERO" ? "ring-hero/70" : ref?.agent.side === "VILLAIN" ? "ring-villain/70" : "ring-border",
+            ref?.uniform.side === "HERO" ? "ring-hero/70" : ref?.uniform.side === "VILLAIN" ? "ring-villain/70" : "ring-border",
           )}
         >
           {ref && <AvatarImage src={ref.uniform.portrait || undefined} alt={ref.agent.name} className="rounded-none" />}
