@@ -526,6 +526,7 @@ para a próxima BAI nos outros dias.
 - [X] T155 Jogadores sem conta: sai cadastro, confirmação de e-mail, recuperação de senha e sincronização (tabelas AuthToken e UserSelectionsDoc); nome no jogo no topo, salvo no aparelho; login só da curadoria (link no rodapé)
 - [X] T156 Limpar as equipes do jogador (todas ou por modo) no Meu Elenco e na tela da Batalha de Aliança
 - [X] T157 CTP: excluir de vez (equipes e reservas ficam sem o CTP), além de desativar
+- [X] T158 Exportar as equipes (Meta, Alternativas e do jogador) dos dias do filtro de semana num documento HTML com tabela (dia, modo, restrição, equipe, Esquerda · Líder · Direita), com fotos, CTP e Causador de Dano
 - [ ] T148 Rotações de exemplo pré-cadastradas a partir de vídeos de jogadores experientes (aguarda as fontes)
 
 ---

@@ -32,5 +32,17 @@
   "endsIn": "Turns over in {{time}} (12 PM Brasília)",
   "cycleDays": "Cycle days",
   "metaUpdated": "Meta updated",
-  "metaUpdatedShort": "Updated"
+  "metaUpdatedShort": "Updated",
+  "export": {
+    "button": "Export table (HTML)",
+    "title": "Alliance Battle teams",
+    "titleOf": "Alliance Battle teams · {{name}}",
+    "subtitle": "Meta, Alternatives and my teams per day · {{week}} · Sword Brazil",
+    "day": "Day",
+    "mode": "Mode",
+    "restriction": "Restriction",
+    "team": "Team",
+    "allReleased": "All agents allowed",
+    "generatedAt": "Generated on {{date}}. ⚔ = Damage dealer."
+  }
 }
