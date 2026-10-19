@@ -8,6 +8,8 @@ type DbMetaTeam = {
   isPrimary: boolean;
   label: string | null;
   notes: string | null;
+  rotation: string | null;
+  rotationNotes: string | null;
   updatedAt: Date;
   battleDay: { mode: string; number: number } | null;
   updatedBy: { nickname: string | null } | null;
@@ -23,6 +25,8 @@ export function toMetaTeam(t: DbMetaTeam): MetaTeam {
     isPrimary: t.isPrimary,
     label: t.label,
     notes: t.notes,
+    rotation: t.rotation,
+    rotationNotes: t.rotationNotes,
     members: [...t.members]
       .sort((a, b) => SLOTS.indexOf(a.slot as Slot) - SLOTS.indexOf(b.slot as Slot))
       .map((m) => ({ slot: m.slot as Slot, uniformId: m.uniformId, ctpId: m.ctpId })),

@@ -14,6 +14,7 @@ import {
   speciesSchema,
   teamScopeSchema,
 } from "./common";
+import { parseRotation } from "@/models/rules/rotation";
 import { VALIDATION } from "./messages";
 
 const distinct = <T>(items: T[], key: (t: T) => unknown) => new Set(items.map(key)).size === items.length;
@@ -43,6 +44,15 @@ export const MetaTeamSchema = z
     isPrimary: z.boolean(),
     label: z.string().trim().max(60).optional().nullable(),
     notes: z.string().trim().max(500).optional().nullable(),
+    /** Rotação do Solador (notação 1–6, c/dc/qc e parênteses). Vazio = sem rotação. */
+    rotation: z
+      .string()
+      .trim()
+      .max(120)
+      .refine((v) => !v || parseRotation(v).ok, { message: VALIDATION.rotationFormat })
+      .optional()
+      .nullable(),
+    rotationNotes: z.string().trim().max(500).optional().nullable(),
     members: z
       .array(MetaTeamMemberSchema)
       .length(SLOTS.length, { message: VALIDATION.teamSize })

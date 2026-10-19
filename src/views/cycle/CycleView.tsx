@@ -21,7 +21,13 @@ import { TeamBuilderPanel } from "./TeamBuilderPanel";
 type Vm = CycleViewModel;
 
 /** Faixa de equipe ligada ao ViewModel da tela central. */
-function TeamStrip(props: { label: string; tone: TeamTone; team: { slot: Slot; uniformId: string; ctpId?: string | null }[]; vm: Vm }) {
+function TeamStrip(props: {
+  label: string;
+  tone: TeamTone;
+  team: { slot: Slot; uniformId: string; ctpId?: string | null }[];
+  rotation?: MetaTeam;
+  vm: Vm;
+}) {
   const { vm } = props;
   return (
     <SharedTeamStrip
@@ -31,6 +37,7 @@ function TeamStrip(props: { label: string; tone: TeamTone; team: { slot: Slot; u
       catalog={vm.catalog}
       isOwned={vm.hasRoster ? vm.isOwned : undefined}
       equippedCtpOf={vm.equippedCtpOf}
+      rotation={props.rotation}
     />
   );
 }
@@ -83,12 +90,12 @@ function ModePanel({
         <RestrictionBadges criteria={data?.criteria ?? []} />
       </div>
       {meta ? (
-        <TeamStrip label={t("cycle:meta")} tone="meta" team={teamMembers(meta)} vm={vm} />
+        <TeamStrip label={t("cycle:meta")} tone="meta" team={teamMembers(meta)} rotation={meta} vm={vm} />
       ) : (
         <p className="rounded-md border border-dashed p-3 text-center text-xs text-muted-foreground">{t("cycle:noTeam")}</p>
       )}
       {alts.map((alt) => (
-        <TeamStrip key={alt.id} label={alt.label ?? t("cycle:alternative")} tone="alt" team={teamMembers(alt)} vm={vm} />
+        <TeamStrip key={alt.id} label={alt.label ?? t("cycle:alternative")} tone="alt" team={teamMembers(alt)} rotation={alt} vm={vm} />
       ))}
       {mine.length > 0 && <TeamStrip label={t("cycle:mine")} tone="mine" team={mine} vm={vm} />}
       <Button variant={mine.length ? "ghost" : "outline"} size="sm" className="self-start" onClick={() => vm.openBuilder(mode, day)}>
@@ -127,12 +134,12 @@ function BaiPanel({ day, vm }: { day: number; vm: Vm }) {
       </div>
       <div className="grid gap-2 md:grid-cols-2">
         {meta ? (
-          <TeamStrip label={t("cycle:meta")} tone="meta" team={teamMembers(meta)} vm={vm} />
+          <TeamStrip label={t("cycle:meta")} tone="meta" team={teamMembers(meta)} rotation={meta} vm={vm} />
         ) : (
           <p className="rounded-md border border-dashed p-3 text-center text-xs text-muted-foreground">{t("cycle:noTeam")}</p>
         )}
         {alts.map((alt) => (
-          <TeamStrip key={alt.id} label={alt.label ?? t("cycle:alternative")} tone="alt" team={teamMembers(alt)} vm={vm} />
+          <TeamStrip key={alt.id} label={alt.label ?? t("cycle:alternative")} tone="alt" team={teamMembers(alt)} rotation={alt} vm={vm} />
         ))}
         {mine.length > 0 && <TeamStrip label={t("cycle:mine")} tone="mine" team={mine} vm={vm} />}
       </div>

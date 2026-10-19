@@ -92,6 +92,7 @@ function ModeCell({
           label={team.isPrimary ? t("common:team.primary") : (team.label ?? t("common:team.alternative"))}
           tone={team.isPrimary ? "meta" : "alt"}
           members={team.members}
+          rotation={team}
           catalog={scopeVm.catalog}
           action={
             <TeamActions onEdit={() => open(() => vm.startEdit(team))} onDelete={() => vm.remove(team.id)} />

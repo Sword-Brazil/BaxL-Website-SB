@@ -13,7 +13,7 @@ const meta: MetaTeam = {
   dayNumber: 1,
   isPrimary: true,
   label: null,
-  notes: null,
+  notes: null, rotation: null, rotationNotes: null,
   updatedAt: "",
   updatedBy: null,
   members: [

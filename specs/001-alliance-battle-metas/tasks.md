@@ -511,6 +511,16 @@ para a próxima BAI nos outros dias.
 
 ---
 
+## Phase 14: Rotação do Líder nas equipes Meta/Alternativa (FR-035)
+
+- [X] T144 Regra `parseRotation`/`formatRotation` (1–6, c/dc/qc, grupos opcionais) com testes
+- [X] T145 Campos `rotation`/`rotationNotes` em `MetaTeam` (migração, schema Zod, serviço normaliza)
+- [X] T146 Editor de equipe (admin): rotação no bloco do Líder com prévia ao vivo, erros explicados e legenda
+- [X] T147 Visão pública: botão "Rotação" no TeamStrip (ciclo, BAI, BAL livre e quadro do admin)
+- [ ] T148 Rotações de exemplo pré-cadastradas a partir de vídeos de jogadores experientes (aguarda as fontes)
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies

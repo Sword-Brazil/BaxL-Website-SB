@@ -9,7 +9,7 @@ const team = (isPrimary: boolean, uniforms: [string, string, string]): MetaTeam 
   dayNumber: null,
   isPrimary,
   label: null,
-  notes: null,
+  notes: null, rotation: null, rotationNotes: null,
   updatedAt: "",
   updatedBy: null,
   members: (["SOLO", "SUPPORT_1", "SUPPORT_2"] as const).map((slot, i) => ({ slot, uniformId: uniforms[i], ctpId: null })),

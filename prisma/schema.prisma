@@ -101,18 +101,21 @@ model RestrictionCriterion {
 // ---------- Equipes curadas ----------
 
 model MetaTeam {
-  id          String           @id @default(cuid())
-  scope       String
-  battleDayId String?
-  battleDay   BattleDay?       @relation(fields: [battleDayId], references: [id])
-  isPrimary   Boolean          @default(false)
-  label       String?
-  notes       String?
-  members     MetaTeamMember[]
-  updatedById String?
-  updatedBy   User?            @relation(fields: [updatedById], references: [id])
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  id            String           @id @default(cuid())
+  scope         String
+  battleDayId   String?
+  battleDay     BattleDay?       @relation(fields: [battleDayId], references: [id])
+  isPrimary     Boolean          @default(false)
+  label         String?
+  notes         String?
+  // Rotação do Solador (Causador de Dano) na notação da comunidade, ex.: "1 2c (3dc 4) 6".
+  rotation      String?
+  rotationNotes String?
+  members       MetaTeamMember[]
+  updatedById   String?
+  updatedBy     User?            @relation(fields: [updatedById], references: [id])
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
 
   @@index([scope, battleDayId])
 }

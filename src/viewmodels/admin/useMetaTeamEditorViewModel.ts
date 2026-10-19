@@ -13,6 +13,8 @@ export interface TeamDraft {
   isPrimary: boolean;
   label: string;
   notes: string;
+  rotation: string;
+  rotationNotes: string;
   members: Record<Slot, { uniformId: string | null; ctpId: string | null }>;
 }
 
@@ -20,6 +22,8 @@ const emptyDraft = (isPrimary: boolean): TeamDraft => ({
   isPrimary,
   label: "",
   notes: "",
+  rotation: "",
+  rotationNotes: "",
   members: Object.fromEntries(SLOTS.map((s) => [s, { uniformId: null, ctpId: null }])) as TeamDraft["members"],
 });
 
@@ -28,6 +32,8 @@ const fromTeam = (t: MetaTeam): TeamDraft => ({
   isPrimary: t.isPrimary,
   label: t.label ?? "",
   notes: t.notes ?? "",
+  rotation: t.rotation ?? "",
+  rotationNotes: t.rotationNotes ?? "",
   members: Object.fromEntries(t.members.map((m) => [m.slot, { uniformId: m.uniformId, ctpId: m.ctpId }])) as TeamDraft["members"],
 });
 
@@ -61,6 +67,8 @@ export function useMetaTeamEditorViewModel(scopeVm: MetaScopeViewModel, messages
         isPrimary: d.isPrimary,
         label: d.label || null,
         notes: d.notes || null,
+        rotation: d.rotation || null,
+        rotationNotes: d.rotationNotes || null,
         members: SLOTS.map((slot) => ({ slot, uniformId: d.members[slot].uniformId ?? "", ctpId: d.members[slot].ctpId ?? null })),
       };
       const parsed = MetaTeamSchema.safeParse(input);

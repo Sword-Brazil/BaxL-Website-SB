@@ -22,6 +22,7 @@ export const VALIDATION = {
   slugFormat: "Use kebab-case (ex.: scarlet-witch)",
   uniformRequired: "Cadastre ao menos um uniforme",
   uniformRepeated: "Uniforme repetido",
+  rotationFormat: "Rotação inválida: use 1–6 com c, dc ou qc e ( ) para trechos opcionais",
 } as const;
 
 export type ValidationCode = keyof typeof VALIDATION;

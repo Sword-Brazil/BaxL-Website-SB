@@ -78,7 +78,24 @@
     "week": "Wk {{n}}",
     "reserves": "Reserves",
     "reservesHint": "Extra characters for the suggestion when players lack the Meta and Alternative ones. Order used: Meta → Alternatives → reserves.",
-    "addReserve": "+ Add reserve"
+    "addReserve": "+ Add reserve",
+    "rotation": {
+      "label": "{{slot}} rotation (damage dealer)",
+      "legendTitle": "Rotation notation",
+      "example": "Example: 1 2c (3dc 4) 6",
+      "hint": "Optional. Use 1–6, c / dc / qc and ( ) for optional parts.",
+      "notes": "Rotation description",
+      "notesPlaceholder": "When to use it, what to watch for, alternatives…",
+      "errors": {
+        "empty": "Enter at least one skill.",
+        "token": "\"{{token}}\" is not a valid step: use 1–6, optionally followed by c, dc or qc.",
+        "unclosedGroup": "A parenthesis is not closed.",
+        "unopenedGroup": "There is a closing parenthesis without an opening one.",
+        "nestedGroup": "Do not nest parentheses.",
+        "emptyGroup": "Empty parentheses.",
+        "tooLong": "Rotation too long (30 steps max)."
+      }
+    }
   },
   "priority": {
     "solo": "Solos",

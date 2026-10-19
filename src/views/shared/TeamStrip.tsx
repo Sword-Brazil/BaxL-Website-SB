@@ -1,10 +1,11 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useTranslation } from "next-i18next/pages";
 import { cn } from "@/lib/utils";
 import { SLOTS, type Slot } from "@/models/domain/enums";
-import type { Ctp } from "@/models/domain/types";
+import type { Ctp, MetaTeam } from "@/models/domain/types";
 import type { CatalogViewModel } from "@/viewmodels/useCatalogViewModel";
 import { MemberChip } from "./MemberChip";
+import { RotationPanel, RotationToggle } from "./RotationSequence";
 
 export type TeamTone = "meta" | "alt" | "mine";
 
@@ -16,6 +17,7 @@ export function TeamStrip({
   catalog,
   isOwned,
   equippedCtpOf,
+  rotation,
   action,
 }: {
   label: string;
@@ -26,10 +28,14 @@ export function TeamStrip({
   isOwned?: (uniformId: string) => boolean;
   /** Para a equipe do usuário: CTP equipado no personagem. */
   equippedCtpOf?: (agentId: string) => Ctp | null;
+  /** Rotação do Solador (equipes Meta/Alternativa): mostra o botão "Rotação" se houver. */
+  rotation?: Pick<MetaTeam, "rotation" | "rotationNotes">;
   action?: ReactNode;
 }) {
   const { t } = useTranslation("common");
   const isMine = tone === "mine";
+  const hasRotation = !!(rotation?.rotation || rotation?.rotationNotes);
+  const [showRotation, setShowRotation] = useState(false);
   return (
     <div
       className={cn(
@@ -48,7 +54,12 @@ export function TeamStrip({
         >
           {label}
         </p>
-        {action}
+        {(hasRotation || action) && (
+          <div className="flex shrink-0 items-center gap-1">
+            {hasRotation && <RotationToggle open={showRotation} onToggle={() => setShowRotation((v) => !v)} />}
+            {action}
+          </div>
+        )}
       </div>
       <ul className="grid grid-cols-3 gap-1.5">
         {SLOTS.map((slot) => {
@@ -68,6 +79,7 @@ export function TeamStrip({
           );
         })}
       </ul>
+      {hasRotation && showRotation && <RotationPanel rotation={rotation!.rotation} notes={rotation!.rotationNotes} />}
     </div>
   );
 }

@@ -78,6 +78,10 @@ export interface MetaTeam {
   isPrimary: boolean;
   label: string | null;
   notes: string | null;
+  /** Rotação do Solador na forma canônica (ver src/models/rules/rotation.ts). */
+  rotation: string | null;
+  /** Descrição da rotação (quando usar, o que observar). */
+  rotationNotes: string | null;
   members: MetaTeamMember[];
   updatedAt: string;
   updatedBy: string | null;

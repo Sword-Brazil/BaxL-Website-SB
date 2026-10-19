@@ -14,13 +14,15 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { SLOTS } from "@/models/domain/enums";
+import { parseRotation } from "@/models/rules/rotation";
 import type { MetaScopeViewModel } from "@/viewmodels/admin/useMetaScopeViewModel";
 import { useMetaTeamEditorViewModel } from "@/viewmodels/admin/useMetaTeamEditorViewModel";
+import { HelpHint } from "@/views/layout/HelpHint";
 import { MetaCycleBoard } from "./MetaCycleBoard";
 import { ReservesEditor } from "./ReservesEditor";
 import { TeamStrip } from "@/views/shared/TeamStrip";
@@ -29,7 +31,65 @@ import { CtpSelect } from "@/views/shared/CtpSelect";
 import { EmptyTeam } from "@/views/shared/EmptyTeam";
 import { QueryState } from "@/views/shared/QueryState";
 import { RestrictionBadges } from "@/views/shared/RestrictionBadges";
+import { RotationLegend, RotationSequence } from "@/views/shared/RotationSequence";
 import { UniformPicker } from "@/views/shared/UniformPicker";
+
+/** Rotação do Solador (Causador de Dano): sequência com prévia ao vivo e descrição. */
+function RotationFields({
+  rotation,
+  notes,
+  onChange,
+}: {
+  rotation: string;
+  notes: string;
+  onChange: (patch: { rotation?: string; rotationNotes?: string }) => void;
+}) {
+  const { t } = useTranslation(["admin", "common"]);
+  const parsed = rotation.trim() ? parseRotation(rotation) : null;
+  return (
+    <div className="flex flex-col gap-3 border-t border-energy/10 pt-3 sm:col-span-2">
+      <Field data-invalid={parsed && !parsed.ok ? true : undefined}>
+        <div className="flex items-center gap-1">
+          <FieldLabel htmlFor="rotation">{t("admin:metas.rotation.label", { slot: t("common:team.slots.SOLO") })}</FieldLabel>
+          <HelpHint title={t("admin:metas.rotation.legendTitle")}>
+            <RotationLegend />
+            <p>{t("admin:metas.rotation.example")}</p>
+          </HelpHint>
+        </div>
+        <Input
+          id="rotation"
+          maxLength={120}
+          className="font-mono"
+          placeholder="1 2c (3dc 4) 6"
+          value={rotation}
+          aria-invalid={parsed && !parsed.ok ? true : undefined}
+          onChange={(e) => onChange({ rotation: e.target.value })}
+        />
+        {parsed?.ok ? (
+          <RotationSequence parts={parsed.parts} />
+        ) : parsed ? (
+          <FieldDescription className="text-destructive">
+            {t(`admin:metas.rotation.errors.${parsed.error}`, { token: parsed.token })}
+          </FieldDescription>
+        ) : (
+          <FieldDescription>{t("admin:metas.rotation.hint")}</FieldDescription>
+        )}
+      </Field>
+      {parsed?.ok && (
+        <Field>
+          <FieldLabel htmlFor="rotationNotes">{t("admin:metas.rotation.notes")}</FieldLabel>
+          <Textarea
+            id="rotationNotes"
+            maxLength={500}
+            placeholder={t("admin:metas.rotation.notesPlaceholder")}
+            value={notes}
+            onChange={(e) => onChange({ rotationNotes: e.target.value })}
+          />
+        </Field>
+      )}
+    </div>
+  );
+}
 
 /** Equipes do escopo. Dias de BAX/BAL: quadro do ciclo inteiro; BAL livre e BAI: lista do escopo. */
 export function MetaTeamEditorView({ scopeVm }: { scopeVm: MetaScopeViewModel }) {
@@ -61,6 +121,7 @@ export function MetaTeamEditorView({ scopeVm }: { scopeVm: MetaScopeViewModel })
                     label={team.isPrimary ? t("common:team.primary") : (team.label ?? t("common:team.alternative"))}
                     tone={team.isPrimary ? "meta" : "alt"}
                     members={team.members}
+                    rotation={team}
                     catalog={catalog}
                     action={
                       <div className="flex items-center gap-1">
@@ -162,6 +223,13 @@ export function MetaTeamEditorView({ scopeVm }: { scopeVm: MetaScopeViewModel })
                           targetName={member.uniformId ? catalog.uniformById(member.uniformId)?.agent.name : undefined}
                         />
                       </Field>
+                      {slot === "SOLO" && (
+                        <RotationFields
+                          rotation={vm.draft!.rotation}
+                          notes={vm.draft!.rotationNotes}
+                          onChange={(patch) => vm.update(patch)}
+                        />
+                      )}
                     </div>
                   );
                 })}

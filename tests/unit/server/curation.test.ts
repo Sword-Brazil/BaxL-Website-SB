@@ -38,6 +38,13 @@ describe("curadoria", () => {
     ...extra,
   });
 
+  it("a rotação do Solador é salva na forma canônica, com a descrição", async () => {
+    const saved = await saveMetaTeam(team(fem, { rotation: "1C > 2dc (3, 4) 6", rotationNotes: "Guarde o 6 para a fase 2" }), curatorId);
+    expect(saved).toMatchObject({ rotation: "1c 2dc (3 4) 6", rotationNotes: "Guarde o 6 para a fase 2" });
+    const cleared = await saveMetaTeam(team(fem, { rotation: "", rotationNotes: "sem rotação" }), curatorId, saved.id);
+    expect(cleared).toMatchObject({ rotation: null, rotationNotes: null });
+  });
+
   it("publicar com agente fora da restrição gera 422 RESTRICTION_VIOLATION", async () => {
     const err = await saveMetaTeam(team([maleMutant, fem[1], fem[2]]), curatorId).catch((e) => e);
     expect(err).toBeInstanceOf(HttpError);

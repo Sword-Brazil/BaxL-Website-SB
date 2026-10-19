@@ -1,6 +1,7 @@
 import type { MetaTeam } from "@/models/domain/types";
 import type { MetaTeamInput } from "@/models/schemas/admin";
 import { prisma } from "@/server/db";
+import { normalizeRotation } from "@/models/rules/rotation";
 import { HttpError } from "@/server/http";
 import { metaTeamInclude } from "@/server/repositories/metaTeamRepository";
 import { assertCtpsExist, assertRestriction, findBattleDay, loadActiveUniforms } from "./curationGuards";
@@ -28,6 +29,8 @@ export async function saveMetaTeam(input: MetaTeamInput, userId: string, id?: st
     isPrimary: input.isPrimary,
     label: input.label || null,
     notes: input.notes || null,
+    rotation: normalizeRotation(input.rotation),
+    rotationNotes: input.rotation?.trim() ? input.rotationNotes || null : null,
     updatedById: userId,
   };
   const members = input.members.map((m) => ({ slot: m.slot, uniformId: m.uniformId, ctpId: m.ctpId ?? null }));
