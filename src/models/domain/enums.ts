@@ -53,6 +53,9 @@ export type CtpQuality = (typeof CTP_QUALITIES)[number];
 export const SLOTS = ["SOLO", "SUPPORT_1", "SUPPORT_2"] as const;
 export type Slot = (typeof SLOTS)[number];
 
+/** Ordem na tela: Esquerda · Líder (no meio, em destaque) · Direita. */
+export const DISPLAY_SLOTS = ["SUPPORT_1", "SOLO", "SUPPORT_2"] as const satisfies readonly Slot[];
+
 export const TEAM_SCOPES = ["DAY", "BAL_FREE", "BAI"] as const;
 export type TeamScope = (typeof TEAM_SCOPES)[number];
 

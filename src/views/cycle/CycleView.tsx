@@ -7,13 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { SLOTS, type DayMode, type Slot } from "@/models/domain/enums";
+import { SLOTS, type DayMode } from "@/models/domain/enums";
 import type { CycleDay, CycleModeDay, MetaTeam } from "@/models/domain/types";
 import type { UserTeam } from "@/models/schemas/selections";
 import { useCycleViewModel, type CycleViewModel, type WeekFilter } from "@/viewmodels/useCycleViewModel";
 import { useMetaUpdatesNotice } from "@/viewmodels/useMetaUpdatesNotice";
 import { HelpHint } from "@/views/layout/HelpHint";
-import { TeamStrip as SharedTeamStrip, type TeamTone } from "@/views/shared/TeamStrip";
+import { TeamStrip as SharedTeamStrip, type StripMember, type TeamTone } from "@/views/shared/TeamStrip";
 import { QueryState } from "@/views/shared/QueryState";
 import { RestrictionBadges } from "@/views/shared/RestrictionBadges";
 import { TeamBuilderPanel } from "./TeamBuilderPanel";
@@ -21,7 +21,12 @@ import { TeamBuilderPanel } from "./TeamBuilderPanel";
 type Vm = CycleViewModel;
 
 /** Faixa de equipe ligada ao ViewModel da tela central. */
-function TeamStrip(props: { label: string; tone: TeamTone; team: { slot: Slot; uniformId: string; ctpId?: string | null }[]; vm: Vm }) {
+function TeamStrip(props: {
+  label: string;
+  tone: TeamTone;
+  team: StripMember[];
+  vm: Vm;
+}) {
   const { vm } = props;
   return (
     <SharedTeamStrip

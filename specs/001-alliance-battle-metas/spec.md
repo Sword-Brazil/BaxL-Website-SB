@@ -382,6 +382,17 @@ com a nova data de atualização, sem alteração de código.
 - **FR-034**: Endereços inexistentes MUST abrir a tela de **404** da Sword Brazil (no tema e no
   idioma da plataforma), com opções de voltar e de ir para a Batalha de Aliança, e com o aviso
   de que a área pode estar em desenvolvimento.
+- **FR-035**: Curadores MUST poder marcar, em cada equipe Meta/Alternativa, quais membros são
+  **Causadores de Dano** (qualquer posição: Esquerda, Líder ou Direita; um ou mais) e cadastrar
+  para cada um a **rotação** e uma descrição dela. A rotação usa a notação da comunidade:
+  números 1–6 = habilidades na ordem da tela (6 = Ultimate, Despertada ou Tier-4); `c` = cancelar
+  logo após usar; `dc` = cancelar com atraso; `qc` = cancelamento rápido; `( )` = trecho
+  opcional/"recheio" antes do bônus principal (ex.: `1 2c (3dc 4) 6`). Notação inválida é
+  recusada com a explicação do erro; a rotação é salva na forma canônica. Na visão pública, a
+  equipe mostra o selo de Causador de Dano no personagem e o botão "Rotação", que abre a
+  sequência e a descrição de cada um, e a legenda da notação.
+- **FR-036**: As equipes MUST aparecer na ordem **Esquerda · Líder · Direita**, com o Líder no meio
+  e em destaque (um pouco maior, com brilho), em todas as telas.
 
 ### Key Entities
 

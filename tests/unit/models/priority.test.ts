@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { MetaTeam } from "@/models/domain/types";
+
+const NO_ROTATION = { isDamageDealer: false, rotation: null, rotationNotes: null };
 import { effectivePriority } from "@/models/rules/priority";
 
 const team = (isPrimary: boolean, [solo, s1, s2]: string[]): MetaTeam => ({
@@ -13,9 +15,9 @@ const team = (isPrimary: boolean, [solo, s1, s2]: string[]): MetaTeam => ({
   updatedAt: "",
   updatedBy: null,
   members: [
-    { slot: "SOLO", uniformId: solo, ctpId: `${solo}-ctp` },
-    { slot: "SUPPORT_1", uniformId: s1, ctpId: null },
-    { slot: "SUPPORT_2", uniformId: s2, ctpId: null },
+    { slot: "SOLO", uniformId: solo, ctpId: `${solo}-ctp`, ...NO_ROTATION },
+    { slot: "SUPPORT_1", uniformId: s1, ctpId: null, ...NO_ROTATION },
+    { slot: "SUPPORT_2", uniformId: s2, ctpId: null, ...NO_ROTATION },
   ],
 });
 

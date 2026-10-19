@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { MetaTeam } from "@/models/domain/types";
+
+const NO_ROTATION = { isDamageDealer: false, rotation: null, rotationNotes: null };
 import { compareWithMeta, type CompareContext } from "@/models/rules/compare";
 
 // agentes: a (uniformes a1, a2), b (b1), c (c1), d (d1)
@@ -17,9 +19,9 @@ const meta: MetaTeam = {
   updatedAt: "",
   updatedBy: null,
   members: [
-    { slot: "SOLO", uniformId: "a1", ctpId: "rageB" },
-    { slot: "SUPPORT_1", uniformId: "b1", ctpId: "lib" },
-    { slot: "SUPPORT_2", uniformId: "c1", ctpId: "lib" },
+    { slot: "SOLO", uniformId: "a1", ctpId: "rageB", ...NO_ROTATION },
+    { slot: "SUPPORT_1", uniformId: "b1", ctpId: "lib", ...NO_ROTATION },
+    { slot: "SUPPORT_2", uniformId: "c1", ctpId: "lib", ...NO_ROTATION },
   ],
 };
 

@@ -68,6 +68,12 @@ export interface MetaTeamMember {
   uniformId: string;
   /** CTP recomendado. As equipes importadas trazem só o tipo; null = sem recomendação. */
   ctpId: string | null;
+  /** Causador de Dano (qualquer posição): é quem tem rotação. */
+  isDamageDealer: boolean;
+  /** Rotação na forma canônica (ver src/models/rules/rotation.ts); só para Causador de Dano. */
+  rotation: string | null;
+  /** Descrição da rotação (quando usar, o que observar). */
+  rotationNotes: string | null;
 }
 
 export interface MetaTeam {

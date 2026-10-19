@@ -44,11 +44,34 @@
     "unavailable": "Unavailable",
     "slots": {
       "SOLO": "Leader",
-      "SUPPORT_1": "Slot 1",
-      "SUPPORT_2": "Slot 2"
+      "SUPPORT_1": "Left",
+      "SUPPORT_2": "Right"
     },
     "owned": "Owned",
-    "notOwned": "Not owned"
+    "notOwned": "Not owned",
+    "damageDealer": "Damage dealer",
+    "emptySlot": "Empty"
+  },
+  "rotation": {
+    "title": "Rotation",
+    "of": "{{name}} rotation",
+    "skill": "Skill {{n}}",
+    "ultimate": "Skill 6 (Ultimate / Awakened / Tier-4)",
+    "optional": "Optional",
+    "showLegend": "How to read the notation",
+    "hideLegend": "Hide legend",
+    "cancels": {
+      "c": "cancel right after use",
+      "dc": "delayed cancel",
+      "qc": "quick cancel"
+    },
+    "legend": {
+      "numbers": "Skills in on-screen order. 6 = Ultimate, Awakened or Tier-4.",
+      "c": "Cancel: cancel the animation right after using it, firing the next skill.",
+      "dc": "Delayed Cancel: wait a split second (the hit effect or the end of the animation) before cancelling into the next one.",
+      "qc": "Quick Cancel: cancel immediately after the input.",
+      "optional": "Optional part or combo \"filler\" before the main bonus."
+    }
   },
   "restriction": {
     "none": "No restriction",
@@ -168,7 +191,8 @@
     "positionRepeated": "Repeated position",
     "slugFormat": "Use kebab-case (e.g. scarlet-witch)",
     "uniformRequired": "Add at least one uniform",
-    "uniformRepeated": "Repeated uniform"
+    "uniformRepeated": "Repeated uniform",
+    "rotationFormat": "Invalid rotation: use 1–6 with c, dc or qc and ( ) for optional parts"
   },
   "security": {
     "label": "Account security notices",

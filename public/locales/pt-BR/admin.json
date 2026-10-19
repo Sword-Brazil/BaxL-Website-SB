@@ -78,7 +78,25 @@
     "week": "Sem. {{n}}",
     "reserves": "Reservas",
     "reservesHint": "Personagens extras para a sugestão de quem não tem os da Meta e das Alternativas. Ordem usada: Meta → Alternativas → reservas.",
-    "addReserve": "+ Adicionar reserva"
+    "addReserve": "+ Adicionar reserva",
+    "rotation": {
+      "label": "Rotação",
+      "legendTitle": "Notação da rotação",
+      "example": "Exemplo: 1 2c (3dc 4) 6",
+      "hint": "Opcional. Use 1–6, c / dc / qc e ( ) para trechos opcionais.",
+      "notes": "Descrição da rotação",
+      "notesPlaceholder": "Quando usar, o que observar, alternativas…",
+      "errors": {
+        "empty": "Informe ao menos uma habilidade.",
+        "token": "\"{{token}}\" não é um passo válido: use 1–6, opcionalmente seguido de c, dc ou qc.",
+        "unclosedGroup": "Falta fechar um parêntese.",
+        "unopenedGroup": "Há um parêntese fechando sem abrir.",
+        "nestedGroup": "Não use parênteses dentro de parênteses.",
+        "emptyGroup": "Parênteses vazios.",
+        "tooLong": "Rotação longa demais (máximo de 30 passos)."
+      }
+    },
+    "damageDealer": "Causador de Dano (precisa de rotação)"
   },
   "priority": {
     "solo": "Soladores",

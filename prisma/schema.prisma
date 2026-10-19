@@ -118,16 +118,20 @@ model MetaTeam {
 }
 
 model MetaTeamMember {
-  id         String   @id @default(cuid())
-  metaTeamId String
-  metaTeam   MetaTeam @relation(fields: [metaTeamId], references: [id], onDelete: Cascade)
-  slot       String
-  uniformId  String
-  uniform    Uniform  @relation(fields: [uniformId], references: [id])
-  ctpId      String?
-  ctp        Ctp?     @relation(fields: [ctpId], references: [id])
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id             String   @id @default(cuid())
+  metaTeamId     String
+  metaTeam       MetaTeam @relation(fields: [metaTeamId], references: [id], onDelete: Cascade)
+  slot           String
+  uniformId      String
+  uniform        Uniform  @relation(fields: [uniformId], references: [id])
+  ctpId          String?
+  ctp            Ctp?     @relation(fields: [ctpId], references: [id])
+  // Causador de Dano (qualquer posição): só ele tem rotação, na notação "1 2c (3dc 4) 6".
+  isDamageDealer Boolean  @default(false)
+  rotation       String?
+  rotationNotes  String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   @@unique([metaTeamId, slot])
 }

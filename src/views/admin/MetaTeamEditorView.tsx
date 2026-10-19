@@ -1,5 +1,5 @@
 import { useTranslation } from "next-i18next/pages";
-import { PencilIcon, PlusIcon, Trash2Icon, TriangleAlertIcon } from "lucide-react";
+import { PencilIcon, PlusIcon, SwordIcon, Trash2Icon, TriangleAlertIcon } from "lucide-react";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import {
   AlertDialog,
@@ -14,13 +14,16 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { cn } from "@/lib/utils";
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { SLOTS } from "@/models/domain/enums";
+import { DISPLAY_SLOTS, type Slot } from "@/models/domain/enums";
+import { parseRotation } from "@/models/rules/rotation";
 import type { MetaScopeViewModel } from "@/viewmodels/admin/useMetaScopeViewModel";
 import { useMetaTeamEditorViewModel } from "@/viewmodels/admin/useMetaTeamEditorViewModel";
+import { HelpHint } from "@/views/layout/HelpHint";
 import { MetaCycleBoard } from "./MetaCycleBoard";
 import { ReservesEditor } from "./ReservesEditor";
 import { TeamStrip } from "@/views/shared/TeamStrip";
@@ -29,7 +32,67 @@ import { CtpSelect } from "@/views/shared/CtpSelect";
 import { EmptyTeam } from "@/views/shared/EmptyTeam";
 import { QueryState } from "@/views/shared/QueryState";
 import { RestrictionBadges } from "@/views/shared/RestrictionBadges";
+import { RotationLegend, RotationSequence } from "@/views/shared/RotationSequence";
 import { UniformPicker } from "@/views/shared/UniformPicker";
+
+/** Rotação de um Causador de Dano: sequência com prévia ao vivo e descrição. */
+function RotationFields({
+  slot,
+  rotation,
+  notes,
+  onChange,
+}: {
+  slot: Slot;
+  rotation: string;
+  notes: string;
+  onChange: (patch: { rotation?: string; rotationNotes?: string }) => void;
+}) {
+  const { t } = useTranslation(["admin", "common"]);
+  const parsed = rotation.trim() ? parseRotation(rotation) : null;
+  return (
+    <div className="flex flex-col gap-3">
+      <Field data-invalid={parsed && !parsed.ok ? true : undefined}>
+        <div className="flex items-center gap-1">
+          <FieldLabel htmlFor={`rotation-${slot}`}>{t("admin:metas.rotation.label")}</FieldLabel>
+          <HelpHint title={t("admin:metas.rotation.legendTitle")}>
+            <RotationLegend />
+            <p>{t("admin:metas.rotation.example")}</p>
+          </HelpHint>
+        </div>
+        <Input
+          id={`rotation-${slot}`}
+          maxLength={120}
+          className="font-mono"
+          placeholder="1 2c (3dc 4) 6"
+          value={rotation}
+          aria-invalid={parsed && !parsed.ok ? true : undefined}
+          onChange={(e) => onChange({ rotation: e.target.value })}
+        />
+        {parsed?.ok ? (
+          <RotationSequence parts={parsed.parts} />
+        ) : parsed ? (
+          <FieldDescription className="text-destructive">
+            {t(`admin:metas.rotation.errors.${parsed.error}`, { token: parsed.token })}
+          </FieldDescription>
+        ) : (
+          <FieldDescription>{t("admin:metas.rotation.hint")}</FieldDescription>
+        )}
+      </Field>
+      {parsed?.ok && (
+        <Field>
+          <FieldLabel htmlFor={`rotationNotes-${slot}`}>{t("admin:metas.rotation.notes")}</FieldLabel>
+          <Textarea
+            id={`rotationNotes-${slot}`}
+            maxLength={500}
+            placeholder={t("admin:metas.rotation.notesPlaceholder")}
+            value={notes}
+            onChange={(e) => onChange({ rotationNotes: e.target.value })}
+          />
+        </Field>
+      )}
+    </div>
+  );
+}
 
 /** Equipes do escopo. Dias de BAX/BAL: quadro do ciclo inteiro; BAL livre e BAI: lista do escopo. */
 export function MetaTeamEditorView({ scopeVm }: { scopeVm: MetaScopeViewModel }) {
@@ -132,10 +195,16 @@ export function MetaTeamEditorView({ scopeVm }: { scopeVm: MetaScopeViewModel })
                     <AlertTitle>{vm.error}</AlertTitle>
                   </Alert>
                 )}
-                {SLOTS.map((slot) => {
+                {DISPLAY_SLOTS.map((slot) => {
                   const member = vm.draft!.members[slot];
                   return (
-                    <div key={slot} className="grid gap-2 rounded-lg border border-energy/10 p-3 sm:grid-cols-[1fr_14rem]">
+                    <div
+                      key={slot}
+                      className={cn(
+                        "grid gap-2 rounded-lg border p-3 sm:grid-cols-[1fr_14rem]",
+                        slot === "SOLO" ? "energy-glow border-energy/40 bg-energy/5" : "border-energy/10",
+                      )}
+                    >
                       <Field>
                         <FieldLabel className="font-heading tracking-widest text-energy uppercase">
                           {t(`common:team.slots.${slot}`)}
@@ -162,6 +231,27 @@ export function MetaTeamEditorView({ scopeVm }: { scopeVm: MetaScopeViewModel })
                           targetName={member.uniformId ? catalog.uniformById(member.uniformId)?.agent.name : undefined}
                         />
                       </Field>
+                      <div className="flex flex-col gap-3 border-t border-energy/10 pt-3 sm:col-span-2">
+                        <Field orientation="horizontal">
+                          <Switch
+                            id={`damageDealer-${slot}`}
+                            checked={member.isDamageDealer}
+                            onCheckedChange={(isDamageDealer) => vm.setMember(slot, { isDamageDealer })}
+                          />
+                          <FieldLabel htmlFor={`damageDealer-${slot}`} className="flex items-center gap-1.5">
+                            <SwordIcon className="size-3.5 text-spark" />
+                            {t("admin:metas.damageDealer")}
+                          </FieldLabel>
+                        </Field>
+                        {member.isDamageDealer && (
+                          <RotationFields
+                            slot={slot}
+                            rotation={member.rotation}
+                            notes={member.rotationNotes}
+                            onChange={(patch) => vm.setMember(slot, patch)}
+                          />
+                        )}
+                      </div>
                     </div>
                   );
                 })}

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { VALIDATION } from "@/models/schemas/messages";
 import {
   AgentSchema,
   AssetUploadSchema,
@@ -134,5 +135,24 @@ describe("AssetUploadSchema", () => {
     expect(AssetUploadSchema.safeParse({ fileName: "a.png", mimeType: "image/png", base64: "AAAA" }).success).toBe(true);
     expect(AssetUploadSchema.safeParse({ fileName: "a.jpg", mimeType: "image/jpeg", base64: "AAAA" }).success).toBe(true);
     expect(AssetUploadSchema.safeParse({ fileName: "a.gif", mimeType: "image/gif", base64: "AAAA" }).success).toBe(false);
+  });
+});
+
+describe("MetaTeamSchema: rotação", () => {
+  const base = {
+    scope: "BAI" as const,
+    isPrimary: true,
+    members: (["SOLO", "SUPPORT_1", "SUPPORT_2"] as const).map((slot, i) => ({ slot, uniformId: `u${i}` })),
+  };
+  const withRotation = (rotation: string) => ({
+    ...base,
+    members: base.members.map((m) => (m.slot === "SUPPORT_2" ? { ...m, isDamageDealer: true, rotation } : m)),
+  });
+  it("aceita rotação válida ou vazia e recusa notação inválida", () => {
+    expect(MetaTeamSchema.safeParse(withRotation("1 2c (3dc 4) 6")).success).toBe(true);
+    expect(MetaTeamSchema.safeParse(withRotation("")).success).toBe(true);
+    const bad = MetaTeamSchema.safeParse(withRotation("1 2x"));
+    expect(bad.success).toBe(false);
+    expect(bad.error?.issues[0].message).toBe(VALIDATION.rotationFormat);
   });
 });

@@ -8,19 +8,30 @@ import type { MetaTeam } from "@/models/domain/types";
 import { MetaTeamSchema, type MetaTeamInput } from "@/models/schemas/admin";
 import type { MetaScopeViewModel } from "./useMetaScopeViewModel";
 
+export interface MemberDraft {
+  uniformId: string | null;
+  ctpId: string | null;
+  /** Causador de Dano: só ele tem rotação e descrição. */
+  isDamageDealer: boolean;
+  rotation: string;
+  rotationNotes: string;
+}
+
 export interface TeamDraft {
   id?: string;
   isPrimary: boolean;
   label: string;
   notes: string;
-  members: Record<Slot, { uniformId: string | null; ctpId: string | null }>;
+  members: Record<Slot, MemberDraft>;
 }
+
+const emptyMember = (): MemberDraft => ({ uniformId: null, ctpId: null, isDamageDealer: false, rotation: "", rotationNotes: "" });
 
 const emptyDraft = (isPrimary: boolean): TeamDraft => ({
   isPrimary,
   label: "",
   notes: "",
-  members: Object.fromEntries(SLOTS.map((s) => [s, { uniformId: null, ctpId: null }])) as TeamDraft["members"],
+  members: Object.fromEntries(SLOTS.map((s) => [s, emptyMember()])) as TeamDraft["members"],
 });
 
 const fromTeam = (t: MetaTeam): TeamDraft => ({
@@ -28,7 +39,18 @@ const fromTeam = (t: MetaTeam): TeamDraft => ({
   isPrimary: t.isPrimary,
   label: t.label ?? "",
   notes: t.notes ?? "",
-  members: Object.fromEntries(t.members.map((m) => [m.slot, { uniformId: m.uniformId, ctpId: m.ctpId }])) as TeamDraft["members"],
+  members: Object.fromEntries(
+    t.members.map((m) => [
+      m.slot,
+      {
+        uniformId: m.uniformId,
+        ctpId: m.ctpId,
+        isDamageDealer: m.isDamageDealer,
+        rotation: m.rotation ?? "",
+        rotationNotes: m.rotationNotes ?? "",
+      },
+    ]),
+  ) as TeamDraft["members"],
 });
 
 /** Criação/edição de equipes Meta do escopo selecionado. Erros 422 aparecem no formulário. */
@@ -61,7 +83,17 @@ export function useMetaTeamEditorViewModel(scopeVm: MetaScopeViewModel, messages
         isPrimary: d.isPrimary,
         label: d.label || null,
         notes: d.notes || null,
-        members: SLOTS.map((slot) => ({ slot, uniformId: d.members[slot].uniformId ?? "", ctpId: d.members[slot].ctpId ?? null })),
+        members: SLOTS.map((slot) => {
+          const m = d.members[slot];
+          return {
+            slot,
+            uniformId: m.uniformId ?? "",
+            ctpId: m.ctpId ?? null,
+            isDamageDealer: m.isDamageDealer,
+            rotation: m.isDamageDealer ? m.rotation || null : null,
+            rotationNotes: m.isDamageDealer ? m.rotationNotes || null : null,
+          };
+        }),
       };
       const parsed = MetaTeamSchema.safeParse(input);
       if (!parsed.success) throw new ApiError(400, "VALIDATION_ERROR", parsed.error.issues[0]?.message ?? "Dados inválidos");
