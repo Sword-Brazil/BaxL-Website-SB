@@ -1,5 +1,6 @@
 import { useTranslation } from "next-i18next/pages";
 import { cn } from "@/lib/utils";
+import { AttributeLabel } from "./AttributeLabel";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import type { UniformRef } from "@/viewmodels/useCatalogViewModel";
@@ -59,7 +60,9 @@ export function AgentPortrait({
               <Badge variant="outline">{t("team.unavailable")}</Badge>
             ) : (
               uniform.side !== "UNKNOWN" && (
-                <Badge variant={uniform.side === "HERO" ? "hero" : "villain"}>{t(`values.${uniform.side}`)}</Badge>
+                <Badge variant={uniform.side === "HERO" ? "hero" : "villain"} className="pl-1">
+                  <AttributeLabel value={uniform.side} />
+                </Badge>
               )
             )}
           </div>

@@ -522,6 +522,7 @@ para a próxima BAI nos outros dias.
 - [X] T151 Vídeo de referência da rotação (YouTube sem cookies ou .mp4/.webm externo), mudo e em loop, carregado só ao abrir o painel
 - [X] T152 Rotações por personagem/traje (aba "Rotações" no admin, texto livre, descrição e vídeo); equipe só marca o Causador de Dano; foto do Causador de Dano leva a `/rotacoes/[personagem]` (por traje, com prévia); `/rotacoes` lista os personagens
 - [X] T153 Cores fixas por modo, como no jogo: BAX azul, BAL laranja, BAI vermelho (tokens `bax`/`bal`/`bai`, temas claro e escuro) no ciclo, faixa de dias, montador, BAL livre, admin e estatísticas
+- [X] T154 Ícone do atributo junto do nome em todos os lugares (filtros do Meu Elenco, seletores de restrição, catálogo, cartões do elenco, seletor de agente, tela de rotações), com um componente único `AttributeLabel`
 - [ ] T148 Rotações de exemplo pré-cadastradas a partir de vídeos de jogadores experientes (aguarda as fontes)
 
 ---

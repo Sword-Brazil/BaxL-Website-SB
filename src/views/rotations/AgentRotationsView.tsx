@@ -14,19 +14,23 @@ import { HelpHint } from "@/views/layout/HelpHint";
 import { QueryState } from "@/views/shared/QueryState";
 import { RotationLegend, RotationText, RotationVideoPlayer } from "@/views/shared/RotationSequence";
 import { UniformPreview } from "./UniformPreview";
+import { AttributeLabel } from "@/views/shared/AttributeLabel";
 
 const groupId = (uniform: Uniform | null) => `traje-${uniform?.slug ?? "todos"}`;
 
 function UniformBadges({ uniform }: { uniform: Uniform }) {
-  const { t } = useTranslation("common");
   return (
     <span className="flex flex-wrap gap-1">
-      {uniform.side !== UNKNOWN && <Badge variant={uniform.side === "HERO" ? "hero" : "villain"}>{t(`values.${uniform.side}`)}</Badge>}
-      {[uniform.species, uniform.attackType]
+      {uniform.side !== UNKNOWN && (
+        <Badge variant={uniform.side === "HERO" ? "hero" : "villain"} className="pl-1">
+          <AttributeLabel value={uniform.side} />
+        </Badge>
+      )}
+      {[uniform.gender, uniform.species, uniform.attackType]
         .filter((v) => v !== UNKNOWN)
         .map((v) => (
-          <Badge key={v} variant="outline">
-            {t(`values.${v}`)}
+          <Badge key={v} variant="outline" className="pl-1">
+            <AttributeLabel value={v} />
           </Badge>
         ))}
     </span>

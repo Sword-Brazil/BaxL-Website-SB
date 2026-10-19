@@ -3,6 +3,7 @@ import { DndContext, KeyboardSensor, PointerSensor, TouchSensor, useDroppable, u
 import { useTranslation } from "next-i18next/pages";
 import { CheckIcon, DownloadIcon, SearchIcon, SlidersHorizontalIcon, UploadIcon, XIcon, ZapIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AttributeLabel } from "@/views/shared/AttributeLabel";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -73,14 +74,20 @@ function AgentRosterCard({ agent, vm, dragging }: { agent: Agent; vm: RosterVm; 
             <span className="flex shrink-0 gap-1">
               {sides.map((side) => (
                 <Badge key={side} variant={side === "HERO" ? "hero" : "villain"}>
-                  {t(`common:values.${side}`)}
+                  <AttributeLabel value={side} />
                 </Badge>
               ))}
             </span>
           </CardTitle>
           <CardDescription className="flex min-w-0 flex-wrap items-center justify-between gap-1">
             <span className="truncate">
-              {main && `${t(`common:values.${main.species}`)} · ${t(`common:values.${main.attackType}`)}`}
+              {main && (
+                <span className="inline-flex items-center gap-1.5">
+                  <AttributeLabel value={main.species} />
+                  <span aria-hidden>·</span>
+                  <AttributeLabel value={main.attackType} />
+                </span>
+              )}
             </span>
             <Button
               size="xs"
@@ -250,8 +257,8 @@ export function RosterView() {
                     className="flex-wrap"
                   >
                     {CRITERION_VALUES[attr].map((v) => (
-                      <ToggleGroupItem key={v} value={v}>
-                        {t(`common:values.${v}`)}
+                      <ToggleGroupItem key={v} value={v} className="gap-1">
+                        <AttributeLabel value={v} />
                       </ToggleGroupItem>
                     ))}
                   </ToggleGroup>

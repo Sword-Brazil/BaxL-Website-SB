@@ -26,6 +26,7 @@ import { useCatalogEditorViewModel } from "@/viewmodels/admin/useCatalogEditorVi
 import { QueryState } from "@/views/shared/QueryState";
 import { useValidationMessage } from "@/views/shared/useValidationMessage";
 import { ATTRIBUTE_FIELDS, AttributeBadgePicker } from "./AttributeBadgePicker";
+import { AttributeLabel } from "@/views/shared/AttributeLabel";
 
 type Vm = ReturnType<typeof useCatalogEditorViewModel>;
 
@@ -214,18 +215,18 @@ export function CatalogEditorView() {
                   <span className="flex min-w-0 flex-wrap items-center gap-1.5">
                     <span className="truncate font-medium">{a.name}</span>
                     {sides.map((side) => (
-                      <Badge key={side} variant={side === "HERO" ? "hero" : "villain"}>
-                        {t(`common:values.${side}`)}
+                      <Badge key={side} variant={side === "HERO" ? "hero" : "villain"} className="pl-1">
+                        <AttributeLabel value={side} />
                       </Badge>
                     ))}
                     {!a.active && <Badge variant="outline">{t("admin:catalog.inactive")}</Badge>}
                   </span>
-                  <span className="mt-0.5 block truncate text-xs text-muted-foreground">
+                  <span className="mt-0.5 flex min-w-0 flex-wrap items-center gap-x-1.5 text-xs text-muted-foreground">
                     {main &&
                       ATTRIBUTE_FIELDS.filter((f) => f.name !== "side").map((f, i) => (
-                        <span key={f.name} className={cn(main[f.name] === UNKNOWN && "text-spark")}>
-                          {i > 0 && " · "}
-                          {t(`common:values.${main[f.name]}`)}
+                        <span key={f.name} className={cn("inline-flex items-center gap-1.5", main[f.name] === UNKNOWN && "text-spark")}>
+                          {i > 0 && <span aria-hidden>·</span>}
+                          <AttributeLabel value={main[f.name]} />
                         </span>
                       ))}
                   </span>

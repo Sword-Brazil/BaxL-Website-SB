@@ -1,5 +1,6 @@
 import { useTranslation } from "next-i18next/pages";
 import { cn } from "@/lib/utils";
+import { AttributeLabel } from "@/views/shared/AttributeLabel";
 import { RotateCcwIcon, SaveIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -52,7 +53,7 @@ function ModeDays({ mode }: { mode: DayMode }) {
                       <SelectItem value={ANY}>{t("admin:days.any")}</SelectItem>
                       {CRITERION_VALUES[a].map((v) => (
                         <SelectItem key={v} value={v}>
-                          {t(`common:values.${v}`)}
+                          <AttributeLabel value={v} />
                         </SelectItem>
                       ))}
                     </SelectContent>

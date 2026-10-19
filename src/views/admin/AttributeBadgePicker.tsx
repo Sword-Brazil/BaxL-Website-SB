@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { badgeVariants } from "@/components/ui/badge";
 import { ATTACK_TYPES, GENDERS, SIDES, SPECIES, UNKNOWN, type CriterionAttribute } from "@/models/domain/enums";
 import type { RestrictableAttributes } from "@/models/domain/types";
+import { AttributeLabel } from "@/views/shared/AttributeLabel";
 import { attributeIcon, attributeVariant } from "@/views/shared/attributeVisuals";
 
 export const ATTRIBUTE_FIELDS = [
@@ -33,7 +34,6 @@ export function AttributeBadgePicker({
       <div className="flex flex-wrap gap-1.5" role="group" aria-label={t(`attributes.${field.attr}`)}>
         {options.map((v) => {
           const selected = v === value;
-          const icon = attributeIcon(v);
           return (
             <button
               key={v}
@@ -43,16 +43,12 @@ export function AttributeBadgePicker({
               className={cn(
                 badgeVariants({ variant: selected ? (v === UNKNOWN ? "outline" : attributeVariant(v)) : "outline" }),
                 "h-7 cursor-pointer gap-1 px-2 transition-opacity",
-                icon && "pl-1",
+                attributeIcon(v) && "pl-1",
                 !selected && "opacity-55 hover:opacity-100",
                 selected && v === UNKNOWN && "text-spark",
               )}
             >
-              {icon && (
-                // eslint-disable-next-line @next/next/no-img-element -- ícone estático de 16px
-                <img src={icon} alt="" width={16} height={16} className={cn("size-4", !selected && "grayscale")} />
-              )}
-              {t(`values.${v}`)}
+              <AttributeLabel value={v} iconClassName={cn(!selected && "grayscale")} />
             </button>
           );
         })}
