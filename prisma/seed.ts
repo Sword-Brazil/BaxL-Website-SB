@@ -11,12 +11,11 @@ if (existsSync(".env.local")) process.loadEnvFile(".env.local");
 const prisma = new PrismaClient();
 
 /** Quinta-feira 12:00 BRT mais recente (início do Dia 1). */
-function lastThursdayNoonBrt(now = new Date()): Date {
-  const brtNow = new Date(now.getTime() - 3 * 3_600_000); // BRT = UTC-3 (sem horário de verão)
-  const daysSinceThu = (brtNow.getUTCDay() - 4 + 7) % 7;
-  const d = new Date(Date.UTC(brtNow.getUTCFullYear(), brtNow.getUTCMonth(), brtNow.getUTCDate() - daysSinceThu, 15));
-  return d.getTime() > now.getTime() ? new Date(d.getTime() - 7 * 86_400_000) : d;
-}
+/**
+ * Início do Dia 1 de um ciclo real: quinta-feira, 01/10/2026, 12h de Brasília (o Dia 19 começou
+ * em 19/10/2026 às 12h). O ciclo se repete a cada 28 dias, então a data vale para qualquer época.
+ */
+const CYCLE_ANCHOR = new Date("2026-10-01T15:00:00.000Z");
 
 async function seedUser(email: string | undefined, password: string | undefined, role: Role) {
   if (!email || !password) {
@@ -63,7 +62,7 @@ async function main() {
   await prisma.settings.upsert({
     where: { id: 1 },
     update: {},
-    create: { id: 1, cycleAnchor: lastThursdayNoonBrt() },
+    create: { id: 1, cycleAnchor: CYCLE_ANCHOR },
   });
   console.log("✔ Settings");
 
