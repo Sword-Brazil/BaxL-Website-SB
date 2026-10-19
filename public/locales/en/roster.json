@@ -16,12 +16,6 @@
     "imported": "Backup imported",
     "invalid": "Invalid backup file"
   },
-  "reset": {
-    "title": "Reset selections",
-    "text": "Deletes the teams built for the chosen mode. Roster and other modes are kept.",
-    "confirm": "Delete the {{mode}} teams?",
-    "done": "{{mode}} teams deleted"
-  },
   "help": {
     "title": "My roster",
     "text1": "Tap a uniform to mark or unmark it. An agent counts as owned if you own at least one of its uniforms.",

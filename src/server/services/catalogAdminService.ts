@@ -79,3 +79,16 @@ export async function saveCtp(input: CtpInput, id?: string) {
     update: { imagePath: input.imagePath, active: input.active ?? true },
   });
 }
+
+/**
+ * Exclui o CTP de vez. As equipes Meta e as reservas que o recomendavam ficam sem CTP; nos
+ * aparelhos dos jogadores, um CTP equipado que não existe mais simplesmente não aparece.
+ */
+export async function deleteCtp(id: string) {
+  if (!(await prisma.ctp.findUnique({ where: { id } }))) throw new HttpError(404, "NOT_FOUND", "CTP não encontrado");
+  await prisma.$transaction([
+    prisma.metaTeamMember.updateMany({ where: { ctpId: id }, data: { ctpId: null } }),
+    prisma.priorityEntry.updateMany({ where: { ctpId: id }, data: { ctpId: null } }),
+    prisma.ctp.delete({ where: { id } }),
+  ]);
+}

@@ -7,7 +7,6 @@
   "nav": {
     "roster": "Meu elenco",
     "admin": "Admin",
-    "login": "Entrar",
     "logout": "Sair",
     "menu": "Menu",
     "account": "Minha conta",
@@ -35,7 +34,8 @@
   "footer": {
     "disclaimer": "Projeto de fã, não oficial e sem fins comerciais. Marvel Future Fight é propriedade da Netmarble; personagens são propriedade da Marvel.",
     "alliance": "Feito para a aliança Sword Brazil.",
-    "credit": "Calendário e equipes de base: Guia BAX/BAL/BAI (guiabaxbal.web.app), com curadoria da Sword Brazil."
+    "credit": "Calendário e equipes de base: Guia BAX/BAL/BAI (guiabaxbal.web.app), com curadoria da Sword Brazil.",
+    "staff": "Acesso da curadoria"
   },
   "team": {
     "empty": "Sem equipe definida",
@@ -141,12 +141,6 @@
     "notFound": "Página não encontrada.",
     "forbidden": "Acesso negado."
   },
-  "sync": {
-    "title": "Escolha quais seleções manter",
-    "text": "Este aparelho e a sua conta têm elencos/equipes diferentes. Qual versão você quer manter? A outra será substituída.",
-    "keepLocal": "Manter as deste aparelho",
-    "keepRemote": "Usar as da conta"
-  },
   "ctpPicker": {
     "choose": "Escolher CTP",
     "change": "Trocar",
@@ -199,22 +193,16 @@
   "security": {
     "label": "Avisos de segurança da conta",
     "dismiss": "Dispensar aviso",
-    "notMe": "Não foi você? Redefina a senha.",
+    "notMe": "Não foi você? Peça a um administrador para trocar sua senha.",
     "roles": {
       "USER": "Usuário",
       "CURATOR": "Curador",
       "ADMIN": "Administrador"
     },
     "toast": {
-      "SESSION_EXPIRED": "Sua sessão expirou. Entre de novo para continuar sincronizando.",
-      "SELECTIONS_SYNCED": "Elenco e equipes sincronizados com a sua conta.",
-      "PASSWORD_CHANGED": "Senha alterada com sucesso."
+      "SESSION_EXPIRED": "Sua sessão expirou. Entre de novo para continuar sincronizando."
     },
     "notices": {
-      "EMAIL_UNVERIFIED": {
-        "title": "E-mail ainda não confirmado",
-        "text": "Abra o link que enviamos para o seu e-mail para confirmar a conta."
-      },
       "NEW_LOGIN": {
         "title": "Novo login na sua conta",
         "text": "Sua conta foi acessada em outro aparelho ou navegador em {{date}}."
@@ -236,5 +224,20 @@
         "text": "O login foi bloqueado por alguns minutos em {{date}} depois de muitas tentativas com a senha errada. Também enviamos um aviso por e-mail."
       }
     }
+  },
+  "nickname": {
+    "label": "Seu nome no jogo",
+    "placeholder": "Seu nome no jogo",
+    "hint": "Fica só neste aparelho, junto com seu elenco e suas equipes. Não precisa de conta."
+  },
+  "resetTeams": {
+    "title": "Limpar minhas equipes",
+    "text": "Apaga as equipes que você montou: todas de uma vez ou só de um modo. O elenco, os CTPs equipados e o seu nome ficam.",
+    "all": "Todas as equipes",
+    "confirmAll": "Apagar todas as suas equipes de BAX, BAL e BAI?",
+    "confirmMode": "Apagar as suas equipes de {{mode}}?",
+    "doneAll": "Todas as suas equipes foram apagadas",
+    "doneMode": "Equipes de {{mode}} apagadas",
+    "button": "Limpar equipes"
   }
 }

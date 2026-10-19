@@ -46,6 +46,7 @@ export const adminApi = {
     apiFetch<Rotation[]>(`/api/admin/agents/${agentId}/rotations`, { method: "PUT", body }),
   createCtp: (body: CtpInput) => apiFetch<Ctp>("/api/admin/ctps", { method: "POST", body }),
   updateCtp: (id: string, body: CtpInput) => apiFetch<Ctp>(`/api/admin/ctps/${id}`, { method: "PUT", body }),
+  deleteCtp: (id: string) => apiFetch<void>(`/api/admin/ctps/${id}`, { method: "DELETE" }),
   uploadAsset: (body: AssetUploadInput) => apiFetch<{ imagePath: string }>("/api/admin/assets", { method: "POST", body }),
 
   getSettings: () => apiFetch<Settings>("/api/admin/settings"),

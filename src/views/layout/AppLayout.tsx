@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next/pages";
 import { useTheme } from "next-themes";
-import { LanguagesIcon, LogInIcon, LogOutIcon, MenuIcon, MoonIcon, ShieldIcon, SunIcon, UserIcon } from "lucide-react";
+import { LanguagesIcon, LogOutIcon, MenuIcon, MoonIcon, ShieldIcon, SunIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,7 +23,7 @@ import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger 
 import { useAuthViewModel } from "@/viewmodels/useAuthViewModel";
 import { BrandMark } from "./BrandMark";
 import { SecurityNotices } from "./SecurityNotices";
-import { SelectionsSyncDialog } from "./SelectionsSyncDialog";
+import { NicknameMenu } from "./NicknameMenu";
 
 const NAV = [
   { href: "/", key: "battle" },
@@ -106,25 +106,17 @@ function ThemeToggle({ className }: { className?: string }) {
   );
 }
 
-function AccountMenu() {
+/** Menu da curadoria (só para quem entrou como curador/administrador). */
+function StaffMenu() {
   const { t } = useTranslation("common");
   const { user, isCurator, logout } = useAuthViewModel();
   const router = useRouter();
-  if (!user) {
-    return (
-      <Button asChild variant="outline" className="h-11">
-        <Link href="/entrar">
-          <LogInIcon data-icon="inline-start" />
-          {t("nav.login")}
-        </Link>
-      </Button>
-    );
-  }
+  if (!user) return null;
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon-touch" aria-label={t("nav.account")}>
-          <UserIcon />
+          <ShieldIcon />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-52">
@@ -213,7 +205,8 @@ export function AppLayout({ title, children, wide = false }: { title?: string; c
             <div className="ml-auto flex items-center gap-1">
               <LanguageMenu className="hidden sm:inline-flex" />
               <ThemeToggle className="hidden sm:inline-flex" />
-              <AccountMenu />
+              <NicknameMenu />
+              <StaffMenu />
             </div>
           </div>
         </header>
@@ -228,10 +221,13 @@ export function AppLayout({ title, children, wide = false }: { title?: string; c
             <p className="font-heading tracking-wider text-energy/80 uppercase">{t("footer.alliance")}</p>
             <p>{t("footer.disclaimer")}</p>
             <p>{t("footer.credit")}</p>
+            {/* Só a curadoria tem login; jogadores não precisam de conta. */}
+            <Link href="/entrar" className="mt-1 self-start text-muted-foreground/80 underline-offset-2 hover:text-energy hover:underline">
+              {t("footer.staff")}
+            </Link>
           </div>
         </footer>
       </div>
-      <SelectionsSyncDialog />
     </>
   );
 }

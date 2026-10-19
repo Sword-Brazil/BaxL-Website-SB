@@ -128,12 +128,15 @@
   },
   "ctps": {
     "title": "Catálogo de CTPs",
-    "help": "Adicione e atualize fotos dos CTPs. Excluir desativa o item para preservar equipes e seleções antigas.",
+    "help": "Adicione, edite e exclua CTPs. Desativar esconde o CTP das escolhas e mantém as equipes antigas; excluir apaga de vez.",
     "add": "Novo CTP",
     "edit": "Editar CTP",
     "quality": "Qualidade",
-    "remove": "Excluir",
-    "restore": "Reativar"
+    "restore": "Reativar",
+    "deactivate": "Desativar",
+    "delete": "Excluir CTP",
+    "deleteConfirm": "Excluir {{name}} de vez? As equipes Meta e reservas que o recomendam ficam sem CTP. Não dá para desfazer.",
+    "deleted": "CTP excluído"
   },
   "bai": {
     "title": "Chefes da BAI",

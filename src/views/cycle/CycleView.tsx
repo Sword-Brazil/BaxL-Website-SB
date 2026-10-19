@@ -1,10 +1,11 @@
 import { useTranslation } from "next-i18next/pages";
-import { CalendarClockIcon, InfinityIcon, PencilIcon, PlusIcon, SparklesIcon, SwordsIcon, TimerResetIcon } from "lucide-react";
+import { CalendarClockIcon, InfinityIcon, PencilIcon, PlusIcon, SparklesIcon, SwordsIcon, TimerResetIcon, Trash2Icon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitle, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { SLOTS, type DayMode } from "@/models/domain/enums";
@@ -16,6 +17,7 @@ import { HelpHint } from "@/views/layout/HelpHint";
 import { TeamStrip as SharedTeamStrip, type StripMember, type TeamTone } from "@/views/shared/TeamStrip";
 import { QueryState } from "@/views/shared/QueryState";
 import { MODE_VISUALS } from "@/views/shared/modeVisuals";
+import { ResetTeamsOptions } from "@/views/shared/ResetTeamsOptions";
 import { RestrictionBadges } from "@/views/shared/RestrictionBadges";
 import { TeamBuilderPanel } from "./TeamBuilderPanel";
 
@@ -293,13 +295,30 @@ export function CycleView() {
           <h1 className="font-heading text-3xl font-bold">{t("cycle:title")}</h1>
           <p className="text-sm text-muted-foreground">{t("cycle:subtitle")}</p>
         </div>
-        <HelpHint title={t("cycle:legend.title")}>
-          <p>{t("cycle:legend.owned")}</p>
-          <p>{t("cycle:legend.dim")}</p>
-          <p>{t("cycle:legend.ctp")}</p>
-          <p>{t("cycle:legend.hero")}</p>
-          <p>{t("cycle:legend.reset")}</p>
-        </HelpHint>
+        <div className="flex items-center gap-1">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="sm">
+                <Trash2Icon data-icon="inline-start" />
+                {t("common:resetTeams.button")}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="flex w-80 flex-col gap-3">
+              <PopoverHeader>
+                <PopoverTitle>{t("common:resetTeams.title")}</PopoverTitle>
+                <PopoverDescription>{t("common:resetTeams.text")}</PopoverDescription>
+              </PopoverHeader>
+              <ResetTeamsOptions />
+            </PopoverContent>
+          </Popover>
+          <HelpHint title={t("cycle:legend.title")}>
+            <p>{t("cycle:legend.owned")}</p>
+            <p>{t("cycle:legend.dim")}</p>
+            <p>{t("cycle:legend.ctp")}</p>
+            <p>{t("cycle:legend.hero")}</p>
+            <p>{t("cycle:legend.reset")}</p>
+          </HelpHint>
+        </div>
       </div>
 
       <DayStrip vm={vm} />

@@ -16,12 +16,6 @@
     "imported": "Copia importada",
     "invalid": "Archivo de copia inválido"
   },
-  "reset": {
-    "title": "Restablecer selecciones",
-    "text": "Borra los equipos armados del modo elegido. La plantilla y los otros modos se mantienen.",
-    "confirm": "¿Borrar los equipos de {{mode}}?",
-    "done": "Equipos de {{mode}} borrados"
-  },
   "help": {
     "title": "Mi plantilla",
     "text1": "Toca un uniforme para marcarlo o desmarcarlo. Un agente cuenta como tuyo si tienes al menos uno de sus uniformes.",
