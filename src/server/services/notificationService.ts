@@ -39,12 +39,22 @@ export async function notify(event: SecurityEvent) {
   }
 }
 
+const pending = new Set<Promise<void>>();
+
 /**
  * Dispara sem esperar: usado nas falhas de login, para o tempo de resposta não revelar se a
  * conta existe. Um erro aqui nunca derruba a requisição.
  */
 export function notifyInBackground(event: SecurityEvent) {
-  notify(event).catch((e) => console.error("[notify]", event.type, e));
+  const job = notify(event)
+    .catch((e) => console.error("[notify]", event.type, e))
+    .finally(() => pending.delete(job));
+  pending.add(job);
+}
+
+/** Espera os avisos disparados em segundo plano (testes: antes de limpar o banco). */
+export async function flushNotifications() {
+  while (pending.size) await Promise.all([...pending]);
 }
 
 /** Um aviso aberto por tipo: um evento repetido atualiza o aviso em vez de empilhar outro. */

@@ -3,7 +3,7 @@ import { prisma } from "@/server/db";
 import { HttpError } from "@/server/http";
 import { hashPassword, login, register, resetPassword, verifyEmail } from "@/server/services/authService";
 import { ConsoleMailService, setMailService, type MailKind, type MailService } from "@/server/services/mailService";
-import { dismissNotice, listNotices, notify } from "@/server/services/notificationService";
+import { dismissNotice, flushNotifications, listNotices, notify } from "@/server/services/notificationService";
 import { adminResetPassword, changeRole } from "@/server/services/usersService";
 
 const IP = "10.0.0.9";
@@ -27,7 +27,7 @@ async function createUser(email = "alvo@sword.br", role = "USER") {
 
 const session = (sid = "outra", loginAt = new Date(0)) => ({ sid, loginAt: loginAt.toISOString() });
 const types = async (userId: string, s = session()) => (await listNotices(userId, s)).map((n) => n.type);
-const flush = () => new Promise((r) => setTimeout(r, 50));
+const flush = flushNotifications;
 
 describe("notify: canal pela gravidade", () => {
   it("atenção grava o aviso e não manda e-mail", async () => {
