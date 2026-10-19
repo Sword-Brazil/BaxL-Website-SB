@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { useTranslation } from "next-i18next/pages";
-import { CheckIcon, CrownIcon, SwordIcon } from "lucide-react";
+import { CheckIcon, ChevronRightIcon, CrownIcon, SwordIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ctpColor } from "@/models/domain/ctpColors";
@@ -51,6 +52,7 @@ export function MemberChip({
   slotLabel,
   leader,
   damageDealer,
+  href,
 }: {
   refItem: UniformRef | null;
   ctp: Ctp | null;
@@ -61,6 +63,8 @@ export function MemberChip({
   leader?: boolean;
   /** Causador de Dano marcado pelos curadores (selo de espada). */
   damageDealer?: boolean;
+  /** Com link (Causador de Dano da Meta): o cartão inteiro leva às rotações do personagem. */
+  href?: string;
 }) {
   const { t } = useTranslation("common");
   const size = leader ? "size-14 sm:size-16" : "size-12 sm:size-14";
@@ -79,11 +83,9 @@ export function MemberChip({
   // Personagem do usuário "pintado" com a cor do CTP equipado.
   const tinted = !!ctp && !ctpTypeOnly;
 
-  return (
-    <div
-      className={cn(tileClass(leader), owned === false && "opacity-55")}
-      title={`${slotLabel}: ${agent.name}${uniformLabel ? ` — ${uniformLabel}` : ""}`}
-    >
+  const label = `${slotLabel}: ${agent.name}${uniformLabel ? ` — ${uniformLabel}` : ""}`;
+  const content = (
+    <>
       <SlotTag label={slotLabel} leader={leader} />
       <div className="relative">
         <div
@@ -117,6 +119,32 @@ export function MemberChip({
       <span className={cn("mt-0.5 w-full truncate leading-tight font-semibold", leader ? "text-xs sm:text-sm" : "text-xs")}>{agent.name}</span>
       {/* Sem traje cadastrado a linha fica vazia, para os três cartões manterem a mesma altura. */}
       <span className="w-full truncate text-[0.65rem] leading-tight text-muted-foreground">{uniformLabel ?? "\u00a0"}</span>
+      {href && (
+        <span className="mt-0.5 flex items-center gap-0.5 font-heading text-[0.6rem] tracking-wider text-spark uppercase">
+          {t("team.seeRotation")}
+          <ChevronRightIcon className="size-3" />
+        </span>
+      )}
+    </>
+  );
+  const className = cn(tileClass(leader), owned === false && "opacity-55");
+  if (href) {
+    return (
+      <Link
+        href={href}
+        title={t("team.seeRotationOf", { name: agent.name })}
+        className={cn(
+          className,
+          "border-spark/50 transition-[transform,border-color] outline-none hover:-translate-y-0.5 hover:border-spark focus-visible:ring-3 focus-visible:ring-spark/50",
+        )}
+      >
+        {content}
+      </Link>
+    );
+  }
+  return (
+    <div className={className} title={label}>
+      {content}
     </div>
   );
 }

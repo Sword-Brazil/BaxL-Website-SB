@@ -28,6 +28,7 @@ import { SelectionsSyncDialog } from "./SelectionsSyncDialog";
 const NAV = [
   { href: "/", key: "battle" },
   { href: "/meu-elenco", key: "roster" },
+  { href: "/rotacoes", key: "rotations" },
   { href: "/estatisticas", key: "stats" },
 ] as const;
 

@@ -12,7 +12,8 @@
     "menu": "Menú",
     "account": "Mi cuenta",
     "battle": "Batalla de Alianza",
-    "stats": "Estadísticas"
+    "stats": "Estadísticas",
+    "rotations": "Rotaciones"
   },
   "modes": {
     "BAX": "Batalla de Alianza Extrema",
@@ -50,16 +51,15 @@
     "owned": "Tienes",
     "notOwned": "No lo tienes",
     "damageDealer": "Causante de daño",
-    "emptySlot": "Vacío"
+    "emptySlot": "Vacío",
+    "seeRotation": "Ver rotación",
+    "seeRotationOf": "Ver las rotaciones de {{name}}"
   },
   "rotation": {
     "title": "Rotación",
-    "of": "Rotación de {{name}}",
     "skill": "Habilidad {{n}}",
     "ultimate": "Habilidad 6 (Ultimate / Despertada / Tier-4)",
     "optional": "Opcional",
-    "showLegend": "Cómo leer la notación",
-    "hideLegend": "Ocultar leyenda",
     "cancels": {
       "c": "cancelar justo después de usar",
       "dc": "cancelar con retraso",
@@ -193,8 +193,8 @@
     "slugFormat": "Usa kebab-case (ej.: scarlet-witch)",
     "uniformRequired": "Registra al menos un uniforme",
     "uniformRepeated": "Uniforme repetido",
-    "rotationFormat": "Rotación inválida: usa 1–6 con c, dc o qc y ( ) para tramos opcionales",
-    "rotationVideo": "Enlace de vídeo inválido: usa un enlace https de YouTube o de un archivo .mp4/.webm"
+    "rotationVideo": "Enlace de vídeo inválido: usa un enlace https de YouTube o de un archivo .mp4/.webm",
+    "rotationRequired": "Escribe la rotación"
   },
   "security": {
     "label": "Avisos de seguridad de la cuenta",

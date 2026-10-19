@@ -1,8 +1,7 @@
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import { useTranslation } from "next-i18next/pages";
-import { ChevronDownIcon, ChevronRightIcon, ExternalLinkIcon, ListOrderedIcon } from "lucide-react";
+import { ChevronRightIcon, ExternalLinkIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { CANCELS, ULTIMATE_SKILL, parseRotation, type Cancel, type RotationPart, type RotationStep } from "@/models/rules/rotation";
 import { parseRotationVideo, youtubeEmbedUrl } from "@/models/rules/rotationVideo";
 
@@ -89,15 +88,16 @@ export function RotationLegend({ className }: { className?: string }) {
   );
 }
 
-/** Botão "Rotação" que abre, logo abaixo da equipe, a sequência do Solador e a descrição. */
-export function RotationToggle({ open, onToggle }: { open: boolean; onToggle: () => void }) {
-  const { t } = useTranslation("common");
-  return (
-    <Button size="xs" variant="ghost" onClick={onToggle} aria-expanded={open} className="text-energy">
-      <ListOrderedIcon data-icon="inline-start" />
-      {t("rotation.title")}
-      <ChevronDownIcon className={cn("transition-transform", open && "rotate-180")} />
-    </Button>
+/**
+ * Sequência em texto livre: se seguir a notação da comunidade (1–6, c/dc/qc, parênteses), vira
+ * "chips"; senão aparece como foi escrita.
+ */
+export function RotationText({ text, className }: { text: string; className?: string }) {
+  const parsed = parseRotation(text);
+  return parsed.ok ? (
+    <RotationSequence parts={parsed.parts} className={className} />
+  ) : (
+    <p className={cn("text-sm font-medium whitespace-pre-wrap", className)}>{text}</p>
   );
 }
 
@@ -129,42 +129,6 @@ export function RotationVideoPlayer({ url, title }: { url: string; title: string
         <ExternalLinkIcon className="size-3" />
         {t("rotation.openVideo")}
       </a>
-    </div>
-  );
-}
-
-/** Rotação de cada Causador de Dano da equipe (sequência e descrição) e a legenda da notação. */
-export function RotationPanel({
-  rotations,
-}: {
-  rotations: { slot: string; name: string; rotation: string | null; notes: string | null; videoUrl: string | null }[];
-}) {
-  const { t } = useTranslation("common");
-  const [showLegend, setShowLegend] = useState(false);
-  return (
-    <div className="mt-2 flex flex-col gap-3 rounded-md border border-energy/15 bg-background/60 p-2">
-      {rotations.map((r) => {
-        const parsed = r.rotation ? parseRotation(r.rotation) : null;
-        return (
-          <div key={r.slot} className="flex flex-col gap-1.5">
-            <p className="font-heading text-[0.65rem] tracking-[0.2em] text-muted-foreground uppercase">
-              {t("rotation.of", { name: r.name })}
-            </p>
-            {parsed?.ok && <RotationSequence parts={parsed.parts} />}
-            {r.notes && <p className="text-xs whitespace-pre-line text-muted-foreground">{r.notes}</p>}
-            {r.videoUrl && <RotationVideoPlayer url={r.videoUrl} title={t("rotation.of", { name: r.name })} />}
-          </div>
-        );
-      })}
-      <button
-        type="button"
-        className="self-start text-[0.7rem] text-energy underline-offset-2 hover:underline"
-        onClick={() => setShowLegend((v) => !v)}
-        aria-expanded={showLegend}
-      >
-        {showLegend ? t("rotation.hideLegend") : t("rotation.showLegend")}
-      </button>
-      {showLegend && <RotationLegend />}
     </div>
   );
 }

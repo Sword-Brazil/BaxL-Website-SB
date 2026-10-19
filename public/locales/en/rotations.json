@@ -1,0 +1,18 @@
+{
+  "title": "Rotations",
+  "subtitle": "Rotations for the Meta damage dealers, per uniform, with a description and a reference video.",
+  "titleOf": "{{name}} rotations",
+  "all": "All characters",
+  "legendTitle": "How to read the notation",
+  "count_one": "{{count}} rotation",
+  "count_other": "{{count}} rotations",
+  "emptyAll": "No rotations yet.",
+  "empty": "No rotations for {{name}} yet.",
+  "notFound": "Character not found.",
+  "uniform": "Uniform",
+  "allUniforms": "Applies to",
+  "allUniformsTitle": "All uniforms",
+  "uniforms": "Uniforms with rotations",
+  "usedInTeam": "Uniform used in the team you opened",
+  "untitled": "Rotation {{n}}"
+}

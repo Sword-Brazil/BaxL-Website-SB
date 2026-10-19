@@ -8,7 +8,8 @@
     "ctps": "CTPs",
     "bai": "BAI",
     "users": "Usuários",
-    "settings": "Configurações"
+    "settings": "Configurações",
+    "rotations": "Rotações"
   },
   "guard": {
     "forbidden": "Acesso negado",
@@ -24,7 +25,8 @@
     "ctps": "Tipos, fotos e disponibilidade dos CTPs.",
     "bai": "Sequência de chefes da BAI.",
     "users": "Curadores e administradores.",
-    "settings": "Âncora do ciclo e horários de virada."
+    "settings": "Âncora do ciclo e horários de virada.",
+    "rotations": "Rotações dos personagens (Causadores de Dano), por traje, com descrição e vídeo."
   },
   "common": {
     "saved": "Alterações salvas",
@@ -79,26 +81,12 @@
     "reserves": "Reservas",
     "reservesHint": "Personagens extras para a sugestão de quem não tem os da Meta e das Alternativas. Ordem usada: Meta → Alternativas → reservas.",
     "addReserve": "+ Adicionar reserva",
-    "rotation": {
-      "label": "Rotação",
-      "legendTitle": "Notação da rotação",
-      "example": "Exemplo: 1 2c (3dc 4) 6",
-      "hint": "Opcional. Use 1–6, c / dc / qc e ( ) para trechos opcionais.",
-      "notes": "Descrição da rotação",
-      "notesPlaceholder": "Quando usar, o que observar, alternativas…",
-      "errors": {
-        "empty": "Informe ao menos uma habilidade.",
-        "token": "\"{{token}}\" não é um passo válido: use 1–6, opcionalmente seguido de c, dc ou qc.",
-        "unclosedGroup": "Falta fechar um parêntese.",
-        "unopenedGroup": "Há um parêntese fechando sem abrir.",
-        "nestedGroup": "Não use parênteses dentro de parênteses.",
-        "emptyGroup": "Parênteses vazios.",
-        "tooLong": "Rotação longa demais (máximo de 30 passos)."
-      },
-      "video": "Vídeo de referência (opcional)",
-      "videoHint": "Link do YouTube (vídeo ou Shorts; use ?t= para começar no trecho certo) ou de um arquivo .mp4/.webm. Toca mudo e em loop na consulta da rotação; o vídeo não é guardado no sistema."
-    },
-    "damageDealer": "Causador de Dano (precisa de rotação)"
+    "damageDealer": "Causador de Dano",
+    "rotationsCount_one": "{{name}} tem {{count}} rotação cadastrada.",
+    "rotationsCount_other": "{{name}} tem {{count}} rotações cadastradas.",
+    "noRotations": "{{name}} ainda não tem rotação cadastrada.",
+    "manageRotations": "Gerenciar rotações",
+    "addRotations": "Cadastrar rotação"
   },
   "priority": {
     "solo": "Soladores",
@@ -182,5 +170,32 @@
     "turnover": "Virada do dia (hora, Brasília)",
     "reset": "Reset semanal (hora, Brasília)",
     "help": "Ajuste a âncora se o \"Dia atual\" estiver diferente do jogo."
+  },
+  "rotations": {
+    "subtitle": "Rotações de cada personagem: por traje ou para todos, em texto livre, com descrição e vídeo.",
+    "help": "Nas Metas, marque quem é o Causador de Dano da equipe; aqui ficam as rotações do personagem. O jogador toca na foto do Causador de Dano e vê estas rotações.",
+    "onlyWith": "Só com rotação",
+    "count_one": "{{count}} rotação",
+    "count_other": "{{count}} rotações",
+    "none": "Sem rotação",
+    "editTitle": "Rotações de {{name}}",
+    "editHelp": "Uma rotação por situação ou traje. A ordem aqui é a ordem na tela do jogador.",
+    "item": "Rotação {{n}}",
+    "moveUp": "Subir",
+    "moveDown": "Descer",
+    "uniform": "Traje",
+    "allUniforms": "Todos os trajes",
+    "titleLabel": "Título (opcional)",
+    "titlePlaceholder": "Ex.: Abertura, Fase 2, Contra chefes",
+    "sequence": "Rotação",
+    "sequencePlaceholder": "Ex.: 1 2c (3dc 4) 6 — ou escreva do seu jeito",
+    "sequenceHint": "Texto livre. Se usar a notação da comunidade (1–6, c, dc, qc, parênteses), aparece em blocos.",
+    "legendTitle": "Notação da comunidade",
+    "legendFree": "A notação é opcional: escreva do jeito que explicar melhor.",
+    "description": "Descrição",
+    "descriptionPlaceholder": "Quando usar, quanto esperar em cada delay, o que observar…",
+    "video": "Vídeo de referência (opcional)",
+    "videoHint": "Link do YouTube (vídeo ou Shorts; use ?t= para começar no trecho certo) ou de um arquivo .mp4/.webm. Toca mudo e em loop; o vídeo não é guardado no sistema.",
+    "add": "Adicionar rotação"
   }
 }

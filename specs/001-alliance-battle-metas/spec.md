@@ -383,16 +383,15 @@ com a nova data de atualização, sem alteração de código.
   idioma da plataforma), com opções de voltar e de ir para a Batalha de Aliança, e com o aviso
   de que a área pode estar em desenvolvimento.
 - **FR-035**: Curadores MUST poder marcar, em cada equipe Meta/Alternativa, quais membros são
-  **Causadores de Dano** (qualquer posição: Esquerda, Líder ou Direita; um ou mais) e cadastrar
-  para cada um a **rotação** e uma descrição dela. A rotação usa a notação da comunidade:
-  números 1–6 = habilidades na ordem da tela (6 = Ultimate, Despertada ou Tier-4); `c` = cancelar
-  logo após usar; `dc` = cancelar com atraso; `qc` = cancelamento rápido; `( )` = trecho
-  opcional/"recheio" antes do bônus principal (ex.: `1 2c (3dc 4) 6`). Notação inválida é
-  recusada com a explicação do erro; a rotação é salva na forma canônica. Na visão pública, a
-  equipe mostra o selo de Causador de Dano no personagem e o botão "Rotação", que abre a
-  sequência e a descrição de cada um, e a legenda da notação. Cada rotação pode ter um **vídeo de
-  referência** (link do YouTube ou de um arquivo .mp4/.webm hospedado fora), que toca mudo e em
-  loop só quando o painel abre; o sistema não armazena vídeo.
+  **Causadores de Dano** (qualquer posição: Esquerda, Líder ou Direita; um ou mais). As
+  **rotações ficam no personagem**, numa aba própria do admin ("Rotações"): cada rotação vale
+  para um traje ou para todos, tem título opcional, sequência em **texto livre** (sem formato
+  obrigatório; a notação da comunidade 1–6 / `c` / `dc` / `qc` / `( )` vira blocos quando
+  usada), descrição (delays, quando usar, o que observar) e **vídeo de referência** opcional
+  (YouTube ou .mp4/.webm hospedado fora, mudo e em loop; o sistema não armazena vídeo). Na
+  visão pública, tocar na foto do Causador de Dano leva à tela de rotações do personagem,
+  separada por traje com a prévia de cada traje, já no traje usado na equipe; `/rotacoes`
+  lista todos os personagens com rotação.
 - **FR-036**: As equipes MUST aparecer na ordem **Esquerda · Líder · Direita**, com o Líder no meio
   e em destaque (um pouco maior, com brilho), em todas as telas.
 

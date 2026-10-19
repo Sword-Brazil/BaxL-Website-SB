@@ -8,7 +8,8 @@
     "ctps": "CTPs",
     "bai": "BAI",
     "users": "Users",
-    "settings": "Settings"
+    "settings": "Settings",
+    "rotations": "Rotations"
   },
   "guard": {
     "forbidden": "Access denied",
@@ -24,7 +25,8 @@
     "ctps": "CTP types, photos and availability.",
     "bai": "BAI boss sequence.",
     "users": "Curators and administrators.",
-    "settings": "Cycle anchor and turnover times."
+    "settings": "Cycle anchor and turnover times.",
+    "rotations": "Character rotations (damage dealers), per uniform, with a description and video."
   },
   "common": {
     "saved": "Changes saved",
@@ -79,26 +81,12 @@
     "reserves": "Reserves",
     "reservesHint": "Extra characters for the suggestion when players lack the Meta and Alternative ones. Order used: Meta → Alternatives → reserves.",
     "addReserve": "+ Add reserve",
-    "rotation": {
-      "label": "Rotation",
-      "legendTitle": "Rotation notation",
-      "example": "Example: 1 2c (3dc 4) 6",
-      "hint": "Optional. Use 1–6, c / dc / qc and ( ) for optional parts.",
-      "notes": "Rotation description",
-      "notesPlaceholder": "When to use it, what to watch for, alternatives…",
-      "errors": {
-        "empty": "Enter at least one skill.",
-        "token": "\"{{token}}\" is not a valid step: use 1–6, optionally followed by c, dc or qc.",
-        "unclosedGroup": "A parenthesis is not closed.",
-        "unopenedGroup": "There is a closing parenthesis without an opening one.",
-        "nestedGroup": "Do not nest parentheses.",
-        "emptyGroup": "Empty parentheses.",
-        "tooLong": "Rotation too long (30 steps max)."
-      },
-      "video": "Reference video (optional)",
-      "videoHint": "YouTube link (video or Shorts; add ?t= to start at the right moment) or a .mp4/.webm file. It plays muted and looped in the rotation view; the video is not stored in the system."
-    },
-    "damageDealer": "Damage dealer (needs a rotation)"
+    "damageDealer": "Damage dealer",
+    "rotationsCount_one": "{{name}} has {{count}} rotation.",
+    "rotationsCount_other": "{{name}} has {{count}} rotations.",
+    "noRotations": "{{name}} has no rotation yet.",
+    "manageRotations": "Manage rotations",
+    "addRotations": "Add a rotation"
   },
   "priority": {
     "solo": "Solos",
@@ -182,5 +170,32 @@
     "turnover": "Day turnover (hour, Brasília)",
     "reset": "Weekly reset (hour, Brasília)",
     "help": "Adjust the anchor if the \"Current day\" differs from the game."
+  },
+  "rotations": {
+    "subtitle": "Each character's rotations: per uniform or for all, free text, with a description and video.",
+    "help": "In Metas, mark the team's damage dealer; the character's rotations live here. Players tap the damage dealer's photo to see them.",
+    "onlyWith": "Only with rotations",
+    "count_one": "{{count}} rotation",
+    "count_other": "{{count}} rotations",
+    "none": "No rotation",
+    "editTitle": "{{name}} rotations",
+    "editHelp": "One rotation per situation or uniform. This order is the order players see.",
+    "item": "Rotation {{n}}",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "uniform": "Uniform",
+    "allUniforms": "All uniforms",
+    "titleLabel": "Title (optional)",
+    "titlePlaceholder": "E.g. Opener, Phase 2, Against bosses",
+    "sequence": "Rotation",
+    "sequencePlaceholder": "E.g. 1 2c (3dc 4) 6 — or write it your way",
+    "sequenceHint": "Free text. If you use the community notation (1–6, c, dc, qc, parentheses), it shows as blocks.",
+    "legendTitle": "Community notation",
+    "legendFree": "The notation is optional: write it however explains it best.",
+    "description": "Description",
+    "descriptionPlaceholder": "When to use it, how long each delay is, what to watch for…",
+    "video": "Reference video (optional)",
+    "videoHint": "YouTube link (video or Shorts; add ?t= to start at the right moment) or a .mp4/.webm file. It plays muted and looped; the video is not stored in the system.",
+    "add": "Add rotation"
   }
 }

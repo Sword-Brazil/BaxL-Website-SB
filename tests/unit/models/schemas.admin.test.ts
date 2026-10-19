@@ -8,6 +8,7 @@ import {
   MetaTeamSchema,
   PrioritySchema,
   RestrictionSchema,
+  RotationInputSchema,
   SettingsSchema,
 } from "@/models/schemas/admin";
 
@@ -146,27 +147,23 @@ describe("AssetUploadSchema", () => {
   });
 });
 
-describe("MetaTeamSchema: rotação", () => {
-  const base = {
-    scope: "BAI" as const,
-    isPrimary: true,
-    members: (["SOLO", "SUPPORT_1", "SUPPORT_2"] as const).map((slot, i) => ({ slot, uniformId: `u${i}` })),
-  };
-  const withRotation = (rotation: string) => ({
-    ...base,
-    members: base.members.map((m) => (m.slot === "SUPPORT_2" ? { ...m, isDamageDealer: true, rotation } : m)),
+describe("RotationInputSchema", () => {
+  const base = { uniformId: null, sequence: "1 2c (3dc 4) 6" };
+  it("a rotação é texto livre: qualquer forma de escrever é aceita, só não pode ficar vazia", () => {
+    expect(RotationInputSchema.safeParse(base).success).toBe(true);
+    expect(RotationInputSchema.safeParse({ ...base, sequence: "Abre com o 3, espera o escudo cair e solta o 6" }).success).toBe(true);
+    expect(RotationInputSchema.safeParse({ ...base, sequence: "  " }).error?.issues[0].message).toBe(VALIDATION.rotationRequired);
   });
-  it("aceita rotação válida ou vazia e recusa notação inválida", () => {
-    expect(MetaTeamSchema.safeParse(withRotation("1 2c (3dc 4) 6")).success).toBe(true);
-    expect(MetaTeamSchema.safeParse(withRotation("")).success).toBe(true);
-    const bad = MetaTeamSchema.safeParse(withRotation("1 2x"));
-    expect(bad.success).toBe(false);
-    expect(bad.error?.issues[0].message).toBe(VALIDATION.rotationFormat);
-    const video = (rotationVideoUrl: string) => ({
-      ...base,
-      members: base.members.map((m) => (m.slot === "SOLO" ? { ...m, isDamageDealer: true, rotation: "1 6", rotationVideoUrl } : m)),
-    });
-    expect(MetaTeamSchema.safeParse(video("https://www.youtube.com/watch?v=dQw4w9WgXcQ")).success).toBe(true);
-    expect(MetaTeamSchema.safeParse(video("https://exemplo.com/pagina")).error?.issues[0].message).toBe(VALIDATION.rotationVideo);
+  it("o vídeo precisa ser YouTube ou .mp4/.webm", () => {
+    expect(RotationInputSchema.safeParse({ ...base, videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" }).success).toBe(true);
+    expect(RotationInputSchema.safeParse({ ...base, videoUrl: "https://exemplo.com/pagina" }).error?.issues[0].message).toBe(VALIDATION.rotationVideo);
+  });
+  it("a equipe só marca o Causador de Dano (a rotação não fica na equipe)", () => {
+    const team = {
+      scope: "BAI" as const,
+      isPrimary: true,
+      members: (["SOLO", "SUPPORT_1", "SUPPORT_2"] as const).map((slot, i) => ({ slot, uniformId: `u${i}`, isDamageDealer: slot !== "SOLO" })),
+    };
+    expect(MetaTeamSchema.safeParse(team).success).toBe(true);
   });
 });

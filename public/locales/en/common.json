@@ -12,7 +12,8 @@
     "menu": "Menu",
     "account": "My account",
     "battle": "Alliance Battle",
-    "stats": "Statistics"
+    "stats": "Statistics",
+    "rotations": "Rotations"
   },
   "modes": {
     "BAX": "Alliance Battle Extreme",
@@ -50,16 +51,15 @@
     "owned": "Owned",
     "notOwned": "Not owned",
     "damageDealer": "Damage dealer",
-    "emptySlot": "Empty"
+    "emptySlot": "Empty",
+    "seeRotation": "See rotation",
+    "seeRotationOf": "See {{name}} rotations"
   },
   "rotation": {
     "title": "Rotation",
-    "of": "{{name}} rotation",
     "skill": "Skill {{n}}",
     "ultimate": "Skill 6 (Ultimate / Awakened / Tier-4)",
     "optional": "Optional",
-    "showLegend": "How to read the notation",
-    "hideLegend": "Hide legend",
     "cancels": {
       "c": "cancel right after use",
       "dc": "delayed cancel",
@@ -193,8 +193,8 @@
     "slugFormat": "Use kebab-case (e.g. scarlet-witch)",
     "uniformRequired": "Add at least one uniform",
     "uniformRepeated": "Repeated uniform",
-    "rotationFormat": "Invalid rotation: use 1–6 with c, dc or qc and ( ) for optional parts",
-    "rotationVideo": "Invalid video link: use an https YouTube link or a .mp4/.webm file"
+    "rotationVideo": "Invalid video link: use an https YouTube link or a .mp4/.webm file",
+    "rotationRequired": "Write the rotation"
   },
   "security": {
     "label": "Account security notices",
