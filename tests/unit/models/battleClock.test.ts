@@ -19,6 +19,14 @@ describe("getBattleClock", () => {
     process.env.TZ = originalTz;
   });
 
+  it("ciclo real (seed): Dia 1 em 01/10/2026 → o Dia 19 (segunda) começa em 19/10/2026 às 12:00 BRT", () => {
+    const real = { ...settings, cycleAnchor: "2026-10-01T15:00:00.000Z" };
+    expect(getBattleClock(brt("2026-10-19", "11:59"), real).cycleDay).toBe(18);
+    const c = getBattleClock(brt("2026-10-19", "12:00"), real);
+    expect(c.cycleDay).toBe(19);
+    expect(c.weekday).toBe("SEG");
+  });
+
   it("começa o Dia 1 (quinta) às 12:00 BRT", () => {
     const c = getBattleClock(brt("2026-10-15", "12:00"), settings);
     expect(c.cycleDay).toBe(1);
