@@ -45,4 +45,6 @@ next-env.d.ts
 prisma/*.db
 prisma/*.db-journal
 test.db*
+# Banco "shadow" temporário do `prisma migrate diff`
+shadow*.db*
 public/assets/uploads/
