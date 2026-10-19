@@ -80,7 +80,7 @@
     "reservesHint": "Personagens extras para a sugestão de quem não tem os da Meta e das Alternativas. Ordem usada: Meta → Alternativas → reservas.",
     "addReserve": "+ Adicionar reserva",
     "rotation": {
-      "label": "Rotação do {{slot}} (Causador de Dano)",
+      "label": "Rotação",
       "legendTitle": "Notação da rotação",
       "example": "Exemplo: 1 2c (3dc 4) 6",
       "hint": "Opcional. Use 1–6, c / dc / qc e ( ) para trechos opcionais.",
@@ -95,7 +95,8 @@
         "emptyGroup": "Parênteses vazios.",
         "tooLong": "Rotação longa demais (máximo de 30 passos)."
       }
-    }
+    },
+    "damageDealer": "Causador de Dano (precisa de rotação)"
   },
   "priority": {
     "solo": "Soladores",

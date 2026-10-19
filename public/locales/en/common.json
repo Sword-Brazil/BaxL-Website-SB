@@ -44,15 +44,16 @@
     "unavailable": "Unavailable",
     "slots": {
       "SOLO": "Leader",
-      "SUPPORT_1": "Slot 1",
-      "SUPPORT_2": "Slot 2"
+      "SUPPORT_1": "Left",
+      "SUPPORT_2": "Right"
     },
     "owned": "Owned",
-    "notOwned": "Not owned"
+    "notOwned": "Not owned",
+    "damageDealer": "Damage dealer"
   },
   "rotation": {
     "title": "Rotation",
-    "of": "{{slot}} rotation",
+    "of": "{{name}} rotation",
     "skill": "Skill {{n}}",
     "ultimate": "Skill 6 (Ultimate / Awakened / Tier-4)",
     "optional": "Optional",

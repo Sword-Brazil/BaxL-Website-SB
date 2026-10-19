@@ -44,15 +44,16 @@
     "unavailable": "Indisponível",
     "slots": {
       "SOLO": "Líder",
-      "SUPPORT_1": "Pos. 1",
-      "SUPPORT_2": "Pos. 2"
+      "SUPPORT_1": "Esquerda",
+      "SUPPORT_2": "Direita"
     },
     "owned": "Possuído",
-    "notOwned": "Não possuído"
+    "notOwned": "Não possuído",
+    "damageDealer": "Causador de Dano"
   },
   "rotation": {
     "title": "Rotação",
-    "of": "Rotação do {{slot}}",
+    "of": "Rotação de {{name}}",
     "skill": "Habilidade {{n}}",
     "ultimate": "Habilidade 6 (Ultimate / Despertada / Tier-4)",
     "optional": "Opcional",

@@ -1,15 +1,22 @@
 import { useState, type ReactNode } from "react";
 import { useTranslation } from "next-i18next/pages";
 import { cn } from "@/lib/utils";
-import { SLOTS, type Slot } from "@/models/domain/enums";
-import type { Ctp, MetaTeam } from "@/models/domain/types";
+import { DISPLAY_SLOTS, type Slot } from "@/models/domain/enums";
+import type { Ctp, MetaTeamMember } from "@/models/domain/types";
 import type { CatalogViewModel } from "@/viewmodels/useCatalogViewModel";
 import { MemberChip } from "./MemberChip";
 import { RotationPanel, RotationToggle } from "./RotationSequence";
 
 export type TeamTone = "meta" | "alt" | "mine";
 
-/** Uma equipe (Meta, Alternativa ou a do usuário) em 3 colunas compactas: cabe em qualquer largura. */
+export type StripMember = { slot: Slot; uniformId: string; ctpId?: string | null } & Partial<
+  Pick<MetaTeamMember, "isDamageDealer" | "rotation" | "rotationNotes">
+>;
+
+/**
+ * Uma equipe (Meta, Alternativa ou a do usuário) em 3 colunas compactas: Esquerda · Líder · Direita.
+ * Equipes curadas com Causador de Dano que tem rotação ganham o botão "Rotação".
+ */
 export function TeamStrip({
   label,
   tone,
@@ -17,25 +24,27 @@ export function TeamStrip({
   catalog,
   isOwned,
   equippedCtpOf,
-  rotation,
   action,
 }: {
   label: string;
   tone: TeamTone;
-  members: { slot: Slot; uniformId: string; ctpId?: string | null }[];
+  members: StripMember[];
   catalog: CatalogViewModel;
   /** Indica posse nas equipes Meta/Alternativa (omitir quando o usuário não tem elenco). */
   isOwned?: (uniformId: string) => boolean;
   /** Para a equipe do usuário: CTP equipado no personagem. */
   equippedCtpOf?: (agentId: string) => Ctp | null;
-  /** Rotação do Solador (equipes Meta/Alternativa): mostra o botão "Rotação" se houver. */
-  rotation?: Pick<MetaTeam, "rotation" | "rotationNotes">;
   action?: ReactNode;
 }) {
   const { t } = useTranslation("common");
   const isMine = tone === "mine";
-  const hasRotation = !!(rotation?.rotation || rotation?.rotationNotes);
   const [showRotation, setShowRotation] = useState(false);
+  const rotations = DISPLAY_SLOTS.flatMap((slot) => {
+    const m = members.find((x) => x.slot === slot);
+    if (!m?.isDamageDealer || !(m.rotation || m.rotationNotes)) return [];
+    const name = catalog.uniformById(m.uniformId)?.agent.name ?? t(`team.slots.${slot}`);
+    return [{ slot, name, rotation: m.rotation ?? null, notes: m.rotationNotes ?? null }];
+  });
   return (
     <div
       className={cn(
@@ -54,15 +63,15 @@ export function TeamStrip({
         >
           {label}
         </p>
-        {(hasRotation || action) && (
+        {(rotations.length > 0 || action) && (
           <div className="flex shrink-0 items-center gap-1">
-            {hasRotation && <RotationToggle open={showRotation} onToggle={() => setShowRotation((v) => !v)} />}
+            {rotations.length > 0 && <RotationToggle open={showRotation} onToggle={() => setShowRotation((v) => !v)} />}
             {action}
           </div>
         )}
       </div>
-      <ul className="grid grid-cols-3 gap-1.5">
-        {SLOTS.map((slot) => {
+      <ul className="grid grid-cols-3 items-end gap-1.5">
+        {DISPLAY_SLOTS.map((slot) => {
           const m = members.find((x) => x.slot === slot);
           const ref = m ? catalog.uniformById(m.uniformId) : null;
           const ctp = isMine ? (ref && equippedCtpOf ? equippedCtpOf(ref.agent.id) : null) : catalog.ctpById(m?.ctpId);
@@ -74,12 +83,14 @@ export function TeamStrip({
                 ctpTypeOnly={!isMine}
                 owned={!isMine && isOwned && m ? isOwned(m.uniformId) : undefined}
                 slotLabel={t(`team.slots.${slot}`)}
+                leader={slot === "SOLO"}
+                damageDealer={!isMine && !!m?.isDamageDealer}
               />
             </li>
           );
         })}
       </ul>
-      {hasRotation && showRotation && <RotationPanel rotation={rotation!.rotation} notes={rotation!.rotationNotes} />}
+      {rotations.length > 0 && showRotation && <RotationPanel rotations={rotations} />}
     </div>
   );
 }

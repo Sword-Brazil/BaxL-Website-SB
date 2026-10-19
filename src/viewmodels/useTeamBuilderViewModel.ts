@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { SLOTS, type Slot } from "@/models/domain/enums";
+import { DISPLAY_SLOTS, type Slot } from "@/models/domain/enums";
 import type { Criterion, MetaTeam, PriorityLists } from "@/models/domain/types";
 import { compareWithMeta } from "@/models/rules/compare";
 import { matchesRestriction } from "@/models/rules/restriction";
@@ -85,7 +85,8 @@ export function useTeamBuilderViewModel({
     catalog,
     team,
     metaTeams,
-    slots: SLOTS.map((slot) => {
+    /** Na ordem da tela: Esquerda · Líder · Direita. */
+    slots: DISPLAY_SLOTS.map((slot) => {
       const ref = team[slot] ? catalog.uniformById(team[slot]!.uniformId) : null;
       return {
         slot,

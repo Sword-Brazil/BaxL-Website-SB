@@ -101,8 +101,6 @@ aba Admin.
 | isPrimary | boolean | no máximo 1 principal por (scope, battleDayId) |
 | label | string? | ex.: "Alternativa sem Uniforme X" |
 | notes | string? | ≤ 500 caracteres, i18n opcional |
-| rotation | string? | rotação do Líder, ≤ 120 caracteres, notação validada por `src/models/rules/rotation.ts` (salva canônica) |
-| rotationNotes | string? | descrição da rotação, ≤ 500 caracteres; descartada se não houver rotação |
 | updatedById | FK User | autor da última publicação |
 | updatedAt | datetime | exibido ao público (FR-009) |
 
@@ -113,6 +111,9 @@ aba Admin.
 | slot | Slot | (metaTeamId, slot) único: exatamente 3 membros |
 | uniformId | FK Uniform | o agente é derivado do uniforme |
 | ctpId | FK Ctp | obrigatório |
+| isDamageDealer | boolean | Causador de Dano (qualquer slot); default false |
+| rotation | string? | só para Causador de Dano; ≤ 120 caracteres, notação validada por `src/models/rules/rotation.ts` (salva canônica) |
+| rotationNotes | string? | descrição da rotação, ≤ 500 caracteres; descartada se não houver rotação |
 
 **Validações ao publicar** (FR-026):
 - Três slots preenchidos, sem agente repetido.

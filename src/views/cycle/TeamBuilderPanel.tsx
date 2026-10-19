@@ -23,7 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ctpColor, ctpTintStyle } from "@/models/domain/ctpColors";
-import { SLOTS, type Slot } from "@/models/domain/enums";
+import { DISPLAY_SLOTS, type Slot } from "@/models/domain/enums";
 import type { Criterion, MetaTeam, PriorityLists } from "@/models/domain/types";
 import type { CtpStatus, SlotStatus } from "@/models/rules/compare";
 import type { TeamKey } from "@/models/schemas/selections";
@@ -77,6 +77,7 @@ function SlotRow({
       style={ctpTintStyle(ctpColor(slot.ctp))}
       className={cn(
         "grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 rounded-lg border border-energy/15 bg-background/40 p-3 transition-[transform,box-shadow,background-color] duration-200",
+        slot.slot === "SOLO" && "border-energy/40 bg-energy/5 shadow-[0_0_14px_-4px_var(--glow)]",
         canReceive && "cursor-copy ring-2 ring-energy/70 motion-safe:animate-pulse",
         isOver && "scale-[1.02] bg-energy/15 ring-4 ring-energy motion-safe:animate-none",
       )}
@@ -331,12 +332,12 @@ export function TeamBuilderPanel(props: { teamKey: TeamKey; criteria: Criterion[
               </CardHeader>
               <CardContent>
                 <ul className="grid grid-cols-3 gap-1.5">
-                  {SLOTS.map((s) => {
+                  {DISPLAY_SLOTS.map((s) => {
                     const pick = vm.suggestion?.[s];
                     const sref = pick ? vm.catalog.uniformById(pick.uniformId) : null;
                     return (
                       <li key={s} className="min-w-0">
-                        <MemberChip refItem={sref} ctp={null} slotLabel={t(`common:team.slots.${s}`)} />
+                        <MemberChip refItem={sref} ctp={null} slotLabel={t(`common:team.slots.${s}`)} leader={s === "SOLO"} />
                       </li>
                     );
                   })}

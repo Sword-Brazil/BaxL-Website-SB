@@ -34,7 +34,21 @@ export const RestrictionSchema = z.object({
 });
 export type RestrictionInput = z.infer<typeof RestrictionSchema>;
 
-export const MetaTeamMemberSchema = z.object({ slot: slotSchema, uniformId: idSchema, ctpId: idSchema.nullable().optional() });
+export const MetaTeamMemberSchema = z.object({
+  slot: slotSchema,
+  uniformId: idSchema,
+  ctpId: idSchema.nullable().optional(),
+  /** Causador de Dano: pode ter rotação (notação 1–6, c/dc/qc e parênteses). */
+  isDamageDealer: z.boolean().optional(),
+  rotation: z
+    .string()
+    .trim()
+    .max(120)
+    .refine((v) => !v || parseRotation(v).ok, { message: VALIDATION.rotationFormat })
+    .optional()
+    .nullable(),
+  rotationNotes: z.string().trim().max(500).optional().nullable(),
+});
 
 export const MetaTeamSchema = z
   .object({
@@ -44,15 +58,6 @@ export const MetaTeamSchema = z
     isPrimary: z.boolean(),
     label: z.string().trim().max(60).optional().nullable(),
     notes: z.string().trim().max(500).optional().nullable(),
-    /** Rotação do Solador (notação 1–6, c/dc/qc e parênteses). Vazio = sem rotação. */
-    rotation: z
-      .string()
-      .trim()
-      .max(120)
-      .refine((v) => !v || parseRotation(v).ok, { message: VALIDATION.rotationFormat })
-      .optional()
-      .nullable(),
-    rotationNotes: z.string().trim().max(500).optional().nullable(),
     members: z
       .array(MetaTeamMemberSchema)
       .length(SLOTS.length, { message: VALIDATION.teamSize })

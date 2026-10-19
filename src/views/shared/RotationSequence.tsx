@@ -100,28 +100,33 @@ export function RotationToggle({ open, onToggle }: { open: boolean; onToggle: ()
   );
 }
 
-export function RotationPanel({ rotation, notes }: { rotation: string | null; notes: string | null }) {
+/** Rotação de cada Causador de Dano da equipe (sequência e descrição) e a legenda da notação. */
+export function RotationPanel({ rotations }: { rotations: { slot: string; name: string; rotation: string | null; notes: string | null }[] }) {
   const { t } = useTranslation("common");
-  const parsed = rotation ? parseRotation(rotation) : null;
   const [showLegend, setShowLegend] = useState(false);
   return (
-    <div className="mt-2 flex flex-col gap-2 rounded-md border border-energy/15 bg-background/60 p-2">
-      <p className="font-heading text-[0.65rem] tracking-[0.2em] text-muted-foreground uppercase">{t("rotation.of", { slot: t("team.slots.SOLO") })}</p>
-      {parsed?.ok && <RotationSequence parts={parsed.parts} />}
-      {notes && <p className="text-xs whitespace-pre-line text-muted-foreground">{notes}</p>}
-      {parsed?.ok && (
-        <>
-          <button
-            type="button"
-            className="self-start text-[0.7rem] text-energy underline-offset-2 hover:underline"
-            onClick={() => setShowLegend((v) => !v)}
-            aria-expanded={showLegend}
-          >
-            {showLegend ? t("rotation.hideLegend") : t("rotation.showLegend")}
-          </button>
-          {showLegend && <RotationLegend />}
-        </>
-      )}
+    <div className="mt-2 flex flex-col gap-3 rounded-md border border-energy/15 bg-background/60 p-2">
+      {rotations.map((r) => {
+        const parsed = r.rotation ? parseRotation(r.rotation) : null;
+        return (
+          <div key={r.slot} className="flex flex-col gap-1.5">
+            <p className="font-heading text-[0.65rem] tracking-[0.2em] text-muted-foreground uppercase">
+              {t("rotation.of", { name: r.name })}
+            </p>
+            {parsed?.ok && <RotationSequence parts={parsed.parts} />}
+            {r.notes && <p className="text-xs whitespace-pre-line text-muted-foreground">{r.notes}</p>}
+          </div>
+        );
+      })}
+      <button
+        type="button"
+        className="self-start text-[0.7rem] text-energy underline-offset-2 hover:underline"
+        onClick={() => setShowLegend((v) => !v)}
+        aria-expanded={showLegend}
+      >
+        {showLegend ? t("rotation.hideLegend") : t("rotation.showLegend")}
+      </button>
+      {showLegend && <RotationLegend />}
     </div>
   );
 }

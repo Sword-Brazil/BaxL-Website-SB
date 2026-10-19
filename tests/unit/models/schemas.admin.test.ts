@@ -144,10 +144,14 @@ describe("MetaTeamSchema: rotação", () => {
     isPrimary: true,
     members: (["SOLO", "SUPPORT_1", "SUPPORT_2"] as const).map((slot, i) => ({ slot, uniformId: `u${i}` })),
   };
+  const withRotation = (rotation: string) => ({
+    ...base,
+    members: base.members.map((m) => (m.slot === "SUPPORT_2" ? { ...m, isDamageDealer: true, rotation } : m)),
+  });
   it("aceita rotação válida ou vazia e recusa notação inválida", () => {
-    expect(MetaTeamSchema.safeParse({ ...base, rotation: "1 2c (3dc 4) 6" }).success).toBe(true);
-    expect(MetaTeamSchema.safeParse({ ...base, rotation: "" }).success).toBe(true);
-    const bad = MetaTeamSchema.safeParse({ ...base, rotation: "1 2x" });
+    expect(MetaTeamSchema.safeParse(withRotation("1 2c (3dc 4) 6")).success).toBe(true);
+    expect(MetaTeamSchema.safeParse(withRotation("")).success).toBe(true);
+    const bad = MetaTeamSchema.safeParse(withRotation("1 2x"));
     expect(bad.success).toBe(false);
     expect(bad.error?.issues[0].message).toBe(VALIDATION.rotationFormat);
   });

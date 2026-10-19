@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { CycleOverview, MetaTeam } from "@/models/domain/types";
+
+const NO_ROTATION = { isDamageDealer: false, rotation: null, rotationNotes: null };
 import { agentRepetition, ctpUsage, myAgentRepetition, myTeamCompositions } from "@/models/rules/stats";
 
 const team = (isPrimary: boolean, uniforms: [string, string, string]): MetaTeam => ({
@@ -9,10 +11,10 @@ const team = (isPrimary: boolean, uniforms: [string, string, string]): MetaTeam 
   dayNumber: null,
   isPrimary,
   label: null,
-  notes: null, rotation: null, rotationNotes: null,
+  notes: null,
   updatedAt: "",
   updatedBy: null,
-  members: (["SOLO", "SUPPORT_1", "SUPPORT_2"] as const).map((slot, i) => ({ slot, uniformId: uniforms[i], ctpId: null })),
+  members: (["SOLO", "SUPPORT_1", "SUPPORT_2"] as const).map((slot, i) => ({ slot, uniformId: uniforms[i], ctpId: null, ...NO_ROTATION })),
 });
 const EMPTY = { solo: [], support: [] };
 const modeDay = (teams: MetaTeam[]) => ({ criteria: [], metaTeams: teams, priority: EMPTY, reserves: EMPTY });

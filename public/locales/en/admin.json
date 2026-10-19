@@ -80,7 +80,7 @@
     "reservesHint": "Extra characters for the suggestion when players lack the Meta and Alternative ones. Order used: Meta → Alternatives → reserves.",
     "addReserve": "+ Add reserve",
     "rotation": {
-      "label": "{{slot}} rotation (damage dealer)",
+      "label": "Rotation",
       "legendTitle": "Rotation notation",
       "example": "Example: 1 2c (3dc 4) 6",
       "hint": "Optional. Use 1–6, c / dc / qc and ( ) for optional parts.",
@@ -95,7 +95,8 @@
         "emptyGroup": "Empty parentheses.",
         "tooLong": "Rotation too long (30 steps max)."
       }
-    }
+    },
+    "damageDealer": "Damage dealer (needs a rotation)"
   },
   "priority": {
     "solo": "Solos",

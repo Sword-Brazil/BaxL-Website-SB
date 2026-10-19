@@ -101,36 +101,37 @@ model RestrictionCriterion {
 // ---------- Equipes curadas ----------
 
 model MetaTeam {
-  id            String           @id @default(cuid())
-  scope         String
-  battleDayId   String?
-  battleDay     BattleDay?       @relation(fields: [battleDayId], references: [id])
-  isPrimary     Boolean          @default(false)
-  label         String?
-  notes         String?
-  // Rotação do Solador (Causador de Dano) na notação da comunidade, ex.: "1 2c (3dc 4) 6".
-  rotation      String?
-  rotationNotes String?
-  members       MetaTeamMember[]
-  updatedById   String?
-  updatedBy     User?            @relation(fields: [updatedById], references: [id])
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
+  id          String           @id @default(cuid())
+  scope       String
+  battleDayId String?
+  battleDay   BattleDay?       @relation(fields: [battleDayId], references: [id])
+  isPrimary   Boolean          @default(false)
+  label       String?
+  notes       String?
+  members     MetaTeamMember[]
+  updatedById String?
+  updatedBy   User?            @relation(fields: [updatedById], references: [id])
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 
   @@index([scope, battleDayId])
 }
 
 model MetaTeamMember {
-  id         String   @id @default(cuid())
-  metaTeamId String
-  metaTeam   MetaTeam @relation(fields: [metaTeamId], references: [id], onDelete: Cascade)
-  slot       String
-  uniformId  String
-  uniform    Uniform  @relation(fields: [uniformId], references: [id])
-  ctpId      String?
-  ctp        Ctp?     @relation(fields: [ctpId], references: [id])
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id             String   @id @default(cuid())
+  metaTeamId     String
+  metaTeam       MetaTeam @relation(fields: [metaTeamId], references: [id], onDelete: Cascade)
+  slot           String
+  uniformId      String
+  uniform        Uniform  @relation(fields: [uniformId], references: [id])
+  ctpId          String?
+  ctp            Ctp?     @relation(fields: [ctpId], references: [id])
+  // Causador de Dano (qualquer posição): só ele tem rotação, na notação "1 2c (3dc 4) 6".
+  isDamageDealer Boolean  @default(false)
+  rotation       String?
+  rotationNotes  String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   @@unique([metaTeamId, slot])
 }

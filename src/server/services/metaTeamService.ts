@@ -29,11 +29,20 @@ export async function saveMetaTeam(input: MetaTeamInput, userId: string, id?: st
     isPrimary: input.isPrimary,
     label: input.label || null,
     notes: input.notes || null,
-    rotation: normalizeRotation(input.rotation),
-    rotationNotes: input.rotation?.trim() ? input.rotationNotes || null : null,
     updatedById: userId,
   };
-  const members = input.members.map((m) => ({ slot: m.slot, uniformId: m.uniformId, ctpId: m.ctpId ?? null }));
+  const members = input.members.map((m) => {
+    // Rotação só para Causador de Dano; a descrição só existe junto com uma rotação.
+    const rotation = m.isDamageDealer ? normalizeRotation(m.rotation) : null;
+    return {
+      slot: m.slot,
+      uniformId: m.uniformId,
+      ctpId: m.ctpId ?? null,
+      isDamageDealer: !!m.isDamageDealer,
+      rotation,
+      rotationNotes: rotation ? m.rotationNotes || null : null,
+    };
+  });
 
   const saved = await prisma.$transaction(async (tx) => {
     if (input.isPrimary) {

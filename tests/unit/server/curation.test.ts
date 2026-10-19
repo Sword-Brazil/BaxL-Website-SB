@@ -38,11 +38,26 @@ describe("curadoria", () => {
     ...extra,
   });
 
-  it("a rotação do Solador é salva na forma canônica, com a descrição", async () => {
-    const saved = await saveMetaTeam(team(fem, { rotation: "1C > 2dc (3, 4) 6", rotationNotes: "Guarde o 6 para a fase 2" }), curatorId);
-    expect(saved).toMatchObject({ rotation: "1c 2dc (3 4) 6", rotationNotes: "Guarde o 6 para a fase 2" });
-    const cleared = await saveMetaTeam(team(fem, { rotation: "", rotationNotes: "sem rotação" }), curatorId, saved.id);
-    expect(cleared).toMatchObject({ rotation: null, rotationNotes: null });
+  it("cada Causador de Dano, em qualquer posição, tem a própria rotação (salva na forma canônica)", async () => {
+    const withDealers = (dealers: Partial<Record<"SOLO" | "SUPPORT_1" | "SUPPORT_2", object>>) => {
+      const base = team(fem);
+      return { ...base, members: base.members.map((m) => ({ ...m, ...dealers[m.slot] })) };
+    };
+    const saved = await saveMetaTeam(
+      withDealers({
+        SUPPORT_1: { isDamageDealer: true, rotation: "1C > 2dc (3, 4) 6", rotationNotes: "Guarde o 6 para a fase 2" },
+        SUPPORT_2: { isDamageDealer: true, rotation: "3 1qc 6" },
+        SOLO: { isDamageDealer: false, rotation: "1 2 3", rotationNotes: "ignorada" },
+      }),
+      curatorId,
+    );
+    const bySlot = Object.fromEntries(saved.members.map((m) => [m.slot, m]));
+    expect(bySlot.SUPPORT_1).toMatchObject({ isDamageDealer: true, rotation: "1c 2dc (3 4) 6", rotationNotes: "Guarde o 6 para a fase 2" });
+    expect(bySlot.SUPPORT_2).toMatchObject({ isDamageDealer: true, rotation: "3 1qc 6", rotationNotes: null });
+    expect(bySlot.SOLO).toMatchObject({ isDamageDealer: false, rotation: null, rotationNotes: null });
+
+    const cleared = await saveMetaTeam(withDealers({ SUPPORT_1: { isDamageDealer: true, rotation: "", rotationNotes: "x" } }), curatorId, saved.id);
+    expect(cleared.members.find((m) => m.slot === "SUPPORT_1")).toMatchObject({ isDamageDealer: true, rotation: null, rotationNotes: null });
   });
 
   it("publicar com agente fora da restrição gera 422 RESTRICTION_VIOLATION", async () => {
