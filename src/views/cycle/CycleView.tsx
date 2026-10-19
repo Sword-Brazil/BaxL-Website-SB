@@ -1,5 +1,5 @@
 import { useTranslation } from "next-i18next/pages";
-import { CalendarClockIcon, InfinityIcon, PencilIcon, PlusIcon, SparklesIcon, SwordsIcon, TimerResetIcon, Trash2Icon } from "lucide-react";
+import { CalendarClockIcon, FileDownIcon, InfinityIcon, PencilIcon, PlusIcon, SparklesIcon, SwordsIcon, TimerResetIcon, Trash2Icon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ import type { CycleDay, CycleModeDay, MetaTeam } from "@/models/domain/types";
 import type { UserTeam } from "@/models/schemas/selections";
 import { useCycleViewModel, type CycleViewModel, type WeekFilter } from "@/viewmodels/useCycleViewModel";
 import { useMetaUpdatesNotice } from "@/viewmodels/useMetaUpdatesNotice";
+import { useTeamsExportViewModel } from "@/viewmodels/useTeamsExportViewModel";
 import { HelpHint } from "@/views/layout/HelpHint";
 import { TeamStrip as SharedTeamStrip, type StripMember, type TeamTone } from "@/views/shared/TeamStrip";
 import { QueryState } from "@/views/shared/QueryState";
@@ -285,6 +286,7 @@ function DayStrip({ vm }: { vm: Vm }) {
 export function CycleView() {
   const { t } = useTranslation(["cycle", "common", "days"]);
   const vm = useCycleViewModel();
+  const exporter = useTeamsExportViewModel(vm);
   const updated = useMetaUpdatesNotice(vm.cycle);
   const resetNotice = vm.clock?.isResetDay ? (vm.clock.beforeWeeklyReset ? "before" : "after") : null;
 
@@ -348,6 +350,10 @@ export function CycleView() {
             </ToggleGroupItem>
           ))}
         </ToggleGroup>
+        <Button variant="outline" size="sm" className="ml-auto" onClick={exporter.exportHtml} disabled={!exporter.canExport}>
+          <FileDownIcon data-icon="inline-start" />
+          {t("cycle:export.button")}
+        </Button>
       </div>
 
       {resetNotice && (
