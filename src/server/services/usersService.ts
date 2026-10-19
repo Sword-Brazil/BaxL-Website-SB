@@ -4,6 +4,7 @@ import { prisma } from "@/server/db";
 import { HttpError } from "@/server/http";
 import { toSessionUser } from "@/server/session";
 import { hashPassword } from "./authService";
+import { notify } from "./notificationService";
 
 const PAGE_SIZE = 20;
 
@@ -51,10 +52,13 @@ export async function changeRole(userId: string, role: Role) {
   if (user.role === "ADMIN" && role !== "ADMIN" && (await prisma.user.count({ where: { role: "ADMIN" } })) <= 1) {
     throw new HttpError(409, "CONFLICT", "Não é possível rebaixar o último administrador");
   }
-  return toSessionUser(await prisma.user.update({ where: { id: userId }, data: { role } }));
+  const updated = await prisma.user.update({ where: { id: userId }, data: { role } });
+  if (user.role !== role) await notify({ type: "ROLE_CHANGED", userId, params: { role } });
+  return toSessionUser(updated);
 }
 
 export async function adminResetPassword(userId: string, password: string) {
   const { count } = await prisma.user.updateMany({ where: { id: userId }, data: { passwordHash: await hashPassword(password) } });
   if (count === 0) throw new HttpError(404, "NOT_FOUND", "Usuário não encontrado");
+  await notify({ type: "PASSWORD_RESET", userId });
 }

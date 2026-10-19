@@ -455,12 +455,9 @@ com a nova data de atualização, sem alteração de código.
 - Fora de escopo nesta feature: rankings, chat, calculadora de dano e outros modos de jogo além
   da Batalha de Aliança.
 
-## Futuro (fora do escopo atual)
+## Padrão de notificações de segurança (Notification pattern)
 
-### Padrão de notificações de segurança (Notification pattern)
-
-Registrado em 2026-10-18 para implementação futura; **não implementar agora**. O sistema deve
-continuar simples: um único ponto de entrada (`notify(evento)`) decide o canal pela gravidade do
+Registrado em 2026-10-18 e implementado em 2026-10-19 (Phase 13). O sistema continua simples: um único ponto de entrada (`notify(evento)`) decide o canal pela gravidade do
 evento, sem filas, serviços externos novos ou infraestrutura além do serviço de e-mail que já
 existe.
 
@@ -478,3 +475,14 @@ existe.
   (senha, token, e-mail completo de terceiros).
 - **FN-004**: A implementação MUST reaproveitar o toast atual (sonner), o padrão de avisos da
   plataforma e o `MailService` existente.
+
+Decisões da implementação:
+
+- Catálogo em `src/models/domain/securityEvents.ts`; `notify` do servidor
+  (`notificationService`) grava o aviso e envia o e-mail; `useNotify` do cliente mostra o toast.
+- Avisos persistentes ficam na tabela `SecurityNotice`, um aberto por tipo e usuário (evento
+  repetido atualiza o mesmo aviso). Aparecem no topo de todas as telas para quem está logado.
+- "Login em outro aparelho" = login feito em outra sessão depois de esta começar (sem
+  identificação de aparelho). Tentativas falhas avisam a partir da 3ª seguida; a 5ª bloqueia.
+- Nas falhas de login o aviso é disparado sem esperar, para o tempo de resposta não revelar se a
+  conta existe.

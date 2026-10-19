@@ -169,5 +169,46 @@
     "slugFormat": "Use kebab-case (e.g. scarlet-witch)",
     "uniformRequired": "Add at least one uniform",
     "uniformRepeated": "Repeated uniform"
+  },
+  "security": {
+    "label": "Account security notices",
+    "dismiss": "Dismiss notice",
+    "notMe": "Wasn't you? Reset your password.",
+    "roles": {
+      "USER": "User",
+      "CURATOR": "Curator",
+      "ADMIN": "Administrator"
+    },
+    "toast": {
+      "SESSION_EXPIRED": "Your session expired. Sign in again to keep syncing.",
+      "SELECTIONS_SYNCED": "Roster and teams synced with your account.",
+      "PASSWORD_CHANGED": "Password changed successfully."
+    },
+    "notices": {
+      "EMAIL_UNVERIFIED": {
+        "title": "E-mail not confirmed yet",
+        "text": "Open the link we sent to your e-mail to confirm your account."
+      },
+      "NEW_LOGIN": {
+        "title": "New sign-in to your account",
+        "text": "Your account was accessed from another device or browser on {{date}}."
+      },
+      "FAILED_LOGINS": {
+        "title": "Sign-in attempts with a wrong password",
+        "text": "There were several attempts to sign in to your account with a wrong password on {{date}}."
+      },
+      "PASSWORD_RESET": {
+        "title": "Password reset",
+        "text": "Your account password was reset on {{date}}. We also sent you an e-mail."
+      },
+      "ROLE_CHANGED": {
+        "title": "Account role changed",
+        "text": "Your account now has the {{role}} role (changed on {{date}}). We also sent you an e-mail."
+      },
+      "ACCOUNT_LOCKED": {
+        "title": "Account temporarily locked",
+        "text": "Sign-in was locked for a few minutes on {{date}} after too many wrong password attempts. We also sent you an e-mail."
+      }
+    }
   }
 }

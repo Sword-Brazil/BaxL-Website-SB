@@ -172,6 +172,7 @@ model User {
   tokens          AuthToken[]
   selections      UserSelectionsDoc?
   metaTeams       MetaTeam[]
+  notices         SecurityNotice[]
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
 }
@@ -193,6 +194,24 @@ model LoginAttempt {
   firstFailAt DateTime?
   lockedUntil DateTime?
   updatedAt   DateTime  @updatedAt
+}
+
+// Aviso persistente de segurança (atenção/crítico): some quando o usuário dispensa ou resolve.
+// Um aviso aberto por tipo e usuário: eventos repetidos atualizam o mesmo aviso.
+model SecurityNotice {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type            String
+  // JSON com parâmetros não sensíveis (ex.: {"role":"CURATOR"}).
+  params          String?
+  // Sessão que causou o evento: o aviso de "novo login" não aparece nela mesma.
+  originSessionId String?
+  dismissedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId, dismissedAt])
 }
 
 model UserSelectionsDoc {

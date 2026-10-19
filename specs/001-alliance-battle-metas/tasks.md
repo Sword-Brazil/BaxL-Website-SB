@@ -501,15 +501,13 @@ para a próxima BAI nos outros dias.
 
 ---
 
-## Phase 13: Futuro — padrão de notificações de segurança (FN-001 a FN-004)
+## Phase 13: Padrão de notificações de segurança (FN-001 a FN-004)
 
-Não implementar agora; manter o sistema simples.
-
-- [ ] T139 Catálogo de eventos de segurança com gravidade fixa (informativo / atenção / crítico) e o canal de cada um, em `src/models/domain` (FN-002)
-- [ ] T140 Ponto único `notify(evento)` (padrão Notification) que despacha para os 3 canais, com testes da escolha de canal (FN-001, FN-002)
-- [ ] T141 Canal "atenção": aviso persistente na tela (faixa dispensável) para e-mail não confirmado, papel alterado, login em outro aparelho e tentativas falhas (FN-001)
-- [ ] T142 Canal "crítico": e-mails de segurança pelo `MailService` (senha redefinida, papel alterado, conta bloqueada) + aviso persistente (FN-001, FN-004)
-- [ ] T143 Ligar os eventos existentes (login, bloqueio, redefinição de senha, troca de papel) ao `notify`, nos 3 idiomas, sem expor dados sensíveis (FN-003)
+- [X] T139 Catálogo de eventos de segurança com gravidade fixa (informativo / atenção / crítico) e o canal de cada um, em `src/models/domain` (FN-002)
+- [X] T140 Ponto único `notify(evento)` (padrão Notification) que despacha para os 3 canais, com testes da escolha de canal (FN-001, FN-002)
+- [X] T141 Canal "atenção": aviso persistente na tela (faixa dispensável) para e-mail não confirmado, papel alterado, login em outro aparelho e tentativas falhas (FN-001)
+- [X] T142 Canal "crítico": e-mails de segurança pelo `MailService` (senha redefinida, papel alterado, conta bloqueada) + aviso persistente (FN-001, FN-004)
+- [X] T143 Ligar os eventos existentes (login, bloqueio, redefinição de senha, troca de papel) ao `notify`, nos 3 idiomas, sem expor dados sensíveis (FN-003)
 
 ---
 

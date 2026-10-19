@@ -169,5 +169,46 @@
     "slugFormat": "Usa kebab-case (ej.: scarlet-witch)",
     "uniformRequired": "Registra al menos un uniforme",
     "uniformRepeated": "Uniforme repetido"
+  },
+  "security": {
+    "label": "Avisos de seguridad de la cuenta",
+    "dismiss": "Descartar aviso",
+    "notMe": "¿No fuiste tú? Restablece la contraseña.",
+    "roles": {
+      "USER": "Usuario",
+      "CURATOR": "Curador",
+      "ADMIN": "Administrador"
+    },
+    "toast": {
+      "SESSION_EXPIRED": "Tu sesión expiró. Inicia sesión de nuevo para seguir sincronizando.",
+      "SELECTIONS_SYNCED": "Plantel y equipos sincronizados con tu cuenta.",
+      "PASSWORD_CHANGED": "Contraseña cambiada con éxito."
+    },
+    "notices": {
+      "EMAIL_UNVERIFIED": {
+        "title": "Correo aún no confirmado",
+        "text": "Abre el enlace que enviamos a tu correo para confirmar la cuenta."
+      },
+      "NEW_LOGIN": {
+        "title": "Nuevo inicio de sesión en tu cuenta",
+        "text": "Se accedió a tu cuenta desde otro dispositivo o navegador el {{date}}."
+      },
+      "FAILED_LOGINS": {
+        "title": "Intentos de inicio de sesión con contraseña incorrecta",
+        "text": "Hubo varios intentos de entrar en tu cuenta con una contraseña incorrecta el {{date}}."
+      },
+      "PASSWORD_RESET": {
+        "title": "Contraseña restablecida",
+        "text": "La contraseña de tu cuenta se restableció el {{date}}. También te enviamos un correo."
+      },
+      "ROLE_CHANGED": {
+        "title": "Rol de la cuenta cambiado",
+        "text": "Tu cuenta ahora tiene el rol {{role}} (cambiado el {{date}}). También te enviamos un correo."
+      },
+      "ACCOUNT_LOCKED": {
+        "title": "Cuenta bloqueada temporalmente",
+        "text": "El inicio de sesión se bloqueó unos minutos el {{date}} tras demasiados intentos con la contraseña incorrecta. También te enviamos un correo."
+      }
+    }
   }
 }
