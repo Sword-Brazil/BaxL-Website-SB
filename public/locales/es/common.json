@@ -49,7 +49,8 @@
     },
     "owned": "Tienes",
     "notOwned": "No lo tienes",
-    "damageDealer": "Causante de daño"
+    "damageDealer": "Causante de daño",
+    "emptySlot": "Vacío"
   },
   "rotation": {
     "title": "Rotación",
