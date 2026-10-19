@@ -2,19 +2,15 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { SLOTS, type Mode, type Slot } from "@/models/domain/enums";
 import { equipCtp } from "@/models/rules/ctpAssign";
-import { emptySelections } from "@/models/rules/selectionsSync";
+import { emptySelections } from "@/models/rules/selections";
 import type { TeamKey, UserSelections, UserTeam } from "@/models/schemas/selections";
 
+/** Tudo do jogador fica no aparelho (localStorage): elenco, equipes, CTPs e o nome no jogo. */
 interface SelectionsState {
   doc: UserSelections;
-  /** updatedAt do servidor na última sincronização (null = nunca sincronizou). */
-  syncBase: string | null;
-  /** Conta à qual o documento local foi vinculado. */
-  syncUserId: string | null;
-  /** doc.updatedAt no momento da última sincronização (diferente = há mudanças locais). */
-  syncedLocalAt: string | null;
   hydrated: boolean;
 
+  setNickname: (nickname: string) => void;
   toggleOwnedUniform: (uniformId: string) => void;
   setOwnedUniforms: (uniformIds: string[], owned: boolean) => void;
   /** Coloca o uniforme no slot; remove o mesmo agente de outro slot da equipe (invariante). */
@@ -24,8 +20,9 @@ interface SelectionsState {
   equipCtp: (agentId: string, ctpId: string | null) => void;
   applyTeam: (teamKey: TeamKey, team: UserTeam) => void;
   resetMode: (mode: Mode) => void;
+  /** Apaga todas as equipes montadas (BAX, BAL e BAI); elenco, CTPs e nome ficam. */
+  resetAllTeams: () => void;
   replaceAll: (doc: UserSelections) => void;
-  markSynced: (base: string | null, userId: string | null) => void;
 }
 
 const touch = (doc: UserSelections, patch: Partial<UserSelections>): UserSelections => ({
@@ -41,10 +38,9 @@ export const useSelectionsStore = create<SelectionsState>()(
   persist(
     (set) => ({
       doc: emptySelections(),
-      syncBase: null,
-      syncUserId: null,
-      syncedLocalAt: null,
       hydrated: false,
+
+      setNickname: (nickname) => set(({ doc }) => ({ doc: touch(doc, { nickname: nickname.trim().slice(0, 30) }) })),
 
       toggleOwnedUniform: (uniformId) =>
         set(({ doc }) => {
@@ -101,20 +97,25 @@ export const useSelectionsStore = create<SelectionsState>()(
           }),
         })),
 
+      resetAllTeams: () => set(({ doc }) => ({ doc: touch(doc, { teams: {} }) })),
+
       replaceAll: (doc) => set({ doc }),
-      markSynced: (syncBase, syncUserId) => set(({ doc }) => ({ syncBase, syncUserId, syncedLocalAt: doc.updatedAt })),
     }),
     {
       name: "mff-selections",
       version: 1,
       storage: createJSONStorage(() => localStorage),
-      partialize: ({ doc, syncBase, syncUserId, syncedLocalAt }) => ({ doc, syncBase, syncUserId, syncedLocalAt }),
+      partialize: ({ doc }) => ({ doc }),
       // Reidratado no cliente (src/pages/_app.tsx) para não divergir do HTML estático.
       skipHydration: true,
-      // Documentos salvos antes do CTP por personagem não têm "equipment".
+      // Documentos antigos não têm "equipment" (CTP por personagem) nem "nickname"; os campos de
+      // sincronização com a conta (que não existe mais) são descartados.
       merge: (persisted, current) => {
         const p = persisted as Partial<SelectionsState> | undefined;
-        return { ...current, ...p, doc: { ...current.doc, ...p?.doc, equipment: p?.doc?.equipment ?? { ctpByAgent: {} } } };
+        return {
+          ...current,
+          doc: { ...current.doc, ...p?.doc, equipment: p?.doc?.equipment ?? { ctpByAgent: {} }, nickname: p?.doc?.nickname ?? "" },
+        };
       },
       onRehydrateStorage: () => () => useSelectionsStore.setState({ hydrated: true }),
     },

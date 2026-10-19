@@ -180,32 +180,20 @@ model BaiBoss {
   updatedAt DateTime @updatedAt
 }
 
-// ---------- Usuários e autenticação ----------
+// ---------- Curadoria (login só de curadores e administradores) ----------
+// Jogadores não têm conta: elenco, equipes e nome no jogo ficam no aparelho (localStorage).
 
 model User {
-  id              String             @id @default(cuid())
-  email           String             @unique
+  id              String           @id @default(cuid())
+  email           String           @unique
   passwordHash    String
   nickname        String?
-  role            String             @default("USER")
+  role            String           @default("USER")
   emailVerifiedAt DateTime?
-  tokens          AuthToken[]
-  selections      UserSelectionsDoc?
   metaTeams       MetaTeam[]
   notices         SecurityNotice[]
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
-}
-
-model AuthToken {
-  id        String    @id @default(cuid())
-  userId    String
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  kind      String
-  tokenHash String    @unique
-  expiresAt DateTime
-  usedAt    DateTime?
-  createdAt DateTime  @default(now())
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 }
 
 model LoginAttempt {
@@ -232,11 +220,4 @@ model SecurityNotice {
   updatedAt       DateTime  @updatedAt
 
   @@index([userId, dismissedAt])
-}
-
-model UserSelectionsDoc {
-  userId    String   @id
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  json      String
-  updatedAt DateTime @updatedAt
 }

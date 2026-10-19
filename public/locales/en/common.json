@@ -7,7 +7,6 @@
   "nav": {
     "roster": "My roster",
     "admin": "Admin",
-    "login": "Sign in",
     "logout": "Sign out",
     "menu": "Menu",
     "account": "My account",
@@ -35,7 +34,8 @@
   "footer": {
     "disclaimer": "Unofficial, non-commercial fan project. Marvel Future Fight is owned by Netmarble; characters are owned by Marvel.",
     "alliance": "Made for the Sword Brazil alliance.",
-    "credit": "Base calendar and teams: Guia BAX/BAL/BAI (guiabaxbal.web.app), curated by Sword Brazil."
+    "credit": "Base calendar and teams: Guia BAX/BAL/BAI (guiabaxbal.web.app), curated by Sword Brazil.",
+    "staff": "Curator access"
   },
   "team": {
     "empty": "No team defined",
@@ -141,12 +141,6 @@
     "notFound": "Page not found.",
     "forbidden": "Access denied."
   },
-  "sync": {
-    "title": "Choose which selections to keep",
-    "text": "This device and your account have different rosters/teams. Which version do you want to keep? The other will be replaced.",
-    "keepLocal": "Keep this device's",
-    "keepRemote": "Use the account's"
-  },
   "ctpPicker": {
     "choose": "Choose CTP",
     "change": "Change",
@@ -199,22 +193,16 @@
   "security": {
     "label": "Account security notices",
     "dismiss": "Dismiss notice",
-    "notMe": "Wasn't you? Reset your password.",
+    "notMe": "Wasn't you? Ask an administrator to change your password.",
     "roles": {
       "USER": "User",
       "CURATOR": "Curator",
       "ADMIN": "Administrator"
     },
     "toast": {
-      "SESSION_EXPIRED": "Your session expired. Sign in again to keep syncing.",
-      "SELECTIONS_SYNCED": "Roster and teams synced with your account.",
-      "PASSWORD_CHANGED": "Password changed successfully."
+      "SESSION_EXPIRED": "Your session expired. Sign in again to keep syncing."
     },
     "notices": {
-      "EMAIL_UNVERIFIED": {
-        "title": "E-mail not confirmed yet",
-        "text": "Open the link we sent to your e-mail to confirm your account."
-      },
       "NEW_LOGIN": {
         "title": "New sign-in to your account",
         "text": "Your account was accessed from another device or browser on {{date}}."
@@ -236,5 +224,20 @@
         "text": "Sign-in was locked for a few minutes on {{date}} after too many wrong password attempts. We also sent you an e-mail."
       }
     }
+  },
+  "nickname": {
+    "label": "Your in-game name",
+    "placeholder": "Your in-game name",
+    "hint": "Stays on this device only, with your roster and teams. No account needed."
+  },
+  "resetTeams": {
+    "title": "Clear my teams",
+    "text": "Deletes the teams you built: all at once or one mode only. Your roster, equipped CTPs and name are kept.",
+    "all": "All teams",
+    "confirmAll": "Delete all your BAX, BAL and BAI teams?",
+    "confirmMode": "Delete your {{mode}} teams?",
+    "doneAll": "All your teams were deleted",
+    "doneMode": "{{mode}} teams deleted",
+    "button": "Clear teams"
   }
 }

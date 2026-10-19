@@ -34,13 +34,11 @@ export const EquipmentSchema = z.object({ ctpByAgent: z.record(idSchema, idSchem
 export const UserSelectionsSchema = z.object({
   version: z.literal(1),
   updatedAt: z.iso.datetime(),
+  /** Nome no jogo, escolhido pelo jogador (fica só no aparelho). */
+  nickname: z.string().trim().max(30).default(""),
   roster: z.object({ ownedUniformIds: z.array(idSchema).max(5000) }),
   teams: z.record(teamKeySchema, UserTeamSchema),
   equipment: EquipmentSchema.default({ ctpByAgent: {} }),
 });
 export type UserSelections = z.infer<typeof UserSelectionsSchema>;
 
-export const PutSelectionsSchema = z.object({
-  selections: UserSelectionsSchema,
-  baseUpdatedAt: z.iso.datetime().optional().nullable(),
-});

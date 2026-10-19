@@ -318,17 +318,16 @@ com a nova data de atualização, sem alteração de código.
   partir de uma paleta com os 6 tipos de CTP PVE em 3 qualidades, com alternativa por toque.
 - **FR-016**: Cada agente de uma equipe MUST ter no máximo um CTP. Soltar outro CTP substitui o
   anterior, e deve existir uma ação para remover o CTP.
-- **FR-017**: As seleções do usuário (elenco, equipes, CTPs) MUST persistir no dispositivo sem
-  exigir login, e o usuário MUST poder exportar e importar um backup delas.
-- **FR-018**: Usuários MUST poder, opcionalmente, entrar com uma conta para sincronizar as
-  seleções entre dispositivos. Ao entrar pela primeira vez, as seleções locais são levadas para a
-  conta. Se já houver dados na conta, o usuário escolhe quais manter.
-- **FR-019**: Contas MUST ser criadas com e-mail e senha, com confirmação do e-mail e
-  recuperação de senha. Enquanto a plataforma roda só localmente, os links de confirmação e
-  recuperação são exibidos no log do servidor, e Administradores podem redefinir senhas
-  manualmente. Contas ainda não confirmadas podem entrar e sincronizar. Exigir a confirmação
-  passará a valer quando houver envio real de e-mail. Senhas MUST NOT ser armazenadas em texto
-  puro, e tentativas de login falhas repetidas MUST ser limitadas temporariamente.
+- **FR-017**: As seleções do jogador (elenco, equipes, CTPs equipados e o **nome no jogo**)
+  MUST ficar salvas **só no dispositivo** (localStorage), sem login, e o jogador MUST poder
+  exportar e importar um backup delas, além de apagar as equipes montadas (todas ou de um modo).
+- **FR-018**: (Revisado em 2026-10-19) Jogadores **não têm conta**: não há cadastro, confirmação
+  de e-mail, recuperação de senha nem sincronização entre dispositivos (para manter o sistema
+  leve e dentro de planos gratuitos). Para levar os dados a outro aparelho, usa-se o backup.
+- **FR-019**: Só a curadoria (Curadores e Administradores) tem login, com e-mail e senha.
+  Administradores cadastram novos Curadores/Administradores e redefinem senhas. Senhas MUST NOT
+  ser armazenadas em texto puro, e tentativas de login falhas repetidas MUST ser limitadas
+  temporariamente. Papel "Usuário" significa acesso retirado e não entra.
 - **FR-020**: Quando o usuário não possuir agentes ou uniformes da Meta, a plataforma MUST
   sugerir a melhor equipe possível com o elenco dele para aquele dia (e para a BAI). A sugestão
   segue listas de prioridade de Soladores e Suportes cadastradas pelos curadores e respeita a
@@ -419,9 +418,9 @@ com a nova data de atualização, sem alteração de código.
   com Uniforme e CTP de cada agente.
 - **Lista de Prioridade**: para um Dia de Batalha (ou para a BAI), a ordem de preferência de
   Soladores e de Suportes (com uniforme e CTP recomendados), usada para gerar sugestões.
-- **Conta do Usuário** (opcional): identifica o usuário para sincronizar seu Elenco e suas
-  Equipes entre dispositivos. Atributos: e-mail (único), senha (nunca armazenada em texto puro),
-  apelido no jogo (opcional) e papel (usuário, Curador ou Administrador).
+- **Conta da curadoria**: só para Curadores e Administradores (jogadores não têm conta).
+  Atributos: e-mail (único), senha (nunca armazenada em texto puro), apelido (opcional) e papel
+  (Curador, Administrador ou Usuário = acesso retirado).
 - **Curador**: Conta do Usuário com permissão de criar, editar e publicar conteúdo.
 - **Administrador**: Curador que também pode promover e remover Curadores e Administradores. Deve
   existir sempre pelo menos um Administrador.
@@ -459,8 +458,8 @@ com a nova data de atualização, sem alteração de código.
 - Os "principais CTPs para PVE" são os 6 listados, cada um com 3 qualidades.
 - O catálogo de agentes, uniformes e CTPs é mantido manualmente pelos curadores. Não há integração
   com o jogo nem com as contas dos jogadores (Constituição, Restrições de Domínio).
-- A visão pública das metas e a personalização local não exigem login. A conta (e-mail e senha)
-  é opcional, só para sincronizar, e a curadoria exige login com papel de Curador.
+- A visão pública das metas e a personalização local não exigem login, e jogadores não têm
+  conta. Só a curadoria tem login (papel de Curador ou Administrador).
 - O conteúdo da BAI é único e vale para todas as semanas. Não há histórico por semana.
 - As sugestões seguem a Meta, as Alternativas e as reservas cadastradas pelos curadores, nessa
   ordem. Não há cálculo de dano nem simulação de batalha.

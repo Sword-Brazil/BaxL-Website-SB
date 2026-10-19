@@ -6,7 +6,7 @@ import { setRestriction } from "@/server/services/restrictionService";
 import { savePriority } from "@/server/services/priorityService";
 import { changeRole, createStaff } from "@/server/services/usersService";
 import { createAgent, createUser, ctpId, dayId, seedBase } from "./fixtures";
-import { saveCtp } from "@/server/services/catalogAdminService";
+import { deleteCtp, saveCtp } from "@/server/services/catalogAdminService";
 
 const status = (s: number) => (e: unknown) => e instanceof HttpError && e.status === s;
 
@@ -78,6 +78,18 @@ describe("curadoria", () => {
     await expect(savePriority({ scope: "BAI" }, { solo: [{ uniformId: fem[0], ctpId: ctp }], support: [] })).rejects.toSatisfy(
       status(400),
     );
+  });
+
+  it("excluir um CTP tira ele das equipes e reservas, sem apagar as equipes", async () => {
+    const saved = await saveMetaTeam(team(fem), curatorId);
+    await savePriority({ scope: "BAI" }, { solo: [{ uniformId: fem[0], ctpId: ctp }], support: [] });
+    await deleteCtp(ctp);
+    expect(await prisma.ctp.findUnique({ where: { id: ctp } })).toBeNull();
+    const members = await prisma.metaTeamMember.findMany({ where: { metaTeamId: saved.id } });
+    expect(members).toHaveLength(3);
+    expect(members.every((m) => m.ctpId === null)).toBe(true);
+    expect((await prisma.priorityEntry.findFirstOrThrow()).ctpId).toBeNull();
+    await expect(deleteCtp(ctp)).rejects.toSatisfy(status(404));
   });
 
   it("publicar com uniforme inativo gera 400", async () => {

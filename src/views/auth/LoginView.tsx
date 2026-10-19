@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next/pages";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,10 +21,10 @@ export function LoginView() {
 
   const onSubmit = form.handleSubmit(async (values) => {
     try {
-      const user = await login(values);
+      await login(values);
       toast.success(t("login.welcome"));
       const next = typeof router.query.next === "string" && router.query.next.startsWith("/") ? router.query.next : null;
-      router.push(next ?? (user.role === "USER" ? "/" : "/admin"));
+      router.push(next ?? "/admin");
     } catch {
       /* erro exibido abaixo */
     }
@@ -63,17 +62,7 @@ export function LoginView() {
             </FieldGroup>
           </form>
         </CardContent>
-        <CardFooter className="flex flex-wrap justify-between gap-2 text-sm">
-          <Link href="/recuperar-senha" className="text-muted-foreground underline-offset-4 hover:underline">
-            {t("login.forgot")}
-          </Link>
-          <span className="text-muted-foreground">
-            {t("login.noAccount")}{" "}
-            <Link href="/cadastro" className="text-energy underline-offset-4 hover:underline">
-              {t("login.register")}
-            </Link>
-          </span>
-        </CardFooter>
+        <CardFooter className="text-sm text-muted-foreground">{t("login.staffOnly")}</CardFooter>
       </Card>
     </div>
   );

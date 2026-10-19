@@ -128,12 +128,15 @@
   },
   "ctps": {
     "title": "Catálogo de CTPs",
-    "help": "Añade CTPs y actualiza sus fotos. Al eliminar, el elemento se desactiva para conservar equipos y selecciones anteriores.",
+    "help": "Añade, edita y elimina CTP. Desactivar oculta el CTP de las opciones y mantiene los equipos antiguos; eliminar lo borra para siempre.",
     "add": "Nuevo CTP",
     "edit": "Editar CTP",
     "quality": "Calidad",
-    "remove": "Eliminar",
-    "restore": "Reactivar"
+    "restore": "Reactivar",
+    "deactivate": "Desactivar",
+    "delete": "Eliminar CTP",
+    "deleteConfirm": "¿Eliminar {{name}} para siempre? Los equipos Meta y reservas que lo recomiendan quedarán sin CTP. No se puede deshacer.",
+    "deleted": "CTP eliminado"
   },
   "bai": {
     "title": "Jefes de la BAI",

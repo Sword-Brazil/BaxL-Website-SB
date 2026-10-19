@@ -162,15 +162,6 @@ O texto explicativo da BAI fica no i18n.
 
 **Invariante**: sempre ≥ 1 usuário com `role = ADMIN` (FR-024). Só um ADMIN altera papéis.
 
-### AuthToken
-| Campo | Tipo | Regras |
-|-------|------|--------|
-| id | string | PK |
-| userId | FK User | |
-| kind | `VERIFY_EMAIL` \| `RESET_PASSWORD` | |
-| tokenHash | string | guarda só o hash do token |
-| expiresAt | datetime | verify: 24 h; reset: 1 h; uso único |
-
 ### LoginAttempt
 | Campo | Tipo | Regras |
 |-------|------|--------|
@@ -191,13 +182,13 @@ O texto explicativo da BAI fica no i18n.
 
 ### UserSelections (documento versionado)
 
-Fica no Zustand `persist` (aparelho) e, se o usuário estiver logado, em `UserSelectionsDoc`
-no servidor.
+Fica **só** no Zustand `persist` (localStorage do aparelho): jogadores não têm conta.
 
 ```text
 UserSelections {
   version: 1
   updatedAt: ISO datetime
+  nickname: string                               // nome no jogo (≤ 30)
   roster: { ownedUniformIds: string[] }          // o agente é possuído se ≥1 uniforme for
   teams: {
     [key: "BAX-4" | "BAL-17" | "BAI"]: {
@@ -209,16 +200,10 @@ UserSelections {
 }
 ```
 
-- **UserSelectionsDoc (servidor)**: `userId` (PK/FK), `json` (string validada por Zod no
-  `UserSelectionsSchema`), `updatedAt`.
 - **Regras**:
   - Um CTP por slot.
   - Um agente não pode ocupar dois slots da mesma equipe.
   - IDs inexistentes ou inativos aparecem como "indisponível" e não são apagados.
-- **Sincronização (FR-018)**:
-  - No primeiro login sem documento no servidor, o envio do local é automático.
-  - Se houver documento local e documento no servidor diferentes, o usuário escolhe "manter do
-    aparelho" ou "manter da conta". Nada é descartado sem confirmação.
 - **Backup**: exportar/importar o mesmo JSON, validado pelo `UserSelectionsSchema`.
 
 ## Regras derivadas (Model puro, testado)
@@ -236,4 +221,4 @@ UserSelections {
 - **User.role**:
   - `USER` ↔ `CURATOR` ↔ `ADMIN`, alterado só por um ADMIN.
   - Rebaixar o último ADMIN é bloqueado.
-- **AuthToken**: `created` → `used` | `expired`.
+- **User.role `USER`** = acesso retirado (não entra); só CURATOR e ADMIN fazem login.

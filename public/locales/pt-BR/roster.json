@@ -16,12 +16,6 @@
     "imported": "Backup importado",
     "invalid": "Arquivo de backup inválido"
   },
-  "reset": {
-    "title": "Redefinir seleções",
-    "text": "Apaga as equipes montadas do modo escolhido. O elenco e os outros modos são mantidos.",
-    "confirm": "Apagar as equipes de {{mode}}?",
-    "done": "Equipes de {{mode}} apagadas"
-  },
   "help": {
     "title": "Meu elenco",
     "text1": "Toque em um uniforme para marcar ou desmarcar. Um agente conta como possuído se você tiver ao menos um uniforme dele.",

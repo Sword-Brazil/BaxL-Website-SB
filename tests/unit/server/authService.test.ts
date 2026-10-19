@@ -6,8 +6,8 @@ import { hashPassword, login } from "@/server/services/authService";
 
 const IP = "10.0.0.1";
 
-async function createUser(email = "jogador@sword.br", password = "senha1234") {
-  return prisma.user.create({ data: { email, passwordHash: await hashPassword(password), role: "USER" } });
+async function createUser(email = "jogador@sword.br", password = "senha1234", role = "CURATOR") {
+  return prisma.user.create({ data: { email, passwordHash: await hashPassword(password), role } });
 }
 
 async function expectHttpError(p: Promise<unknown>, status: number) {
@@ -18,8 +18,17 @@ describe("authService.login", () => {
   it("login correto retorna o SessionUser (sem hash)", async () => {
     const u = await createUser();
     const user = await login({ email: " Jogador@Sword.BR ", password: "senha1234", ip: IP });
-    expect(user).toEqual({ id: u.id, email: "jogador@sword.br", nickname: null, role: "USER" });
+    expect(user).toEqual({ id: u.id, email: "jogador@sword.br", nickname: null, role: "CURATOR" });
     expect(user).not.toHaveProperty("passwordHash");
+  });
+
+  it("só a curadoria entra: papel USER (acesso retirado) recebe o mesmo 401 de senha errada", async () => {
+    await createUser("ex-curador@sword.br", "senha1234", "USER");
+    const denied = await login({ email: "ex-curador@sword.br", password: "senha1234", ip: IP }).catch((e) => e);
+    const wrong = await login({ email: "ninguem@sword.br", password: "senha1234", ip: IP }).catch((e) => e);
+    expect(denied).toBeInstanceOf(HttpError);
+    expect(denied.status).toBe(401);
+    expect(denied.message).toBe(wrong.message);
   });
 
   it("senha errada e e-mail inexistente dão o mesmo erro genérico 401", async () => {

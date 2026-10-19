@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "next-i18next/pages";
-import { ImageUpIcon, LoaderIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { BanIcon, ImageUpIcon, LoaderIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -48,6 +49,16 @@ export function CtpAdminView() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+  /** Exclusão definitiva: as equipes e reservas que usavam o CTP ficam sem CTP. */
+  const remove = useMutation({
+    mutationFn: (id: string) => adminApi.deleteCtp(id),
+    onSuccess: (_, id) => {
+      qc.setQueryData<Catalog>(["catalog"], (current) => current && { ...current, ctps: current.ctps.filter((ctp) => ctp.id !== id) });
+      qc.invalidateQueries({ queryKey: ["cycle"] });
+      toast.success(t("admin:ctps.deleted"));
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
   const edit = (ctp: Ctp) => setDraft({ id: ctp.id, type: ctp.type, quality: ctp.quality, imagePath: ctp.imagePath, active: ctp.active });
   /** Qualidades ainda livres no tipo (a do próprio CTP em edição continua disponível). */
   const freeQualities = (type: CtpType, exceptId?: string) =>
@@ -83,7 +94,14 @@ export function CtpAdminView() {
           </CardHeader>
           <CardContent className="flex justify-end gap-2">
             <Button size="sm" variant="outline" onClick={() => edit(ctp)}><PencilIcon data-icon="inline-start" />{t("admin:common.edit")}</Button>
-            {ctp.active ? <Button size="sm" variant="destructive" onClick={() => save.mutate({ id: ctp.id, type: ctp.type, quality: ctp.quality, imagePath: ctp.imagePath, active: false })}><Trash2Icon data-icon="inline-start" />{t("admin:ctps.remove")}</Button> : <Button size="sm" variant="outline" onClick={() => save.mutate({ id: ctp.id, type: ctp.type, quality: ctp.quality, imagePath: ctp.imagePath, active: true })}>{t("admin:ctps.restore")}</Button>}
+            {ctp.active ? <Button size="sm" variant="outline" onClick={() => save.mutate({ id: ctp.id, type: ctp.type, quality: ctp.quality, imagePath: ctp.imagePath, active: false })}><BanIcon data-icon="inline-start" />{t("admin:ctps.deactivate")}</Button> : <Button size="sm" variant="outline" onClick={() => save.mutate({ id: ctp.id, type: ctp.type, quality: ctp.quality, imagePath: ctp.imagePath, active: true })}>{t("admin:ctps.restore")}</Button>}
+            <AlertDialog>
+              <AlertDialogTrigger asChild><Button size="icon-sm" variant="ghost" aria-label={t("admin:ctps.delete")} title={t("admin:ctps.delete")}><Trash2Icon className="text-destructive" /></Button></AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader><AlertDialogTitle>{t("admin:ctps.delete")}</AlertDialogTitle><AlertDialogDescription>{t("admin:ctps.deleteConfirm", { name: `${t(`common:ctp.${ctp.type}`)} · ${t(`common:quality.${ctp.quality}`)}` })}</AlertDialogDescription></AlertDialogHeader>
+                <AlertDialogFooter><AlertDialogCancel>{t("admin:common.cancel")}</AlertDialogCancel><AlertDialogAction variant="destructive" onClick={() => remove.mutate(ctp.id)}>{t("admin:ctps.delete")}</AlertDialogAction></AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </CardContent>
         </Card>)}
       </div>

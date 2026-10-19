@@ -5,14 +5,14 @@ const ALL = Object.keys(SECURITY_EVENTS) as SecurityEventType[];
 
 describe("catálogo de eventos de segurança", () => {
   it("informativo vai só para o toast", () => {
-    for (const type of ["SESSION_EXPIRED", "SELECTIONS_SYNCED", "PASSWORD_CHANGED"] as const) {
+    for (const type of ["SESSION_EXPIRED"] as const) {
       expect(severityOf(type)).toBe("INFO");
       expect(channelsOf(type)).toEqual(["toast"]);
     }
   });
 
   it("atenção vai só para o aviso persistente", () => {
-    for (const type of ["EMAIL_UNVERIFIED", "NEW_LOGIN", "FAILED_LOGINS"] as const) {
+    for (const type of ["NEW_LOGIN", "FAILED_LOGINS"] as const) {
       expect(channelsOf(type)).toEqual(["banner"]);
     }
   });

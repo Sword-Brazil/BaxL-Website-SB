@@ -1,4 +1,4 @@
-// Seed idempotente: CTPs, dias de BAX/BAL, Settings e as contas ADMIN e USER do dono do projeto.
+// Seed idempotente: CTPs, dias de BAX/BAL, Settings e a conta ADMIN do dono do projeto (jogadores não têm conta).
 // Uso: npx prisma db seed  (lê .env.local)
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
@@ -67,7 +67,6 @@ async function main() {
   console.log("✔ Settings");
 
   await seedUser(process.env.SEED_ADMIN_EMAIL, process.env.SEED_ADMIN_PASSWORD, "ADMIN");
-  await seedUser(process.env.SEED_USER_EMAIL, process.env.SEED_USER_PASSWORD, "USER");
 }
 
 main()

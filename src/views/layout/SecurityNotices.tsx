@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next/pages";
-import { MailWarningIcon, ShieldAlertIcon, TriangleAlertIcon, XIcon } from "lucide-react";
+import { ShieldAlertIcon, TriangleAlertIcon, XIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,7 @@ import type { SecurityNotice } from "@/models/domain/securityEvents";
 import { BRT_TIME_ZONE } from "@/models/rules/battleClock";
 import { useSecurityNoticesViewModel } from "@/viewmodels/useSecurityNoticesViewModel";
 
-/** Avisos em que faz sentido oferecer "não foi você?" (leva à recuperação de senha). */
+/** Avisos em que faz sentido o "não foi você?" (um administrador troca a senha em /admin/usuarios). */
 const OFFER_RESET = new Set<SecurityNotice["type"]>(["NEW_LOGIN", "FAILED_LOGINS", "PASSWORD_RESET", "ACCOUNT_LOCKED"]);
 
 function NoticeItem({ notice, onDismiss }: { notice: SecurityNotice; onDismiss: () => void }) {
@@ -19,7 +18,7 @@ function NoticeItem({ notice, onDismiss }: { notice: SecurityNotice; onDismiss: 
     new Date(notice.createdAt),
   );
   const critical = notice.severity === "CRITICAL";
-  const Icon = critical ? ShieldAlertIcon : notice.type === "EMAIL_UNVERIFIED" ? MailWarningIcon : TriangleAlertIcon;
+  const Icon = critical ? ShieldAlertIcon : TriangleAlertIcon;
   const role = notice.params.role ? t(`security.roles.${notice.params.role}`) : "";
   return (
     <Alert
@@ -34,9 +33,7 @@ function NoticeItem({ notice, onDismiss }: { notice: SecurityNotice; onDismiss: 
           {OFFER_RESET.has(notice.type) && (
             <>
               {" "}
-              <Link href="/recuperar-senha" className="text-energy underline">
-                {t("security.notMe")}
-              </Link>
+              <span className="font-medium text-foreground">{t("security.notMe")}</span>
             </>
           )}
         </p>

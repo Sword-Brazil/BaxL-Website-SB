@@ -1,5 +1,6 @@
 import {
   channelsOf,
+  isNoticeEvent,
   severityOf,
   type NoticeEventType,
   type NoticeParams,
@@ -17,11 +18,11 @@ export interface SecurityEvent {
   originSessionId?: string;
 }
 
-/** Página indicada no e-mail crítico ("não foi você?" leva à recuperação de senha). */
+/** Página indicada no e-mail crítico (o login da curadoria). */
 const MAIL_LINK: Record<SecurityMailKind, string> = {
-  PASSWORD_RESET: "/recuperar-senha",
-  ROLE_CHANGED: "/",
-  ACCOUNT_LOCKED: "/recuperar-senha",
+  PASSWORD_RESET: "/entrar",
+  ROLE_CHANGED: "/admin",
+  ACCOUNT_LOCKED: "/entrar",
 };
 
 /**
@@ -65,11 +66,6 @@ async function openNotice({ type, userId, params, originSessionId }: SecurityEve
   else await prisma.securityNotice.create({ data: { userId, type, ...data } });
 }
 
-/** Fecha o aviso quando o problema foi resolvido (ex.: e-mail confirmado). */
-export async function resolveNotice(userId: string, type: NoticeEventType) {
-  await prisma.securityNotice.updateMany({ where: { userId, type, dismissedAt: null }, data: { dismissedAt: new Date() } });
-}
-
 /**
  * Avisos abertos do usuário, do mais recente ao mais antigo. O "novo login" só aparece nas
  * outras sessões, e só se aconteceu depois de esta sessão começar.
@@ -79,6 +75,8 @@ export async function listNotices(userId: string, session: { sid?: string; login
   const loginAt = session.loginAt ? new Date(session.loginAt) : null;
   const seen = new Set<string>();
   return rows
+    // Tipos que saíram do catálogo (ex.: avisos de conta de jogador) não aparecem.
+    .filter((r) => isNoticeEvent(r.type))
     .filter((r) => r.type !== "NEW_LOGIN" || (r.originSessionId !== session.sid && !!loginAt && r.createdAt >= loginAt))
     .filter((r) => !seen.has(r.type) && !!seen.add(r.type))
     .map((r) => {

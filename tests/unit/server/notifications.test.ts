@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/server/db";
 import { HttpError } from "@/server/http";
-import { hashPassword, login, register, resetPassword, verifyEmail } from "@/server/services/authService";
+import { hashPassword, login } from "@/server/services/authService";
 import { ConsoleMailService, setMailService, type MailKind, type MailService } from "@/server/services/mailService";
 import { dismissNotice, flushNotifications, listNotices, notify } from "@/server/services/notificationService";
 import { adminResetPassword, changeRole } from "@/server/services/usersService";
@@ -21,7 +21,7 @@ beforeEach(() => {
 });
 afterEach(() => setMailService(new ConsoleMailService()));
 
-async function createUser(email = "alvo@sword.br", role = "USER") {
+async function createUser(email = "alvo@sword.br", role = "CURATOR") {
   return prisma.user.create({ data: { email, passwordHash: await hashPassword("senha1234"), role, emailVerifiedAt: new Date() } });
 }
 
@@ -98,37 +98,25 @@ describe("eventos ligados ao notify", () => {
     expect(sent).toEqual([]);
   });
 
-  it("cadastro abre o aviso de e-mail não confirmado, que fecha ao confirmar", async () => {
-    await register({ email: "novo@sword.br", password: "senha1234" });
-    const user = await prisma.user.findUniqueOrThrow({ where: { email: "novo@sword.br" } });
-    expect(await types(user.id)).toEqual(["EMAIL_UNVERIFIED"]);
-    const token = new URL(sent.find((m) => m.kind === "VERIFY_EMAIL")!.link).searchParams.get("token")!;
-    await verifyEmail(token);
-    expect(await types(user.id)).toEqual([]);
-  });
-
-  it("redefinir a senha (link ou administrador) é crítico", async () => {
+  it("redefinir a senha pelo administrador é crítico", async () => {
     const u = await createUser();
     await adminResetPassword(u.id, "nova12345");
     expect(await types(u.id)).toEqual(["PASSWORD_RESET"]);
     expect(sent.map((m) => m.kind)).toEqual(["PASSWORD_RESET"]);
+  });
 
-    sent = [];
-    await prisma.securityNotice.deleteMany();
-    const { forgotPassword } = await import("@/server/services/authService");
-    await forgotPassword(u.email);
-    const token = new URL(sent[0].link).searchParams.get("token")!;
-    await resetPassword(token, "outra12345");
-    expect(await types(u.id)).toEqual(["PASSWORD_RESET"]);
-    expect(sent.map((m) => m.kind)).toEqual(["RESET_PASSWORD", "PASSWORD_RESET"]);
+  it("avisos de tipos que saíram do catálogo não aparecem", async () => {
+    const u = await createUser();
+    await prisma.securityNotice.create({ data: { userId: u.id, type: "EMAIL_UNVERIFIED" } });
+    expect(await types(u.id)).toEqual([]);
   });
 
   it("troca de papel avisa; manter o mesmo papel não", async () => {
     await createUser("chefe@sword.br", "ADMIN");
     const u = await createUser();
-    await changeRole(u.id, "USER");
-    expect(await types(u.id)).toEqual([]);
     await changeRole(u.id, "CURATOR");
+    expect(await types(u.id)).toEqual([]);
+    await changeRole(u.id, "ADMIN");
     expect(await types(u.id)).toEqual(["ROLE_CHANGED"]);
     expect(sent.map((m) => m.kind)).toEqual(["ROLE_CHANGED"]);
   });

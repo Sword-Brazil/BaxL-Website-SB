@@ -128,12 +128,15 @@
   },
   "ctps": {
     "title": "CTP catalog",
-    "help": "Add CTPs and update their photos. Deleting deactivates an item to preserve existing teams and selections.",
+    "help": "Add, edit and delete CTPs. Deactivating hides the CTP from choices and keeps old teams; deleting removes it for good.",
     "add": "New CTP",
     "edit": "Edit CTP",
     "quality": "Quality",
-    "remove": "Delete",
-    "restore": "Restore"
+    "restore": "Restore",
+    "deactivate": "Deactivate",
+    "delete": "Delete CTP",
+    "deleteConfirm": "Delete {{name}} for good? Meta teams and reserves recommending it will have no CTP. This can't be undone.",
+    "deleted": "CTP deleted"
   },
   "bai": {
     "title": "BAI bosses",

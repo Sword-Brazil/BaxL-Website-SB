@@ -4,17 +4,6 @@ import { useTranslation } from "next-i18next/pages";
 import { CheckIcon, DownloadIcon, SearchIcon, SlidersHorizontalIcon, UploadIcon, XIcon, ZapIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AttributeLabel } from "@/views/shared/AttributeLabel";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -25,13 +14,14 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/in
 import { Skeleton } from "@/components/ui/skeleton";
 import { Toggle } from "@/components/ui/toggle";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { CRITERION_ATTRIBUTES, CRITERION_VALUES, MODES } from "@/models/domain/enums";
+import { CRITERION_ATTRIBUTES, CRITERION_VALUES } from "@/models/domain/enums";
 import { ctpColor } from "@/models/domain/ctpColors";
 import type { Agent } from "@/models/domain/types";
 import { useRosterViewModel } from "@/viewmodels/useRosterViewModel";
 import { CtpPalette } from "@/views/day/CtpPalette";
 import { CtpBadge } from "@/views/shared/CtpBadge";
 import { CtpDragOverlay } from "@/views/shared/CtpDragOverlay";
+import { ResetTeamsOptions } from "@/views/shared/ResetTeamsOptions";
 import { CtpPicker } from "@/views/shared/CtpPicker";
 import { HelpHint } from "@/views/layout/HelpHint";
 import { QueryState } from "@/views/shared/QueryState";
@@ -177,7 +167,6 @@ export function RosterView() {
   const vm = useRosterViewModel({
     imported: t("roster:backup.imported"),
     invalid: t("roster:backup.invalid"),
-    reset: (mode) => t("roster:reset.done", { mode }),
   });
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -354,29 +343,11 @@ export function RosterView() {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>{t("roster:reset.title")}</CardTitle>
-              <CardDescription>{t("roster:reset.text")}</CardDescription>
+              <CardTitle>{t("common:resetTeams.title")}</CardTitle>
+              <CardDescription>{t("common:resetTeams.text")}</CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-wrap gap-2">
-              {MODES.map((mode) => (
-                <AlertDialog key={mode}>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="destructive">{mode}</Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>{t("roster:reset.title")}</AlertDialogTitle>
-                      <AlertDialogDescription>{t("roster:reset.confirm", { mode })}</AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>{t("common:actions.cancel")}</AlertDialogCancel>
-                      <AlertDialogAction variant="destructive" onClick={() => vm.resetMode(mode)}>
-                        {t("common:actions.confirm")}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              ))}
+            <CardContent>
+              <ResetTeamsOptions />
             </CardContent>
           </Card>
         </div>

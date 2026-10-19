@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getCycle } from "@/models/api/cycle";
 import { toast } from "sonner";
-import { CRITERION_ATTRIBUTES, type CriterionAttribute, type Mode } from "@/models/domain/enums";
+import { CRITERION_ATTRIBUTES, type CriterionAttribute } from "@/models/domain/enums";
 import type { Agent, CycleOverview } from "@/models/domain/types";
 import { matchesRestriction } from "@/models/rules/restriction";
 import { UserSelectionsSchema } from "@/models/schemas/selections";
@@ -30,11 +30,11 @@ function visibleUniforms(agent: Agent, used: Set<string>) {
 }
 
 /** Elenco do usuário: marcação de uniformes, busca/filtros, backup e redefinição por modo. */
-export function useRosterViewModel(messages: { imported: string; invalid: string; reset: (mode: Mode) => string }) {
+export function useRosterViewModel(messages: { imported: string; invalid: string }) {
   const catalog = useCatalogViewModel();
   const cycle = useQuery({ queryKey: ["cycle"], queryFn: getCycle });
   const usedUniforms = useMemo(() => uniformsInTeams(cycle.data), [cycle.data]);
-  const { doc, hydrated, toggleOwnedUniform, setOwnedUniforms, replaceAll, resetMode, equipCtp } = useSelectionsStore();
+  const { doc, hydrated, toggleOwnedUniform, setOwnedUniforms, replaceAll, equipCtp } = useSelectionsStore();
   const [search, setSearch] = useState("");
   const [armedCtp, setArmedCtp] = useState<string | null>(null);
   const equipment = doc.equipment?.ctpByAgent ?? {};
@@ -105,10 +105,6 @@ export function useRosterViewModel(messages: { imported: string; invalid: string
       } catch {
         toast.error(messages.invalid);
       }
-    },
-    resetMode: (mode: Mode) => {
-      resetMode(mode);
-      toast.success(messages.reset(mode));
     },
     isLoading: catalog.isLoading || !hydrated,
     isError: catalog.isError,
