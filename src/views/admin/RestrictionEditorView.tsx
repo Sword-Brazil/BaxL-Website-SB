@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CRITERION_ATTRIBUTES, CRITERION_VALUES, DAY_MODES, type DayMode } from "@/models/domain/enums";
+import { MODE_VISUALS } from "@/views/shared/modeVisuals";
 import { ANY, useRestrictionEditorViewModel } from "@/viewmodels/admin/useRestrictionEditorViewModel";
 import { QueryState } from "@/views/shared/QueryState";
 
@@ -71,7 +72,7 @@ export function RestrictionEditorView() {
     <Tabs defaultValue="BAX">
       <TabsList>
         {DAY_MODES.map((m) => (
-          <TabsTrigger key={m} value={m} className="font-heading tracking-wider">
+          <TabsTrigger key={m} value={m} className={cn("font-heading tracking-wider", MODE_VISUALS[m].active)}>
             {m}
           </TabsTrigger>
         ))}

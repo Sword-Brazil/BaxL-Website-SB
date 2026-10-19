@@ -76,6 +76,10 @@
   --ctp-normal: oklch(0.55 0.04 240);
   --ctp-mighty: oklch(0.52 0.2 300);
   --ctp-brilliant: oklch(0.54 0.16 80);
+  /* Modos da Batalha de Aliança, como no jogo: BAX azul, BAL laranja, BAI vermelho */
+  --mode-bax: oklch(0.53 0.17 252);
+  --mode-bal: oklch(0.6 0.18 48);
+  --mode-bai: oklch(0.54 0.21 25);
   --glow: oklch(0.6 0.14 210 / 0.18);
 
   /* Séries de gráfico (paleta categórica validada para daltonismo; ordem fixa) */
@@ -129,6 +133,9 @@
   --ctp-normal: oklch(0.72 0.04 230);
   --ctp-mighty: oklch(0.7 0.18 305);
   --ctp-brilliant: oklch(0.84 0.15 85);
+  --mode-bax: oklch(0.7 0.16 250);
+  --mode-bal: oklch(0.76 0.17 52);
+  --mode-bai: oklch(0.66 0.21 24);
   --glow: oklch(0.82 0.13 205 / 0.22);
 
   --series-1: #3987e5;
@@ -191,6 +198,9 @@
   --color-ctp-normal: var(--ctp-normal);
   --color-ctp-mighty: var(--ctp-mighty);
   --color-ctp-brilliant: var(--ctp-brilliant);
+  --color-bax: var(--mode-bax);
+  --color-bal: var(--mode-bal);
+  --color-bai: var(--mode-bai);
   --color-series-1: var(--series-1);
   --color-series-2: var(--series-2);
   --color-series-3: var(--series-3);

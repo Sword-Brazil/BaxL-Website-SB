@@ -1,4 +1,5 @@
 import { useTranslation } from "next-i18next/pages";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSelectionsStore } from "@/viewmodels/stores/selectionsStore";
 import { useCatalogViewModel } from "@/viewmodels/useCatalogViewModel";
@@ -17,7 +18,12 @@ export function BalFreeView() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-heading text-3xl font-bold">{t("days:free.title")}</h1>
+          <h1 className="flex items-center gap-2 font-heading text-3xl font-bold">
+            <Badge variant="bal" className="h-7 px-2.5 font-heading text-sm">
+              BAL
+            </Badge>
+            {t("days:free.title")}
+          </h1>
           <p className="text-sm text-muted-foreground">{t("days:free.subtitle")}</p>
         </div>
         <HelpHint title={t("days:free.help.title")}>
