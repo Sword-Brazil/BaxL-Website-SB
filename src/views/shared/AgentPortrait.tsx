@@ -40,7 +40,7 @@ export function AgentPortrait({
 
   const { agent, uniform } = refItem;
   const unavailable = !uniform.active || !agent.active;
-  const sideRing = agent.side === "HERO" ? "ring-hero/60" : "ring-villain/60";
+  const sideRing = uniform.side === "HERO" ? "ring-hero/60" : uniform.side === "VILLAIN" ? "ring-villain/60" : "ring-border";
 
   return (
     <div className={cn("flex min-w-0 items-center gap-3", className)}>
@@ -58,7 +58,9 @@ export function AgentPortrait({
             {unavailable ? (
               <Badge variant="outline">{t("team.unavailable")}</Badge>
             ) : (
-              <Badge variant={agent.side === "HERO" ? "hero" : "villain"}>{t(`values.${agent.side}`)}</Badge>
+              uniform.side !== "UNKNOWN" && (
+                <Badge variant={uniform.side === "HERO" ? "hero" : "villain"}>{t(`values.${uniform.side}`)}</Badge>
+              )
             )}
           </div>
         </div>

@@ -44,6 +44,9 @@ function AgentRosterCard({ agent, vm, dragging }: { agent: Agent; vm: RosterVm; 
   const ownedCount = activeUniforms.filter((u) => vm.isOwned(u.id)).length;
   const isOwned = ownedCount > 0;
   const ctp = vm.equippedCtpOf(agent.id);
+  // Atributos são do traje: o cartão mostra os lados de todos os trajes e o resumo do principal.
+  const main = activeUniforms.find((u) => u.slug === "padrao") ?? activeUniforms[0] ?? agent.uniforms[0];
+  const sides = [...new Set(activeUniforms.map((u) => u.side))].filter((s) => s !== "UNKNOWN");
   const { setNodeRef, isOver } = useDroppable({ id: `agent:${agent.id}`, disabled: !isOwned });
   return (
     <li
@@ -67,13 +70,17 @@ function AgentRosterCard({ agent, vm, dragging }: { agent: Agent; vm: RosterVm; 
         <CardHeader>
           <CardTitle className="flex min-w-0 items-center justify-between gap-2">
             <span className="truncate font-heading">{agent.name}</span>
-            {agent.side !== "UNKNOWN" && (
-              <Badge variant={agent.side === "HERO" ? "hero" : "villain"}>{t(`common:values.${agent.side}`)}</Badge>
-            )}
+            <span className="flex shrink-0 gap-1">
+              {sides.map((side) => (
+                <Badge key={side} variant={side === "HERO" ? "hero" : "villain"}>
+                  {t(`common:values.${side}`)}
+                </Badge>
+              ))}
+            </span>
           </CardTitle>
           <CardDescription className="flex min-w-0 flex-wrap items-center justify-between gap-1">
             <span className="truncate">
-              {t(`common:values.${agent.species}`)} · {t(`common:values.${agent.attackType}`)}
+              {main && `${t(`common:values.${main.species}`)} · ${t(`common:values.${main.attackType}`)}`}
             </span>
             <Button
               size="xs"
@@ -98,7 +105,12 @@ function AgentRosterCard({ agent, vm, dragging }: { agent: Agent; vm: RosterVm; 
                   onPressedChange={() => vm.toggle(u.id)}
                   onClick={(e) => e.stopPropagation()}
                   variant="outline"
-                  className={cn("h-auto min-h-11 max-w-full gap-2 py-1 pr-3 pl-1", owned && "border-energy/60 bg-energy/10")}
+                  className={cn(
+                    "h-auto min-h-11 max-w-full gap-2 border-l-2 py-1 pr-3 pl-1",
+                    u.side === "HERO" ? "border-l-hero" : u.side === "VILLAIN" ? "border-l-villain" : "",
+                    owned && "border-energy/60 bg-energy/10",
+                  )}
+                  title={`${u.name} · ${t(`common:values.${u.side}`)}`}
                   aria-label={`${agent.name} — ${u.name}`}
                 >
                   <Avatar className="chamfer-sm size-9 shrink-0 rounded-none after:hidden">

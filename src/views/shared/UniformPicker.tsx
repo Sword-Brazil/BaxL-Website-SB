@@ -76,7 +76,7 @@ export function UniformPicker({
                     <Avatar
                       className={cn(
                         "chamfer-sm size-9 shrink-0 rounded-none ring-2 after:hidden",
-                        r.agent.side === "HERO" ? "ring-hero/60" : r.agent.side === "VILLAIN" ? "ring-villain/60" : "ring-border",
+                        r.uniform.side === "HERO" ? "ring-hero/60" : r.uniform.side === "VILLAIN" ? "ring-villain/60" : "ring-border",
                       )}
                     >
                       <AvatarImage src={r.uniform.portrait || undefined} alt="" loading="lazy" decoding="async" className="rounded-none" />
@@ -86,7 +86,7 @@ export function UniformPicker({
                       <span className="truncate font-medium">{r.agent.name}</span>
                       <span className="truncate text-xs text-muted-foreground">{r.uniform.name}</span>
                     </span>
-                    <span className="text-xs text-muted-foreground">{t(`values.${r.agent.side}`)}</span>
+                    <span className="text-xs text-muted-foreground">{t(`values.${r.uniform.side}`)}</span>
                     <CheckIcon className={cn(value?.uniform.id === r.uniform.id ? "opacity-100" : "opacity-0")} />
                   </CommandItem>
                 ))}

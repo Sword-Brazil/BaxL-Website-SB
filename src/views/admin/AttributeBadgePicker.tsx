@@ -14,51 +14,37 @@ export const ATTRIBUTE_FIELDS = [
 
 type Field = (typeof ATTRIBUTE_FIELDS)[number];
 
-/**
- * Uma linha de badges por atributo. Sem `inherited` (personagem): escolhe o valor, incluindo
- * "Não informado". Com `inherited` (traje): o valor herdado aparece tracejado; tocar em outro
- * valor personaliza só o traje e tocar no herdado (ou no personalizado) volta a herdar (null).
- */
+/** Uma linha de badges por atributo do traje, incluindo "Não informado" (não bloqueia restrições). */
 export function AttributeBadgePicker({
   field,
   value,
-  inherited,
   onChange,
 }: {
   field: Field;
-  value: string | null;
-  inherited?: string;
-  onChange: (value: string | null) => void;
+  value: string;
+  onChange: (value: string) => void;
 }) {
   const { t } = useTranslation("common");
-  const isUniform = inherited !== undefined;
-  const effective = value ?? inherited;
-  const options: readonly string[] = isUniform ? field.values : [...field.values, UNKNOWN];
-
-  const pick = (v: string) => {
-    if (!isUniform) return onChange(v);
-    onChange(v === value || v === inherited ? null : v);
-  };
+  const options: readonly string[] = [...field.values, UNKNOWN];
 
   return (
     <div className="flex flex-col gap-1.5">
       <span className="text-xs font-medium text-muted-foreground">{t(`attributes.${field.attr}`)}</span>
       <div className="flex flex-wrap gap-1.5" role="group" aria-label={t(`attributes.${field.attr}`)}>
         {options.map((v) => {
-          const selected = v === effective;
+          const selected = v === value;
           const icon = attributeIcon(v);
           return (
             <button
               key={v}
               type="button"
               aria-pressed={selected}
-              onClick={() => pick(v)}
+              onClick={() => onChange(v)}
               className={cn(
                 badgeVariants({ variant: selected ? (v === UNKNOWN ? "outline" : attributeVariant(v)) : "outline" }),
                 "h-7 cursor-pointer gap-1 px-2 transition-opacity",
                 icon && "pl-1",
                 !selected && "opacity-55 hover:opacity-100",
-                selected && isUniform && value === null && "border-dashed",
                 selected && v === UNKNOWN && "text-spark",
               )}
             >

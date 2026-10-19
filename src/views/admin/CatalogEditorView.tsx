@@ -9,7 +9,6 @@ import {
   SearchIcon,
   Trash2Icon,
   TriangleAlertIcon,
-  Undo2Icon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Alert, AlertTitle } from "@/components/ui/alert";
@@ -49,42 +48,15 @@ function AgentThumb({ agent }: { agent: Agent }) {
   );
 }
 
-/** Atributos do traje: herdados do personagem (tracejados) ou próprios do traje. */
+/** Atributos do traje (gênero, lado, espécie, ataque): cada traje tem os seus. */
 function UniformAttributes({ index, vm }: { index: number; vm: Vm }) {
   const { t } = useTranslation("admin");
-  const { form } = vm;
-  const own = form.watch(ATTRIBUTE_FIELDS.map((f) => `uniforms.${index}.${f.name}` as const));
-  const base = form.watch(ATTRIBUTE_FIELDS.map((f) => f.name));
-  const customized = own.some((v) => v != null);
-
+  const values = vm.form.watch(ATTRIBUTE_FIELDS.map((f) => `uniforms.${index}.${f.name}` as const));
   return (
     <div className="flex flex-col gap-2 rounded-md border border-dashed border-energy/20 p-2.5">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="text-xs font-semibold tracking-wider uppercase">{t("catalog.uniformAttributes")}</span>
-        {customized && (
-          <div className="flex items-center gap-1">
-            <Badge variant="energy">{t("catalog.customized")}</Badge>
-            <Button
-              type="button"
-              size="icon-sm"
-              variant="ghost"
-              onClick={() => ATTRIBUTE_FIELDS.forEach((f) => vm.setUniformAttribute(index, f.name, null))}
-              aria-label={t("catalog.resetAttributes")}
-              title={t("catalog.resetAttributes")}
-            >
-              <Undo2Icon />
-            </Button>
-          </div>
-        )}
-      </div>
+      <span className="text-xs font-semibold tracking-wider uppercase">{t("catalog.uniformAttributes")}</span>
       {ATTRIBUTE_FIELDS.map((f, i) => (
-        <AttributeBadgePicker
-          key={f.name}
-          field={f}
-          value={own[i] ?? null}
-          inherited={base[i]}
-          onChange={(v) => vm.setUniformAttribute(index, f.name, v)}
-        />
+        <AttributeBadgePicker key={f.name} field={f} value={values[i]} onChange={(v) => vm.setUniformAttribute(index, f.name, v)} />
       ))}
     </div>
   );
@@ -229,33 +201,37 @@ export function CatalogEditorView() {
         <ul className="flex flex-col divide-y divide-foreground/10 rounded-xl ring-1 ring-foreground/10">
           {vm.agents.map((a) => {
             const withPhoto = a.uniforms.filter((u) => u.imagePath).length;
-            const customized = a.uniforms.filter((u) => Object.values(u.overrides).some((v) => v != null)).length;
+            // Resumo pelo traje principal (Padrão ou o primeiro); os lados de todos os trajes aparecem.
+            const main = a.uniforms.find((u) => u.slug === "padrao") ?? a.uniforms[0];
+            const sides = [...new Set(a.uniforms.map((u) => u.side))].filter((s) => s !== UNKNOWN);
+            const varied = main
+              ? a.uniforms.filter((u) => ATTRIBUTE_FIELDS.some((f) => u[f.name] !== main[f.name])).length
+              : 0;
             return (
               <li key={a.id} className={cn("flex items-center gap-3 p-3", !a.active && "opacity-60")}>
                 <AgentThumb agent={a} />
                 <button type="button" className="min-w-0 flex-1 text-left" onClick={() => vm.openEdit(a)}>
                   <span className="flex min-w-0 flex-wrap items-center gap-1.5">
                     <span className="truncate font-medium">{a.name}</span>
-                    {a.side !== UNKNOWN && (
-                      <Badge variant={a.side === "HERO" ? "hero" : "villain"}>{t(`common:values.${a.side}`)}</Badge>
-                    )}
+                    {sides.map((side) => (
+                      <Badge key={side} variant={side === "HERO" ? "hero" : "villain"}>
+                        {t(`common:values.${side}`)}
+                      </Badge>
+                    ))}
                     {!a.active && <Badge variant="outline">{t("admin:catalog.inactive")}</Badge>}
                   </span>
                   <span className="mt-0.5 block truncate text-xs text-muted-foreground">
-                    {ATTRIBUTE_FIELDS.filter((f) => f.name !== "side").map((f, i) => (
-                      <span key={f.name} className={cn(a[f.name] === UNKNOWN && "text-spark")}>
-                        {i > 0 && " · "}
-                        {t(`common:values.${a[f.name]}`)}
-                      </span>
-                    ))}
+                    {main &&
+                      ATTRIBUTE_FIELDS.filter((f) => f.name !== "side").map((f, i) => (
+                        <span key={f.name} className={cn(main[f.name] === UNKNOWN && "text-spark")}>
+                          {i > 0 && " · "}
+                          {t(`common:values.${main[f.name]}`)}
+                        </span>
+                      ))}
                   </span>
                   <span className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
                     {t("admin:catalog.photos", { n: withPhoto, total: a.uniforms.length })}
-                    {customized > 0 && (
-                      <Badge variant="energy">
-                        {customized} {t("admin:catalog.customized")}
-                      </Badge>
-                    )}
+                    {varied > 0 && <Badge variant="energy">{t("admin:catalog.variedUniforms", { count: varied })}</Badge>}
                   </span>
                 </button>
                 <div className="flex shrink-0 gap-1">
@@ -329,22 +305,6 @@ export function CatalogEditorView() {
                   )}
                 />
               </div>
-              <FieldSet>
-                <FieldLegend>{t("admin:catalog.baseAttributes")}</FieldLegend>
-                <FieldDescription>{t("admin:catalog.baseAttributesHint")}</FieldDescription>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {ATTRIBUTE_FIELDS.map((f) => (
-                    <Controller
-                      key={f.name}
-                      control={form.control}
-                      name={f.name}
-                      render={({ field }) => (
-                        <AttributeBadgePicker field={f} value={field.value} onChange={(v) => field.onChange(v ?? UNKNOWN)} />
-                      )}
-                    />
-                  ))}
-                </div>
-              </FieldSet>
               <Controller
                 control={form.control}
                 name="active"
@@ -365,7 +325,7 @@ export function CatalogEditorView() {
                     {t("admin:catalog.addUniform")}
                   </Button>
                 </div>
-                <FieldDescription>{t("admin:catalog.inheritedHint")}</FieldDescription>
+                <FieldDescription>{t("admin:catalog.uniformsHint")}</FieldDescription>
                 {uniformsError && <p className="text-sm text-destructive">{translate(uniformsError)}</p>}
                 <ul className="grid gap-3 md:grid-cols-2">
                   {vm.uniforms.fields.map((u, index) => (

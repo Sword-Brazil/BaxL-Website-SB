@@ -131,12 +131,10 @@
     "slugAuto": "Generado a partir del nombre; edítalo solo si hace falta.",
     "photos": "{{n}}/{{total}} con foto",
     "quickUniform": "Uniforme",
-    "baseAttributes": "Atributos del personaje",
-    "baseAttributesHint": "Valen para todos los uniformes, salvo los que tengan atributos propios.",
     "uniformAttributes": "Atributos de este uniforme",
-    "inheritedHint": "Punteado = heredado del personaje. Toca otro valor para personalizar solo este uniforme.",
-    "customized": "Personalizado",
-    "resetAttributes": "Heredar todo del personaje"
+    "uniformsHint": "Cada traje tiene sus propios atributos (género, lado, especie y ataque): las restricciones de los días se verifican por el traje usado. Un traje nuevo empieza con los atributos del primer traje.",
+    "variedUniforms_one": "{{count}} traje con atributos distintos",
+    "variedUniforms_other": "{{count}} trajes con atributos distintos"
   },
   "ctps": {
     "title": "Catálogo de CTPs",

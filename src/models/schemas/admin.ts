@@ -105,20 +105,16 @@ export const UniformInputSchema = z.object({
   name: z.string().trim().min(1).max(80),
   imagePath: z.string().max(300), // vazio = sem imagem (mostra as iniciais)
   active: z.boolean().optional(),
-  // Atributos próprios do traje; null/ausente = herda do personagem.
-  gender: genderSchema.nullable().optional(),
-  side: sideSchema.nullable().optional(),
-  species: speciesSchema.nullable().optional(),
-  attackType: attackTypeSchema.nullable().optional(),
+  // Atributos são de cada traje (UNKNOWN = não informado; não bloqueia restrições).
+  gender: genderSchema.or(z.literal(UNKNOWN)),
+  side: sideSchema.or(z.literal(UNKNOWN)),
+  species: speciesSchema.or(z.literal(UNKNOWN)),
+  attackType: attackTypeSchema.or(z.literal(UNKNOWN)),
 });
 
 export const AgentSchema = z.object({
   slug: slugSchema,
   name: z.string().trim().min(1).max(80),
-  gender: genderSchema.or(z.literal(UNKNOWN)),
-  side: sideSchema.or(z.literal(UNKNOWN)),
-  species: speciesSchema.or(z.literal(UNKNOWN)),
-  attackType: attackTypeSchema.or(z.literal(UNKNOWN)),
   active: z.boolean().optional(),
   uniforms: z
     .array(UniformInputSchema)

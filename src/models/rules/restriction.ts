@@ -1,5 +1,5 @@
 import { UNKNOWN, type CriterionAttribute } from "@/models/domain/enums";
-import type { Criterion, RestrictableAttributes, UniformOverrides } from "@/models/domain/types";
+import type { Criterion, RestrictableAttributes } from "@/models/domain/types";
 
 const FIELD: Record<CriterionAttribute, keyof RestrictableAttributes> = {
   GENDER: "gender",
@@ -9,19 +9,6 @@ const FIELD: Record<CriterionAttribute, keyof RestrictableAttributes> = {
 };
 
 export const RESTRICTABLE_FIELDS = Object.values(FIELD);
-
-/** Atributos efetivos de um traje: os próprios ou, se não tiver, os do personagem. */
-export function resolveAttributes(
-  agent: RestrictableAttributes,
-  overrides: Partial<UniformOverrides>,
-): RestrictableAttributes {
-  return {
-    gender: overrides.gender ?? agent.gender,
-    side: overrides.side ?? agent.side,
-    species: overrides.species ?? agent.species,
-    attackType: overrides.attackType ?? agent.attackType,
-  };
-}
 
 /**
  * Regra "E": o traje atende ao dia se atender a todos os critérios. Sem critérios = sem restrição.

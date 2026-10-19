@@ -109,16 +109,24 @@ describe("AgentSchema", () => {
     const ok = {
       slug: "scarlet-witch",
       name: "Scarlet Witch",
-      gender: "FEMALE",
-      side: "HERO",
-      species: "MUTANT",
-      attackType: "UNIVERSAL",
-      uniforms: [{ slug: "padrao", name: "Padrão", imagePath: "/assets/agents/scarlet-witch/padrao.png" }],
+      uniforms: [
+        {
+          slug: "padrao",
+          name: "Padrão",
+          imagePath: "/assets/agents/scarlet-witch/padrao.png",
+          gender: "FEMALE",
+          side: "HERO",
+          species: "MUTANT",
+          attackType: "UNIVERSAL",
+        },
+      ],
     };
     expect(AgentSchema.safeParse(ok).success).toBe(true);
     expect(AgentSchema.safeParse({ ...ok, slug: "Scarlet Witch" }).success).toBe(false);
     expect(AgentSchema.safeParse({ ...ok, name: "" }).success).toBe(false);
     expect(AgentSchema.safeParse({ ...ok, uniforms: [] }).success).toBe(false);
+    // Atributos são do traje: valor inválido no traje é recusado.
+    expect(AgentSchema.safeParse({ ...ok, uniforms: [{ ...ok.uniforms[0], side: "NEUTRO" }] }).success).toBe(false);
   });
 });
 

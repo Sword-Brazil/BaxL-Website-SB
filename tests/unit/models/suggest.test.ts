@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import type { Agent, Criterion, PriorityLists } from "@/models/domain/types";
 import { suggestTeam } from "@/models/rules/suggest";
 
-const NO_OVERRIDES = { gender: null, side: null, species: null, attackType: null };
 
 const agent = (id: string, side: "HERO" | "VILLAIN" = "HERO"): Agent => {
   const attrs = { gender: "MALE", side, species: "HUMAN", attackType: "COMBAT" } as const;
@@ -10,7 +9,6 @@ const agent = (id: string, side: "HERO" | "VILLAIN" = "HERO"): Agent => {
     id,
     slug: id,
     name: id,
-    ...attrs,
     active: true,
     uniforms: [
       {
@@ -22,7 +20,6 @@ const agent = (id: string, side: "HERO" | "VILLAIN" = "HERO"): Agent => {
         portrait: "",
         active: true,
         ...attrs,
-        overrides: NO_OVERRIDES,
       },
     ],
   };
