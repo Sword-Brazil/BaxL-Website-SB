@@ -19,14 +19,14 @@ export function CtpBadge({
 }: {
   ctp: Ctp | null;
   typeOnly?: boolean;
-  size?: "xs" | "sm" | "md";
+  size?: "xs" | "sm" | "md" | "lg";
   className?: string;
 }) {
   const { t } = useTranslation("common");
   if (!ctp) return null;
   const name = t(`ctp.${ctp.type}`);
   const label = typeOnly ? name : `${name} · ${t(`quality.${ctp.quality}`)}`;
-  const dim = { xs: "size-5", sm: "size-6", md: "size-8" }[size];
+  const dim = { xs: "size-5", sm: "size-6", md: "size-8", lg: "size-9" }[size];
   return (
     <Tooltip>
       <TooltipTrigger asChild>

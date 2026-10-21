@@ -97,7 +97,7 @@ export function MemberChip({
             <AvatarFallback className="rounded-none bg-secondary font-heading text-sm text-secondary-foreground">{initials(agent.name)}</AvatarFallback>
           </Avatar>
         </div>
-        {ctp && <CtpBadge ctp={ctp} typeOnly={ctpTypeOnly} size="xs" className="absolute -right-1.5 -bottom-1.5" />}
+        {ctp && <CtpBadge ctp={ctp} typeOnly={ctpTypeOnly} size={leader ? "lg" : "md"} className="absolute -right-3 -bottom-1" />}
         {damageDealer && (
           <span
             className="absolute -top-1.5 -right-1.5 flex size-4 items-center justify-center rounded-full bg-spark text-background ring-2 ring-card"
