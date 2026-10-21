@@ -39,10 +39,12 @@
     "credit": "Calendário e equipes de base: Guia BAX/BAL/BAI (guiabaxbal.web.app), com curadoria da Sword Brasil.",
     "support": {
       "dev": "Desenvolvido e mantido por um único dev.",
-      "text": "Quer ajudar no Pack Stark? Pix:",
+      "text": "Quer ajudar no Pack Stark? Faça um Pix:",
       "copy": "Copiar chave",
       "copied": "Chave Pix copiada.",
-      "copyFailed": "Não foi possível copiar. Selecione a chave e copie manualmente."
+      "copyFailed": "Não foi possível copiar. Selecione a chave e copie manualmente.",
+      "button": "Apoiar",
+      "keyType": "Celular"
     }
   },
   "team": {

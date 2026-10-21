@@ -28,7 +28,7 @@ import { FontSizeMenu } from "./FontSizeMenu";
 import { SecurityNotices } from "./SecurityNotices";
 import { NicknameMenu } from "./NicknameMenu";
 import { SelectionsSyncDialog } from "./SelectionsSyncDialog";
-import { SupportFooter } from "./SupportFooter";
+import { SupportButton, SupportFooter } from "./SupportFooter";
 
 const NAV = [
   { href: "/", key: "battle" },
@@ -231,6 +231,7 @@ export function AppLayout({ title, children, wide = false }: { title?: string; c
             )}
 
             <div className="ml-auto flex items-center gap-1">
+              {isLoggedIn && <SupportButton />}
               <LanguageMenu className="hidden sm:inline-flex" />
               <FontSizeMenu className="hidden sm:inline-flex" />
               <ThemeToggle className="hidden sm:inline-flex" />

@@ -39,10 +39,12 @@
     "credit": "Base calendar and teams: Guia BAX/BAL/BAI (guiabaxbal.web.app), curated by Sword Brazil.",
     "support": {
       "dev": "Built and maintained by a single developer.",
-      "text": "Want to help with the Stark Pack? Pix (Brazil):",
+      "text": "Want to help with the Stark Pack? Send a Pix (Brazil):",
       "copy": "Copy key",
       "copied": "Pix key copied.",
-      "copyFailed": "Couldn't copy. Select the key and copy it manually."
+      "copyFailed": "Couldn't copy. Select the key and copy it manually.",
+      "button": "Support",
+      "keyType": "Phone"
     }
   },
   "team": {

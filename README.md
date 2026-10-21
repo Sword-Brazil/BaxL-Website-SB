@@ -43,7 +43,6 @@ Variáveis em `.env.local`:
 | `SUPABASE_STORAGE_BUCKET` | Bucket público das imagens (padrão `assets`). |
 | `SESSION_SECRET` | ≥ 32 caracteres aleatórios. Sem ele o servidor não inicia. |
 | `SEED_ADMIN_USERNAME` / `SEED_ADMIN_PASSWORD` | Administrador padrão (ex.: `Sword Menezes`). Ele cria as demais contas. |
-| `NEXT_PUBLIC_PIX_KEY` / `NEXT_PUBLIC_PIX_KEY_TYPE` | Opcional: chave Pix (e o rótulo, ex.: `CNPJ`) mostrada no rodapé com botão de copiar. Entra no build: depois de mudar na Vercel, faça *Redeploy*. |
 
 Rodar `npm run db:seed` de novo é seguro: ele não duplica nada e atualiza a senha do administrador.
 
