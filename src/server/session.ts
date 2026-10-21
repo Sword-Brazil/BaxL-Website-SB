@@ -1,9 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getIronSession, type SessionOptions } from "iron-session";
+import { getIronSession } from "iron-session";
 import type { Role } from "@/models/domain/enums";
 import type { SessionUser } from "@/models/domain/types";
 import { prisma } from "@/server/db";
 import { HttpError } from "@/server/http";
+import { sessionOptions } from "@/server/sessionOptions";
 
 export interface SessionData {
   userId?: string;
@@ -13,30 +14,12 @@ export interface SessionData {
   loginAt?: string;
 }
 
-function sessionOptions(): SessionOptions {
-  const password = process.env.SESSION_SECRET;
-  if (!password || password.length < 32) {
-    throw new Error("SESSION_SECRET ausente ou com menos de 32 caracteres. Configure em .env.local.");
-  }
-  return {
-    password,
-    cookieName: "mff_session",
-    ttl: 60 * 60 * 24 * 30, // 30 dias
-    cookieOptions: {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-    },
-  };
-}
-
 export function getSession(req: NextApiRequest, res: NextApiResponse) {
   return getIronSession<SessionData>(req, res, sessionOptions());
 }
 
-export function toSessionUser(u: { id: string; username: string | null; email: string | null; nickname: string | null; role: string }): SessionUser {
-  return { id: u.id, username: u.username, email: u.email, nickname: u.nickname, role: u.role as Role };
+export function toSessionUser(u: { id: string; username: string; nickname: string | null; role: string }): SessionUser {
+  return { id: u.id, username: u.username, nickname: u.nickname, role: u.role as Role };
 }
 
 /** Usuário da sessão, lido do banco a cada requisição (mudança de papel vale na hora). */

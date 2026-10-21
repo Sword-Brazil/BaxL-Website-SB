@@ -11,12 +11,12 @@ const PAGE_SIZE = 20;
 
 export async function listUsers({ q, page = 1 }: { q?: string; page?: number }) {
   const contains = { contains: q ?? "", mode: "insensitive" as const };
-  const where = q ? { OR: [{ username: contains }, { email: contains }, { nickname: contains }] } : {};
+  const where = q ? { OR: [{ username: contains }, { nickname: contains }] } : {};
   const [total, rows] = await Promise.all([
     prisma.user.count({ where }),
     prisma.user.findMany({
       where,
-      orderBy: [{ role: "asc" }, { username: { sort: "asc", nulls: "last" } }, { email: "asc" }],
+      orderBy: [{ role: "asc" }, { username: "asc" }],
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
     }),
@@ -31,30 +31,18 @@ export async function listUsers({ q, page = 1 }: { q?: string; page?: number }) 
 
 /** Cadastro de contas (jogadores, curadores e administradores): só um Administrador cria. */
 export async function createUser(input: CreateUserInput) {
-  const username = input.username?.trim().toLowerCase() || null;
-  const email = input.email?.trim().toLowerCase() || null;
-  if (!username && !email) throw new HttpError(400, "VALIDATION_ERROR", "Informe um nome de usuário ou um e-mail");
-  if (username && (await prisma.user.findUnique({ where: { username } }))) {
+  const username = input.username.trim().toLowerCase().replace(/\s+/g, " ");
+  if (await prisma.user.findUnique({ where: { username } })) {
     throw new HttpError(409, "CONFLICT", "Nome de usuário já cadastrado");
-  }
-  if (email && (await prisma.user.findUnique({ where: { email } }))) {
-    throw new HttpError(409, "CONFLICT", "E-mail já cadastrado");
   }
   try {
     const user = await prisma.user.create({
-      data: {
-        username,
-        email,
-        passwordHash: await hashPassword(input.password),
-        nickname: input.nickname || null,
-        role: input.role,
-        emailVerifiedAt: email ? new Date() : null,
-      },
+      data: { username, passwordHash: await hashPassword(input.password), nickname: input.nickname || null, role: input.role },
     });
     return toSessionUser(user);
   } catch (e) {
     // Outro administrador criou a mesma conta ao mesmo tempo.
-    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") throw new HttpError(409, "CONFLICT", "Conta já cadastrada");
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") throw new HttpError(409, "CONFLICT", "Nome de usuário já cadastrado");
     throw e;
   }
 }

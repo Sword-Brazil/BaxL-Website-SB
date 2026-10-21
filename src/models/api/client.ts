@@ -1,3 +1,4 @@
+import Router from "next/router";
 import type { ApiErrorBody } from "@/models/schemas/common";
 
 export class ApiError extends Error {
@@ -24,6 +25,10 @@ export async function apiFetch<T>(url: string, init: Omit<RequestInit, "body"> &
   const data = await res.json().catch(() => null);
   if (!res.ok) {
     const err = (data as ApiErrorBody | null)?.error;
+    // Site privado: sessão expirada (ou removida) em qualquer chamada leva de volta ao login.
+    if (res.status === 401 && !url.startsWith("/api/auth/") && typeof window !== "undefined" && Router.pathname !== "/entrar") {
+      void Router.push({ pathname: "/entrar", query: { next: Router.asPath } });
+    }
     throw new ApiError(res.status, err?.code ?? "INTERNAL_ERROR", err?.message ?? res.statusText, err?.fields);
   }
   return data as T;

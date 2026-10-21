@@ -20,27 +20,22 @@ const prisma = new PrismaClient();
  */
 const CYCLE_ANCHOR = new Date("2026-10-01T15:00:00.000Z");
 
-/**
- * Administrador padrão: entra com SEED_ADMIN_USERNAME (ex.: "Sword Menezes", sem diferenciar
- * maiúsculas) e/ou SEED_ADMIN_EMAIL. Se a conta já existe (por um dos dois), atualiza a senha.
- */
+/** Administrador padrão: SEED_ADMIN_USERNAME (ex.: "Sword Menezes") + SEED_ADMIN_PASSWORD. Se já existe, atualiza a senha. */
 async function seedAdmin() {
-  const display = process.env.SEED_ADMIN_USERNAME?.trim().replace(/\s+/g, " ") || null;
-  const username = display?.toLowerCase() ?? null;
-  const email = process.env.SEED_ADMIN_EMAIL?.trim().toLowerCase() || null;
+  const display = process.env.SEED_ADMIN_USERNAME?.trim().replace(/\s+/g, " ");
   const password = process.env.SEED_ADMIN_PASSWORD;
-  if ((!username && !email) || !password) {
-    console.warn("⚠ Defina SEED_ADMIN_USERNAME (ou SEED_ADMIN_EMAIL) e SEED_ADMIN_PASSWORD em .env.local; administrador não criado.");
+  if (!display || !password) {
+    console.warn("⚠ Defina SEED_ADMIN_USERNAME e SEED_ADMIN_PASSWORD em .env.local; administrador não criado.");
     return;
   }
+  const username = display.toLowerCase();
   const passwordHash = await bcrypt.hash(password, 12);
-  const existing = await prisma.user.findFirst({
-    where: { OR: [...(username ? [{ username }] : []), ...(email ? [{ email }] : [])] },
+  await prisma.user.upsert({
+    where: { username },
+    update: { passwordHash, role: "ADMIN" satisfies Role },
+    create: { username, passwordHash, role: "ADMIN" satisfies Role, nickname: display },
   });
-  const data = { username, email, passwordHash, role: "ADMIN" satisfies Role, nickname: display, emailVerifiedAt: email ? new Date() : null };
-  if (existing) await prisma.user.update({ where: { id: existing.id }, data: { ...data, nickname: existing.nickname ?? display } });
-  else await prisma.user.create({ data });
-  console.log(`✔ Administrador: ${display ?? email}${display && email ? ` (${email})` : ""}`);
+  console.log(`✔ Administrador: ${display}`);
 }
 
 /** Ícone de cada tipo de CTP, com a extensão do arquivo em public/assets/ctp (manifesto de imagens). */

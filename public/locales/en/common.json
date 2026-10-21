@@ -172,10 +172,8 @@
   },
   "validation": {
     "passwordRequired": "Enter your password",
-    "loginRequired": "Enter your username or e-mail",
+    "loginRequired": "Enter your username",
     "usernameFormat": "Use 3 to 30 letters, digits, space, dot, hyphen or underscore",
-    "accountIdRequired": "Enter a username or an e-mail",
-    "emailInvalid": "Invalid e-mail",
     "passwordMin": "At least 8 characters",
     "passwordLower": "Must contain a lowercase letter",
     "passwordUpper": "Must contain an uppercase letter",
@@ -222,15 +220,15 @@
       },
       "PASSWORD_RESET": {
         "title": "Password reset",
-        "text": "Your account password was reset on {{date}}. If the account has an e-mail, we also sent you one."
+        "text": "Your account password was reset on {{date}}."
       },
       "ROLE_CHANGED": {
         "title": "Account role changed",
-        "text": "Your account now has the {{role}} role (changed on {{date}}). If the account has an e-mail, we also sent you one."
+        "text": "Your account now has the {{role}} role (changed on {{date}})."
       },
       "ACCOUNT_LOCKED": {
         "title": "Account temporarily locked",
-        "text": "Sign-in was locked for a few minutes on {{date}} after too many wrong password attempts. If the account has an e-mail, we also sent you one."
+        "text": "Sign-in was locked for a few minutes on {{date}} after too many wrong password attempts."
       }
     }
   },

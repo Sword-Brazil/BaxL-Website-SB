@@ -4,6 +4,7 @@ import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/ca
 import { withTranslations } from "@/lib/pageProps";
 import { useAuthViewModel } from "@/viewmodels/useAuthViewModel";
 import { AdminLayout } from "@/views/admin/AdminLayout";
+import { displayName } from "@/models/domain/types";
 
 export const getStaticProps = withTranslations(["admin"]);
 
@@ -23,7 +24,7 @@ export default function AdminHome() {
   const { user, isAdmin } = useAuthViewModel();
   return (
     <AdminLayout title={t("nav.overview")} subtitle={t("overview.text")}>
-      <p className="font-heading text-lg">{t("overview.welcome", { name: user?.nickname ?? user?.email ?? "" })}</p>
+      <p className="font-heading text-lg">{t("overview.welcome", { name: user ? displayName(user) : "" })}</p>
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {SECTIONS.filter((s) => !("adminOnly" in s) || isAdmin).map((s) => (
           <li key={s.href}>

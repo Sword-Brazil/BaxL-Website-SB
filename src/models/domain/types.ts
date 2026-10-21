@@ -125,16 +125,14 @@ export interface Settings {
 
 export interface SessionUser {
   id: string;
-  /** Login dos jogadores (contas criadas por um Administrador). */
-  username: string | null;
-  /** Login da curadoria; também recebe os avisos críticos por e-mail. */
-  email: string | null;
+  /** Login (com a senha). Contas são criadas por um Administrador. */
+  username: string;
   nickname: string | null;
   role: Role;
 }
 
-/** Nome para exibir: apelido, senão usuário, senão e-mail. */
-export const displayName = (u: Pick<SessionUser, "nickname" | "username" | "email">) => u.nickname || u.username || u.email || "";
+/** Nome para exibir: apelido, senão o nome de usuário. */
+export const displayName = (u: Pick<SessionUser, "nickname" | "username">) => u.nickname || u.username;
 
 export interface BattleClock {
   /** Dia do ciclo (1–28). Muda somente na virada diária (12:00 BRT). */

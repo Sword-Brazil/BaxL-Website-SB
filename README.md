@@ -41,8 +41,7 @@ Variáveis em `.env.local`:
 | `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` | Storage das imagens enviadas (chave secreta, só no servidor). Sem elas, no ambiente local, os uploads vão para `public/assets/uploads`. |
 | `SUPABASE_STORAGE_BUCKET` | Bucket público das imagens (padrão `assets`). |
 | `SESSION_SECRET` | ≥ 32 caracteres aleatórios. Sem ele o servidor não inicia. |
-| `SEED_ADMIN_USERNAME` / `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` | Administrador padrão (ex.: usuário `Sword Menezes`). O e-mail é opcional. |
-| `APP_URL` | URL pública do site (links dos avisos por e-mail). |
+| `SEED_ADMIN_USERNAME` / `SEED_ADMIN_PASSWORD` | Administrador padrão (ex.: `Sword Menezes`). Ele cria as demais contas. |
 
 Rodar `npx prisma db seed` de novo é seguro: ele não duplica nada e atualiza a senha do administrador.
 
@@ -64,20 +63,21 @@ Rodar `npx prisma db seed` de novo é seguro: ele não duplica nada e atualiza a
 
 ## Uso
 
-- **Público** (sem login): `/` é a tela central da Batalha de Aliança, com os 28 dias, BAX e BAL lado
+- **Site privado da aliança**: sem login, nada é exibido além de `/entrar` (páginas e APIs exigem
+  sessão). Todo login é **nome de usuário + senha** (sem e-mail).
+- **Membros**: `/` é a tela central da Batalha de Aliança, com os 28 dias, BAX e BAL lado
   a lado (Meta e Alternativa), a BAI ocupando o dia inteiro e o dia atual destacado. Também há
   `/meu-elenco` (personagens, trajes e CTPs equipados), `/estatisticas` (gráficos) e `/bal/livre`.
-- **Contas**: só Administradores criam contas (jogadores entram com nome de usuário; curadoria pode usar
-  o e-mail) e trocam senhas de quem esqueceu, em `/admin/usuarios`. Logado, o elenco, as equipes, os
-  CTPs e o nome no jogo ficam na conta e iguais em todo aparelho. Sem entrar, tudo fica no aparelho.
+- **Contas**: só Administradores criam contas e trocam senhas de quem esqueceu, em `/admin/usuarios`.
+  O elenco, as equipes, os CTPs e o nome no jogo ficam na conta e iguais em todo aparelho; ao sair,
+  o aparelho é limpo.
 - **Admin** (`/admin`, Curadores e Administradores): restrições dos dias, equipes Meta, listas de
   prioridade, catálogo e imagens, e chefes da BAI. Usuários e configurações do calendário são só para
   Administradores.
 - **Calendário** (horário de Brasília): o dia vira às 12h, o reset semanal da pontuação é às 22h e o
   3º dia de cada semana é a BAI. Ajuste a âncora do ciclo em `/admin/config` se o "Dia atual" estiver
   diferente do jogo.
-- **E-mail**: ainda sem provedor de envio. Os avisos críticos (senha trocada, papel alterado, bloqueio)
-  aparecem no app e no log do servidor.
+- **Avisos de segurança** (novo login, senha trocada, papel alterado, bloqueio) aparecem no app.
 
 ## Deploy (Vercel + Supabase)
 
@@ -90,7 +90,7 @@ Rodar `npx prisma db seed` de novo é seguro: ele não duplica nada e atualiza a
    lê nem grava nada; só o app (Prisma) acessa.
 3. **Vercel**: importe o repositório (branch `master`), framework Next.js, e cadastre em *Environment
    Variables* (Production): `DATABASE_URL`, `DIRECT_URL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`,
-   `SUPABASE_STORAGE_BUCKET`, `SESSION_SECRET` (um novo, só da produção) e `APP_URL`. Em *Settings →
+   `SUPABASE_STORAGE_BUCKET` e `SESSION_SECRET` (um novo, só da produção). Em *Settings →
    Functions*, escolha a região da Vercel mais perto do banco: `gru1` para Supabase em São Paulo,
    `iad1` para `us-east-1`.
 4. **Migrações futuras**: rode `npm run db:deploy` contra o Supabase antes (ou junto) do deploy

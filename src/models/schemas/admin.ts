@@ -5,7 +5,6 @@ import {
   criterionAttributeSchema,
   dayModeSchema,
   dayNumberSchema,
-  emailSchema,
   genderSchema,
   idSchema,
   passwordSchema,
@@ -132,19 +131,13 @@ export const SettingsSchema = z.object({
 });
 export type SettingsInput = z.infer<typeof SettingsSchema>;
 
-/**
- * Conta criada por um Administrador (não há cadastro aberto). Jogadores costumam ter só nome de
- * usuário; curadores e administradores, e-mail (recebem os avisos críticos por e-mail).
- */
-export const CreateUserSchema = z
-  .object({
-    username: z.union([z.literal(""), usernameSchema]).optional(),
-    email: z.union([z.literal(""), emailSchema]).optional(),
-    password: passwordSchema,
-    nickname: z.string().trim().max(30).optional(),
-    role: z.enum(["USER", "CURATOR", "ADMIN"]),
-  })
-  .refine((v) => !!v.username || !!v.email, { message: VALIDATION.accountIdRequired, path: ["username"] });
+/** Conta criada por um Administrador (não há cadastro aberto): nome de usuário + senha forte. */
+export const CreateUserSchema = z.object({
+  username: usernameSchema,
+  password: passwordSchema,
+  nickname: z.string().trim().max(30).optional(),
+  role: z.enum(["USER", "CURATOR", "ADMIN"]),
+});
 export type CreateUserInput = z.infer<typeof CreateUserSchema>;
 
 export const ChangeRoleSchema = z.object({ role: z.enum(["USER", "CURATOR", "ADMIN"]) });

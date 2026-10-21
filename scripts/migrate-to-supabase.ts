@@ -73,6 +73,9 @@ async function uploadImages(): Promise<Map<string, string>> {
   return urls;
 }
 
+const tableHasColumn = (db: DatabaseSync, table: string, column: string) =>
+  (db.prepare(`PRAGMA table_info("${table}")`).all() as { name: string }[]).some((c) => c.name === column);
+
 /** Converte uma linha do SQLite (datas em ms, booleanos 0/1) para o formato do Prisma. */
 function convert(model: Prisma.DMMF.Model, row: Record<string, unknown>, urls: Map<string, string>) {
   const out: Record<string, unknown> = {};
@@ -124,7 +127,15 @@ async function main() {
     for (const name of MODELS) {
       if (!tables.has(name)) continue;
       const model = models.get(name)!;
-      const rows = sqlite.prepare(`SELECT * FROM "${name}"`).all() as Record<string, unknown>[];
+      let rows = sqlite.prepare(`SELECT * FROM "${name}"`).all() as Record<string, unknown>[];
+      // Login é só por nome de usuário: contas antigas sem ele (só com e-mail) não vêm; o que
+      // dependia delas fica sem autor (MetaTeam) ou não é copiado (avisos e seleções).
+      const users = new Set(
+        (sqlite.prepare(`SELECT id FROM "User" WHERE ${tableHasColumn(sqlite, "User", "username") ? `"username" IS NOT NULL` : "0"}`).all() as { id: string }[]).map((u) => u.id),
+      );
+      if (name === "User") rows = rows.filter((r) => users.has(String(r.id)));
+      if (name === "SecurityNotice" || name === "UserSelectionsDoc") rows = rows.filter((r) => users.has(String(r.userId)));
+      if (name === "MetaTeam") rows = rows.map((r) => (r.updatedById && !users.has(String(r.updatedById)) ? { ...r, updatedById: null } : r));
       const data = rows.map((r) => convert(model, r, urls));
       const delegate = delegateOf(name);
       let created = 0;

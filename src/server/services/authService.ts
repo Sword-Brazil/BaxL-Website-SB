@@ -12,7 +12,7 @@ const LOCK_MS = 15 * 60_000;
 /** A partir de quantas falhas seguidas o dono da conta recebe o aviso de tentativas. */
 const WARN_FAILURES = 3;
 
-/** Hash usado quando o e-mail não existe, para o tempo de resposta não revelar contas. */
+/** Hash usado quando o usuário não existe, para o tempo de resposta não revelar contas. */
 const DUMMY_HASH = bcrypt.hashSync("dummy-password-0", BCRYPT_COST);
 
 export const hashPassword = (password: string) => bcrypt.hash(password, BCRYPT_COST);
@@ -20,23 +20,23 @@ export const hashPassword = (password: string) => bcrypt.hash(password, BCRYPT_C
 const invalidCredentials = () => new HttpError(401, "UNAUTHENTICATED", "Usuário ou senha incorretos");
 
 /**
- * Login por nome de usuário (jogadores) ou e-mail (curadoria) e senha, com limite de tentativas
- * por `login|ip`: 5 falhas em 15 min → bloqueio de 15 min. Contas só são criadas por um
+ * Login por nome de usuário e senha, com limite de tentativas por `usuário|ip`: 5 falhas em
+ * 15 min → bloqueio de 15 min. Contas só são criadas por um
  * Administrador, que também é quem troca a senha de quem a esqueceu.
- * Avisa o dono da conta: 3 falhas → aviso de tentativas; bloqueio → e-mail + aviso;
+ * Avisa o dono da conta: 3 falhas → aviso de tentativas; bloqueio → aviso;
  * login certo → aviso de "novo login" nas outras sessões (`sessionId` é a sessão que entrou).
  */
-export async function login(input: { login: string; password: string; ip: string; sessionId?: string; now?: Date }): Promise<SessionUser> {
+export async function login(input: { username: string; password: string; ip: string; sessionId?: string; now?: Date }): Promise<SessionUser> {
   const now = input.now ?? new Date();
-  const login = input.login.trim().toLowerCase();
-  const key = `${login}|${input.ip}`;
+  const username = input.username.trim().toLowerCase().replace(/\s+/g, " ");
+  const key = `${username}|${input.ip}`;
 
   const attempt = await userRepository.getAttempt(key);
   if (attempt?.lockedUntil && attempt.lockedUntil > now) {
     throw new HttpError(429, "RATE_LIMITED", "Muitas tentativas. Tente novamente em alguns minutos.");
   }
 
-  const user = await userRepository.findByLogin(login);
+  const user = await userRepository.findByUsername(username);
   const ok = await bcrypt.compare(input.password, user?.passwordHash ?? DUMMY_HASH);
 
   // Conta inexistente e senha errada têm a mesma resposta (não revela quais contas existem).

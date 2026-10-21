@@ -51,8 +51,6 @@ export const usernameSchema = z
   .transform((s) => s.replace(/\s+/g, " "))
   .pipe(z.string().regex(/^[a-z0-9][a-z0-9 ._-]{1,28}[a-z0-9]$/, { message: VALIDATION.usernameFormat }));
 
-export const emailSchema = z.string().trim().toLowerCase().pipe(z.email({ message: VALIDATION.emailInvalid }));
-
 /** Senha nova (criada ou trocada por um administrador): forte. O login aceita qualquer senha já salva. */
 export const passwordSchema = z
   .string()

@@ -152,7 +152,7 @@ function AccountMenu() {
         <DropdownMenuItem
           onSelect={async () => {
             await logout();
-            if (router.pathname.startsWith("/admin")) router.push("/");
+            router.push("/entrar");
           }}
         >
           <LogOutIcon />

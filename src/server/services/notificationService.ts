@@ -8,7 +8,6 @@ import {
 } from "@/models/domain/securityEvents";
 import { prisma } from "@/server/db";
 import { HttpError } from "@/server/http";
-import { appUrl, getMailService, type SecurityMailKind } from "./mailService";
 
 export interface SecurityEvent {
   type: NoticeEventType;
@@ -18,27 +17,14 @@ export interface SecurityEvent {
   originSessionId?: string;
 }
 
-/** Página indicada no e-mail crítico (o login da curadoria). */
-const MAIL_LINK: Record<SecurityMailKind, string> = {
-  PASSWORD_RESET: "/entrar",
-  ROLE_CHANGED: "/admin",
-  ACCOUNT_LOCKED: "/entrar",
-};
-
 /**
  * Ponto único das notificações de segurança no servidor (FN-001, FN-002): o canal vem do
- * catálogo pela gravidade do evento. Atenção → aviso persistente; crítico → aviso + e-mail.
+ * catálogo pela gravidade do evento. Atenção e crítico → aviso persistente no app.
  * Os eventos informativos (toast) são só do cliente (src/viewmodels/useNotify.ts).
  */
 export async function notify(event: SecurityEvent) {
   const channels = channelsOf(event.type);
   if (channels.includes("banner")) await openNotice(event);
-  if (channels.includes("email")) {
-    const user = await prisma.user.findUnique({ where: { id: event.userId }, select: { email: true } });
-    const kind = event.type as SecurityMailKind;
-    // Jogadores podem não ter e-mail: ficam só com o aviso no app.
-    if (user?.email) await getMailService().send(user.email, kind, `${appUrl()}${MAIL_LINK[kind]}`);
-  }
 }
 
 const pending = new Set<Promise<void>>();
