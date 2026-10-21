@@ -6,7 +6,7 @@ import { mergeDecision } from "@/models/rules/selectionsSync";
 import type { UserSelections } from "@/models/schemas/selections";
 import { useSelectionsStore } from "./stores/selectionsStore";
 import { useAuthViewModel } from "./useAuthViewModel";
-import { useNotify } from "./useNotify";
+import { useNotify, useNotifyError } from "./useNotify";
 
 const DEBOUNCE_MS = 2000;
 
@@ -21,6 +21,7 @@ export function useSelectionsSyncViewModel() {
   const { user } = useAuthViewModel();
   const qc = useQueryClient();
   const notify = useNotify();
+  const notifyError = useNotifyError();
   const { doc, hydrated, syncUserId, syncBase, syncedLocalAt, replaceAll, markSynced } = useSelectionsStore();
   const [conflict, setConflict] = useState<UserSelections | null>(null);
   const checkedFor = useRef<string | null>(null);
@@ -47,9 +48,16 @@ export function useSelectionsSyncViewModel() {
 
       switch (mergeDecision(state.doc, remote)) {
         case "UPLOAD_LOCAL": {
-          const saved = await putRemoteSelections(state.doc, remote?.updatedAt ?? null);
-          markSynced(saved.updatedAt, user.id);
-          notify("SELECTIONS_SYNCED");
+          try {
+            const saved = await putRemoteSelections(state.doc, remote?.updatedAt ?? null);
+            markSynced(saved.updatedAt, user.id);
+            notify("SELECTIONS_SYNCED");
+          } catch (e) {
+            // Outro aparelho salvou na conta ao mesmo tempo: pergunta qual versão manter.
+            const latest = e instanceof ApiError && e.status === 409 ? await getRemoteSelections().catch(() => null) : null;
+            if (latest) setConflict(latest);
+            else notifyError(e);
+          }
           break;
         }
         case "USE_REMOTE":
@@ -65,7 +73,7 @@ export function useSelectionsSyncViewModel() {
           break;
       }
     })();
-  }, [hydrated, user, replaceAll, markSynced, notify, qc]);
+  }, [hydrated, user, replaceAll, markSynced, notify, notifyError, qc]);
 
   // Envio das mudanças locais (debounce).
   const dirty = doc.updatedAt !== syncedLocalAt;
@@ -79,24 +87,29 @@ export function useSelectionsSyncViewModel() {
         if (e instanceof ApiError && e.status === 409) {
           const remote = await getRemoteSelections().catch(() => null);
           if (remote) setConflict(remote);
-        } else if (e instanceof ApiError && e.status === 401) {
-          qc.setQueryData(["me"], null);
-          notify("SESSION_EXPIRED");
+        } else {
+          // Sessão encerrada, sem conexão etc.: o padrão de erros decide como avisar.
+          if (e instanceof ApiError && e.status === 401) qc.setQueryData(["me"], null);
+          notifyError(e);
         }
       }
     }, DEBOUNCE_MS);
     return () => clearTimeout(id);
-  }, [user, syncUserId, syncBase, dirty, doc, conflict, markSynced, qc, notify]);
+  }, [user, syncUserId, syncBase, dirty, doc, conflict, markSynced, qc, notify, notifyError]);
 
   return {
     conflict: !!conflict,
     /** Mantém o que está no aparelho e sobrescreve a conta. */
     keepLocal: async () => {
       if (!user || !conflict) return;
-      const saved = await putRemoteSelections(useSelectionsStore.getState().doc, conflict.updatedAt);
-      markSynced(saved.updatedAt, user.id);
-      setConflict(null);
-      notify("SELECTIONS_SYNCED");
+      try {
+        const saved = await putRemoteSelections(useSelectionsStore.getState().doc, conflict.updatedAt);
+        markSynced(saved.updatedAt, user.id);
+        setConflict(null);
+        notify("SELECTIONS_SYNCED");
+      } catch (e) {
+        notifyError(e);
+      }
     },
     /** Usa o que está na conta e substitui o aparelho. */
     keepRemote: () => {

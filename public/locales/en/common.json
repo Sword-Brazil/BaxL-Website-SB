@@ -275,5 +275,47 @@
     },
     "show": "Show password",
     "hide": "Hide password"
+  },
+  "errors": {
+    "NETWORK": {
+      "title": "Can't reach the server",
+      "text": "Check your internet. What you marked on this device is not lost; try again when you're back online."
+    },
+    "DATABASE": {
+      "title": "Can't reach the database",
+      "text": "The server couldn't access the data right now. Try again in a moment; if it keeps happening, tell an administrator."
+    },
+    "SERVER": {
+      "title": "Server error",
+      "text": "Something went wrong on our side. Try again; if it keeps happening, tell an administrator."
+    },
+    "FORBIDDEN": {
+      "title": "Access denied",
+      "text": "Your account isn't allowed to do this. If you think it's a mistake, talk to an administrator."
+    },
+    "SESSION_EXPIRED": {
+      "title": "Your session ended",
+      "text": "For your security, sign in again to continue."
+    },
+    "RATE_LIMITED": {
+      "title": "Too many attempts in a row. Wait a few minutes."
+    },
+    "CONFLICT": {
+      "title": "The data changed somewhere else at the same time."
+    },
+    "INVALID": {
+      "title": "Check the data you entered."
+    },
+    "NOT_FOUND": {
+      "title": "Item not found."
+    },
+    "UNKNOWN": {
+      "title": "Couldn't complete the action."
+    },
+    "actions": {
+      "signIn": "Sign in again",
+      "goHome": "Back to home",
+      "dismiss": "Close alert"
+    }
   }
 }

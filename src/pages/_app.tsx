@@ -8,8 +8,9 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ApiError } from "@/models/api/client";
+import { APP_ERRORS, classifyError } from "@/models/domain/appErrors";
 import { useSelectionsStore } from "@/viewmodels/stores/selectionsStore";
-import { notifyClient } from "@/viewmodels/useNotify";
+import { notifyErrorClient } from "@/viewmodels/useNotify";
 import { bodyFont, displayFont } from "@/styles/fonts";
 import { setZodLocale } from "@/lib/zodLocale";
 
@@ -37,16 +38,26 @@ function App({ Component, pageProps }: AppProps) {
   useMemo(() => setZodLocale(locale), [locale]);
   const { i18n } = useTranslation();
   const [queryClient] = useState(() => {
-    // 401 com alguém logado = a sessão expirou: sai da conta na tela e avisa (toast informativo).
+    // Erros graves (rede, banco, servidor, acesso negado, sessão) viram o alerta fixo na tela, de
+    // qualquer consulta ou ação; os leves ficam com cada tela (notificação ou o aviso da própria tela).
     const onError = (e: Error) => {
-      if (!(e instanceof ApiError) || e.status !== 401 || !client.getQueryData(["me"])) return;
-      client.setQueryData(["me"], null);
-      notifyClient(client, i18n.t.bind(i18n), "SESSION_EXPIRED");
+      // Senha errada (401) e bloqueio (429) no login aparecem no próprio formulário.
+      if (e instanceof ApiError && e.url?.startsWith("/api/auth/")) return;
+      if (e instanceof ApiError && e.status === 401) client.setQueryData(["me"], null);
+      if (APP_ERRORS[classifyError(e)] !== "INFO") notifyErrorClient(i18n.t.bind(i18n), e);
     };
     const client = new QueryClient({
       queryCache: new QueryCache({ onError }),
       mutationCache: new MutationCache({ onError }),
-      defaultOptions: { queries: { staleTime: 60_000, refetchOnWindowFocus: false } },
+      defaultOptions: {
+        queries: {
+          staleTime: 60_000,
+          refetchOnWindowFocus: false,
+          // Só repete falhas passageiras (rede, banco, servidor); acesso negado, sessão encerrada e
+          // dados inválidos não mudam com nova tentativa e aparecem na hora.
+          retry: (count, e) => count < 2 && ["NETWORK", "DATABASE", "SERVER"].includes(classifyError(e)),
+        },
+      },
     });
     return client;
   });

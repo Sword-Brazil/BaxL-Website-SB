@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "next-i18next/pages";
 import { BanIcon, ImageUpIcon, LoaderIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
+import { useNotifyError } from "@/viewmodels/useNotify";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -48,6 +49,7 @@ function CtpMedallion({ ctp }: { ctp: Ctp }) {
 
 export function CtpAdminView() {
   const { t } = useTranslation(["admin", "common"]);
+  const notifyError = useNotifyError();
   const catalog = useCatalogViewModel();
   const qc = useQueryClient();
   const [draft, setDraft] = useState<Draft | null>(null);
@@ -67,7 +69,7 @@ export function CtpAdminView() {
       setDraft(null);
       toast.success(t("admin:common.saved"));
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => notifyError(e),
   });
   /** Exclusão definitiva: as equipes e reservas que usavam o CTP ficam sem CTP. */
   const remove = useMutation({
@@ -77,7 +79,7 @@ export function CtpAdminView() {
       qc.invalidateQueries({ queryKey: ["cycle"] });
       toast.success(t("admin:ctps.deleted"));
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => notifyError(e),
   });
   const edit = (ctp: Ctp) => setDraft({ id: ctp.id, type: ctp.type, quality: ctp.quality, imagePath: ctp.imagePath, active: ctp.active });
   /** Qualidades ainda livres no tipo (a do próprio CTP em edição continua disponível). */
@@ -95,7 +97,7 @@ export function CtpAdminView() {
       const result = await adminApi.uploadAsset({ fileName: file.name, mimeType: TYPES[file.type], base64: await dataUrl(file) });
       patchDraft({ imagePath: result.imagePath });
       toast.success(t("admin:catalog.uploaded"));
-    } catch (error) { toast.error(error instanceof Error ? error.message : String(error)); }
+    } catch (error) { notifyError(error); }
     finally { setUploading(false); }
   };
 

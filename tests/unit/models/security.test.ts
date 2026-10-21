@@ -46,3 +46,16 @@ describe("assertSameOrigin (CSRF)", () => {
     expect(status(() => assertSameOrigin(req("POST", form)))).toBe(415);
   });
 });
+
+describe("banco fora do ar vira 503", () => {
+  it("reconhece os erros de conexão do Prisma e ignora os demais", async () => {
+    const { Prisma } = await import("@prisma/client");
+    const { isDatabaseUnavailable } = await import("@/server/http");
+    const known = (code: string) => new Prisma.PrismaClientKnownRequestError("x", { code, clientVersion: "6" });
+    expect(isDatabaseUnavailable(known("P1001"))).toBe(true);
+    expect(isDatabaseUnavailable(known("P2024"))).toBe(true);
+    expect(isDatabaseUnavailable(new Prisma.PrismaClientInitializationError("x", "6"))).toBe(true);
+    expect(isDatabaseUnavailable(known("P2002"))).toBe(false);
+    expect(isDatabaseUnavailable(new Error("x"))).toBe(false);
+  });
+});
