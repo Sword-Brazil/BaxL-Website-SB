@@ -253,5 +253,13 @@
   h2,
   h3 {
     @apply font-heading tracking-wide;
+    text-wrap: balance;
+  }
+  /* Evita uma palavra sozinha na última linha de parágrafos e descrições. */
+  p,
+  li,
+  dd,
+  figcaption {
+    text-wrap: pretty;
   }
 }

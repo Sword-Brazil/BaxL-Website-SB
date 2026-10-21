@@ -51,6 +51,32 @@ export const parseQuery = <T>(schema: ZodType<T>, req: NextApiRequest) => parse(
 type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 type Handler = (req: NextApiRequest, res: NextApiResponse) => unknown | Promise<unknown>;
 
+const host = (value: string | undefined) => {
+  try {
+    return value ? new URL(value).host : null;
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * Defesa contra CSRF nas requisições que alteram dados: precisam vir deste site (Origin, ou Referer
+ * quando o navegador não manda Origin) e, com corpo, em JSON (um formulário HTML de outro site não
+ * consegue enviar JSON). O cookie de sessão já é SameSite=Lax; isto é a segunda barreira.
+ */
+export function assertSameOrigin(req: NextApiRequest) {
+  if (req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS") return;
+  const origin = host(req.headers.origin) ?? host(req.headers.referer);
+  const forwarded = req.headers["x-forwarded-host"];
+  const self = (Array.isArray(forwarded) ? forwarded[0] : forwarded) ?? req.headers.host;
+  if (!origin || origin !== self) throw new HttpError(403, "FORBIDDEN", "Origem da requisição não permitida");
+  const length = Number(req.headers["content-length"] ?? 0);
+  const type = req.headers["content-type"] ?? "";
+  if (length > 0 && !type.toLowerCase().startsWith("application/json")) {
+    throw new HttpError(415, "VALIDATION_ERROR", "Envie os dados em JSON");
+  }
+}
+
 /** Roteia por método HTTP e converte HttpError no formato de erro padrão da API. */
 export function handler(handlers: Partial<Record<Method, Handler>>) {
   return async (req: NextApiRequest, res: NextApiResponse) => {
@@ -60,6 +86,7 @@ export function handler(handlers: Partial<Record<Method, Handler>>) {
       return sendError(res, 405, "METHOD_NOT_ALLOWED", "Método não permitido");
     }
     try {
+      assertSameOrigin(req);
       await fn(req, res);
     } catch (e) {
       if (e instanceof HttpError) return sendError(res, e.status, e.code, e.message, e.fields);
@@ -72,9 +99,15 @@ export function handler(handlers: Partial<Record<Method, Handler>>) {
   };
 }
 
-/** IP do cliente, para o limite de tentativas de login. */
+/**
+ * IP do cliente, para o limite de tentativas de login. Na Vercel, `x-real-ip` é definido pela
+ * própria plataforma (não pelo cliente). Fora dela, o primeiro `x-forwarded-for` pode ser forjado:
+ * por isso o login também tem um limite por conta, que não depende do IP.
+ */
 export function clientIp(req: NextApiRequest): string {
-  const fwd = req.headers["x-forwarded-for"];
-  const first = Array.isArray(fwd) ? fwd[0] : fwd?.split(",")[0];
-  return (first ?? req.socket.remoteAddress ?? "unknown").trim();
+  const header = (name: string) => {
+    const v = req.headers[name];
+    return (Array.isArray(v) ? v[0] : v)?.split(",")[0]?.trim() || undefined;
+  };
+  return (header("x-real-ip") ?? header("x-forwarded-for") ?? req.socket.remoteAddress ?? "unknown").slice(0, 64);
 }
