@@ -3,13 +3,13 @@
 // Uso: npx prisma db seed  (lê .env.local)
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import nextEnv from "@next/env";
+import { loadEnvConfig } from "@next/env";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { BATTLE_DAY_NUMBERS, CTP_QUALITIES, CTP_TYPES, DAY_MODES, type Role } from "../src/models/domain/enums";
 
 // .env.local com expansão de ${VAR} (ex.: a senha do banco dentro das URLs), como no Next.
-nextEnv.loadEnvConfig(process.cwd(), true, { info: () => {}, error: console.error });
+loadEnvConfig(process.cwd(), true, { info: () => {}, error: console.error });
 
 const prisma = new PrismaClient();
 
