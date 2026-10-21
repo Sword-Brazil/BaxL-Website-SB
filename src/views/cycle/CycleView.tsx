@@ -201,7 +201,7 @@ function DayRow({ day, vm, updated }: { day: CycleDay; vm: Vm; updated: Readonly
       {day.isBai ? (
         <BaiPanel day={day.number} vm={vm} />
       ) : (
-        <div className="grid divide-y md:grid-cols-2 md:divide-x md:divide-y-0">
+        <div className="grid divide-y *:min-w-0 md:grid-cols-2 md:divide-x md:divide-y-0">
           <ModePanel mode="BAX" day={day.number} data={day.bax} vm={vm} updated={isUpdated("BAX")} />
           <ModePanel mode="BAL" day={day.number} data={day.bal} vm={vm} updated={isUpdated("BAL")} />
         </div>

@@ -9,6 +9,11 @@ const BCRYPT_COST = 12;
 const MAX_FAILURES = 5;
 const FAILURE_WINDOW_MS = 15 * 60_000;
 const LOCK_MS = 15 * 60_000;
+/**
+ * Limite por conta, somando todos os IPs: quem troca de IP (ou forja o cabeçalho) a cada tentativa
+ * não escapa do bloqueio. Mais alto que o por IP para não travar o dono por engano.
+ */
+const MAX_ACCOUNT_FAILURES = 20;
 /** A partir de quantas falhas seguidas o dono da conta recebe o aviso de tentativas. */
 const WARN_FAILURES = 3;
 
@@ -30,10 +35,13 @@ export async function login(input: { username: string; password: string; ip: str
   const now = input.now ?? new Date();
   const username = input.username.trim().toLowerCase().replace(/\s+/g, " ");
   const key = `${username}|${input.ip}`;
+  const accountKey = `${username}|*`;
 
-  const attempt = await userRepository.getAttempt(key);
-  if (attempt?.lockedUntil && attempt.lockedUntil > now) {
-    throw new HttpError(429, "RATE_LIMITED", "Muitas tentativas. Tente novamente em alguns minutos.");
+  for (const k of [key, accountKey]) {
+    const attempt = await userRepository.getAttempt(k);
+    if (attempt?.lockedUntil && attempt.lockedUntil > now) {
+      throw new HttpError(429, "RATE_LIMITED", "Muitas tentativas. Tente novamente em alguns minutos.");
+    }
   }
 
   const user = await userRepository.findByUsername(username);
@@ -46,12 +54,18 @@ export async function login(input: { username: string; password: string; ip: str
       maxFailures: MAX_FAILURES,
       lockMs: LOCK_MS,
     });
+    await userRepository.recordFailure(accountKey, now, {
+      windowMs: FAILURE_WINDOW_MS,
+      maxFailures: MAX_ACCOUNT_FAILURES,
+      lockMs: LOCK_MS,
+    });
     if (user && failedCount === WARN_FAILURES) notifyInBackground({ type: "FAILED_LOGINS", userId: user.id });
     if (user && failedCount === MAX_FAILURES) notifyInBackground({ type: "ACCOUNT_LOCKED", userId: user.id });
     throw invalidCredentials();
   }
 
   await userRepository.clearAttempt(key);
+  await userRepository.clearAttempt(accountKey);
   await notify({ type: "NEW_LOGIN", userId: user.id, originSessionId: input.sessionId });
   return toSessionUser(user);
 }

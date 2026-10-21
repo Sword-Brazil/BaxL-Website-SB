@@ -101,6 +101,15 @@ describe("authService.login", () => {
     await expect(login({ username: "  SWORD   Menezes ", password: "Desenho.2020!", ip: IP })).resolves.toMatchObject({ role: "ADMIN" });
   });
 
+  it("trocar de IP a cada tentativa não escapa do bloqueio por conta (20 falhas)", async () => {
+    await createUser();
+    const t0 = Date.parse("2026-10-21T12:00:00Z");
+    for (let i = 0; i < 20; i++) {
+      await login({ username: "jogador", password: "errada123", ip: `10.1.0.${i}`, now: new Date(t0 + i * 1000) }).catch(() => null);
+    }
+    await expectHttpError(login({ username: "jogador", password: "senha1234", ip: "10.9.9.9", now: new Date(t0 + 30_000) }), 429);
+  });
+
   it("o hash nunca é igual à senha e usa bcrypt custo 12", async () => {
     const hash = await hashPassword("senha1234");
     expect(hash).not.toBe("senha1234");

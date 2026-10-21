@@ -36,7 +36,7 @@ Variáveis em `.env.local`:
 
 | Variável | Uso |
 |----------|-----|
-| `DATABASE_URL` | Postgres pelo *Transaction pooler* do Supabase (porta 6543, `?pgbouncer=true&connection_limit=1`). |
+| `DATABASE_URL` | Postgres pelo *Transaction pooler* do Supabase (porta 6543, `?pgbouncer=true&connection_limit=5&pool_timeout=20`). |
 | `DIRECT_URL` | Conexão direta ou *Session pooler* (porta 5432): usada pelas migrações. |
 | `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` | Storage das imagens enviadas (chave secreta, só no servidor). Sem elas, no ambiente local, os uploads vão para `public/assets/uploads`. |
 | `SUPABASE_STORAGE_BUCKET` | Bucket público das imagens (padrão `assets`). |

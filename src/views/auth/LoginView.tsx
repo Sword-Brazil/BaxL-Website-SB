@@ -3,13 +3,14 @@ import { useTranslation } from "next-i18next/pages";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { TriangleAlertIcon } from "lucide-react";
+import { LifeBuoyIcon, TriangleAlertIcon } from "lucide-react";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { ApiError } from "@/models/api/client";
+import { safeNextPath } from "@/models/rules/safeRedirect";
 import { LoginSchema, type LoginFormValues, type LoginInput } from "@/models/schemas/auth";
 import { useAuthViewModel } from "@/viewmodels/useAuthViewModel";
 import { TextField } from "@/views/shared/FormFields";
@@ -28,7 +29,7 @@ export function LoginView() {
     try {
       await login(values);
       toast.success(t("login.welcome"));
-      const next = typeof router.query.next === "string" && router.query.next.startsWith("/") ? router.query.next : null;
+      const next = safeNextPath(router.query.next);
       // Volta para onde a pessoa ia antes do login (o site é só para membros).
       router.push(next ?? "/");
     } catch {
@@ -39,11 +40,11 @@ export function LoginView() {
   const error = loginState.error instanceof ApiError ? loginState.error : null;
 
   return (
-    <div className="mx-auto w-full max-w-md">
-      <Card variant="panel">
+    <div className="mx-auto flex min-h-[calc(100dvh-16rem)] w-full max-w-md items-center py-4 sm:py-8">
+      <Card variant="panel" className="w-full">
         <CardHeader>
           <CardTitle className="text-2xl">{t("login.title")}</CardTitle>
-          <CardDescription>{t("login.subtitle")}</CardDescription>
+          <CardDescription className="text-pretty">{t("login.subtitle")}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={onSubmit} noValidate>
@@ -83,9 +84,9 @@ export function LoginView() {
             </FieldGroup>
           </form>
         </CardContent>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm text-muted-foreground">
-          <p>{t("login.forgot")}</p>
-          <p>{t("login.noAccount")}</p>
+        <CardFooter className="gap-2 text-xs text-muted-foreground sm:text-sm">
+          <LifeBuoyIcon className="size-4 shrink-0 text-energy" aria-hidden />
+          <p className="text-pretty">{t("login.help")}</p>
         </CardFooter>
       </Card>
     </div>

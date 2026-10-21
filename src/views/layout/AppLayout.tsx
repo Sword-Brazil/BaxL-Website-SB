@@ -184,7 +184,7 @@ export function AppLayout({ title, children, wide = false }: { title?: string; c
             {isLoggedIn && (
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon-touch" className="md:hidden" aria-label={t("nav.menu")}>
+                  <Button variant="ghost" size="icon-touch" className="xl:hidden" aria-label={t("nav.menu")}>
                     <MenuIcon />
                   </Button>
                 </SheetTrigger>
@@ -208,7 +208,7 @@ export function AppLayout({ title, children, wide = false }: { title?: string; c
             <BrandMark />
 
             {isLoggedIn && (
-              <NavigationMenu viewport={false} className="ml-6 hidden md:flex">
+              <NavigationMenu viewport={false} className="ml-4 hidden xl:flex">
                 <NavigationMenuList>
                   {NAV.map((item) => (
                     <NavigationMenuItem key={item.href}>
@@ -233,7 +233,8 @@ export function AppLayout({ title, children, wide = false }: { title?: string; c
               <FontSizeMenu className="hidden sm:inline-flex" />
               <ThemeToggle className="hidden sm:inline-flex" />
               {isLoggedIn && <NicknameMenu />}
-              <AccountMenu />
+              {/* Na própria tela de login o botão "Entrar" seria redundante. */}
+              {pathname !== "/entrar" && <AccountMenu />}
             </div>
           </div>
         </header>
@@ -249,10 +250,6 @@ export function AppLayout({ title, children, wide = false }: { title?: string; c
             <p className="font-heading tracking-wider text-energy/80 uppercase">{t("footer.alliance")}</p>
             <p>{t("footer.disclaimer")}</p>
             <p>{t("footer.credit")}</p>
-            {/* Contas são criadas por um administrador; sem entrar, os dados ficam só no aparelho. */}
-            <Link href="/entrar" className="mt-1 self-start text-muted-foreground/80 underline-offset-2 hover:text-energy hover:underline">
-              {t("footer.staff")}
-            </Link>
           </div>
         </footer>
       </div>

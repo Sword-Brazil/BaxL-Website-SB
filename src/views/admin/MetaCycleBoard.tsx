@@ -141,7 +141,7 @@ export function MetaCycleBoard({ scopeVm, vm }: { scopeVm: MetaScopeViewModel; v
     <div className="flex flex-col gap-3">
       <p className="text-sm text-muted-foreground">{t("admin:metas.boardHint")}</p>
       <div className="sticky top-16 z-20 -mx-4 flex flex-wrap items-center gap-2 border-b border-energy/15 bg-background/90 px-4 py-2 backdrop-blur-md">
-        <ToggleGroup type="single" size="sm" variant="outline" value={week} onValueChange={(v) => v && setWeek(v)}>
+        <ToggleGroup type="single" size="sm" variant="outline" value={week} onValueChange={(v) => v && setWeek(v)} className="max-w-full overflow-x-auto">
           <ToggleGroupItem value="all">{t("admin:metas.allWeeks")}</ToggleGroupItem>
           {[1, 2, 3, 4].map((n) => (
             <ToggleGroupItem key={n} value={String(n)}>
@@ -153,6 +153,7 @@ export function MetaCycleBoard({ scopeVm, vm }: { scopeVm: MetaScopeViewModel; v
           type="single"
           size="sm"
           variant="outline"
+          className="max-w-full overflow-x-auto"
           value={modeFilter}
           onValueChange={(v) => v && setModeFilter(v as ModeFilter)}
         >
@@ -173,7 +174,7 @@ export function MetaCycleBoard({ scopeVm, vm }: { scopeVm: MetaScopeViewModel; v
                 {t("common:day", { number: d.number })}{" "}
                 <span className="text-xs text-muted-foreground">{t(`common:weekdays.${d.weekday}`)}</span>
               </p>
-              <div className={cn("grid gap-4", modes.length === 2 && "md:grid-cols-2 md:divide-x md:divide-foreground/10")}>
+              <div className={cn("grid gap-4 *:min-w-0", modes.length === 2 && "md:grid-cols-2 md:divide-x md:divide-foreground/10")}>
                 {modes.map((m, i) => (
                   <div key={m} className={cn(i > 0 && "border-t border-foreground/10 pt-3 md:border-t-0 md:pt-0 md:pl-4")}>
                     <ModeCell
