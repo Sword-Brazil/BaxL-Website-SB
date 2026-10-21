@@ -1,11 +1,11 @@
 <!--
 Sync Impact Report
 ==================
-Version change: 1.2.0 → 1.3.0 (MINOR: workflow section expanded, no principle removed)
+Version change: 1.3.0 → 1.4.0 (MINOR: domain restriction on personal data revised)
 Modified principles: none
 Modified sections:
-  - Fluxo de Desenvolvimento e Qualidade: branch de integração `Dev` (testes de toda nova
-    implementação) e PR para `master` com o template do repositório
+  - Restrições de Domínio e Conteúdo: contas sem e-mail (nome de usuário, hash de senha e
+    apelido opcional), criadas só por Administradores; site privado da aliança
 Added/removed sections: none
 Templates: not modified.
 Follow-up TODOs: none
@@ -105,9 +105,9 @@ significa tempo e pontuação perdidos.
   exibir esse aviso e NÃO DEVE se apresentar como produto oficial.
 - O sistema NÃO DEVE coletar credenciais de conta do jogo nem interagir com os
   servidores do jogo.
-- Dados pessoais DEVEM se limitar ao necessário para autenticar: e-mail, hash de senha e
-  apelido opcional. A conta é opcional para jogadores (sincronização entre aparelhos) e
-  obrigatória para Curadores e Administradores. Senhas NUNCA são armazenadas em texto puro.
+- Dados pessoais DEVEM se limitar ao necessário para autenticar: nome de usuário, hash de senha
+  e apelido opcional (sem e-mail). O site é privado da aliança: todo membro tem conta, criada por
+  um Administrador, que também redefine senhas. Senhas NUNCA são armazenadas em texto puro.
 
 ## Fluxo de Desenvolvimento e Qualidade
 
@@ -145,4 +145,4 @@ significa tempo e pontuação perdidos.
 - Revisões de código e de spec DEVEM apontar violações; exceções exigem justificativa
   escrita no plano da feature.
 
-**Version**: 1.3.0 | **Ratified**: 2026-10-17 | **Last Amended**: 2026-10-18
+**Version**: 1.4.0 | **Ratified**: 2026-10-17 | **Last Amended**: 2026-10-21
