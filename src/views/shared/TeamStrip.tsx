@@ -79,7 +79,8 @@ export function TeamStrip({
                 slotLabel={t(`team.slots.${slot}`)}
                 leader={slot === "SOLO"}
                 damageDealer={!isMine && !!m?.isDamageDealer}
-                striker={!isMine && m?.isDamageDealer && m.strikerUniformId ? catalog.uniformById(m.strikerUniformId) : null}
+                // Meta: Striker do Causador de Dano. Minha equipe: o Striker que o jogador escolheu.
+                striker={m?.strikerUniformId && (isMine || m.isDamageDealer) ? catalog.uniformById(m.strikerUniformId) : null}
                 stunEffect={effect && ref?.uniform.effects.includes(effect) ? effect : undefined}
                 // Causador de Dano da Meta/Alternativa: tocar leva às rotações do personagem.
                 href={!isMine && m?.isDamageDealer && ref ? rotationHref(ref.agent.slug, ref.uniform.slug, effect) : undefined}

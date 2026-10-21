@@ -53,7 +53,11 @@ function teamMembers(team: MetaTeam) {
 }
 
 function userMembers(team: UserTeam | null) {
-  return team ? SLOTS.flatMap((slot) => (team[slot] ? [{ slot, uniformId: team[slot]!.uniformId }] : [])) : [];
+  return team
+    ? SLOTS.flatMap((slot) =>
+        team[slot] ? [{ slot, uniformId: team[slot]!.uniformId, strikerUniformId: team[slot]!.strikerUniformId ?? null }] : [],
+      )
+    : [];
 }
 
 /** Coluna de um modo (BAX ou BAL) dentro de um dia. */

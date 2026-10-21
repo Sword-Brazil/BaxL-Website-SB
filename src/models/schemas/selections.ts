@@ -15,7 +15,12 @@ export const teamKeySchema = z.string().refine(
 );
 export type TeamKey = string;
 
-const SlotPickSchema = z.object({ uniformId: idSchema, ctpId: idSchema.optional().nullable() });
+const SlotPickSchema = z.object({
+  uniformId: idSchema,
+  ctpId: idSchema.optional().nullable(),
+  /** Striker (apoio da Transcendência 4) que o jogador usa com este personagem. */
+  strikerUniformId: idSchema.optional().nullable(),
+});
 
 export const UserTeamSchema = z
   .object({ SOLO: SlotPickSchema.optional(), SUPPORT_1: SlotPickSchema.optional(), SUPPORT_2: SlotPickSchema.optional() })

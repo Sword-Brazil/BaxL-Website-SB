@@ -27,7 +27,7 @@ export function useTeamBuilderViewModel({
   priority: PriorityLists;
 }) {
   const catalog = useCatalogViewModel();
-  const { doc, hydrated, setSlot, clearSlot, equipCtp, applyTeam, setFreePick } = useSelectionsStore();
+  const { doc, hydrated, setSlot, clearSlot, setStriker, equipCtp, applyTeam, setFreePick } = useSelectionsStore();
   const [armedCtp, setArmedCtp] = useState<string | null>(null);
 
   const owned = useMemo(() => new Set(doc.roster.ownedUniformIds), [doc.roster.ownedUniformIds]);
@@ -81,7 +81,12 @@ export function useTeamBuilderViewModel({
   /** Copia uma equipe Meta/Alternativa mantendo só o que o usuário possui (na escolha livre, tudo). */
   const copyTeam = (source: MetaTeam) => {
     const next: UserTeam = {};
-    for (const m of source.members) if (pool.has(m.uniformId)) next[m.slot] = { uniformId: m.uniformId, ctpId: null };
+    for (const m of source.members) {
+      if (!pool.has(m.uniformId)) continue;
+      // O Striker meta do Causador de Dano vem junto, se o jogador também tiver o Striker.
+      const striker = m.isDamageDealer && m.strikerUniformId && pool.has(m.strikerUniformId) ? m.strikerUniformId : null;
+      next[m.slot] = { uniformId: m.uniformId, ctpId: null, strikerUniformId: striker };
+    }
     applyTeam(teamKey, next);
     return Object.keys(next).length;
   };
@@ -103,6 +108,12 @@ export function useTeamBuilderViewModel({
         pick: team[slot] ?? null,
         ref,
         ctp: ref ? catalog.ctpById(equipment[ref.agent.id]) : null,
+        striker: team[slot]?.strikerUniformId ? catalog.uniformById(team[slot]!.strikerUniformId!) : null,
+        /** Striker da Meta para esta posição (quando ela é Causadora de Dano), como referência. */
+        metaStriker: (() => {
+          const m = meta?.members.find((x) => x.slot === slot);
+          return m?.isDamageDealer && m.strikerUniformId ? catalog.uniformById(m.strikerUniformId) : null;
+        })(),
         comparison: comparison?.[slot] ?? null,
         metaRef: meta ? catalog.uniformById(meta.members.find((m) => m.slot === slot)?.uniformId ?? "") : null,
       };
@@ -117,6 +128,14 @@ export function useTeamBuilderViewModel({
     hydrated,
     setSlot: (slot: Slot, uniformId: string) => setSlot(teamKey, slot, uniformId, agentIdOf),
     clearSlot: (slot: Slot) => clearSlot(teamKey, slot),
+    setStriker: (slot: Slot, strikerUniformId: string | null) => setStriker(teamKey, slot, strikerUniformId),
+    /** Strikers possíveis para a posição: os mesmos personagens liberados para a equipe, menos o próprio. */
+    strikerOptions: (slot: Slot): UniformRef[] => {
+      const own = team[slot] ? agentIdOf(team[slot]!.uniformId) : undefined;
+      return catalog.agents
+        .filter((a) => a.active && a.id !== own)
+        .flatMap((agent) => agent.uniforms.filter((u) => u.active && pool.has(u.id)).map((uniform) => ({ agent, uniform })));
+    },
     applySuggestion: () => suggestion && applyTeam(teamKey, suggestion),
     copyTeam,
 

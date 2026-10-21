@@ -24,6 +24,18 @@ describe("selectionsService", () => {
     expect(doc?.nickname).toBe("TenMenezes");
   });
 
+  it("a escolha livre e o Striker de cada personagem da equipe voltam da conta", async () => {
+    const u = await createUser();
+    await putSelections(u.id, {
+      ...emptySelections(),
+      freePick: true,
+      teams: { "BAX-1": { SOLO: { uniformId: "u1", ctpId: null, strikerUniformId: "u9" } } },
+    });
+    const doc = await getSelections(u.id);
+    expect(doc?.freePick).toBe(true);
+    expect(doc?.teams["BAX-1"].SOLO).toMatchObject({ uniformId: "u1", strikerUniformId: "u9" });
+  });
+
   it("PUT com baseUpdatedAt divergente gera 409", async () => {
     const u = await createUser();
     const first = await putSelections(u.id, emptySelections());
