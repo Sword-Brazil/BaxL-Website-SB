@@ -22,12 +22,13 @@ const PATHS: Record<BossEffect, React.ReactNode> = {
       <path d="m4 3 17 18" />
     </>
   ),
-  // Corpo travado entre barras, com faíscas de paralisia.
+  // Mão de "pare": imobilizado.
   PARALYSIS: (
     <>
-      <circle cx="12" cy="5.5" r="2" />
-      <path d="M12 8v6m-3 6 3-6 3 6M8 11h8" />
-      <path d="M4 4v16M20 4v16" />
+      <path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V11" />
+      <path d="M11 10V4a1.5 1.5 0 0 1 3 0v6" />
+      <path d="M14 10.5V6a1.5 1.5 0 0 1 3 0v8" />
+      <path d="M8 11.5a1.5 1.5 0 0 0-3 0v1.5a8 8 0 0 0 8 8h1a5 5 0 0 0 5-5v-2" />
     </>
   ),
   // Chama.
