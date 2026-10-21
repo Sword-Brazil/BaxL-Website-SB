@@ -4,12 +4,11 @@ import type { LoginInput } from "@/models/schemas/auth";
 import { useSelectionsStore } from "./stores/selectionsStore";
 import { NOTICES_KEY } from "./useNotify";
 
-/** Envia o que ainda não subiu para a conta, sai e limpa o aparelho (pode ser compartilhado). */
-async function logoutAndClear() {
+/** Envia o que ainda não subiu para a conta e sai (o aparelho é limpo no onSuccess). */
+async function flushAndLogout() {
   const s = useSelectionsStore.getState();
   if (s.syncUserId && s.doc.updatedAt !== s.syncedLocalAt) await putRemoteSelections(s.doc, s.syncBase).catch(() => undefined);
   await postLogout();
-  useSelectionsStore.getState().clearDevice();
 }
 
 export function useAuthViewModel() {
@@ -25,9 +24,11 @@ export function useAuthViewModel() {
   });
 
   const logoutMutation = useMutation({
-    mutationFn: logoutAndClear,
+    mutationFn: flushAndLogout,
     onSuccess: () => {
       qc.setQueryData(["me"], null);
+      // Aparelho pode ser compartilhado: depois de zerar a sessão no app, limpa os dados locais.
+      useSelectionsStore.getState().clearDevice();
       qc.invalidateQueries({ queryKey: ["selections"] });
       qc.removeQueries({ queryKey: NOTICES_KEY });
     },

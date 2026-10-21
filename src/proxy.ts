@@ -37,5 +37,6 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   // Tudo, menos arquivos do Next, imagens públicas, traduções e ícones.
-  matcher: ["/((?!_next/static|_next/image|assets/|brand/|locales/|favicon\\.ico|robots\\.txt).*)"],
+  // A raiz entra à parte: com o i18n do Pages Router, "/" não casa com o padrão abaixo.
+  matcher: ["/", "/((?!_next/static|_next/image|assets/|brand/|locales/|favicon\\.ico|robots\\.txt).*)"],
 };
