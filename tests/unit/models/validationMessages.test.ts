@@ -11,8 +11,8 @@ describe("mensagens de validação", () => {
   });
 
   it("o código é achado a partir da mensagem que o schema devolve", () => {
-    const issue = LoginSchema.safeParse({ email: "x", password: "" }).error!.issues;
-    expect(issue.map((i) => validationCode(i.message))).toEqual(["emailInvalid", "passwordRequired"]);
+    const issue = LoginSchema.safeParse({ login: " ", password: "" }).error!.issues;
+    expect(issue.map((i) => validationCode(i.message))).toEqual(["loginRequired", "passwordRequired"]);
     expect(validationCode("qualquer outra")).toBeUndefined();
   });
 });

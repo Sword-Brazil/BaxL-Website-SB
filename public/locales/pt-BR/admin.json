@@ -24,7 +24,7 @@
     "catalog": "Agentes, uniformes e imagens.",
     "ctps": "Tipos, fotos e disponibilidade dos CTPs.",
     "bai": "Sequência de chefes da BAI.",
-    "users": "Curadores e administradores.",
+    "users": "Jogadores, curadores e administradores: criar contas, papéis e senhas.",
     "settings": "Âncora do ciclo e horários de virada.",
     "rotations": "Rotações dos personagens (Causadores de Dano), por traje, com descrição e vídeo."
   },
@@ -149,22 +149,26 @@
   },
   "users": {
     "title": "Usuários e papéis",
-    "search": "Buscar por e-mail ou apelido…",
-    "newStaff": "Novo administrador/curador",
+    "search": "Buscar por usuário, e-mail ou apelido…",
     "role": "Papel",
     "roles": {
-      "USER": "Usuário",
+      "USER": "Jogador",
       "CURATOR": "Curador",
       "ADMIN": "Administrador"
     },
-    "changeRoleConfirm": "Alterar o papel de {{email}} para {{role}}?",
+    "changeRoleConfirm": "Alterar o papel de {{name}} para {{role}}?",
     "resetPassword": "Redefinir senha",
-    "verified": "Confirmado",
-    "unverified": "Não confirmado",
     "created": "Conta criada",
     "passwordReset": "Senha redefinida",
     "lastAdmin": "Não é possível rebaixar o último administrador.",
-    "help": "Administradores promovem e removem curadores. Sempre deve existir ao menos um administrador."
+    "help": "Só administradores criam contas e trocam senhas. Jogadores entram com o nome de usuário; curadores e administradores podem usar o e-mail. Sempre deve existir ao menos um administrador.",
+    "newUser": "Nova conta",
+    "username": "Nome de usuário",
+    "usernameHint": "Usado para entrar. Ex.: o nick do jogo (3 a 30 letras, números, espaço, ponto, hífen ou sublinhado). Maiúsculas não importam.",
+    "email": "E-mail",
+    "emailHint": "Opcional para jogadores. Curadores e administradores recebem os avisos críticos por e-mail.",
+    "resetHelp": "Defina uma senha nova e passe para a pessoa. A senha antiga deixa de funcionar na hora.",
+    "noEmail": "sem e-mail"
   },
   "settings": {
     "title": "Configurações do calendário",

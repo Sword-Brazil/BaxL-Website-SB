@@ -2,7 +2,8 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/server/db";
 
 export const userRepository = {
-  findByEmail: (email: string) => prisma.user.findUnique({ where: { email } }),
+  /** Conta pelo login: com "@" é e-mail (curadoria), sem é nome de usuário (jogadores). */
+  findByLogin: (login: string) => prisma.user.findUnique({ where: login.includes("@") ? { email: login } : { username: login } }),
   findById: (id: string) => prisma.user.findUnique({ where: { id } }),
 
   getAttempt: (key: string) => prisma.loginAttempt.findUnique({ where: { key } }),

@@ -1,4 +1,5 @@
-// Seed idempotente: CTPs, dias de BAX/BAL, Settings e a conta ADMIN do dono do projeto (jogadores não têm conta).
+// Seed idempotente: CTPs, dias de BAX/BAL, Settings e o Administrador padrão (as demais contas,
+// de jogadores e da curadoria, são criadas por ele em Admin → Usuários).
 // Uso: npx prisma db seed  (lê .env.local)
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
@@ -17,19 +18,27 @@ const prisma = new PrismaClient();
  */
 const CYCLE_ANCHOR = new Date("2026-10-01T15:00:00.000Z");
 
-async function seedUser(email: string | undefined, password: string | undefined, role: Role) {
-  if (!email || !password) {
-    console.warn(`⚠ SEED_${role}_EMAIL/SEED_${role}_PASSWORD ausentes em .env.local; conta ${role} não criada.`);
+/**
+ * Administrador padrão: entra com SEED_ADMIN_USERNAME (ex.: "Sword Menezes", sem diferenciar
+ * maiúsculas) e/ou SEED_ADMIN_EMAIL. Se a conta já existe (por um dos dois), atualiza a senha.
+ */
+async function seedAdmin() {
+  const display = process.env.SEED_ADMIN_USERNAME?.trim().replace(/\s+/g, " ") || null;
+  const username = display?.toLowerCase() ?? null;
+  const email = process.env.SEED_ADMIN_EMAIL?.trim().toLowerCase() || null;
+  const password = process.env.SEED_ADMIN_PASSWORD;
+  if ((!username && !email) || !password) {
+    console.warn("⚠ Defina SEED_ADMIN_USERNAME (ou SEED_ADMIN_EMAIL) e SEED_ADMIN_PASSWORD em .env.local; administrador não criado.");
     return;
   }
   const passwordHash = await bcrypt.hash(password, 12);
-  const normalized = email.trim().toLowerCase();
-  await prisma.user.upsert({
-    where: { email: normalized },
-    update: { passwordHash, role },
-    create: { email: normalized, passwordHash, role, emailVerifiedAt: new Date() },
+  const existing = await prisma.user.findFirst({
+    where: { OR: [...(username ? [{ username }] : []), ...(email ? [{ email }] : [])] },
   });
-  console.log(`✔ Conta ${role}: ${normalized}`);
+  const data = { username, email, passwordHash, role: "ADMIN" satisfies Role, nickname: display, emailVerifiedAt: email ? new Date() : null };
+  if (existing) await prisma.user.update({ where: { id: existing.id }, data: { ...data, nickname: existing.nickname ?? display } });
+  else await prisma.user.create({ data });
+  console.log(`✔ Administrador: ${display ?? email}${display && email ? ` (${email})` : ""}`);
 }
 
 /** Ícone de cada tipo de CTP, com a extensão do arquivo em public/assets/ctp (manifesto de imagens). */
@@ -66,7 +75,7 @@ async function main() {
   });
   console.log("✔ Settings");
 
-  await seedUser(process.env.SEED_ADMIN_EMAIL, process.env.SEED_ADMIN_PASSWORD, "ADMIN");
+  await seedAdmin();
 }
 
 main()

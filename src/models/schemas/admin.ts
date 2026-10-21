@@ -13,6 +13,7 @@ import {
   slotSchema,
   speciesSchema,
   teamScopeSchema,
+  usernameSchema,
 } from "./common";
 import { parseRotationVideo } from "@/models/rules/rotationVideo";
 import { VALIDATION } from "./messages";
@@ -131,13 +132,20 @@ export const SettingsSchema = z.object({
 });
 export type SettingsInput = z.infer<typeof SettingsSchema>;
 
-export const CreateStaffSchema = z.object({
-  email: emailSchema,
-  password: passwordSchema,
-  nickname: z.string().trim().max(30).optional(),
-  role: z.enum(["CURATOR", "ADMIN"]),
-});
-export type CreateStaffInput = z.infer<typeof CreateStaffSchema>;
+/**
+ * Conta criada por um Administrador (não há cadastro aberto). Jogadores costumam ter só nome de
+ * usuário; curadores e administradores, e-mail (recebem os avisos críticos por e-mail).
+ */
+export const CreateUserSchema = z
+  .object({
+    username: z.union([z.literal(""), usernameSchema]).optional(),
+    email: z.union([z.literal(""), emailSchema]).optional(),
+    password: passwordSchema,
+    nickname: z.string().trim().max(30).optional(),
+    role: z.enum(["USER", "CURATOR", "ADMIN"]),
+  })
+  .refine((v) => !!v.username || !!v.email, { message: VALIDATION.accountIdRequired, path: ["username"] });
+export type CreateUserInput = z.infer<typeof CreateUserSchema>;
 
 export const ChangeRoleSchema = z.object({ role: z.enum(["USER", "CURATOR", "ADMIN"]) });
 export const AdminResetPasswordSchema = z.object({ password: passwordSchema });

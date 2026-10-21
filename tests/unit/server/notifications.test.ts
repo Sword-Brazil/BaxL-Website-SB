@@ -70,7 +70,7 @@ describe("eventos ligados ao notify", () => {
   it("novo login aparece só nas outras sessões abertas antes dele", async () => {
     const u = await createUser();
     const before = new Date(Date.now() - 60_000);
-    await login({ email: u.email, password: "senha1234", ip: IP, sessionId: "nova" });
+    await login({ login: u.email!, password: "senha1234", ip: IP, sessionId: "nova" });
     expect(await types(u.id, session("nova", before))).toEqual([]);
     expect(await types(u.id, session("antiga", before))).toEqual(["NEW_LOGIN"]);
     expect(await types(u.id, session("depois", new Date(Date.now() + 60_000)))).toEqual([]);
@@ -80,7 +80,7 @@ describe("eventos ligados ao notify", () => {
     const u = await createUser();
     const t0 = new Date("2026-10-19T12:00:00Z");
     for (let i = 0; i < 5; i++) {
-      await login({ email: u.email, password: "errada123", ip: IP, now: new Date(t0.getTime() + i * 1000) }).catch(() => null);
+      await login({ login: u.email!, password: "errada123", ip: IP, now: new Date(t0.getTime() + i * 1000) }).catch(() => null);
       if (i === 2) {
         await flush();
         expect(await types(u.id)).toEqual(["FAILED_LOGINS"]);
@@ -92,7 +92,7 @@ describe("eventos ligados ao notify", () => {
   });
 
   it("falhas com e-mail inexistente não gravam nada", async () => {
-    for (let i = 0; i < 5; i++) await login({ email: "ninguem@sword.br", password: "errada123", ip: IP }).catch(() => null);
+    for (let i = 0; i < 5; i++) await login({ login: "ninguem@sword.br", password: "errada123", ip: IP }).catch(() => null);
     await flush();
     expect(await prisma.securityNotice.count()).toBe(0);
     expect(sent).toEqual([]);

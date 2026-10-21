@@ -5,11 +5,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postinstall": "prisma generate",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
     "seed:demo": "tsx prisma/seed-demo.ts",
+    "db:migrate-data": "tsx scripts/migrate-to-supabase.ts",
     "assets:import": "tsx scripts/import-assets.ts",
     "check:locales": "tsx scripts/check-locales.ts",
     "import:guiabaxbal": "tsx scripts/import-guiabaxbal.ts",
@@ -45,12 +47,14 @@
     "zustand": "^5.0.15"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.3.15",
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^22.20.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.4.2",
+    "pglite-prisma-adapter": "^0.6.1",
     "prisma": "^6.19.3",
     "tailwindcss": "^4",
     "tsx": "^4.23.15",

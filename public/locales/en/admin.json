@@ -24,7 +24,7 @@
     "catalog": "Agents, uniforms and images.",
     "ctps": "CTP types, photos and availability.",
     "bai": "BAI boss sequence.",
-    "users": "Curators and administrators.",
+    "users": "Players, curators and administrators: accounts, roles and passwords.",
     "settings": "Cycle anchor and turnover times.",
     "rotations": "Character rotations (damage dealers), per uniform, with a description and video."
   },
@@ -149,22 +149,26 @@
   },
   "users": {
     "title": "Users and roles",
-    "search": "Search by email or nickname…",
-    "newStaff": "New administrator/curator",
+    "search": "Search by username, e-mail or nickname…",
     "role": "Role",
     "roles": {
-      "USER": "User",
+      "USER": "Player",
       "CURATOR": "Curator",
       "ADMIN": "Administrator"
     },
-    "changeRoleConfirm": "Change {{email}} role to {{role}}?",
+    "changeRoleConfirm": "Change {{name}} role to {{role}}?",
     "resetPassword": "Reset password",
-    "verified": "Confirmed",
-    "unverified": "Not confirmed",
     "created": "Account created",
     "passwordReset": "Password reset",
     "lastAdmin": "The last administrator cannot be demoted.",
-    "help": "Administrators promote and remove curators. There must always be at least one administrator."
+    "help": "Only administrators create accounts and change passwords. Players sign in with their username; curators and administrators may use their e-mail. There must always be at least one administrator.",
+    "newUser": "New account",
+    "username": "Username",
+    "usernameHint": "Used to sign in. E.g. the in-game nick (3 to 30 letters, digits, space, dot, hyphen or underscore). Case doesn't matter.",
+    "email": "E-mail",
+    "emailHint": "Optional for players. Curators and administrators get critical alerts by e-mail.",
+    "resetHelp": "Set a new password and hand it to the person. The old password stops working right away.",
+    "noEmail": "no e-mail"
   },
   "settings": {
     "title": "Calendar settings",

@@ -20,6 +20,7 @@ import type { Agent } from "@/models/domain/types";
 import { useRosterViewModel } from "@/viewmodels/useRosterViewModel";
 import { CtpPalette } from "@/views/day/CtpPalette";
 import { CtpBadge } from "@/views/shared/CtpBadge";
+import { Hint } from "@/views/shared/Hint";
 import { CtpDragOverlay } from "@/views/shared/CtpDragOverlay";
 import { ResetTeamsOptions } from "@/views/shared/ResetTeamsOptions";
 import { CtpPicker } from "@/views/shared/CtpPicker";
@@ -96,27 +97,27 @@ function AgentRosterCard({ agent, vm, dragging }: { agent: Agent; vm: RosterVm; 
             {activeUniforms.map((u) => {
               const owned = vm.isOwned(u.id);
               return (
-                <Toggle
-                  key={u.id}
-                  pressed={owned}
-                  onPressedChange={() => vm.toggle(u.id)}
-                  onClick={(e) => e.stopPropagation()}
-                  variant="outline"
-                  className={cn(
-                    "h-auto min-h-11 max-w-full gap-2 border-l-2 py-1 pr-3 pl-1",
-                    u.side === "HERO" ? "border-l-hero" : u.side === "VILLAIN" ? "border-l-villain" : "",
-                    owned && "border-energy/60 bg-energy/10",
-                  )}
-                  title={`${u.name} · ${t(`common:values.${u.side}`)}`}
-                  aria-label={`${agent.name} — ${u.name}`}
-                >
-                  <Avatar className="chamfer-sm size-9 shrink-0 rounded-none after:hidden">
-                    <AvatarImage src={u.portrait || undefined} alt="" loading="lazy" decoding="async" className={cn("rounded-none", !owned && "grayscale")} />
-                    <AvatarFallback className="rounded-none text-xs">{agent.name.slice(0, 2)}</AvatarFallback>
-                  </Avatar>
-                  <span className="min-w-0 truncate text-xs">{u.name}</span>
-                  {owned && <CheckIcon className="shrink-0 text-energy" />}
-                </Toggle>
+                <Hint key={u.id} label={`${u.name} · ${t(`common:values.${u.side}`)}`}>
+                  <Toggle
+                    pressed={owned}
+                    onPressedChange={() => vm.toggle(u.id)}
+                    onClick={(e) => e.stopPropagation()}
+                    variant="outline"
+                    className={cn(
+                      "h-auto min-h-11 max-w-full gap-2 border-l-2 py-1 pr-3 pl-1",
+                      u.side === "HERO" ? "border-l-hero" : u.side === "VILLAIN" ? "border-l-villain" : "",
+                      owned && "border-energy/60 bg-energy/10",
+                    )}
+                    aria-label={`${agent.name} — ${u.name}`}
+                  >
+                    <Avatar className="chamfer-sm size-9 shrink-0 rounded-none after:hidden">
+                      <AvatarImage src={u.portrait || undefined} alt="" loading="lazy" decoding="async" className={cn("rounded-none", !owned && "grayscale")} />
+                      <AvatarFallback className="rounded-none text-xs">{agent.name.slice(0, 2)}</AvatarFallback>
+                    </Avatar>
+                    <span className="min-w-0 truncate text-xs">{u.name}</span>
+                    {owned && <CheckIcon className="shrink-0 text-energy" />}
+                  </Toggle>
+                </Hint>
               );
             })}
           </div>

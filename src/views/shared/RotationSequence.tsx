@@ -3,6 +3,7 @@ import { useTranslation } from "next-i18next/pages";
 import { ChevronRightIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CANCELS, ULTIMATE_SKILL, parseRotation, type Cancel, type RotationPart, type RotationStep } from "@/models/rules/rotation";
+import { Hint } from "./Hint";
 
 const CANCEL_CLASS: Record<Cancel, string> = {
   c: "text-spark",
@@ -20,17 +21,18 @@ function StepChip({ step }: { step: RotationStep }) {
     .filter(Boolean)
     .join(" · ");
   return (
-    <span
-      title={label}
-      aria-label={label}
-      className={cn(
-        "inline-flex h-7 min-w-7 items-center justify-center gap-0.5 rounded-md border px-1.5 font-heading text-sm leading-none font-bold tabular-nums",
-        ultimate ? "border-energy/60 bg-energy/15 text-energy" : "border-border bg-muted/50",
-      )}
-    >
-      {step.skill}
-      {step.cancel && <span className={cn("text-[0.65rem] font-semibold uppercase", CANCEL_CLASS[step.cancel])}>{step.cancel}</span>}
-    </span>
+    <Hint label={label}>
+      <span
+        aria-label={label}
+        className={cn(
+          "inline-flex h-7 min-w-7 items-center justify-center gap-0.5 rounded-md border px-1.5 font-heading text-sm leading-none font-bold tabular-nums",
+          ultimate ? "border-energy/60 bg-energy/15 text-energy" : "border-border bg-muted/50",
+        )}
+      >
+        {step.skill}
+        {step.cancel && <span className={cn("text-[0.65rem] font-semibold uppercase", CANCEL_CLASS[step.cancel])}>{step.cancel}</span>}
+      </span>
+    </Hint>
   );
 }
 
@@ -46,10 +48,7 @@ export function RotationSequence({ parts, className }: { parts: RotationPart[]; 
           {i > 0 && <Arrow />}
           <li className="flex items-center">
             {Array.isArray(part) ? (
-              <span
-                className="flex items-center gap-1 rounded-lg border border-dashed border-muted-foreground/50 px-1 py-0.5"
-                title={t("rotation.optional")}
-              >
+              <span className="flex items-center gap-1 rounded-lg border border-dashed border-muted-foreground/50 px-1 py-0.5">
                 <span className="sr-only">{t("rotation.optional")}:</span>
                 {part.map((step, j) => (
                   <Fragment key={j}>

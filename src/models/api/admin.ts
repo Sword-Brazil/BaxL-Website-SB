@@ -6,7 +6,7 @@ import type {
   CtpInput,
   AssetUploadInput,
   BaiBossesInput,
-  CreateStaffInput,
+  CreateUserInput,
   MetaTeamInput,
   PriorityInput,
   PriorityTarget,
@@ -18,7 +18,6 @@ const priorityPath = (t: PriorityTarget) =>
   t.scope === "DAY" ? `/api/admin/priority/DAY/${t.mode}/${t.number}` : "/api/admin/priority/BAI";
 
 export interface AdminUser extends SessionUser {
-  emailVerified: boolean;
   createdAt: string;
 }
 
@@ -56,7 +55,7 @@ export const adminApi = {
     apiFetch<{ total: number; page: number; pageSize: number; users: AdminUser[] }>(
       `/api/admin/users?${new URLSearchParams({ ...(q ? { q } : {}), page: String(page) })}`,
     ),
-  createStaff: (body: CreateStaffInput) => apiFetch<SessionUser>("/api/admin/users", { method: "POST", body }),
+  createUser: (body: CreateUserInput) => apiFetch<SessionUser>("/api/admin/users", { method: "POST", body }),
   changeRole: (id: string, role: Role) => apiFetch<SessionUser>(`/api/admin/users/${id}/role`, { method: "PATCH", body: { role } }),
   resetPassword: (id: string, password: string) =>
     apiFetch<void>(`/api/admin/users/${id}/reset-password`, { method: "POST", body: { password } }),
