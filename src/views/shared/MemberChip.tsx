@@ -22,38 +22,36 @@ const initials = (name: string) =>
 /** Moldura da foto pela facção (o clip-path do chanfro corta o `ring`, então a moldura é um fundo). */
 const FRAME_BY_SIDE: Record<string, string> = { HERO: "bg-hero/70", VILLAIN: "bg-villain/70" };
 
-/** Striker meta do Causador de Dano: foto pequena + nome, logo abaixo do traje. */
-function StrikerTag({ striker }: { striker: UniformRef }) {
+/**
+ * Striker meta do Causador de Dano: foto redonda no canto superior esquerdo do cartão, com um raio.
+ * Sem Striker, o círculo fica tracejado ("Striker a definir").
+ */
+function StrikerCorner({ striker }: { striker: UniformRef | null }) {
   const { t } = useTranslation("common");
-  const uniformLabel = striker.uniform.slug === "padrao" ? null : striker.uniform.name;
-  const label = t("team.striker", { name: `${striker.agent.name}${uniformLabel ? ` — ${uniformLabel}` : ""}` });
+  const uniformLabel = striker && striker.uniform.slug !== "padrao" ? striker.uniform.name : null;
+  const label = striker
+    ? t("team.striker", { name: `${striker.agent.name}${uniformLabel ? ` — ${uniformLabel}` : ""}` })
+    : t("team.noStriker");
   return (
     <Hint label={label}>
-      <span
-        aria-label={label}
-        className="mt-0.5 flex w-full min-w-0 items-center gap-1 rounded-full border border-spark/40 bg-spark/10 py-0.5 pr-1.5 pl-0.5 text-[0.6rem] leading-tight text-spark"
-      >
-        <Avatar className={cn("chamfer-sm size-5 shrink-0 rounded-none after:hidden", !striker.uniform.active && "grayscale")}>
-          <AvatarImage src={striker.uniform.portrait || undefined} alt="" loading="lazy" decoding="async" className="rounded-none" />
-          <AvatarFallback className="rounded-none bg-secondary font-heading text-[0.5rem] text-secondary-foreground">
-            {initials(striker.agent.name)}
-          </AvatarFallback>
-        </Avatar>
-        <ZapIcon aria-hidden className="size-2.5 shrink-0" />
-        <span className="min-w-0 truncate font-semibold">{striker.agent.name}</span>
+      <span aria-label={label} role="img" className="absolute -top-1.5 -left-1.5 z-10 size-6 sm:size-7">
+        {striker ? (
+          <Avatar className={cn("size-full ring-2 ring-spark after:hidden", !striker.uniform.active && "grayscale")}>
+            <AvatarImage src={striker.uniform.portrait || undefined} alt="" loading="lazy" decoding="async" />
+            <AvatarFallback className="bg-secondary font-heading text-[0.5rem] text-secondary-foreground">{initials(striker.agent.name)}</AvatarFallback>
+          </Avatar>
+        ) : (
+          <span className="flex size-full items-center justify-center rounded-full border border-dashed border-spark/50 bg-card text-spark/70">
+            <ZapIcon aria-hidden className="size-3" />
+          </span>
+        )}
+        {striker && (
+          <span className="absolute -right-1 -bottom-1 flex size-3.5 items-center justify-center rounded-full bg-spark text-background ring-2 ring-card">
+            <ZapIcon aria-hidden className="size-2" />
+          </span>
+        )}
       </span>
     </Hint>
-  );
-}
-
-/** Causador de Dano ainda sem Striker meta: a linha fica no cartão, para a curadoria ver o que falta. */
-function MissingStrikerTag() {
-  const { t } = useTranslation("common");
-  return (
-    <span className="mt-0.5 flex w-full min-w-0 items-center justify-center gap-1 rounded-full border border-dashed border-spark/30 py-0.5 text-[0.6rem] leading-tight text-muted-foreground">
-      <ZapIcon aria-hidden className="size-2.5 shrink-0" />
-      <span className="truncate">{t("team.noStriker")}</span>
-    </span>
   );
 }
 
@@ -103,7 +101,7 @@ export function MemberChip({
   damageDealer?: boolean;
   /** O traje causa o efeito da temporada: atordoa o chefe (selo com o ícone do efeito). */
   stunEffect?: BossEffect;
-  /** Striker meta do Causador de Dano (apoio da Transcendência 4); sem ele, "Striker a definir". */
+  /** Striker meta do Causador de Dano (apoio da Transcendência 4): ícone no canto do cartão. */
   striker?: UniformRef | null;
   /** Com link (Causador de Dano da Meta): o cartão inteiro leva às rotações do personagem. */
   href?: string;
@@ -129,6 +127,7 @@ export function MemberChip({
   const content = (
     <>
       <SlotTag label={slotLabel} leader={leader} />
+      {damageDealer && <StrikerCorner striker={striker ?? null} />}
       <div className="relative">
         {/* A dica fica no retrato: o CTP e os selos têm as próprias dicas. */}
         <Hint label={href ? t("team.seeRotationOf", { name: agent.name }) : label}>
@@ -177,7 +176,6 @@ export function MemberChip({
       <span className={cn("mt-0.5 w-full truncate leading-tight font-semibold", leader ? "text-xs sm:text-sm" : "text-xs")}>{agent.name}</span>
       {/* Sem traje cadastrado a linha fica vazia, para os três cartões manterem a mesma altura. */}
       <span className="w-full truncate text-[0.65rem] leading-tight text-muted-foreground">{uniformLabel ?? "\u00a0"}</span>
-      {damageDealer && (striker ? <StrikerTag striker={striker} /> : <MissingStrikerTag />)}
       {href && (
         <span className="mt-0.5 flex items-center gap-0.5 font-heading text-[0.6rem] tracking-wider text-spark uppercase">
           {t("team.seeRotation")}
