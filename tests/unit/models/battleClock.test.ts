@@ -27,11 +27,11 @@ describe("getBattleClock", () => {
     expect(c.weekday).toBe("SEG");
   });
 
-  it("começa o Dia 1 (quinta) às 12:00 BRT", () => {
+  it("começa o Dia 1 (quinta) às 12:00 BRT, ainda antes do reset das 22:00", () => {
     const c = getBattleClock(brt("2026-10-15", "12:00"), settings);
     expect(c.cycleDay).toBe(1);
     expect(c.weekday).toBe("QUI");
-    expect(c.weekIndex).toBe(0);
+    expect(c.weekIndex).toBe(3); // até o reset, a pontuação é da última semana do ciclo anterior
     expect(c.mode).toBe("BAX_BAL");
   });
 
@@ -57,39 +57,49 @@ describe("getBattleClock", () => {
     expect(getBattleClock(brt("2026-10-18", "13:00"), settings).mode).toBe("BAX_BAL");
   });
 
-  describe("dia do reset semanal (Dia 7: quarta 12:00 → quinta 12:00)", () => {
-    it("às 21:59 ainda conta para a semana anterior", () => {
-      const c = getBattleClock(brt("2026-10-21", "21:59"), settings);
+  describe("reset semanal: quinta-feira às 22:00 (Dia 8: quinta 12:00 → sexta 12:00)", () => {
+    it("quarta (Dia 7) não é dia de reset", () => {
+      const c = getBattleClock(brt("2026-10-21", "22:30"), settings);
       expect(c.cycleDay).toBe(7);
+      expect(c.weekday).toBe("QUA");
+      expect(c.isResetDay).toBe(false);
+      expect(c.weekIndex).toBe(0);
+    });
+
+    it("quinta às 21:59 ainda conta para a semana anterior", () => {
+      const c = getBattleClock(brt("2026-10-22", "21:59"), settings);
+      expect(c.cycleDay).toBe(8);
+      expect(c.weekday).toBe("QUI");
       expect(c.isResetDay).toBe(true);
       expect(c.beforeWeeklyReset).toBe(true);
       expect(c.weekIndex).toBe(0);
     });
 
-    it("às 22:00 a semana avança, mas o número do dia NÃO muda", () => {
-      const c = getBattleClock(brt("2026-10-21", "22:00"), settings);
-      expect(c.cycleDay).toBe(7);
+    it("quinta às 22:00 a semana avança, mas o número do dia NÃO muda", () => {
+      const c = getBattleClock(brt("2026-10-22", "22:00"), settings);
+      expect(c.cycleDay).toBe(8);
       expect(c.isResetDay).toBe(true);
       expect(c.beforeWeeklyReset).toBe(false);
       expect(c.weekIndex).toBe(1);
     });
 
-    it("o número do dia só avança às 12:00 seguintes", () => {
-      expect(getBattleClock(brt("2026-10-22", "11:59"), settings).cycleDay).toBe(7);
-      const c = getBattleClock(brt("2026-10-22", "12:00"), settings);
-      expect(c.cycleDay).toBe(8);
+    it("o número do dia só avança às 12:00 seguintes, e a sexta não é dia de reset", () => {
+      expect(getBattleClock(brt("2026-10-23", "11:59"), settings).cycleDay).toBe(8);
+      const c = getBattleClock(brt("2026-10-23", "12:00"), settings);
+      expect(c.cycleDay).toBe(9);
       expect(c.weekIndex).toBe(1);
       expect(c.isResetDay).toBe(false);
     });
   });
 
-  it("o ciclo dá a volta: dia 28 → dia 1 e semana 3 → semana 0", () => {
-    const d28 = getBattleClock(brt("2026-11-11", "13:00"), settings);
+  it("o ciclo dá a volta: dia 28 → dia 1, e a semana 3 → 0 só no reset de quinta", () => {
+    const d28 = getBattleClock(brt("2026-11-11", "22:30"), settings);
     expect(d28.cycleDay).toBe(28);
     expect(d28.weekIndex).toBe(3);
-    const after = getBattleClock(brt("2026-11-11", "22:00"), settings);
-    expect(after.weekIndex).toBe(0);
-    expect(getBattleClock(brt("2026-11-12", "12:00"), settings).cycleDay).toBe(1);
+    const d1 = getBattleClock(brt("2026-11-12", "12:00"), settings);
+    expect(d1.cycleDay).toBe(1);
+    expect(d1.weekIndex).toBe(3);
+    expect(getBattleClock(brt("2026-11-12", "22:00"), settings).weekIndex).toBe(0);
   });
 
   it("calcula nextBaiStart e dayStart", () => {
