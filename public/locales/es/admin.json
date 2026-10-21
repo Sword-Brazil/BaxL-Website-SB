@@ -24,7 +24,7 @@
     "catalog": "Agentes, uniformes e imágenes.",
     "ctps": "Tipos, fotos y disponibilidad de los CTPs.",
     "bai": "Secuencia de jefes de la BAI.",
-    "users": "Curadores y administradores.",
+    "users": "Jugadores, curadores y administradores: cuentas, roles y contraseñas.",
     "settings": "Ancla del ciclo y horarios de cambio.",
     "rotations": "Rotaciones de los personajes (causantes de daño), por traje, con descripción y vídeo."
   },
@@ -149,22 +149,26 @@
   },
   "users": {
     "title": "Usuarios y roles",
-    "search": "Buscar por correo o apodo…",
-    "newStaff": "Nuevo administrador/curador",
+    "search": "Buscar por usuario, e-mail o apodo…",
     "role": "Rol",
     "roles": {
-      "USER": "Usuario",
+      "USER": "Jugador",
       "CURATOR": "Curador",
       "ADMIN": "Administrador"
     },
-    "changeRoleConfirm": "¿Cambiar el rol de {{email}} a {{role}}?",
+    "changeRoleConfirm": "¿Cambiar el rol de {{name}} a {{role}}?",
     "resetPassword": "Restablecer contraseña",
-    "verified": "Confirmado",
-    "unverified": "No confirmado",
     "created": "Cuenta creada",
     "passwordReset": "Contraseña restablecida",
     "lastAdmin": "No se puede degradar al último administrador.",
-    "help": "Los administradores promueven y quitan curadores. Siempre debe haber al menos un administrador."
+    "help": "Solo los administradores crean cuentas y cambian contraseñas. Los jugadores entran con su nombre de usuario; curadores y administradores pueden usar el e-mail. Siempre debe haber al menos un administrador.",
+    "newUser": "Nueva cuenta",
+    "username": "Nombre de usuario",
+    "usernameHint": "Se usa para entrar. Ej.: el nick del juego (3 a 30 letras, números, espacio, punto, guion o guion bajo). Mayúsculas no importan.",
+    "email": "E-mail",
+    "emailHint": "Opcional para jugadores. Curadores y administradores reciben las alertas críticas por e-mail.",
+    "resetHelp": "Define una contraseña nueva y pásala a la persona. La anterior deja de funcionar al momento.",
+    "noEmail": "sin e-mail"
   },
   "settings": {
     "title": "Configuración del calendario",

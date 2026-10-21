@@ -36,7 +36,8 @@ export async function notify(event: SecurityEvent) {
   if (channels.includes("email")) {
     const user = await prisma.user.findUnique({ where: { id: event.userId }, select: { email: true } });
     const kind = event.type as SecurityMailKind;
-    if (user) await getMailService().send(user.email, kind, `${appUrl()}${MAIL_LINK[kind]}`);
+    // Jogadores podem não ter e-mail: ficam só com o aviso no app.
+    if (user?.email) await getMailService().send(user.email, kind, `${appUrl()}${MAIL_LINK[kind]}`);
   }
 }
 

@@ -4,7 +4,7 @@ import {
   AgentSchema,
   AssetUploadSchema,
   BaiBossesSchema,
-  CreateStaffSchema,
+  CreateUserSchema,
   MetaTeamSchema,
   PrioritySchema,
   RestrictionSchema,
@@ -83,16 +83,24 @@ describe("PrioritySchema", () => {
   });
 });
 
-describe("CreateStaffSchema", () => {
-  it("aceita CURATOR e ADMIN e rejeita USER", () => {
-    const base = { email: "novo@sword.br", password: "senha1234" };
-    expect(CreateStaffSchema.safeParse({ ...base, role: "ADMIN" }).success).toBe(true);
-    expect(CreateStaffSchema.safeParse({ ...base, role: "CURATOR" }).success).toBe(true);
-    expect(CreateStaffSchema.safeParse({ ...base, role: "USER" }).success).toBe(false);
+describe("CreateUserSchema", () => {
+  it("aceita os três papéis, com nome de usuário ou e-mail", () => {
+    expect(CreateUserSchema.safeParse({ username: "tenmenezes", password: "Senha.1234", role: "USER" }).success).toBe(true);
+    expect(CreateUserSchema.safeParse({ email: "novo@sword.br", password: "Senha.1234", role: "ADMIN" }).success).toBe(true);
+    expect(CreateUserSchema.safeParse({ username: "cur", email: "", password: "Senha.1234", role: "CURATOR" }).success).toBe(true);
   });
 
-  it("rejeita e-mail inválido", () => {
-    expect(CreateStaffSchema.safeParse({ email: "x", password: "senha1234", role: "ADMIN" }).success).toBe(false);
+  it("exige usuário ou e-mail, e valida o formato de cada um", () => {
+    expect(CreateUserSchema.safeParse({ username: "", email: "", password: "Senha.1234", role: "USER" }).error?.issues[0].message).toBe(
+      VALIDATION.accountIdRequired,
+    );
+    expect(CreateUserSchema.safeParse({ username: "com espaço", password: "Senha.1234", role: "USER" }).success).toBe(false);
+    expect(CreateUserSchema.safeParse({ username: "ab", password: "Senha.1234", role: "USER" }).success).toBe(false);
+    expect(CreateUserSchema.safeParse({ email: "x", password: "Senha.1234", role: "ADMIN" }).success).toBe(false);
+  });
+
+  it("normaliza o nome de usuário para minúsculas", () => {
+    expect(CreateUserSchema.parse({ username: " TenMenezes ", password: "Senha.1234", role: "USER" }).username).toBe("tenmenezes");
   });
 });
 

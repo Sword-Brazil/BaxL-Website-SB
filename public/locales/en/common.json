@@ -12,7 +12,9 @@
     "account": "My account",
     "battle": "Alliance Battle",
     "stats": "Statistics",
-    "rotations": "Rotations"
+    "rotations": "Rotations",
+    "login": "Sign in",
+    "synced": "Synced with your account"
   },
   "modes": {
     "BAX": "Alliance Battle Extreme",
@@ -35,7 +37,7 @@
     "disclaimer": "Unofficial, non-commercial fan project. Marvel Future Fight is owned by Netmarble; characters are owned by Marvel.",
     "alliance": "Made for the Sword Brazil alliance.",
     "credit": "Base calendar and teams: Guia BAX/BAL/BAI (guiabaxbal.web.app), curated by Sword Brazil.",
-    "staff": "Curator access"
+    "staff": "Sign in to your account"
   },
   "team": {
     "empty": "No team defined",
@@ -170,10 +172,15 @@
   },
   "validation": {
     "passwordRequired": "Enter your password",
+    "loginRequired": "Enter your username or e-mail",
+    "usernameFormat": "Use 3 to 30 letters, digits, space, dot, hyphen or underscore",
+    "accountIdRequired": "Enter a username or an e-mail",
     "emailInvalid": "Invalid e-mail",
     "passwordMin": "At least 8 characters",
-    "passwordLetter": "Must contain a letter",
+    "passwordLower": "Must contain a lowercase letter",
+    "passwordUpper": "Must contain an uppercase letter",
     "passwordDigit": "Must contain a number",
+    "passwordSymbol": "Must contain a symbol (e.g. ! . @ #)",
     "baiDay": "Day reserved for BAI",
     "teamKey": "Invalid team key",
     "sameAgentTwoSlots": "The same agent can't take two slots",
@@ -201,7 +208,8 @@
       "ADMIN": "Administrator"
     },
     "toast": {
-      "SESSION_EXPIRED": "Your session expired. Sign in again to keep syncing."
+      "SESSION_EXPIRED": "Your session expired. Sign in again to keep syncing.",
+      "SELECTIONS_SYNCED": "Roster and teams synced with your account."
     },
     "notices": {
       "NEW_LOGIN": {
@@ -214,15 +222,15 @@
       },
       "PASSWORD_RESET": {
         "title": "Password reset",
-        "text": "Your account password was reset on {{date}}. We also sent you an e-mail."
+        "text": "Your account password was reset on {{date}}. If the account has an e-mail, we also sent you one."
       },
       "ROLE_CHANGED": {
         "title": "Account role changed",
-        "text": "Your account now has the {{role}} role (changed on {{date}}). We also sent you an e-mail."
+        "text": "Your account now has the {{role}} role (changed on {{date}}). If the account has an e-mail, we also sent you one."
       },
       "ACCOUNT_LOCKED": {
         "title": "Account temporarily locked",
-        "text": "Sign-in was locked for a few minutes on {{date}} after too many wrong password attempts. We also sent you an e-mail."
+        "text": "Sign-in was locked for a few minutes on {{date}} after too many wrong password attempts. If the account has an e-mail, we also sent you one."
       }
     }
   },
@@ -246,5 +254,29 @@
     "sm": "Small",
     "md": "Medium",
     "lg": "Large"
+  },
+  "sync": {
+    "title": "Choose which selections to keep",
+    "text": "This device and your account have different rosters/teams. Which version do you want to keep? The other will be replaced.",
+    "keepLocal": "Keep this device's",
+    "keepRemote": "Use the account's"
+  },
+  "password": {
+    "strength": "Password strength",
+    "levels": {
+      "1": "Weak",
+      "2": "Fair",
+      "3": "Good",
+      "4": "Strong"
+    },
+    "rules": {
+      "length": "8+ characters",
+      "lower": "lowercase",
+      "upper": "UPPERCASE",
+      "digit": "digit",
+      "symbol": "symbol"
+    },
+    "show": "Show password",
+    "hide": "Hide password"
   }
 }

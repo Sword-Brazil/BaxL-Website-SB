@@ -12,7 +12,9 @@
     "account": "Minha conta",
     "battle": "Batalha de Aliança",
     "stats": "Estatísticas",
-    "rotations": "Rotações"
+    "rotations": "Rotações",
+    "login": "Entrar",
+    "synced": "Sincronizado com a sua conta"
   },
   "modes": {
     "BAX": "Batalha de Aliança Extrema",
@@ -35,7 +37,7 @@
     "disclaimer": "Projeto de fã, não oficial e sem fins comerciais. Marvel Future Fight é propriedade da Netmarble; personagens são propriedade da Marvel.",
     "alliance": "Feito para a aliança Sword Brazil.",
     "credit": "Calendário e equipes de base: Guia BAX/BAL/BAI (guiabaxbal.web.app), com curadoria da Sword Brazil.",
-    "staff": "Acesso da curadoria"
+    "staff": "Entrar na conta"
   },
   "team": {
     "empty": "Sem equipe definida",
@@ -170,10 +172,15 @@
   },
   "validation": {
     "passwordRequired": "Informe a senha",
+    "loginRequired": "Informe o usuário ou e-mail",
+    "usernameFormat": "Use de 3 a 30 letras, números, espaço, ponto, hífen ou sublinhado",
+    "accountIdRequired": "Informe um nome de usuário ou um e-mail",
     "emailInvalid": "E-mail inválido",
     "passwordMin": "Mínimo de 8 caracteres",
-    "passwordLetter": "Precisa conter uma letra",
+    "passwordLower": "Precisa conter uma letra minúscula",
+    "passwordUpper": "Precisa conter uma letra maiúscula",
     "passwordDigit": "Precisa conter um número",
+    "passwordSymbol": "Precisa conter um símbolo (ex.: ! . @ #)",
     "baiDay": "Dia reservado à BAI",
     "teamKey": "Chave de equipe inválida",
     "sameAgentTwoSlots": "O mesmo agente não pode ocupar dois slots",
@@ -201,7 +208,8 @@
       "ADMIN": "Administrador"
     },
     "toast": {
-      "SESSION_EXPIRED": "Sua sessão expirou. Entre de novo para continuar sincronizando."
+      "SESSION_EXPIRED": "Sua sessão expirou. Entre de novo para continuar sincronizando.",
+      "SELECTIONS_SYNCED": "Elenco e equipes sincronizados com a sua conta."
     },
     "notices": {
       "NEW_LOGIN": {
@@ -214,15 +222,15 @@
       },
       "PASSWORD_RESET": {
         "title": "Senha redefinida",
-        "text": "A senha da sua conta foi redefinida em {{date}}. Também enviamos um aviso por e-mail."
+        "text": "A senha da sua conta foi redefinida em {{date}}. Se a conta tem e-mail, também enviamos um aviso por lá."
       },
       "ROLE_CHANGED": {
         "title": "Papel da conta alterado",
-        "text": "Sua conta agora tem o papel {{role}} (alterado em {{date}}). Também enviamos um aviso por e-mail."
+        "text": "Sua conta agora tem o papel {{role}} (alterado em {{date}}). Se a conta tem e-mail, também enviamos um aviso por lá."
       },
       "ACCOUNT_LOCKED": {
         "title": "Conta bloqueada temporariamente",
-        "text": "O login foi bloqueado por alguns minutos em {{date}} depois de muitas tentativas com a senha errada. Também enviamos um aviso por e-mail."
+        "text": "O login foi bloqueado por alguns minutos em {{date}} depois de muitas tentativas com a senha errada. Se a conta tem e-mail, também enviamos um aviso por lá."
       }
     }
   },
@@ -246,5 +254,29 @@
     "sm": "Pequena",
     "md": "Média",
     "lg": "Grande"
+  },
+  "sync": {
+    "title": "Escolha quais seleções manter",
+    "text": "Este aparelho e a sua conta têm elencos/equipes diferentes. Qual versão você quer manter? A outra será substituída.",
+    "keepLocal": "Manter as deste aparelho",
+    "keepRemote": "Usar as da conta"
+  },
+  "password": {
+    "strength": "Força da senha",
+    "levels": {
+      "1": "Fraca",
+      "2": "Razoável",
+      "3": "Boa",
+      "4": "Forte"
+    },
+    "rules": {
+      "length": "8+ caracteres",
+      "lower": "minúscula",
+      "upper": "MAIÚSCULA",
+      "digit": "número",
+      "symbol": "símbolo"
+    },
+    "show": "Mostrar senha",
+    "hide": "Ocultar senha"
   }
 }

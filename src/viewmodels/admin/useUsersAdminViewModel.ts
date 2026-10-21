@@ -6,9 +6,9 @@ import { toast } from "sonner";
 import { adminApi } from "@/models/api/admin";
 import { ApiError } from "@/models/api/client";
 import type { Role } from "@/models/domain/enums";
-import { AdminResetPasswordSchema, CreateStaffSchema, type CreateStaffInput } from "@/models/schemas/admin";
+import { AdminResetPasswordSchema, CreateUserSchema, type CreateUserInput } from "@/models/schemas/admin";
 
-/** Gestão de contas: busca, novos administradores/curadores (Zod), troca de papel e reset de senha. */
+/** Gestão de contas (só administradores): busca, novas contas de qualquer papel, troca de papel e de senha. */
 export function useUsersAdminViewModel(messages: { created: string; saved: string; passwordReset: string; lastAdmin: string }) {
   const qc = useQueryClient();
   const [q, setQ] = useState("");
@@ -19,14 +19,14 @@ export function useUsersAdminViewModel(messages: { created: string; saved: strin
     placeholderData: keepPreviousData,
   });
 
-  const createForm = useForm<CreateStaffInput>({
-    resolver: zodResolver(CreateStaffSchema),
-    defaultValues: { email: "", password: "", nickname: "", role: "CURATOR" },
+  const createForm = useForm<CreateUserInput>({
+    resolver: zodResolver(CreateUserSchema),
+    defaultValues: { username: "", email: "", password: "", nickname: "", role: "USER" },
   });
   const [createOpen, setCreateOpen] = useState(false);
 
   const create = useMutation({
-    mutationFn: adminApi.createStaff,
+    mutationFn: adminApi.createUser,
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-users"] });
       setCreateOpen(false);
@@ -35,7 +35,7 @@ export function useUsersAdminViewModel(messages: { created: string; saved: strin
     },
     onError: (e: Error) =>
       e instanceof ApiError && e.status === 409
-        ? createForm.setError("email", { message: e.message })
+        ? createForm.setError(e.message.startsWith("E-mail") ? "email" : "username", { message: e.message })
         : createForm.setError("root", { message: e.message }),
   });
 

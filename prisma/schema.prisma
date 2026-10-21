@@ -5,9 +5,12 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// Postgres do Supabase: DATABASE_URL é o pooler (app/serverless) e DIRECT_URL a conexão
+// direta, usada pelo `prisma migrate`.
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ---------- Catálogo ----------
@@ -183,17 +186,29 @@ model BaiBoss {
 // ---------- Curadoria (login só de curadores e administradores) ----------
 // Jogadores não têm conta: elenco, equipes e nome no jogo ficam no aparelho (localStorage).
 
+// Jogadores (USER) entram com nome de usuário; curadores e administradores, com e-mail.
+// Só administradores criam contas e trocam senhas (não há cadastro nem "esqueci a senha").
 model User {
-  id              String           @id @default(cuid())
-  email           String           @unique
+  id              String             @id @default(cuid())
+  username        String?            @unique
+  email           String?            @unique
   passwordHash    String
   nickname        String?
-  role            String           @default("USER")
+  role            String             @default("USER")
   emailVerifiedAt DateTime?
+  selections      UserSelectionsDoc?
   metaTeams       MetaTeam[]
   notices         SecurityNotice[]
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+}
+
+// Elenco, equipes, CTPs e nome no jogo do jogador logado (documento JSON), iguais em todo aparelho.
+model UserSelectionsDoc {
+  userId    String   @id
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  json      String
+  updatedAt DateTime @updatedAt
 }
 
 model LoginAttempt {

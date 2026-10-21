@@ -4,10 +4,15 @@
  */
 export const VALIDATION = {
   passwordRequired: "Informe a senha",
+  loginRequired: "Informe o usuário ou e-mail",
+  usernameFormat: "Use de 3 a 30 letras, números, espaço, ponto, hífen ou sublinhado",
+  accountIdRequired: "Informe um nome de usuário ou um e-mail",
   emailInvalid: "E-mail inválido",
   passwordMin: "Mínimo de 8 caracteres",
-  passwordLetter: "Precisa conter uma letra",
+  passwordLower: "Precisa conter uma letra minúscula",
+  passwordUpper: "Precisa conter uma letra maiúscula",
   passwordDigit: "Precisa conter um número",
+  passwordSymbol: "Precisa conter um símbolo (ex.: ! . @ #)",
   baiDay: "Dia reservado à BAI",
   teamKey: "Chave de equipe inválida",
   sameAgentTwoSlots: "O mesmo agente não pode ocupar dois slots",

@@ -1,6 +1,6 @@
 import type { UserSelections } from "@/models/schemas/selections";
 
-/** Seleções vazias do jogador (ficam só no aparelho, no localStorage). */
+/** Seleções vazias do jogador (no aparelho, no localStorage; logado, também na conta). */
 export const emptySelections = (): UserSelections => ({
   version: 1,
   updatedAt: new Date(0).toISOString(),

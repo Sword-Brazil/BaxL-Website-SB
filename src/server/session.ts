@@ -35,8 +35,8 @@ export function getSession(req: NextApiRequest, res: NextApiResponse) {
   return getIronSession<SessionData>(req, res, sessionOptions());
 }
 
-export function toSessionUser(u: { id: string; email: string; nickname: string | null; role: string }): SessionUser {
-  return { id: u.id, email: u.email, nickname: u.nickname, role: u.role as Role };
+export function toSessionUser(u: { id: string; username: string | null; email: string | null; nickname: string | null; role: string }): SessionUser {
+  return { id: u.id, username: u.username, email: u.email, nickname: u.nickname, role: u.role as Role };
 }
 
 /** Usuário da sessão, lido do banco a cada requisição (mudança de papel vale na hora). */

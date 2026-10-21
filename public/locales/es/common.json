@@ -12,7 +12,9 @@
     "account": "Mi cuenta",
     "battle": "Batalla de Alianza",
     "stats": "Estadísticas",
-    "rotations": "Rotaciones"
+    "rotations": "Rotaciones",
+    "login": "Entrar",
+    "synced": "Sincronizado con tu cuenta"
   },
   "modes": {
     "BAX": "Batalla de Alianza Extrema",
@@ -35,7 +37,7 @@
     "disclaimer": "Proyecto de fans, no oficial y sin fines comerciales. Marvel Future Fight es propiedad de Netmarble; los personajes son propiedad de Marvel.",
     "alliance": "Hecho para la alianza Sword Brazil.",
     "credit": "Calendario y equipos base: Guia BAX/BAL/BAI (guiabaxbal.web.app), con curaduría de Sword Brazil.",
-    "staff": "Acceso de curaduría"
+    "staff": "Entrar en la cuenta"
   },
   "team": {
     "empty": "Sin equipo definido",
@@ -170,10 +172,15 @@
   },
   "validation": {
     "passwordRequired": "Ingresa la contraseña",
+    "loginRequired": "Introduce el usuario o el e-mail",
+    "usernameFormat": "Usa de 3 a 30 letras, números, espacio, punto, guion o guion bajo",
+    "accountIdRequired": "Introduce un nombre de usuario o un e-mail",
     "emailInvalid": "Correo inválido",
     "passwordMin": "Mínimo de 8 caracteres",
-    "passwordLetter": "Debe contener una letra",
+    "passwordLower": "Debe contener una letra minúscula",
+    "passwordUpper": "Debe contener una letra mayúscula",
     "passwordDigit": "Debe contener un número",
+    "passwordSymbol": "Debe contener un símbolo (ej.: ! . @ #)",
     "baiDay": "Día reservado para la BAI",
     "teamKey": "Clave de equipo inválida",
     "sameAgentTwoSlots": "El mismo agente no puede ocupar dos posiciones",
@@ -201,7 +208,8 @@
       "ADMIN": "Administrador"
     },
     "toast": {
-      "SESSION_EXPIRED": "Tu sesión expiró. Inicia sesión de nuevo para seguir sincronizando."
+      "SESSION_EXPIRED": "Tu sesión expiró. Inicia sesión de nuevo para seguir sincronizando.",
+      "SELECTIONS_SYNCED": "Plantel y equipos sincronizados con tu cuenta."
     },
     "notices": {
       "NEW_LOGIN": {
@@ -214,15 +222,15 @@
       },
       "PASSWORD_RESET": {
         "title": "Contraseña restablecida",
-        "text": "La contraseña de tu cuenta se restableció el {{date}}. También te enviamos un correo."
+        "text": "La contraseña de tu cuenta se restableció el {{date}}. Si la cuenta tiene e-mail, también te enviamos un correo."
       },
       "ROLE_CHANGED": {
         "title": "Rol de la cuenta cambiado",
-        "text": "Tu cuenta ahora tiene el rol {{role}} (cambiado el {{date}}). También te enviamos un correo."
+        "text": "Tu cuenta ahora tiene el rol {{role}} (cambiado el {{date}}). Si la cuenta tiene e-mail, también te enviamos un correo."
       },
       "ACCOUNT_LOCKED": {
         "title": "Cuenta bloqueada temporalmente",
-        "text": "El inicio de sesión se bloqueó unos minutos el {{date}} tras demasiados intentos con la contraseña incorrecta. También te enviamos un correo."
+        "text": "El inicio de sesión se bloqueó unos minutos el {{date}} tras demasiados intentos con la contraseña incorrecta. Si la cuenta tiene e-mail, también te enviamos un correo."
       }
     }
   },
@@ -246,5 +254,29 @@
     "sm": "Pequeña",
     "md": "Mediana",
     "lg": "Grande"
+  },
+  "sync": {
+    "title": "Elige qué selecciones mantener",
+    "text": "Este dispositivo y tu cuenta tienen plantillas/equipos distintos. ¿Qué versión quieres mantener? La otra será reemplazada.",
+    "keepLocal": "Mantener las de este dispositivo",
+    "keepRemote": "Usar las de la cuenta"
+  },
+  "password": {
+    "strength": "Fuerza de la contraseña",
+    "levels": {
+      "1": "Débil",
+      "2": "Aceptable",
+      "3": "Buena",
+      "4": "Fuerte"
+    },
+    "rules": {
+      "length": "8+ caracteres",
+      "lower": "minúscula",
+      "upper": "MAYÚSCULA",
+      "digit": "número",
+      "symbol": "símbolo"
+    },
+    "show": "Mostrar contraseña",
+    "hide": "Ocultar contraseña"
   }
 }

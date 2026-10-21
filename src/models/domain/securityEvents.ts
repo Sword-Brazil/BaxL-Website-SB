@@ -11,7 +11,8 @@ export type Channel = (typeof CHANNELS)[number];
 export const SECURITY_EVENTS = {
   // Informativo → toast (só no cliente)
   SESSION_EXPIRED: "INFO",
-  // Atenção → aviso persistente (contas da curadoria; jogadores não têm conta)
+  SELECTIONS_SYNCED: "INFO",
+  // Atenção → aviso persistente
   NEW_LOGIN: "ATTENTION",
   FAILED_LOGINS: "ATTENTION",
   // Crítico → e-mail + aviso persistente
