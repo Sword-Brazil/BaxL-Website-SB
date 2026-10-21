@@ -7,6 +7,7 @@ import { ctpColor } from "@/models/domain/ctpColors";
 import type { Ctp } from "@/models/domain/types";
 import type { UniformRef } from "@/viewmodels/useCatalogViewModel";
 import { CtpBadge } from "./CtpBadge";
+import { Hint } from "./Hint";
 
 const initials = (name: string) =>
   name
@@ -88,32 +89,38 @@ export function MemberChip({
     <>
       <SlotTag label={slotLabel} leader={leader} />
       <div className="relative">
-        <div
-          className={cn("chamfer-sm", tinted ? "p-[3px]" : "p-[2px]", !tinted && (FRAME_BY_SIDE[uniform.side] ?? "bg-border"))}
-          style={tinted ? { background: ctpColor(ctp) ?? undefined } : undefined}
-        >
-          <Avatar className={cn("chamfer-sm rounded-none after:hidden", size, (unavailable || owned === false) && "grayscale")}>
-            <AvatarImage src={uniform.portrait || undefined} alt={`${agent.name}${uniformLabel ? ` — ${uniformLabel}` : ""}`} loading="lazy" decoding="async" className="rounded-none" />
-            <AvatarFallback className="rounded-none bg-secondary font-heading text-sm text-secondary-foreground">{initials(agent.name)}</AvatarFallback>
-          </Avatar>
-        </div>
+        {/* A dica fica no retrato: o CTP e os selos têm as próprias dicas. */}
+        <Hint label={href ? t("team.seeRotationOf", { name: agent.name }) : label}>
+          <div
+            className={cn("chamfer-sm", tinted ? "p-[3px]" : "p-[2px]", !tinted && (FRAME_BY_SIDE[uniform.side] ?? "bg-border"))}
+            style={tinted ? { background: ctpColor(ctp) ?? undefined } : undefined}
+          >
+            <Avatar className={cn("chamfer-sm rounded-none after:hidden", size, (unavailable || owned === false) && "grayscale")}>
+              <AvatarImage src={uniform.portrait || undefined} alt={`${agent.name}${uniformLabel ? ` — ${uniformLabel}` : ""}`} loading="lazy" decoding="async" className="rounded-none" />
+              <AvatarFallback className="rounded-none bg-secondary font-heading text-sm text-secondary-foreground">{initials(agent.name)}</AvatarFallback>
+            </Avatar>
+          </div>
+        </Hint>
         {ctp && <CtpBadge ctp={ctp} typeOnly={ctpTypeOnly} size={leader ? "lg" : "md"} className="absolute -right-3 -bottom-1" />}
         {damageDealer && (
-          <span
-            className="absolute -top-1.5 -right-1.5 flex size-4 items-center justify-center rounded-full bg-spark text-background ring-2 ring-card"
-            title={t("team.damageDealer")}
-            aria-label={t("team.damageDealer")}
-          >
-            <SwordIcon className="size-2.5" />
-          </span>
+          <Hint label={t("team.damageDealer")}>
+            <span
+              className="absolute -top-1.5 -right-1.5 flex size-4 items-center justify-center rounded-full bg-spark text-background ring-2 ring-card"
+              aria-label={t("team.damageDealer")}
+            >
+              <SwordIcon className="size-2.5" />
+            </span>
+          </Hint>
         )}
         {owned && (
-          <span
-            className="absolute -top-1.5 -left-1.5 flex size-4 items-center justify-center rounded-full bg-brazil-green text-background ring-2 ring-card"
-            aria-label={t("team.owned")}
-          >
-            <CheckIcon className="size-3" />
-          </span>
+          <Hint label={t("team.owned")}>
+            <span
+              className="absolute -top-1.5 -left-1.5 flex size-4 items-center justify-center rounded-full bg-brazil-green text-background ring-2 ring-card"
+              aria-label={t("team.owned")}
+            >
+              <CheckIcon className="size-3" />
+            </span>
+          </Hint>
         )}
       </div>
       <span className={cn("mt-0.5 w-full truncate leading-tight font-semibold", leader ? "text-xs sm:text-sm" : "text-xs")}>{agent.name}</span>
@@ -132,7 +139,7 @@ export function MemberChip({
     return (
       <Link
         href={href}
-        title={t("team.seeRotationOf", { name: agent.name })}
+        aria-label={t("team.seeRotationOf", { name: agent.name })}
         className={cn(
           className,
           "border-spark/50 transition-[transform,border-color] outline-none hover:-translate-y-0.5 hover:border-spark focus-visible:ring-3 focus-visible:ring-spark/50",
@@ -143,7 +150,7 @@ export function MemberChip({
     );
   }
   return (
-    <div className={className} title={label}>
+    <div className={className}>
       {content}
     </div>
   );

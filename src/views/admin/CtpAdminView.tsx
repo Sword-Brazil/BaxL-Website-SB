@@ -18,6 +18,7 @@ import { adminApi } from "@/models/api/admin";
 import { ASSET_MAX_BYTES } from "@/models/schemas/admin";
 import { useCatalogViewModel } from "@/viewmodels/useCatalogViewModel";
 import { CtpQualityFx } from "@/views/shared/CtpQualityFx";
+import { Hint } from "@/views/shared/Hint";
 
 type Draft = { id?: string; type: CtpType; quality: CtpQuality; imagePath: string; active: boolean };
 const TYPES: Record<string, "image/png" | "image/webp" | "image/jpeg"> = { "image/png": "image/png", "image/webp": "image/webp", "image/jpeg": "image/jpeg" };
@@ -115,7 +116,7 @@ export function CtpAdminView() {
             <Button size="sm" variant="outline" onClick={() => edit(ctp)}><PencilIcon data-icon="inline-start" />{t("admin:common.edit")}</Button>
             {ctp.active ? <Button size="sm" variant="outline" onClick={() => save.mutate({ id: ctp.id, type: ctp.type, quality: ctp.quality, imagePath: ctp.imagePath, active: false })}><BanIcon data-icon="inline-start" />{t("admin:ctps.deactivate")}</Button> : <Button size="sm" variant="outline" onClick={() => save.mutate({ id: ctp.id, type: ctp.type, quality: ctp.quality, imagePath: ctp.imagePath, active: true })}>{t("admin:ctps.restore")}</Button>}
             <AlertDialog>
-              <AlertDialogTrigger asChild><Button size="icon-sm" variant="ghost" aria-label={t("admin:ctps.delete")} title={t("admin:ctps.delete")}><Trash2Icon className="text-destructive" /></Button></AlertDialogTrigger>
+              <Hint label={t("admin:ctps.delete")}><AlertDialogTrigger asChild><Button size="icon-sm" variant="ghost" aria-label={t("admin:ctps.delete")}><Trash2Icon className="text-destructive" /></Button></AlertDialogTrigger></Hint>
               <AlertDialogContent>
                 <AlertDialogHeader><AlertDialogTitle>{t("admin:ctps.delete")}</AlertDialogTitle><AlertDialogDescription>{t("admin:ctps.deleteConfirm", { name: `${t(`common:ctp.${ctp.type}`)} · ${t(`common:quality.${ctp.quality}`)}` })}</AlertDialogDescription></AlertDialogHeader>
                 <AlertDialogFooter><AlertDialogCancel>{t("admin:common.cancel")}</AlertDialogCancel><AlertDialogAction variant="destructive" onClick={() => remove.mutate(ctp.id)}>{t("admin:ctps.delete")}</AlertDialogAction></AlertDialogFooter>
