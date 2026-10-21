@@ -46,6 +46,17 @@ function StrikerTag({ striker }: { striker: UniformRef }) {
   );
 }
 
+/** Causador de Dano ainda sem Striker meta: a linha fica no cartão, para a curadoria ver o que falta. */
+function MissingStrikerTag() {
+  const { t } = useTranslation("common");
+  return (
+    <span className="mt-0.5 flex w-full min-w-0 items-center justify-center gap-1 rounded-full border border-dashed border-spark/30 py-0.5 text-[0.6rem] leading-tight text-muted-foreground">
+      <ZapIcon aria-hidden className="size-2.5 shrink-0" />
+      <span className="truncate">{t("team.noStriker")}</span>
+    </span>
+  );
+}
+
 /** Selo da posição (Esquerda / Líder / Direita): sempre visível, sobre a borda do cartão. */
 function SlotTag({ label, leader }: { label: string; leader?: boolean }) {
   return (
@@ -92,7 +103,7 @@ export function MemberChip({
   damageDealer?: boolean;
   /** O traje causa o efeito da temporada: atordoa o chefe (selo com o ícone do efeito). */
   stunEffect?: BossEffect;
-  /** Striker meta do Causador de Dano (apoio da Transcendência 4). */
+  /** Striker meta do Causador de Dano (apoio da Transcendência 4); sem ele, "Striker a definir". */
   striker?: UniformRef | null;
   /** Com link (Causador de Dano da Meta): o cartão inteiro leva às rotações do personagem. */
   href?: string;
@@ -166,7 +177,7 @@ export function MemberChip({
       <span className={cn("mt-0.5 w-full truncate leading-tight font-semibold", leader ? "text-xs sm:text-sm" : "text-xs")}>{agent.name}</span>
       {/* Sem traje cadastrado a linha fica vazia, para os três cartões manterem a mesma altura. */}
       <span className="w-full truncate text-[0.65rem] leading-tight text-muted-foreground">{uniformLabel ?? "\u00a0"}</span>
-      {striker && <StrikerTag striker={striker} />}
+      {damageDealer && (striker ? <StrikerTag striker={striker} /> : <MissingStrikerTag />)}
       {href && (
         <span className="mt-0.5 flex items-center gap-0.5 font-heading text-[0.6rem] tracking-wider text-spark uppercase">
           {t("team.seeRotation")}

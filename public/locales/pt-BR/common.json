@@ -62,7 +62,8 @@
     "emptySlot": "Vazio",
     "seeRotation": "Ver rotação",
     "seeRotationOf": "Ver as rotações de {{name}}",
-    "striker": "Striker: {{name}}"
+    "striker": "Striker: {{name}}",
+    "noStriker": "Striker a definir"
   },
   "rotation": {
     "title": "Rotação",
