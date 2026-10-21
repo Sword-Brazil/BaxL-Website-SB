@@ -21,7 +21,7 @@ export function useUsersAdminViewModel(messages: { created: string; saved: strin
 
   const createForm = useForm<CreateUserInput>({
     resolver: zodResolver(CreateUserSchema),
-    defaultValues: { username: "", email: "", password: "", nickname: "", role: "USER" },
+    defaultValues: { username: "", password: "", nickname: "", role: "USER" },
   });
   const [createOpen, setCreateOpen] = useState(false);
 
@@ -35,7 +35,7 @@ export function useUsersAdminViewModel(messages: { created: string; saved: strin
     },
     onError: (e: Error) =>
       e instanceof ApiError && e.status === 409
-        ? createForm.setError(e.message.startsWith("E-mail") ? "email" : "username", { message: e.message })
+        ? createForm.setError("username", { message: e.message })
         : createForm.setError("root", { message: e.message }),
   });
 

@@ -17,9 +17,10 @@ describe("catálogo de eventos de segurança", () => {
     }
   });
 
-  it("crítico vai para o e-mail e para o aviso persistente", () => {
+  it("crítico vai para o aviso persistente (contas não têm e-mail)", () => {
     for (const type of ["PASSWORD_RESET", "ROLE_CHANGED", "ACCOUNT_LOCKED"] as const) {
-      expect(channelsOf(type)).toEqual(["email", "banner"]);
+      expect(severityOf(type)).toBe("CRITICAL");
+      expect(channelsOf(type)).toEqual(["banner"]);
     }
   });
 

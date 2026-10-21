@@ -6,9 +6,9 @@ import { getSession } from "@/server/session";
 
 export default handler({
   POST: async (req, res) => {
-    const { login: id, password } = parseBody(LoginSchema, req);
+    const { username, password } = parseBody(LoginSchema, req);
     const sid = randomUUID();
-    const user = await login({ login: id, password, ip: clientIp(req), sessionId: sid });
+    const user = await login({ username, password, ip: clientIp(req), sessionId: sid });
     const session = await getSession(req, res);
     session.userId = user.id;
     session.sid = sid;

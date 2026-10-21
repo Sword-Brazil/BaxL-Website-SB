@@ -31,7 +31,8 @@ export function useSelectionsSyncViewModel() {
     checkedFor.current = user.id;
     (async () => {
       const remote = await getRemoteSelections().catch(() => undefined);
-      if (remote === undefined) return;
+      // Saiu da conta enquanto a checagem estava em andamento: não religa o aparelho.
+      if (remote === undefined || qc.getQueryData<{ id: string } | null>(["me"])?.id !== user.id) return;
       const state = useSelectionsStore.getState();
       const linked = state.syncUserId === user.id;
       const localDirty = state.doc.updatedAt !== state.syncedLocalAt;
@@ -64,7 +65,7 @@ export function useSelectionsSyncViewModel() {
           break;
       }
     })();
-  }, [hydrated, user, replaceAll, markSynced, notify]);
+  }, [hydrated, user, replaceAll, markSynced, notify, qc]);
 
   // Envio das mudanças locais (debounce).
   const dirty = doc.updatedAt !== syncedLocalAt;

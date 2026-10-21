@@ -64,11 +64,10 @@ export function UsersAdminView() {
             <li key={u.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 p-3">
               <div className="flex min-w-0 flex-1 basis-56 flex-col">
                 <span className="flex items-center gap-2">
-                  <span className="truncate font-medium">{u.username ? `@${u.username}` : u.email}</span>
+                  <span className="truncate font-medium">@{u.username}</span>
                   {u.nickname && <span className="truncate text-sm text-muted-foreground">{u.nickname}</span>}
                 </span>
                 <span className="flex items-center gap-2 text-xs text-muted-foreground">
-                  {u.username && <span className="truncate">{u.email ?? t("admin:users.noEmail")}</span>}
                   <Badge variant={u.role === "USER" ? "outline" : "brazil"}>{t(`admin:users.roles.${u.role}`)}</Badge>
                 </span>
               </div>
@@ -172,19 +171,11 @@ export function UsersAdminView() {
               />
               <TextField
                 control={vm.createForm.control}
-                name="email"
-                label={t("admin:users.email")}
-                description={t("admin:users.emailHint")}
-                type="email"
-                autoComplete="off"
-              />
-              <TextField
-                control={vm.createForm.control}
                 name="password"
                 label={t("auth:fields.password")}
                 type="password"
                 autoComplete="new-password"
-              strength
+                strength
                 description={t("auth:fields.passwordHint")}
               />
               <TextField control={vm.createForm.control} name="nickname" label={t("auth:fields.nickname")} />

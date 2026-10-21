@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { passwordStrength } from "@/models/rules/passwordStrength";
-import { dayNumberSchema, emailSchema, passwordSchema, usernameSchema } from "@/models/schemas/common";
+import { dayNumberSchema, passwordSchema, usernameSchema } from "@/models/schemas/common";
 
 describe("dayNumberSchema", () => {
   it.each([0, 29, 3, 10, 17, 24, 1.5])("rejeita %s", (n) => {
@@ -52,15 +52,5 @@ describe("usernameSchema", () => {
     expect(usernameSchema.safeParse("ab").success).toBe(false);
     expect(usernameSchema.safeParse(" x ").success).toBe(false);
     expect(usernameSchema.safeParse("nome@site").success).toBe(false);
-  });
-});
-
-describe("emailSchema", () => {
-  it("normaliza espaços e maiúsculas", () => {
-    expect(emailSchema.parse("  Yago@Example.COM ")).toBe("yago@example.com");
-  });
-
-  it("rejeita e-mail inválido", () => {
-    expect(emailSchema.safeParse("nao-e-email").success).toBe(false);
   });
 });

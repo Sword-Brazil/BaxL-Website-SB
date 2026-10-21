@@ -152,7 +152,7 @@ function AccountMenu() {
         <DropdownMenuItem
           onSelect={async () => {
             await logout();
-            if (router.pathname.startsWith("/admin")) router.push("/");
+            router.push("/entrar");
           }}
         >
           <LogOutIcon />
@@ -166,6 +166,8 @@ function AccountMenu() {
 export function AppLayout({ title, children, wide = false }: { title?: string; children: ReactNode; wide?: boolean }) {
   const { t } = useTranslation("common");
   const { pathname } = useRouter();
+  // Site privado: quem ainda não entrou (só vê a tela de login) não tem navegação.
+  const { isLoggedIn } = useAuthViewModel();
   const pageTitle = title ? `${title} · ${t("brand.name")}` : t("brand.title");
 
   return (
@@ -179,54 +181,58 @@ export function AppLayout({ title, children, wide = false }: { title?: string; c
       <div className="flex min-h-dvh flex-col">
         <header className="sticky top-0 z-40 border-b border-energy/15 bg-background/80 backdrop-blur-md">
           <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon-touch" className="md:hidden" aria-label={t("nav.menu")}>
-                  <MenuIcon />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-72">
-                <SheetHeader>
-                  <SheetTitle className="sr-only">{t("nav.menu")}</SheetTitle>
-                  <BrandMark />
-                </SheetHeader>
-                <Separator />
-                <MobileNav pathname={pathname} />
-                <Separator />
-                <div className="flex items-center gap-1 px-4">
-                  <LanguageMenu />
-                  <FontSizeMenu />
-                  <ThemeToggle />
-                </div>
-              </SheetContent>
-            </Sheet>
+            {isLoggedIn && (
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon-touch" className="md:hidden" aria-label={t("nav.menu")}>
+                    <MenuIcon />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-72">
+                  <SheetHeader>
+                    <SheetTitle className="sr-only">{t("nav.menu")}</SheetTitle>
+                    <BrandMark />
+                  </SheetHeader>
+                  <Separator />
+                  <MobileNav pathname={pathname} />
+                  <Separator />
+                  <div className="flex items-center gap-1 px-4">
+                    <LanguageMenu />
+                    <FontSizeMenu />
+                    <ThemeToggle />
+                  </div>
+                </SheetContent>
+              </Sheet>
+            )}
 
             <BrandMark />
 
-            <NavigationMenu viewport={false} className="ml-6 hidden md:flex">
-              <NavigationMenuList>
-                {NAV.map((item) => (
-                  <NavigationMenuItem key={item.href}>
-                    <NavigationMenuLink
-                      asChild
-                      active={isActive(pathname, item.href)}
-                      className={cn(
-                        navigationMenuTriggerStyle(),
-                        "font-heading tracking-wider uppercase data-active:text-energy",
-                      )}
-                    >
-                      <Link href={item.href}>{t(`nav.${item.key}`)}</Link>
-                    </NavigationMenuLink>
-                  </NavigationMenuItem>
-                ))}
-              </NavigationMenuList>
-            </NavigationMenu>
+            {isLoggedIn && (
+              <NavigationMenu viewport={false} className="ml-6 hidden md:flex">
+                <NavigationMenuList>
+                  {NAV.map((item) => (
+                    <NavigationMenuItem key={item.href}>
+                      <NavigationMenuLink
+                        asChild
+                        active={isActive(pathname, item.href)}
+                        className={cn(
+                          navigationMenuTriggerStyle(),
+                          "font-heading tracking-wider uppercase data-active:text-energy",
+                        )}
+                      >
+                        <Link href={item.href}>{t(`nav.${item.key}`)}</Link>
+                      </NavigationMenuLink>
+                    </NavigationMenuItem>
+                  ))}
+                </NavigationMenuList>
+              </NavigationMenu>
+            )}
 
             <div className="ml-auto flex items-center gap-1">
               <LanguageMenu className="hidden sm:inline-flex" />
               <FontSizeMenu className="hidden sm:inline-flex" />
               <ThemeToggle className="hidden sm:inline-flex" />
-              <NicknameMenu />
+              {isLoggedIn && <NicknameMenu />}
               <AccountMenu />
             </div>
           </div>

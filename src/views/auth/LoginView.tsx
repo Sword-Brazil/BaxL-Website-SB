@@ -17,15 +17,15 @@ export function LoginView() {
   const { t } = useTranslation("auth");
   const router = useRouter();
   const { login, loginState } = useAuthViewModel();
-  const form = useForm<LoginInput>({ resolver: zodResolver(LoginSchema), defaultValues: { login: "", password: "" } });
+  const form = useForm<LoginInput>({ resolver: zodResolver(LoginSchema), defaultValues: { username: "", password: "" } });
 
   const onSubmit = form.handleSubmit(async (values) => {
     try {
-      const user = await login(values);
+      await login(values);
       toast.success(t("login.welcome"));
       const next = typeof router.query.next === "string" && router.query.next.startsWith("/") ? router.query.next : null;
-      // Jogador volta para o elenco; a curadoria, para a administração.
-      router.push(next ?? (user.role === "USER" ? "/meu-elenco" : "/admin"));
+      // Volta para onde a pessoa ia antes do login (o site é só para membros).
+      router.push(next ?? "/");
     } catch {
       /* erro exibido abaixo */
     }
@@ -49,7 +49,7 @@ export function LoginView() {
                   <AlertTitle>{error.status === 429 ? t("login.rateLimited") : error.message}</AlertTitle>
                 </Alert>
               )}
-              <TextField control={form.control} name="login" label={t("fields.login")} autoComplete="username" autoCapitalize="none" spellCheck={false} />
+              <TextField control={form.control} name="username" label={t("fields.username")} autoComplete="username" autoCapitalize="none" spellCheck={false} />
               <TextField
                 control={form.control}
                 name="password"

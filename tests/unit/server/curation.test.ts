@@ -156,33 +156,25 @@ describe("curadoria", () => {
   });
 
   describe("usuários", () => {
-    it("cria conta de administrador com e-mail; e-mail repetido gera 409", async () => {
-      const u = await createAccount({ email: "novo@sword.br", password: "senha1234", role: "ADMIN" });
-      expect(u.role).toBe("ADMIN");
+    it("cria conta com nome de usuário (minúsculo); usuário repetido gera 409", async () => {
+      const u = await createAccount({ username: "Sword Menezes", password: "Desenho.2020!", role: "ADMIN" });
+      expect(u).toMatchObject({ username: "sword menezes", role: "ADMIN" });
       const row = await prisma.user.findUniqueOrThrow({ where: { id: u.id } });
-      expect(row.emailVerifiedAt).not.toBeNull();
-      expect(row.passwordHash).not.toBe("senha1234");
-      await expect(createAccount({ email: "NOVO@sword.br", password: "senha1234", role: "CURATOR" })).rejects.toSatisfy(status(409));
+      expect(row.passwordHash).not.toBe("Desenho.2020!");
+      await expect(createAccount({ username: "SWORD MENEZES", password: "Desenho.2020!", role: "USER" })).rejects.toSatisfy(status(409));
     });
 
-    it("cria jogador só com nome de usuário (minúsculo); usuário repetido gera 409", async () => {
-      const u = await createAccount({ username: "tenmenezes", password: "senha1234", role: "USER" });
-      expect(u).toMatchObject({ username: "tenmenezes", email: null, role: "USER" });
-      await expect(createAccount({ username: "TenMenezes", password: "senha1234", role: "USER" })).rejects.toSatisfy(status(409));
-      await expect(createAccount({ password: "senha1234", role: "USER" })).rejects.toSatisfy(status(400));
-    });
-
-    it("a busca acha por usuário, e-mail ou apelido, sem diferenciar maiúsculas", async () => {
+    it("a busca acha por usuário ou apelido, sem diferenciar maiúsculas", async () => {
       await createAccount({ username: "tenmenezes", nickname: "Ten Menezes", password: "senha1234", role: "USER" });
-      await createAccount({ email: "curador@sword.br", password: "senha1234", role: "CURATOR" });
+      await createAccount({ username: "curador", password: "senha1234", role: "CURATOR" });
       expect((await listUsers({ q: "MENEZES" })).users.map((u) => u.username)).toEqual(["tenmenezes"]);
-      expect((await listUsers({ q: "Curador@" })).users.map((u) => u.email)).toEqual(["curador@sword.br"]);
+      expect((await listUsers({ q: "Curad" })).users.map((u) => u.username)).toEqual(["curador"]);
     });
 
     it("rebaixar o último ADMIN gera 409", async () => {
       const admin = await createUser("ADMIN");
       await expect(changeRole(admin.id, "USER")).rejects.toSatisfy(status(409));
-      await createUser("ADMIN", "outro@sword.br");
+      await createUser("ADMIN", "outro");
       await expect(changeRole(admin.id, "CURATOR")).resolves.toMatchObject({ role: "CURATOR" });
     });
   });

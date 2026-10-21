@@ -4,10 +4,8 @@
  */
 export const VALIDATION = {
   passwordRequired: "Informe a senha",
-  loginRequired: "Informe o usuário ou e-mail",
+  loginRequired: "Informe o nome de usuário",
   usernameFormat: "Use de 3 a 30 letras, números, espaço, ponto, hífen ou sublinhado",
-  accountIdRequired: "Informe um nome de usuário ou um e-mail",
-  emailInvalid: "E-mail inválido",
   passwordMin: "Mínimo de 8 caracteres",
   passwordLower: "Precisa conter uma letra minúscula",
   passwordUpper: "Precisa conter uma letra maiúscula",

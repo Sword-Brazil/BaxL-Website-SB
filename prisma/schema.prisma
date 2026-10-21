@@ -186,21 +186,20 @@ model BaiBoss {
 // ---------- Curadoria (login só de curadores e administradores) ----------
 // Jogadores não têm conta: elenco, equipes e nome no jogo ficam no aparelho (localStorage).
 
-// Jogadores (USER) entram com nome de usuário; curadores e administradores, com e-mail.
-// Só administradores criam contas e trocam senhas (não há cadastro nem "esqueci a senha").
+// Todo login é nome de usuário + senha (sem e-mail). Só administradores criam contas e trocam
+// senhas (não há cadastro nem "esqueci a senha").
 model User {
-  id              String             @id @default(cuid())
-  username        String?            @unique
-  email           String?            @unique
-  passwordHash    String
-  nickname        String?
-  role            String             @default("USER")
-  emailVerifiedAt DateTime?
-  selections      UserSelectionsDoc?
-  metaTeams       MetaTeam[]
-  notices         SecurityNotice[]
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
+  id           String             @id @default(cuid())
+  // Guardado em minúsculas, com espaços simples (ex.: "sword menezes").
+  username     String             @unique
+  passwordHash String
+  nickname     String?
+  role         String             @default("USER")
+  selections   UserSelectionsDoc?
+  metaTeams    MetaTeam[]
+  notices      SecurityNotice[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
 }
 
 // Elenco, equipes, CTPs e nome no jogo do jogador logado (documento JSON), iguais em todo aparelho.

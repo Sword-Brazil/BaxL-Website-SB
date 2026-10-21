@@ -172,10 +172,8 @@
   },
   "validation": {
     "passwordRequired": "Informe a senha",
-    "loginRequired": "Informe o usuário ou e-mail",
+    "loginRequired": "Informe o nome de usuário",
     "usernameFormat": "Use de 3 a 30 letras, números, espaço, ponto, hífen ou sublinhado",
-    "accountIdRequired": "Informe um nome de usuário ou um e-mail",
-    "emailInvalid": "E-mail inválido",
     "passwordMin": "Mínimo de 8 caracteres",
     "passwordLower": "Precisa conter uma letra minúscula",
     "passwordUpper": "Precisa conter uma letra maiúscula",
@@ -222,15 +220,15 @@
       },
       "PASSWORD_RESET": {
         "title": "Senha redefinida",
-        "text": "A senha da sua conta foi redefinida em {{date}}. Se a conta tem e-mail, também enviamos um aviso por lá."
+        "text": "A senha da sua conta foi redefinida em {{date}}."
       },
       "ROLE_CHANGED": {
         "title": "Papel da conta alterado",
-        "text": "Sua conta agora tem o papel {{role}} (alterado em {{date}}). Se a conta tem e-mail, também enviamos um aviso por lá."
+        "text": "Sua conta agora tem o papel {{role}} (alterado em {{date}})."
       },
       "ACCOUNT_LOCKED": {
         "title": "Conta bloqueada temporariamente",
-        "text": "O login foi bloqueado por alguns minutos em {{date}} depois de muitas tentativas com a senha errada. Se a conta tem e-mail, também enviamos um aviso por lá."
+        "text": "O login foi bloqueado por alguns minutos em {{date}} depois de muitas tentativas com a senha errada."
       }
     }
   },

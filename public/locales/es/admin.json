@@ -149,7 +149,7 @@
   },
   "users": {
     "title": "Usuarios y roles",
-    "search": "Buscar por usuario, e-mail o apodo…",
+    "search": "Buscar por usuario o apodo…",
     "role": "Rol",
     "roles": {
       "USER": "Jugador",
@@ -161,14 +161,11 @@
     "created": "Cuenta creada",
     "passwordReset": "Contraseña restablecida",
     "lastAdmin": "No se puede degradar al último administrador.",
-    "help": "Solo los administradores crean cuentas y cambian contraseñas. Los jugadores entran con su nombre de usuario; curadores y administradores pueden usar el e-mail. Siempre debe haber al menos un administrador.",
+    "help": "Solo los administradores crean cuentas y cambian contraseñas. Todos entran con nombre de usuario y contraseña. Siempre debe haber al menos un administrador.",
     "newUser": "Nueva cuenta",
     "username": "Nombre de usuario",
     "usernameHint": "Se usa para entrar. Ej.: el nick del juego (3 a 30 letras, números, espacio, punto, guion o guion bajo). Mayúsculas no importan.",
-    "email": "E-mail",
-    "emailHint": "Opcional para jugadores. Curadores y administradores reciben las alertas críticas por e-mail.",
-    "resetHelp": "Define una contraseña nueva y pásala a la persona. La anterior deja de funcionar al momento.",
-    "noEmail": "sin e-mail"
+    "resetHelp": "Define una contraseña nueva y pásala a la persona. La anterior deja de funcionar al momento."
   },
   "settings": {
     "title": "Configuración del calendario",

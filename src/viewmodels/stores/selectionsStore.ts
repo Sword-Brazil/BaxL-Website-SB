@@ -33,6 +33,8 @@ interface SelectionsState {
   resetAllTeams: () => void;
   replaceAll: (doc: UserSelections) => void;
   markSynced: (base: string | null, userId: string | null) => void;
+  /** Ao sair da conta: o aparelho fica limpo (os dados continuam na conta). */
+  clearDevice: () => void;
 }
 
 const touch = (doc: UserSelections, patch: Partial<UserSelections>): UserSelections => ({
@@ -114,6 +116,7 @@ export const useSelectionsStore = create<SelectionsState>()(
 
       replaceAll: (doc) => set({ doc }),
       markSynced: (syncBase, syncUserId) => set(({ doc }) => ({ syncBase, syncUserId, syncedLocalAt: doc.updatedAt })),
+      clearDevice: () => set({ doc: emptySelections(), syncBase: null, syncUserId: null, syncedLocalAt: null }),
     }),
     {
       name: "mff-selections",

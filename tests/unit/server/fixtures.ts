@@ -45,8 +45,8 @@ export const ctpId = async (type = "RAGE", quality = "BRILLIANT") =>
 export const dayId = async (mode: string, number: number) =>
   (await prisma.battleDay.findUniqueOrThrow({ where: { mode_number: { mode, number } } })).id;
 
-export async function createUser(role = "USER", email = `${role.toLowerCase()}@sword.br`) {
-  return prisma.user.create({ data: { email, passwordHash: "x", role, nickname: role.toLowerCase() } });
+export async function createUser(role = "USER", username = role.toLowerCase()) {
+  return prisma.user.create({ data: { username, passwordHash: "x", role, nickname: role.toLowerCase() } });
 }
 
 export async function createMetaTeam(opts: {
