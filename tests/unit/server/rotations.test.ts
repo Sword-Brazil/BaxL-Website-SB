@@ -47,4 +47,15 @@ describe("rotações por personagem", () => {
     );
     await expect(saveAgentRotations("nao-existe", { rotations: [] })).rejects.toSatisfy((e) => e instanceof HttpError && e.status === 404);
   });
+
+  it("guarda a temporada de cada rotação (null = todas)", async () => {
+    const saved = await saveAgentRotations(agentId, {
+      rotations: [
+        { uniformId: null, effect: "PARALYSIS", sequence: "1 2 3" },
+        { uniformId: null, effect: "SHOCK", sequence: "4 5 6" },
+        { uniformId: null, sequence: "geral" },
+      ],
+    });
+    expect(saved.map((r) => r.effect)).toEqual(["PARALYSIS", "SHOCK", null]);
+  });
 });

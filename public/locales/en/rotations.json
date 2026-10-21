@@ -14,5 +14,6 @@
   "allUniformsTitle": "All uniforms",
   "uniforms": "Uniforms with rotations",
   "usedInTeam": "Uniform used in the team you opened",
-  "untitled": "Rotation {{n}}"
+  "untitled": "Rotation {{n}}",
+  "season": "Season"
 }

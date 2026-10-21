@@ -17,6 +17,7 @@ const uniformData = (u: AgentInput["uniforms"][number]) => ({
   side: u.side,
   species: u.species,
   attackType: u.attackType,
+  ...(u.effects ? { effects: u.effects } : {}),
 });
 
 async function assertSlugFree(slug: string, exceptId?: string) {
@@ -46,11 +47,21 @@ export async function updateAgent(id: string, input: AgentInput) {
   if (!agent) throw new HttpError(404, "NOT_FOUND", "Agente não encontrado");
   await assertSlugFree(input.slug, id);
 
+  const matched = input.uniforms.map((u) => ({
+    u,
+    existing: agent.uniforms.find((x) => x.id === u.id) ?? agent.uniforms.find((x) => x.slug === u.slug),
+  }));
+  const renamed = matched.filter(({ u, existing }) => existing && existing.slug !== u.slug).map(({ existing }) => existing!.id);
+
   return prisma.$transaction(async (tx) => {
     await tx.agent.update({ where: { id }, data: agentData(input) });
+    // Trajes que mudam de identificador liberam o antigo antes: renomear um traje para o nome que
+    // outro está deixando (ou trocar dois de nome) violaria o slug único por agente no meio do laço.
+    for (const uniformId of renamed) {
+      await tx.uniform.update({ where: { id: uniformId }, data: { slug: `~${uniformId}` } });
+    }
     const keep = new Set<string>();
-    for (const u of input.uniforms) {
-      const existing = agent.uniforms.find((x) => x.id === u.id) ?? agent.uniforms.find((x) => x.slug === u.slug);
+    for (const { u, existing } of matched) {
       const data = uniformData(u);
       if (existing) {
         await tx.uniform.update({ where: { id: existing.id }, data });

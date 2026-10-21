@@ -28,6 +28,7 @@ import { FontSizeMenu } from "./FontSizeMenu";
 import { SecurityNotices } from "./SecurityNotices";
 import { NicknameMenu } from "./NicknameMenu";
 import { SelectionsSyncDialog } from "./SelectionsSyncDialog";
+import { SupportFooter } from "./SupportFooter";
 
 const NAV = [
   { href: "/", key: "battle" },
@@ -252,6 +253,7 @@ export function AppLayout({ title, children, wide = false }: { title?: string; c
             <p className="font-heading tracking-wider text-energy/80 uppercase">{t("footer.alliance")}</p>
             <p>{t("footer.disclaimer")}</p>
             <p>{t("footer.credit")}</p>
+            <SupportFooter />
           </div>
         </footer>
       </div>

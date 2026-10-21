@@ -1,12 +1,12 @@
-# MFF System · Sword Brazil
+# MFF System · Sword Brasil
 
-Plataforma de metas da **Batalha de Aliança** de *Marvel Future Fight* para a aliança **Sword Brazil**:
+Plataforma de metas da **Batalha de Aliança** de *Marvel Future Fight* para a aliança **Sword Brasil**:
 equipes Meta por dia de **BAX** e **BAL** (ciclo de 28 dias), modo livre da BAL, **BAI**, elenco pessoal,
 montagem de equipe com CTPs (arrastar e soltar) e sugestões, com curadoria pela aba Admin.
 
 > Projeto de fã, **não oficial** e **sem fins comerciais**. *Marvel Future Fight* é propriedade da
 > Netmarble; os personagens são propriedade da Marvel. Calendário e equipes de base importados do
-> [Guia BAX/BAL/BAI](https://guiabaxbal.web.app/), com curadoria da Sword Brazil.
+> [Guia BAX/BAL/BAI](https://guiabaxbal.web.app/), com curadoria da Sword Brasil.
 
 Especificação, plano e tarefas: [`specs/001-alliance-battle-metas/`](specs/001-alliance-battle-metas/).
 
@@ -43,6 +43,7 @@ Variáveis em `.env.local`:
 | `SUPABASE_STORAGE_BUCKET` | Bucket público das imagens (padrão `assets`). |
 | `SESSION_SECRET` | ≥ 32 caracteres aleatórios. Sem ele o servidor não inicia. |
 | `SEED_ADMIN_USERNAME` / `SEED_ADMIN_PASSWORD` | Administrador padrão (ex.: `Sword Menezes`). Ele cria as demais contas. |
+| `NEXT_PUBLIC_PIX_KEY` / `NEXT_PUBLIC_PIX_KEY_TYPE` | Opcional: chave Pix (e o rótulo, ex.: `CNPJ`) mostrada no rodapé com botão de copiar. Entra no build: depois de mudar na Vercel, faça *Redeploy*. |
 
 Rodar `npm run db:seed` de novo é seguro: ele não duplica nada e atualiza a senha do administrador.
 
@@ -123,8 +124,12 @@ os dados e o administrador **Sword Menezes**. Falta publicar o site:
 
 Depois disso:
 
-- **Migrações novas**: rode `npm run db:deploy` contra o Supabase antes do merge que trouxer a
-  migração (ou mude o *Build Command* para `prisma migrate deploy && next build`).
+- **CI** (`.github/workflows/ci.yml`): todo PR e push na `Dev`/`master` roda lint, `tsc`,
+  `check:locales`, testes e build. O deploy continua sendo o da Vercel (preview por PR, produção na
+  `master`).
+- **Migrações novas**: no push para a `master`, o job `migrate` do CI roda `prisma migrate deploy`
+  se os secrets `DATABASE_URL` e `DIRECT_URL` estiverem no GitHub (*Settings → Secrets and variables
+  → Actions*, URLs completas). Sem eles, rode `npm run db:deploy` contra o Supabase antes do merge.
 - **Novo projeto Supabase do zero**: `npm run db:deploy` → `npm run db:migrate-data` (só para trazer
   um `dev.db` antigo) → `npm run db:seed`, nessa ordem.
 - **Plano gratuito do Supabase**: projetos sem uso por um tempo podem ser pausados; reative pelo

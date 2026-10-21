@@ -1,5 +1,5 @@
 import type { Role, TeamScope } from "@/models/domain/enums";
-import type { BaiBoss, Ctp, Criterion, MetaTeam, PriorityLists, Rotation, SessionUser, Settings } from "@/models/domain/types";
+import type { BaiBoss, Ctp, Criterion, MetaTeam, PriorityLists, Rotation, Season, SessionUser, Settings } from "@/models/domain/types";
 import type {
   AgentInput,
   AgentRotationsInput,
@@ -10,6 +10,7 @@ import type {
   MetaTeamInput,
   PriorityInput,
   PriorityTarget,
+  SeasonInput,
   SettingsInput,
 } from "@/models/schemas/admin";
 import { apiFetch } from "./client";
@@ -22,6 +23,8 @@ export interface AdminUser extends SessionUser {
 }
 
 export const adminApi = {
+  getSeason: () => apiFetch<Season>("/api/admin/season"),
+  setSeason: (body: SeasonInput) => apiFetch<Season>("/api/admin/season", { method: "PUT", body }),
   setRestriction: (mode: string, number: number, criteria: Criterion[]) =>
     apiFetch<{ criteria: Criterion[] }>(`/api/admin/days/${mode}/${number}/restriction`, { method: "PUT", body: { criteria } }),
 

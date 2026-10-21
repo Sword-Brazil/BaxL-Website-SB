@@ -14,5 +14,6 @@
   "allUniformsTitle": "Todos os trajes",
   "uniforms": "Trajes com rotação",
   "usedInTeam": "Traje usado na equipe que você abriu",
-  "untitled": "Rotação {{n}}"
+  "untitled": "Rotação {{n}}",
+  "season": "Temporada"
 }

@@ -6,15 +6,17 @@ import { listBosses } from "./baiService";
 import { effectivePriority } from "@/models/rules/priority";
 import { toCriteria, toMetaTeam, toPriority } from "./mappers";
 import { getPriority } from "./priorityService";
+import { getSeason } from "./seasonService";
 
 /** Ciclo de 28 dias com BAX e BAL de cada dia e o conteúdo da BAI, para a tela central. */
 export async function getCycle(): Promise<CycleOverview> {
-  const [bax, bal, baiTeams, bosses, baiReserves] = await Promise.all([
+  const [bax, bal, baiTeams, bosses, baiReserves, season] = await Promise.all([
     daysRepository.listByMode("BAX"),
     daysRepository.listByMode("BAL"),
     metaTeamRepository.listByScope("BAI"),
     listBosses(),
     getPriority({ scope: "BAI" }),
+    getSeason(),
   ]);
   const byNumber = (rows: typeof bax) => new Map(rows.map((r) => [r.number, r]));
   const modes: Record<DayMode, ReturnType<typeof byNumber>> = { BAX: byNumber(bax), BAL: byNumber(bal) };
@@ -42,6 +44,7 @@ export async function getCycle(): Promise<CycleOverview> {
 
   const baiMetaTeams = baiTeams.map(toMetaTeam);
   return {
+    season,
     days,
     bai: { metaTeams: baiMetaTeams, bosses, priority: effectivePriority(baiMetaTeams, baiReserves), reserves: baiReserves },
   };

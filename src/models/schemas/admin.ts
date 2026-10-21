@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CRITERION_VALUES, CTP_QUALITIES, CTP_TYPES, SLOTS, UNKNOWN } from "@/models/domain/enums";
+import { BAL_EFFECTS, BAX_EFFECTS, BOSS_EFFECTS, CRITERION_VALUES, CTP_QUALITIES, CTP_TYPES, SLOTS, UNKNOWN } from "@/models/domain/enums";
 import {
   attackTypeSchema,
   criterionAttributeSchema,
@@ -40,6 +40,8 @@ export const MetaTeamMemberSchema = z.object({
   ctpId: idSchema.nullable().optional(),
   /** Causador de Dano: o jogador toca na foto e vê as rotações do personagem. */
   isDamageDealer: z.boolean().optional(),
+  /** Striker meta do Causador de Dano (ignorado em quem não é Causador de Dano). */
+  strikerUniformId: idSchema.nullable().optional(),
 });
 
 export const MetaTeamSchema = z
@@ -102,6 +104,12 @@ export const UniformInputSchema = z.object({
   side: sideSchema.or(z.literal(UNKNOWN)),
   species: speciesSchema.or(z.literal(UNKNOWN)),
   attackType: attackTypeSchema.or(z.literal(UNKNOWN)),
+  // Efeitos que o traje causa no chefe (sem repetição). Ausente = mantém os que já tem.
+  effects: z
+    .array(z.enum(BOSS_EFFECTS))
+    .max(BOSS_EFFECTS.length)
+    .refine((es) => new Set(es).size === es.length)
+    .optional(),
 });
 
 export const AgentSchema = z.object({
@@ -154,6 +162,7 @@ export type AssetUploadInput = z.infer<typeof AssetUploadSchema>;
 /** Rotação em texto livre (sem formato obrigatório); o vídeo precisa ser YouTube ou .mp4/.webm. */
 export const RotationInputSchema = z.object({
   uniformId: idSchema.nullable(),
+  effect: z.enum(BOSS_EFFECTS).optional().nullable(),
   title: z.string().trim().max(80).optional().nullable(),
   sequence: z.string().trim().min(1, { message: VALIDATION.rotationRequired }).max(1000),
   description: z.string().trim().max(3000).optional().nullable(),
@@ -169,3 +178,7 @@ export type RotationInput = z.infer<typeof RotationInputSchema>;
 
 export const AgentRotationsSchema = z.object({ rotations: z.array(RotationInputSchema).max(40) });
 export type AgentRotationsInput = z.infer<typeof AgentRotationsSchema>;
+
+/** Temporada atual: o efeito da BAX e o da BAL, escolhidos separadamente. */
+export const SeasonSchema = z.object({ BAX: z.enum(BAX_EFFECTS), BAL: z.enum(BAL_EFFECTS) });
+export type SeasonInput = z.infer<typeof SeasonSchema>;

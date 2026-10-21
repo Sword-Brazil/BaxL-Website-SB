@@ -14,6 +14,8 @@ export interface MemberDraft {
   ctpId: string | null;
   /** Causador de Dano: o jogador toca na foto e vê as rotações do personagem. */
   isDamageDealer: boolean;
+  /** Striker meta do Causador de Dano. */
+  strikerUniformId: string | null;
 }
 
 export interface TeamDraft {
@@ -24,7 +26,7 @@ export interface TeamDraft {
   members: Record<Slot, MemberDraft>;
 }
 
-const emptyMember = (): MemberDraft => ({ uniformId: null, ctpId: null, isDamageDealer: false });
+const emptyMember = (): MemberDraft => ({ uniformId: null, ctpId: null, isDamageDealer: false, strikerUniformId: null });
 
 const emptyDraft = (isPrimary: boolean): TeamDraft => ({
   isPrimary,
@@ -45,6 +47,7 @@ const fromTeam = (t: MetaTeam): TeamDraft => ({
         uniformId: m.uniformId,
         ctpId: m.ctpId,
         isDamageDealer: m.isDamageDealer,
+        strikerUniformId: m.strikerUniformId,
       },
     ]),
   ) as TeamDraft["members"],
@@ -88,6 +91,7 @@ export function useMetaTeamEditorViewModel(scopeVm: MetaScopeViewModel, messages
             uniformId: m.uniformId ?? "",
             ctpId: m.ctpId ?? null,
             isDamageDealer: m.isDamageDealer,
+            strikerUniformId: m.isDamageDealer ? m.strikerUniformId : null,
           };
         }),
       };

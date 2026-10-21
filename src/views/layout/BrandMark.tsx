@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useTranslation } from "next-i18next/pages";
 
-/** Logo + nome da Sword Brazil para o cabeçalho. */
+/** Logo + nome da Sword Brasil para o cabeçalho. */
 export function BrandMark() {
   const { t } = useTranslation("common");
   return (

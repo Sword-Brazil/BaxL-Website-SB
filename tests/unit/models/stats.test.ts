@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { CycleOverview, MetaTeam } from "@/models/domain/types";
 
-const NO_ROTATION = { isDamageDealer: false, rotation: null, rotationNotes: null, rotationVideoUrl: null };
+const NO_ROTATION = { isDamageDealer: false, strikerUniformId: null, rotation: null, rotationNotes: null, rotationVideoUrl: null };
 import { agentRepetition, ctpUsage, myAgentRepetition, myTeamCompositions } from "@/models/rules/stats";
 
 const team = (isPrimary: boolean, uniforms: [string, string, string]): MetaTeam => ({
@@ -20,6 +20,7 @@ const EMPTY = { solo: [], support: [] };
 const modeDay = (teams: MetaTeam[]) => ({ criteria: [], metaTeams: teams, priority: EMPTY, reserves: EMPTY });
 
 const cycle: CycleOverview = {
+  season: { BAX: "PARALYSIS", BAL: "SHOCK" },
   days: [
     { number: 1, weekday: "QUI", week: 1, isBai: false, bax: modeDay([team(true, ["a", "b", "c"]), team(false, ["a", "d", "e"])]), bal: modeDay([team(true, ["a", "x", "y"])]) },
     { number: 3, weekday: "SÁB", week: 1, isBai: true, bax: null, bal: null },

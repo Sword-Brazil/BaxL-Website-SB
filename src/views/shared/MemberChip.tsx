@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { useTranslation } from "next-i18next/pages";
-import { CheckIcon, ChevronRightIcon, CrownIcon, SwordIcon } from "lucide-react";
+import { CheckIcon, ChevronRightIcon, CrownIcon, SwordIcon, ZapIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ctpColor } from "@/models/domain/ctpColors";
+import type { BossEffect } from "@/models/domain/enums";
 import type { Ctp } from "@/models/domain/types";
 import type { UniformRef } from "@/viewmodels/useCatalogViewModel";
+import { BossEffectIcon } from "./BossEffect";
 import { CtpBadge } from "./CtpBadge";
 import { Hint } from "./Hint";
 
@@ -19,6 +21,30 @@ const initials = (name: string) =>
 
 /** Moldura da foto pela facção (o clip-path do chanfro corta o `ring`, então a moldura é um fundo). */
 const FRAME_BY_SIDE: Record<string, string> = { HERO: "bg-hero/70", VILLAIN: "bg-villain/70" };
+
+/** Striker meta do Causador de Dano: foto pequena + nome, logo abaixo do traje. */
+function StrikerTag({ striker }: { striker: UniformRef }) {
+  const { t } = useTranslation("common");
+  const uniformLabel = striker.uniform.slug === "padrao" ? null : striker.uniform.name;
+  const label = t("team.striker", { name: `${striker.agent.name}${uniformLabel ? ` — ${uniformLabel}` : ""}` });
+  return (
+    <Hint label={label}>
+      <span
+        aria-label={label}
+        className="mt-0.5 flex w-full min-w-0 items-center gap-1 rounded-full border border-spark/40 bg-spark/10 py-0.5 pr-1.5 pl-0.5 text-[0.6rem] leading-tight text-spark"
+      >
+        <Avatar className={cn("chamfer-sm size-5 shrink-0 rounded-none after:hidden", !striker.uniform.active && "grayscale")}>
+          <AvatarImage src={striker.uniform.portrait || undefined} alt="" loading="lazy" decoding="async" className="rounded-none" />
+          <AvatarFallback className="rounded-none bg-secondary font-heading text-[0.5rem] text-secondary-foreground">
+            {initials(striker.agent.name)}
+          </AvatarFallback>
+        </Avatar>
+        <ZapIcon aria-hidden className="size-2.5 shrink-0" />
+        <span className="min-w-0 truncate font-semibold">{striker.agent.name}</span>
+      </span>
+    </Hint>
+  );
+}
 
 /** Selo da posição (Esquerda / Líder / Direita): sempre visível, sobre a borda do cartão. */
 function SlotTag({ label, leader }: { label: string; leader?: boolean }) {
@@ -48,22 +74,26 @@ const tileClass = (leader?: boolean) =>
 export function MemberChip({
   refItem,
   ctp,
-  ctpTypeOnly,
   owned,
   slotLabel,
   leader,
   damageDealer,
+  stunEffect,
+  striker,
   href,
 }: {
   refItem: UniformRef | null;
   ctp: Ctp | null;
-  ctpTypeOnly?: boolean;
   owned?: boolean;
   slotLabel: string;
   /** Líder: fica no meio da equipe, um pouco maior e com brilho. */
   leader?: boolean;
   /** Causador de Dano marcado pelos curadores (selo de espada). */
   damageDealer?: boolean;
+  /** O traje causa o efeito da temporada: atordoa o chefe (selo com o ícone do efeito). */
+  stunEffect?: BossEffect;
+  /** Striker meta do Causador de Dano (apoio da Transcendência 4). */
+  striker?: UniformRef | null;
   /** Com link (Causador de Dano da Meta): o cartão inteiro leva às rotações do personagem. */
   href?: string;
 }) {
@@ -81,8 +111,8 @@ export function MemberChip({
   const { agent, uniform } = refItem;
   const unavailable = !agent.active || !uniform.active;
   const uniformLabel = uniform.slug === "padrao" ? null : uniform.name;
-  // Personagem do usuário "pintado" com a cor do CTP equipado.
-  const tinted = !!ctp && !ctpTypeOnly;
+  // Com CTP (o equipado pelo usuário ou o da Meta), o personagem é "pintado" com a cor dele.
+  const tinted = !!ctp;
 
   const label = `${slotLabel}: ${agent.name}${uniformLabel ? ` — ${uniformLabel}` : ""}`;
   const content = (
@@ -101,7 +131,7 @@ export function MemberChip({
             </Avatar>
           </div>
         </Hint>
-        {ctp && <CtpBadge ctp={ctp} typeOnly={ctpTypeOnly} size={leader ? "lg" : "md"} className="absolute -right-3 -bottom-1" />}
+        {ctp && <CtpBadge ctp={ctp} size={leader ? "lg" : "md"} className="absolute -right-3 -bottom-1" />}
         {damageDealer && (
           <Hint label={t("team.damageDealer")}>
             <span
@@ -109,6 +139,16 @@ export function MemberChip({
               aria-label={t("team.damageDealer")}
             >
               <SwordIcon className="size-2.5" />
+            </span>
+          </Hint>
+        )}
+        {stunEffect && (
+          <Hint label={t("season.stuns", { effect: t(`effects.${stunEffect}`) })}>
+            <span
+              className="absolute -bottom-1 -left-1.5 flex size-5 items-center justify-center rounded-full bg-card ring-2 ring-card"
+              aria-label={t("season.stuns", { effect: t(`effects.${stunEffect}`) })}
+            >
+              <BossEffectIcon effect={stunEffect} className="size-3.5" />
             </span>
           </Hint>
         )}
@@ -126,6 +166,7 @@ export function MemberChip({
       <span className={cn("mt-0.5 w-full truncate leading-tight font-semibold", leader ? "text-xs sm:text-sm" : "text-xs")}>{agent.name}</span>
       {/* Sem traje cadastrado a linha fica vazia, para os três cartões manterem a mesma altura. */}
       <span className="w-full truncate text-[0.65rem] leading-tight text-muted-foreground">{uniformLabel ?? "\u00a0"}</span>
+      {striker && <StrikerTag striker={striker} />}
       {href && (
         <span className="mt-0.5 flex items-center gap-0.5 font-heading text-[0.6rem] tracking-wider text-spark uppercase">
           {t("team.seeRotation")}

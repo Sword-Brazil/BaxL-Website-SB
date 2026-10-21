@@ -37,6 +37,18 @@ export const CRITERION_VALUES = {
   ATTACK_TYPE: ATTACK_TYPES,
 } as const satisfies Record<CriterionAttribute, readonly string[]>;
 
+/**
+ * Efeito que atordoa o chefe da BA. Cada temporada (um ciclo de 28 dias) tem um efeito na BAX e
+ * outro na BAL; a curadoria escolhe os dois. Trajes com skill desse efeito atordoam o chefe.
+ */
+export const BAX_EFFECTS = ["SILENCE", "PARALYSIS", "BURN"] as const;
+export const BAL_EFFECTS = ["FRACTURE", "SHOCK", "TRAP"] as const;
+export type BaxEffect = (typeof BAX_EFFECTS)[number];
+export type BalEffect = (typeof BAL_EFFECTS)[number];
+export const BOSS_EFFECTS = [...BAX_EFFECTS, ...BAL_EFFECTS] as const;
+export type BossEffect = (typeof BOSS_EFFECTS)[number];
+export const EFFECTS_BY_MODE: Record<DayMode, readonly BossEffect[]> = { BAX: BAX_EFFECTS, BAL: BAL_EFFECTS };
+
 export const CTP_TYPES = [
   "RAGE", // Fúria
   "LIBERATION", // Liberação
