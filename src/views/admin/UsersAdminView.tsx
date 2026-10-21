@@ -71,9 +71,9 @@ export function UsersAdminView() {
                   <Badge variant={u.role === "USER" ? "outline" : "brazil"}>{t(`admin:users.roles.${u.role}`)}</Badge>
                 </span>
               </div>
-              <div className="flex w-full items-center gap-2 sm:w-auto">
+              <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
                 <Select value={u.role} onValueChange={(role) => setPendingRole({ id: u.id, name: displayName(u), role: role as Role })}>
-                  <SelectTrigger className="flex-1 sm:w-40 sm:flex-none" aria-label={`${t("admin:users.role")} · ${displayName(u)}`}>
+                  <SelectTrigger className="min-w-32 flex-1 sm:w-40 sm:flex-none" aria-label={`${t("admin:users.role")} · ${displayName(u)}`}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

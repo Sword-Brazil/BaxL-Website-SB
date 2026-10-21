@@ -30,7 +30,7 @@ function ModeDays({ mode, effect }: { mode: DayMode; effect: BossEffect | null }
               row.dirty && "bg-energy/5 ring-energy/50",
             )}
           >
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="font-heading font-semibold whitespace-nowrap">
                 {t("common:day", { number: row.number })}{" "}
                 <span className="text-xs text-muted-foreground">{t(`common:weekdays.${row.weekday}`)}</span>
