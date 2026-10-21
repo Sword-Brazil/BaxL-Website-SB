@@ -15,7 +15,8 @@ import { parseRotationVideo } from "@/models/rules/rotationVideo";
 import { useRotationsEditorViewModel, type RotationDraft } from "@/viewmodels/admin/useRotationsEditorViewModel";
 import { HelpHint } from "@/views/layout/HelpHint";
 import { QueryState } from "@/views/shared/QueryState";
-import { RotationLegend, RotationText, RotationVideoPlayer } from "@/views/shared/RotationSequence";
+import { RotationLegend, RotationText } from "@/views/shared/RotationSequence";
+import { RotationVideoPlayer } from "@/views/shared/RotationVideoPlayer";
 import { UniformPreview } from "@/views/rotations/UniformPreview";
 
 type Vm = ReturnType<typeof useRotationsEditorViewModel>;

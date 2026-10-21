@@ -72,7 +72,8 @@
       "qc": "Quick Cancel: cancelación rápida justo después del comando.",
       "optional": "Tramo opcional o \"relleno\" del combo antes del bono principal."
     },
-    "openVideo": "Abrir el vídeo"
+    "openVideo": "Abrir el vídeo",
+    "playVideo": "Ver la rotación"
   },
   "restriction": {
     "none": "Sin restricción",

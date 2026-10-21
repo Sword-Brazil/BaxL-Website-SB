@@ -12,7 +12,8 @@ import type { Rotation, Uniform } from "@/models/domain/types";
 import { useRotationsViewModel, type RotationGroup } from "@/viewmodels/useRotationsViewModel";
 import { HelpHint } from "@/views/layout/HelpHint";
 import { QueryState } from "@/views/shared/QueryState";
-import { RotationLegend, RotationText, RotationVideoPlayer } from "@/views/shared/RotationSequence";
+import { RotationLegend, RotationText } from "@/views/shared/RotationSequence";
+import { RotationVideoPlayer } from "@/views/shared/RotationVideoPlayer";
 import { UniformPreview } from "./UniformPreview";
 import { AttributeLabel } from "@/views/shared/AttributeLabel";
 
