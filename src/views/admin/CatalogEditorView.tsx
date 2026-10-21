@@ -73,27 +73,29 @@ function UniformEffects({ index, vm }: { index: number; vm: Vm }) {
     <div className="flex flex-col gap-1.5">
       <span className="text-xs font-medium text-muted-foreground">{t("admin:catalog.effects")}</span>
       {DAY_MODES.map((mode) => (
-        <div key={mode} className="flex flex-wrap items-center gap-1.5" role="group" aria-label={`${t("admin:catalog.effects")} · ${mode}`}>
-          <span className="w-8 font-heading text-[0.65rem] tracking-wider text-muted-foreground">{mode}</span>
-          {EFFECTS_BY_MODE[mode].map((effect) => {
-            const on = selected.includes(effect);
-            return (
-              <button
-                key={effect}
-                type="button"
-                aria-pressed={on}
-                onClick={() => vm.toggleUniformEffect(index, effect)}
-                className={cn(
-                  "inline-flex h-7 cursor-pointer items-center gap-1 rounded-full border px-2 pl-1 text-xs transition-opacity",
-                  !on && "border-border opacity-55 hover:opacity-100",
-                )}
-                style={on ? bossEffectTint(effect) : undefined}
-              >
-                <BossEffectIcon effect={effect} colored={on} />
-                {t(`common:effects.${effect}`)}
-              </button>
-            );
-          })}
+        <div key={mode} className="flex flex-col gap-1" role="group" aria-label={`${t("admin:catalog.effects")} · ${mode}`}>
+          <span className="font-heading text-[0.65rem] tracking-wider text-muted-foreground">{mode}</span>
+          <div className="flex flex-wrap gap-1.5">
+            {EFFECTS_BY_MODE[mode].map((effect) => {
+              const on = selected.includes(effect);
+              return (
+                <button
+                  key={effect}
+                  type="button"
+                  aria-pressed={on}
+                  onClick={() => vm.toggleUniformEffect(index, effect)}
+                  className={cn(
+                    "inline-flex h-7 cursor-pointer items-center gap-1 rounded-full border px-2 pl-1 text-xs transition-opacity",
+                    !on && "border-border opacity-55 hover:opacity-100",
+                  )}
+                  style={on ? bossEffectTint(effect) : undefined}
+                >
+                  <BossEffectIcon effect={effect} colored={on} />
+                  {t(`common:effects.${effect}`)}
+                </button>
+              );
+            })}
+          </div>
         </div>
       ))}
     </div>
@@ -269,7 +271,11 @@ export function CatalogEditorView() {
                   </span>
                   <span className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
                     {t("admin:catalog.photos", { n: withPhoto, total: a.uniforms.length })}
-                    {varied > 0 && <Badge variant="energy">{t("admin:catalog.variedUniforms", { count: varied })}</Badge>}
+                    {varied > 0 && (
+                      <Badge variant="energy" className="h-auto max-w-full py-0.5 text-left whitespace-normal">
+                        {t("admin:catalog.variedUniforms", { count: varied })}
+                      </Badge>
+                    )}
                   </span>
                 </button>
                 <div className="flex shrink-0 gap-1">

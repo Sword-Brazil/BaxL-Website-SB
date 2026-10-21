@@ -63,7 +63,7 @@ export function SupportButton() {
           <span className="hidden sm:inline">{t("footer.support.button")}</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-80 max-w-[calc(100vw-2rem)] text-sm">
+      <PopoverContent align="end" collisionPadding={16} className="w-80 max-w-[calc(100vw-2rem)] text-sm">
         <SupportContent />
       </PopoverContent>
     </Popover>

@@ -207,7 +207,7 @@ export function AppLayout({ title, children, wide = false }: { title?: string; c
               </Sheet>
             )}
 
-            <BrandMark />
+            <BrandMark compact={isLoggedIn} />
 
             {isLoggedIn && (
               <NavigationMenu viewport={false} className="ml-4 hidden xl:flex">

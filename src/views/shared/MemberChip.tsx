@@ -34,15 +34,21 @@ function StrikerCorner({ striker }: { striker: UniformRef | null }) {
     : t("team.noStriker");
   return (
     <Hint label={label}>
-      <span aria-label={label} role="img" className="absolute -top-1.5 -left-1.5 z-10 size-6 sm:size-7">
+      <span aria-label={label} role="img" className="absolute -top-2 -left-2.5 z-10 size-7 sm:size-8">
         {striker ? (
-          <Avatar className={cn("size-full ring-2 ring-spark after:hidden", !striker.uniform.active && "grayscale")}>
-            <AvatarImage src={striker.uniform.portrait || undefined} alt="" loading="lazy" decoding="async" />
+          // Fundo sólido com brilho na cor do Striker: a foto não some sobre o cartão.
+          <Avatar
+            className={cn(
+              "size-full bg-linear-to-b from-spark/40 to-card ring-2 ring-spark shadow-[0_0_10px_-2px_var(--spark)] after:hidden",
+              !striker.uniform.active && "grayscale",
+            )}
+          >
+            <AvatarImage src={striker.uniform.portrait || undefined} alt="" loading="lazy" decoding="async" className="object-cover" />
             <AvatarFallback className="bg-secondary font-heading text-[0.5rem] text-secondary-foreground">{initials(striker.agent.name)}</AvatarFallback>
           </Avatar>
         ) : (
-          <span className="flex size-full items-center justify-center rounded-full border border-dashed border-spark/50 bg-card text-spark/70">
-            <ZapIcon aria-hidden className="size-3" />
+          <span className="flex size-full items-center justify-center rounded-full border border-dashed border-spark/60 bg-card text-spark/80 shadow-sm">
+            <ZapIcon aria-hidden className="size-3.5" />
           </span>
         )}
         {striker && (
@@ -56,11 +62,13 @@ function StrikerCorner({ striker }: { striker: UniformRef | null }) {
 }
 
 /** Selo da posição (Esquerda / Líder / Direita): sempre visível, sobre a borda do cartão. */
-function SlotTag({ label, leader }: { label: string; leader?: boolean }) {
+function SlotTag({ label, leader, besideStriker }: { label: string; leader?: boolean; besideStriker?: boolean }) {
   return (
     <span
       className={cn(
         "absolute -top-2 left-1/2 flex max-w-[calc(100%-0.5rem)] -translate-x-1/2 items-center gap-0.5 truncate rounded-full border px-1.5 py-px font-heading text-[0.55rem] leading-tight tracking-widest whitespace-nowrap uppercase",
+        // Com o Striker na quina esquerda, o selo centraliza no espaço que sobra à direita dele.
+        besideStriker && "left-[calc(50%+0.625rem)] max-w-[calc(100%-1.75rem)] tracking-wide",
         leader ? "border-energy bg-energy text-primary-foreground" : "border-border bg-card text-muted-foreground",
       )}
     >
@@ -126,7 +134,7 @@ export function MemberChip({
   const label = `${slotLabel}: ${agent.name}${uniformLabel ? ` — ${uniformLabel}` : ""}`;
   const content = (
     <>
-      <SlotTag label={slotLabel} leader={leader} />
+      <SlotTag label={slotLabel} leader={leader} besideStriker={damageDealer} />
       {damageDealer && <StrikerCorner striker={striker ?? null} />}
       <div className="relative">
         {/* A dica fica no retrato: o CTP e os selos têm as próprias dicas. */}
@@ -162,18 +170,21 @@ export function MemberChip({
             </span>
           </Hint>
         )}
+      </div>
+      {/* Posse fica junto do nome: as quinas do cartão e da foto já têm Striker, Causador de Dano e CTP. */}
+      <span className={cn("mt-0.5 flex w-full min-w-0 items-center justify-center gap-0.5 leading-tight font-semibold", leader ? "text-xs sm:text-sm" : "text-xs")}>
         {owned && (
           <Hint label={t("team.owned")}>
             <span
-              className="absolute -top-1.5 -left-1.5 flex size-4 items-center justify-center rounded-full bg-brazil-green text-background ring-2 ring-card"
+              className="flex size-3.5 shrink-0 items-center justify-center rounded-full bg-brazil-green text-background"
               aria-label={t("team.owned")}
             >
-              <CheckIcon className="size-3" />
+              <CheckIcon className="size-2.5" />
             </span>
           </Hint>
         )}
-      </div>
-      <span className={cn("mt-0.5 w-full truncate leading-tight font-semibold", leader ? "text-xs sm:text-sm" : "text-xs")}>{agent.name}</span>
+        <span className="min-w-0 truncate">{agent.name}</span>
+      </span>
       {/* Sem traje cadastrado a linha fica vazia, para os três cartões manterem a mesma altura. */}
       <span className="w-full truncate text-[0.65rem] leading-tight text-muted-foreground">{uniformLabel ?? "\u00a0"}</span>
       {href && (

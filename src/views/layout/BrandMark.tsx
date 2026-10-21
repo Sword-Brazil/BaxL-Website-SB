@@ -1,9 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useTranslation } from "next-i18next/pages";
+import { cn } from "@/lib/utils";
 
-/** Logo + nome da Sword Brasil para o cabeçalho. */
-export function BrandMark() {
+/**
+ * Logo + nome da Sword Brasil para o cabeçalho. `compact`: em telas de até 400px (ex.: 360px do
+ * Galaxy A55) fica só o logo, para caber o menu e os botões da conta.
+ */
+export function BrandMark({ compact = false }: { compact?: boolean }) {
   const { t } = useTranslation("common");
   return (
     <Link href="/" className="flex items-center gap-2.5 rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
@@ -15,7 +19,7 @@ export function BrandMark() {
         priority
         className="chamfer-sm size-10 object-cover ring-1 ring-energy/40"
       />
-      <span className="flex flex-col leading-none">
+      <span className={cn("flex flex-col leading-none", compact && "max-[400px]:sr-only")}>
         <span className="font-heading text-base font-bold tracking-widest whitespace-nowrap text-energy uppercase max-[380px]:text-sm max-[380px]:tracking-wider">
           {t("brand.name")}
         </span>
