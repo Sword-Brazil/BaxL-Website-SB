@@ -2,9 +2,11 @@
 
 **Feature**: `001-alliance-battle-metas` | **Date**: 2026-10-17
 
-Persistência: SQLite via Prisma (servidor) e Zustand `persist` (aparelho do usuário). Os
-"enums" são `String` validados por Zod (ver research R5). `id` = cuid. Todas as tabelas de
-conteúdo têm `createdAt` e `updatedAt`.
+Persistência (atualizado em 2026-10-21): **Postgres no Supabase** via Prisma (servidor; migrações
+em `prisma/migrations`, RLS ligado em todas as tabelas e sem policies) e Zustand `persist` (cópia
+no aparelho do usuário). Imagens enviadas pela curadoria ficam no **Supabase Storage** (bucket
+público `assets`) e o `imagePath` guarda a URL pública. Os "enums" são `String` validados por Zod
+(ver research R5). `id` = cuid. Todas as tabelas de conteúdo têm `createdAt` e `updatedAt`.
 
 ## Enums de domínio (Zod)
 
@@ -154,20 +156,29 @@ O texto explicativo da BAI fica no i18n.
 | Campo | Tipo | Regras |
 |-------|------|--------|
 | id | string | PK |
-| email | string | único, minúsculo, formato e-mail (Zod) |
-| passwordHash | string | bcrypt custo 12 |
-| nickname | string? | apelido no jogo, ≤ 30 caracteres |
-| role | Role | padrão `USER` |
-| emailVerifiedAt | datetime? | |
+| username | string | único; login; minúsculo, espaços simples, 3–30 de `[a-z0-9 ._-]` (ex.: `sword menezes`) |
+| passwordHash | string | bcrypt custo 12; senha nova forte (8+, minúscula, MAIÚSCULA, número, símbolo) |
+| nickname | string? | apelido para exibir, ≤ 30 caracteres |
+| role | Role | `USER` (jogador), `CURATOR` ou `ADMIN`; padrão `USER` |
 
-**Invariante**: sempre ≥ 1 usuário com `role = ADMIN` (FR-024). Só um ADMIN altera papéis.
+Sem e-mail (removido em 2026-10-21, migração `username_only`). Só um ADMIN cria contas, troca
+papéis e redefine senhas.
+
+**Invariante**: sempre ≥ 1 usuário com `role = ADMIN` (FR-024).
+
+### UserSelectionsDoc
+| Campo | Tipo | Regras |
+|-------|------|--------|
+| userId | FK User | PK, cascade |
+| json | string | documento `UserSelections` (abaixo) |
+| updatedAt | datetime | gravação condicional: só atualiza se o aparelho estiver na mesma versão (senão 409) |
 
 ### LoginAttempt
 | Campo | Tipo | Regras |
 |-------|------|--------|
-| key | string | `email|ip` |
+| key | string | `usuário|ip` (5 falhas em 15 min) ou `usuário|*` (20 falhas em 15 min, qualquer IP) |
 | failedCount | int | |
-| lockedUntil | datetime? | 5 falhas em 15 min geram bloqueio de 15 min |
+| lockedUntil | datetime? | bloqueio de 15 min |
 
 ### SecurityNotice
 | Campo | Tipo | Regras |
@@ -176,13 +187,20 @@ O texto explicativo da BAI fica no i18n.
 | type | evento de atenção/crítico do catálogo (`securityEvents.ts`) | um aberto por tipo e usuário |
 | params | JSON? | só dados não sensíveis (ex.: `{"role":"CURATOR"}`) |
 | originSessionId | string? | sessão que fez o login (o "novo login" não aparece nela) |
-| dismissedAt | datetime? | dispensado pelo usuário ou resolvido (ex.: e-mail confirmado) |
+| dismissedAt | datetime? | dispensado pelo usuário |
+
+### Sessão (cookie, sem tabela)
+Cookie `mff_session` (iron-session, criptografado): `userId`, `sid`, `loginAt`, `remember` e
+`expiresAt`. "Manter logado" = cookie de 30 dias; sem ele, cookie de sessão (some ao fechar o
+navegador) e `expiresAt` de 12 h, conferido pelo proxy e pela API.
 
 ## Dados do usuário
 
 ### UserSelections (documento versionado)
 
-Fica **só** no Zustand `persist` (localStorage do aparelho): jogadores não têm conta.
+Fica na conta (`UserSelectionsDoc`) e no Zustand `persist` (cópia no aparelho). Ao entrar, aparelho
+e conta são mesclados (conta vazia → envia o aparelho; aparelho vazio → usa a conta; diferentes →
+o jogador escolhe). Mudanças sobem com debounce de 2 s. Ao sair, o aparelho é limpo.
 
 ```text
 UserSelections {
@@ -221,4 +239,4 @@ UserSelections {
 - **User.role**:
   - `USER` ↔ `CURATOR` ↔ `ADMIN`, alterado só por um ADMIN.
   - Rebaixar o último ADMIN é bloqueado.
-- **User.role `USER`** = acesso retirado (não entra); só CURATOR e ADMIN fazem login.
+- **User.role `USER`** = jogador: entra, vê o site e guarda as próprias seleções; não acessa o Admin.

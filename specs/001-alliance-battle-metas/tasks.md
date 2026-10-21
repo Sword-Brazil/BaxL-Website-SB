@@ -523,11 +523,32 @@ para a próxima BAI nos outros dias.
 - [X] T152 Rotações por personagem/traje (aba "Rotações" no admin, texto livre, descrição e vídeo); equipe só marca o Causador de Dano; foto do Causador de Dano leva a `/rotacoes/[personagem]` (por traje, com prévia); `/rotacoes` lista os personagens
 - [X] T153 Cores fixas por modo, como no jogo: BAX azul, BAL laranja, BAI vermelho (tokens `bax`/`bal`/`bai`, temas claro e escuro) no ciclo, faixa de dias, montador, BAL livre, admin e estatísticas
 - [X] T154 Ícone do atributo junto do nome em todos os lugares (filtros do Meu Elenco, seletores de restrição, catálogo, cartões do elenco, seletor de agente, tela de rotações), com um componente único `AttributeLabel`
-- [X] T155 Jogadores sem conta: sai cadastro, confirmação de e-mail, recuperação de senha e sincronização (tabelas AuthToken e UserSelectionsDoc); nome no jogo no topo, salvo no aparelho; login só da curadoria (link no rodapé)
+- [X] T155 (Substituída pela Phase 15 em 2026-10-21) Jogadores sem conta: sai cadastro, confirmação de e-mail, recuperação de senha e sincronização (tabelas AuthToken e UserSelectionsDoc); nome no jogo no topo, salvo no aparelho; login só da curadoria (link no rodapé)
 - [X] T156 Limpar as equipes do jogador (todas ou por modo) no Meu Elenco e na tela da Batalha de Aliança
 - [X] T157 CTP: excluir de vez (equipes e reservas ficam sem o CTP), além de desativar
 - [X] T158 Exportar as equipes (Meta, Alternativas e do jogador) dos dias do filtro de semana num documento HTML com tabela (dia, modo, restrição, equipe, Esquerda · Líder · Direita), com fotos, CTP e Causador de Dano
 - [ ] T148 Rotações de exemplo pré-cadastradas a partir de vídeos de jogadores experientes (aguarda as fontes)
+
+---
+
+## Phase 15: Site privado, contas por nome de usuário, Supabase e Vercel (2026-10-20 e 2026-10-21)
+
+- [X] T159 CTPs Poderoso e Brilhante animados na própria caixa do CTP (`CtpQualityFx`, lib `motion`): estrelas de raios finos piscando; Brilhante com galáxia roxa girando; pausa fora da tela e com "reduzir movimento"; medalhão redondo na lista de CTPs do admin
+- [X] T160 Ícone do CTP maior nas equipes (32 px; 36 px no Líder)
+- [X] T161 Vídeo das rotações em largura total (`RotationVideoPlayer`): capa com play, proporção real do vídeo (faixas pretas medidas na capa), Shorts numa faixa 9:16
+- [X] T162 Fonte padrão maior e menu "AA" (Pequena/Média/Grande), aplicado antes da primeira pintura
+- [X] T163 Banco Postgres no Supabase (Prisma; migração base `postgres_init`, RLS ligado e sem policies), pool de 5 conexões; testes dos services em Postgres em memória (PGlite)
+- [X] T164 Uploads no Supabase Storage (bucket público `assets`); `npm run db:migrate-data` copia o `dev.db` e as imagens; scripts `db:deploy`/`db:seed` leem o `.env.local`
+- [X] T165 Contas criadas só por Administradores (Jogador/Curador/Administrador), troca de papel e de senha; sincronização das seleções na conta (diálogo de conflito); ao sair, o aparelho é limpo
+- [X] T166 Login só por nome de usuário + senha (sem e-mail; migração `username_only` apaga contas sem usuário); Administrador padrão `SEED_ADMIN_USERNAME`
+- [X] T167 Senha forte obrigatória (8+, minúscula, MAIÚSCULA, número, símbolo) com medidor animado (shadcn `Progress`) e botão mostrar/ocultar em todo campo de senha
+- [X] T168 Site privado: `src/proxy.ts` exige sessão em toda página/API (só `/entrar` e estáticos ficam públicos); APIs de dados com `requireUser`; navegação escondida para visitantes
+- [X] T169 "Manter logado" no login (30 dias; sem ele, cookie de sessão + 12 h)
+- [X] T170 Dicas com o Tooltip do design system (`Hint`) no lugar do `title` nativo; diálogos com rolagem no celular
+- [X] T171 Segurança: CSRF (Origin + JSON), destino seguro depois do login, limite de login por conta (20) além de conta+IP, IP confiável (`x-real-ip`), cabeçalhos (CSP, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy, COOP, HSTS), sem `X-Powered-By`
+- [X] T172 Login com textos curtos e cartão centralizado; `text-wrap: pretty/balance` no app; menu de desktop só a partir de 1280 px; colunas do quadro de metas e do ciclo encolhem no celular
+- [X] T173 Padrão de erros por gravidade (FE-001 a FE-004): alerta fixo para erros graves, notificação para os leves; 503 quando o banco cai; correção do 409 da sincronização logo depois do login
+- [X] T174 Specs, contrato da API, quickstart, research, plano, constituição e README atualizados para o estado atual
 
 ---
 
@@ -619,6 +640,6 @@ Task: "T052 Schemas de admin em src/models/schemas/admin.ts"
 ### Notes
 
 - Antes de instalar qualquer lib fora de `research.md`, pedir autorização. Pendentes conhecidas:
-  `jsdom` + `@testing-library/react` (testes de ViewModel) e `nodemailer` (e-mail real, quando
-  houver hospedagem).
+  `jsdom` + `@testing-library/react` (testes de ViewModel) e a aprovação de `@electric-sql/pglite`
+  + `pglite-prisma-adapter` (já usadas nos testes).
 - Commitar após cada tarefa ou grupo lógico; validar cada checkpoint.

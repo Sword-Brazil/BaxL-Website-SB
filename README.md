@@ -36,14 +36,15 @@ Variáveis em `.env.local`:
 
 | Variável | Uso |
 |----------|-----|
+| `SUPABASE_DB_PASSWORD` | Senha do banco (só letras e números). Entra nas duas URLs abaixo com `${SUPABASE_DB_PASSWORD}` (só no `.env.local`; na Vercel use as URLs completas). |
 | `DATABASE_URL` | Postgres pelo *Transaction pooler* do Supabase (porta 6543, `?pgbouncer=true&connection_limit=5&pool_timeout=20`). |
-| `DIRECT_URL` | Conexão direta ou *Session pooler* (porta 5432): usada pelas migrações. |
+| `DIRECT_URL` | *Session pooler* (porta 5432): usada pelas migrações. |
 | `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` | Storage das imagens enviadas (chave secreta, só no servidor). Sem elas, no ambiente local, os uploads vão para `public/assets/uploads`. |
 | `SUPABASE_STORAGE_BUCKET` | Bucket público das imagens (padrão `assets`). |
 | `SESSION_SECRET` | ≥ 32 caracteres aleatórios. Sem ele o servidor não inicia. |
 | `SEED_ADMIN_USERNAME` / `SEED_ADMIN_PASSWORD` | Administrador padrão (ex.: `Sword Menezes`). Ele cria as demais contas. |
 
-Rodar `npx prisma db seed` de novo é seguro: ele não duplica nada e atualiza a senha do administrador.
+Rodar `npm run db:seed` de novo é seguro: ele não duplica nada e atualiza a senha do administrador.
 
 ## Comandos
 
@@ -77,24 +78,57 @@ Rodar `npx prisma db seed` de novo é seguro: ele não duplica nada e atualiza a
 - **Calendário** (horário de Brasília): o dia vira às 12h, o reset semanal da pontuação é às 22h e o
   3º dia de cada semana é a BAI. Ajuste a âncora do ciclo em `/admin/config` se o "Dia atual" estiver
   diferente do jogo.
+- **Login**: "Manter logado" deixa a pessoa conectada por 30 dias; sem marcar, a sessão termina ao
+  fechar o navegador (e em no máximo 12 h). Senhas novas precisam ser fortes (8+ caracteres, com
+  minúscula, MAIÚSCULA, número e símbolo).
 - **Avisos de segurança** (novo login, senha trocada, papel alterado, bloqueio) aparecem no app.
+- **Erros**: os graves (sem conexão, banco fora do ar, erro no servidor, acesso negado, sessão
+  encerrada) aparecem num alerta fixo no topo; os leves, numa notificação.
+- **Segurança**: CSRF bloqueado (só requisições do próprio site e em JSON), cabeçalhos de segurança
+  (CSP, sem iframe de terceiros, HSTS…), limite de tentativas de login por conta e por IP, e só o
+  Prisma acessa o banco (RLS ligado no Supabase).
 
 ## Deploy (Vercel + Supabase)
 
-1. **Supabase**: crie o projeto (de preferência em São Paulo, `sa-east-1`). Em *Connect* copie as strings do
-   *Transaction pooler* (`DATABASE_URL`) e do *Session pooler* (`DIRECT_URL`); em *API*, a URL e a
-   chave secreta (`service_role`).
-2. **Banco** (do seu computador, com as variáveis do Supabase exportadas):
-   `npm run db:deploy` → `npm run db:migrate-data` (só se for trazer o SQLite antigo) →
-   `npm run db:seed`. As tabelas têm RLS ligado e nenhuma policy: a Data API do Supabase não
-   lê nem grava nada; só o app (Prisma) acessa.
-3. **Vercel**: importe o repositório (branch `master`), framework Next.js, e cadastre em *Environment
-   Variables* (Production): `DATABASE_URL`, `DIRECT_URL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`,
-   `SUPABASE_STORAGE_BUCKET` e `SESSION_SECRET` (um novo, só da produção). Em *Settings →
-   Functions*, escolha a região da Vercel mais perto do banco: `gru1` para Supabase em São Paulo,
-   `iad1` para `us-east-1`.
-4. **Migrações futuras**: rode `npm run db:deploy` contra o Supabase antes (ou junto) do deploy
-   que precisar delas; ou mude o *Build Command* da Vercel para `prisma migrate deploy && next build`.
+O banco já está no Supabase (projeto `trmvrhunlmrankshppvs`, região **us-east-1**), com as tabelas,
+os dados e o administrador **Sword Menezes**. Falta publicar o site:
+
+1. **Gerar o segredo da produção** (diferente do local):
+   `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`.
+2. **Importar na Vercel**: *Add New → Project* → `Sword-Brazil/BaxL-Website-Mff-Sword-Brazil`. Se o
+   repositório não aparecer, um dono da organização precisa liberar o app da Vercel no GitHub.
+   Framework **Next.js** (detectado), pasta raiz = raiz do repositório, comandos padrão.
+3. **Environment Variables** (marque só *Production*; *Preview* ficaria ligado ao banco de produção):
+
+   | Variável | Valor |
+   |----------|-------|
+   | `DATABASE_URL` | `postgresql://postgres.<ref>:<SENHA>@aws-0-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=5&pool_timeout=20` |
+   | `DIRECT_URL` | `postgresql://postgres.<ref>:<SENHA>@aws-0-us-east-1.pooler.supabase.com:5432/postgres` |
+   | `SUPABASE_URL` | `https://<ref>.supabase.co` |
+   | `SUPABASE_SERVICE_ROLE_KEY` | chave secreta do Supabase (*Project Settings → API Keys*) |
+   | `SUPABASE_STORAGE_BUCKET` | `assets` |
+   | `SESSION_SECRET` | o segredo do passo 1 |
+
+   A Vercel não expande `${...}`: escreva a senha dentro das URLs (símbolos precisam ser
+   codificados, ex.: `!` → `%21`).
+4. **Settings → Build and Deployment**: *Node.js Version* **22.x**; *Production Branch* `master`.
+5. **Settings → Functions**: *Function Region* **Washington, D.C. (`iad1`)**, a mesma região do
+   banco (`gru1` só se o Supabase estiver em São Paulo).
+6. **Publicar**: faça o merge do PR `Dev → master`; a Vercel constrói e publica sozinha. Acompanhe em
+   *Deployments*. Depois, abra a URL e entre como Sword Menezes.
+7. **Conferir em produção**: aba anônima cai no login; login, Admin → Usuários (criar um jogador),
+   envio de uma imagem (URL do `supabase.co/storage`) e os cabeçalhos de segurança
+   (`curl -I https://<seu-site>`).
+8. **Domínio (opcional)**: *Settings → Domains*.
+
+Depois disso:
+
+- **Migrações novas**: rode `npm run db:deploy` contra o Supabase antes do merge que trouxer a
+  migração (ou mude o *Build Command* para `prisma migrate deploy && next build`).
+- **Novo projeto Supabase do zero**: `npm run db:deploy` → `npm run db:migrate-data` (só para trazer
+  um `dev.db` antigo) → `npm run db:seed`, nessa ordem.
+- **Plano gratuito do Supabase**: projetos sem uso por um tempo podem ser pausados; reative pelo
+  painel se o site mostrar "Sem conexão com o banco de dados".
 
 ## Backup
 
@@ -108,6 +142,7 @@ src/models/      Model: tipos, enums, schemas Zod, regras puras (calendário, re
 src/viewmodels/  ViewModel: hooks use*ViewModel (TanStack Query + Zustand)
 src/views/       View: composições de componentes shadcn/ui, sem regra de negócio
 src/pages/       Pages Router: páginas e API Routes (pages/api)
+src/proxy.ts     Site privado: exige sessão em toda página e API (Next 16 "proxy", antes "middleware")
 src/server/      Somente servidor: Prisma, sessão (iron-session), repositórios e services
 src/components/  shadcn/ui (restilizado com os tokens MFF em src/styles/globals.css)
 ```

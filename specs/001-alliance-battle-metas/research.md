@@ -45,7 +45,16 @@ Regra do usuário: **toda lib não listada aqui precisa de autorização antes d
 - **Decision**: `next-themes` (padrão do shadcn), com escuro como padrão e a preferência
   salva no aparelho.
 
-## R5. Persistência (sem banco em nuvem)
+## R5. Persistência
+
+> **Substituída em 2026-10-21**: o banco passou a ser **Postgres no Supabase** (plano gratuito),
+> com Prisma, para o site ficar online na Vercel (que não tem disco persistente). Detalhes:
+> `DATABASE_URL` = *Transaction pooler* (porta 6543, `pgbouncer=true&connection_limit=5&pool_timeout=20`),
+> `DIRECT_URL` = *Session pooler* (5432) para as migrações; a conexão direta `db.<ref>.supabase.co`
+> é só IPv6 e não funciona no WSL nem na Vercel. Todas as tabelas têm RLS ligado e nenhuma
+> policy, então a Data API do Supabase não lê nem grava nada; só o app (Prisma) acessa. Os dados
+> do SQLite antigo foram copiados com `npm run db:migrate-data`. A decisão original fica abaixo
+> como histórico.
 
 - **Decision**: **SQLite** em arquivo local + **Prisma** ORM (`prisma`, `@prisma/client`).
 - **Rationale**: o usuário não quer serviço em nuvem, pago ou que exija login periódico.
@@ -59,6 +68,13 @@ Regra do usuário: **toda lib não listada aqui precisa de autorização antes d
 - **Alternatives considered**: Supabase/Firebase (nuvem, recusados); Drizzle (preterido).
 
 ## R6. Autenticação e papéis
+
+> **Revisada em 2026-10-21**: site privado (toda página e API exige sessão, via `src/proxy.ts`);
+> login por **nome de usuário + senha**, sem e-mail; contas criadas só por Administradores (sem
+> cadastro, confirmação ou recuperação por e-mail); senha nova forte; limite de tentativas por
+> conta+IP (5) e por conta (20); opção "Manter logado" (30 dias; sem ela, cookie de sessão + 12 h).
+> O `MailService` foi removido. O Administrador padrão vem de `SEED_ADMIN_USERNAME` /
+> `SEED_ADMIN_PASSWORD`. A decisão original fica abaixo como histórico.
 
 - **Decision**:
   - Login por e-mail e senha.
@@ -116,8 +132,9 @@ Regra do usuário: **toda lib não listada aqui precisa de autorização antes d
     a partir de um manifesto de URLs de referência (thanosvibs). Os ícones de CTP de lá já são
     PNG com fundo transparente.
   - Admins podem enviar ou trocar imagens pela aba Admin. O upload vai **em base64 no corpo JSON**
-    (PNG/WebP, até 2 MB depois de decodificado), sem lib de multipart, e é salvo em
-    `public/assets/uploads/`.
+    (PNG/WebP/JPEG, até 2 MB depois de decodificado), sem lib de multipart. Desde 2026-10-21 vai
+    para o **Supabase Storage** (bucket público `assets`, via API REST com a chave secreta, sem
+    lib nova); `public/assets/uploads/` só é usado no ambiente local sem Supabase.
 - **Notes**:
   - As imagens são assets de *Marvel Future Fight* (Netmarble/Marvel), usados sob o aviso de
     projeto de fã (Constituição).
@@ -156,10 +173,12 @@ Regra do usuário: **toda lib não listada aqui precisa de autorização antes d
 | @dnd-kit/core | Autorizado |
 | @tanstack/react-query, zustand | Autorizado |
 | html-to-image | Autorizado |
-| prisma, @prisma/client (SQLite) | Autorizado (escolha do usuário) |
+| prisma, @prisma/client (Postgres/Supabase desde 2026-10-21) | Autorizado (escolha do usuário) |
 | bcryptjs, iron-session | Autorizado junto com Prisma |
 | tsx (dev) | Autorizado em 2026-10-17 (`@types/bcryptjs` dispensado: bcryptjs 3 já traz tipos) |
 | recharts (via componente Chart do shadcn) | Autorizado em 2026-10-18 |
 | vitest | Autorizado em 2026-10-17 |
+| motion | Autorizado em 2026-10-20 (pedido do usuário para as animações dos CTPs) |
+| @electric-sql/pglite, pglite-prisma-adapter (dev, Postgres em memória nos testes) | **Pendente de aprovação**: instaladas em 2026-10-20 para os testes; alternativa sem elas é Postgres em Docker |
 | jsdom + @testing-library/react (testar hooks de ViewModel) | **Pendente**. Sem elas, os testes cobrem Model e services em ambiente Node |
-| nodemailer (futuro, envio real de e-mail) | **Pendente**, só quando houver hospedagem |
+| ~~nodemailer~~ | Não é mais necessário: as contas não têm e-mail (2026-10-21) |
