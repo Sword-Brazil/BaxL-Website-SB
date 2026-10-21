@@ -3,6 +3,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tansta
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { useNotifyError } from "@/viewmodels/useNotify";
 import { adminApi } from "@/models/api/admin";
 import { ApiError } from "@/models/api/client";
 import type { Role } from "@/models/domain/enums";
@@ -11,6 +12,7 @@ import { AdminResetPasswordSchema, CreateUserSchema, type CreateUserInput } from
 /** Gestão de contas (só administradores): busca, novas contas de qualquer papel, troca de papel e de senha. */
 export function useUsersAdminViewModel(messages: { created: string; saved: string; passwordReset: string; lastAdmin: string }) {
   const qc = useQueryClient();
+  const notifyError = useNotifyError();
   const [q, setQ] = useState("");
   const [page, setPage] = useState(1);
   const query = useQuery({
@@ -46,7 +48,7 @@ export function useUsersAdminViewModel(messages: { created: string; saved: strin
       qc.invalidateQueries({ queryKey: ["me"] });
       toast.success(messages.saved);
     },
-    onError: (e: Error) => toast.error(e instanceof ApiError && e.status === 409 ? messages.lastAdmin : e.message),
+    onError: (e: Error) => (e instanceof ApiError && e.status === 409 ? toast.error(messages.lastAdmin) : notifyError(e)),
   });
 
   const resetForm = useForm<{ password: string }>({ resolver: zodResolver(AdminResetPasswordSchema), defaultValues: { password: "" } });

@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { Prisma } from "@prisma/client";
 import { z, type ZodType } from "zod";
 import "@/lib/zodLocale";
 import { stalePrismaClientHint } from "./prismaFreshness";
@@ -12,6 +13,7 @@ export type ErrorCode =
   | "RESTRICTION_VIOLATION"
   | "RATE_LIMITED"
   | "METHOD_NOT_ALLOWED"
+  | "SERVICE_UNAVAILABLE"
   | "INTERNAL_ERROR";
 
 export class HttpError extends Error {
@@ -77,6 +79,18 @@ export function assertSameOrigin(req: NextApiRequest) {
   }
 }
 
+/** Códigos do Prisma de falha de conexão: banco fora do ar, tempo esgotado, fila de conexões cheia. */
+const CONNECTION_CODES = new Set(["P1001", "P1002", "P1008", "P1017", "P2024"]);
+
+/** O banco de dados está inacessível (e não é um erro do pedido nem do código)? */
+export function isDatabaseUnavailable(e: unknown): boolean {
+  return (
+    e instanceof Prisma.PrismaClientInitializationError ||
+    e instanceof Prisma.PrismaClientRustPanicError ||
+    (e instanceof Prisma.PrismaClientKnownRequestError && CONNECTION_CODES.has(e.code))
+  );
+}
+
 /** Roteia por método HTTP e converte HttpError no formato de erro padrão da API. */
 export function handler(handlers: Partial<Record<Method, Handler>>) {
   return async (req: NextApiRequest, res: NextApiResponse) => {
@@ -91,6 +105,10 @@ export function handler(handlers: Partial<Record<Method, Handler>>) {
     } catch (e) {
       if (e instanceof HttpError) return sendError(res, e.status, e.code, e.message, e.fields);
       console.error(e);
+      if (isDatabaseUnavailable(e)) {
+        res.setHeader("Retry-After", "5");
+        return sendError(res, 503, "SERVICE_UNAVAILABLE", "Sem conexão com o banco de dados. Tente de novo em instantes.");
+      }
       // Em desenvolvimento, explica a causa mais comum de 500 depois de uma migração.
       const hint = stalePrismaClientHint();
       if (hint) console.error(`\n⚠️  ${hint}\n`);

@@ -7,6 +7,8 @@ export class ApiError extends Error {
     public code: string,
     message: string,
     public fields?: Record<string, string[]>,
+    /** Rota que falhou (o login trata os próprios erros no formulário). */
+    public url?: string,
   ) {
     super(message);
   }
@@ -29,7 +31,7 @@ export async function apiFetch<T>(url: string, init: Omit<RequestInit, "body"> &
     if (res.status === 401 && !url.startsWith("/api/auth/") && typeof window !== "undefined" && Router.pathname !== "/entrar") {
       void Router.push({ pathname: "/entrar", query: { next: Router.asPath } });
     }
-    throw new ApiError(res.status, err?.code ?? "INTERNAL_ERROR", err?.message ?? res.statusText, err?.fields);
+    throw new ApiError(res.status, err?.code ?? "INTERNAL_ERROR", err?.message ?? res.statusText, err?.fields, url);
   }
   return data as T;
 }

@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { useNotifyError } from "@/viewmodels/useNotify";
 import { adminApi } from "@/models/api/admin";
 import { UNKNOWN } from "@/models/domain/enums";
 import type { Agent, RestrictableAttributes } from "@/models/domain/types";
@@ -67,6 +68,7 @@ const fileToBase64 = (file: File) =>
  */
 export function useCatalogEditorViewModel(messages: { saved: string; uploaded: string; tooBig: string; badType: string }) {
   const qc = useQueryClient();
+  const notifyError = useNotifyError();
   const catalog = useCatalogViewModel();
   const [search, setSearch] = useState("");
   const [editingId, setEditingId] = useState<string | null | undefined>(undefined); // undefined = fechado, null = novo
@@ -101,7 +103,7 @@ export function useCatalogEditorViewModel(messages: { saved: string; uploaded: s
       form.setValue(`uniforms.${index}.imagePath`, imagePath, { shouldDirty: true, shouldValidate: true });
     },
     onSuccess: () => toast.success(messages.uploaded),
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => notifyError(e),
     onSettled: () => setUploadingIndex(null),
   });
 

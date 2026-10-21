@@ -23,6 +23,7 @@ import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger 
 import { displayName } from "@/models/domain/types";
 import { useAuthViewModel } from "@/viewmodels/useAuthViewModel";
 import { BrandMark } from "./BrandMark";
+import { CriticalErrorBanner } from "./CriticalErrorBanner";
 import { FontSizeMenu } from "./FontSizeMenu";
 import { SecurityNotices } from "./SecurityNotices";
 import { NicknameMenu } from "./NicknameMenu";
@@ -240,6 +241,7 @@ export function AppLayout({ title, children, wide = false }: { title?: string; c
         </header>
 
         <main className={cn("mx-auto w-full flex-1 px-4 py-6", wide ? "max-w-7xl" : "max-w-6xl")}>
+          <CriticalErrorBanner />
           <SecurityNotices />
           {children}
         </main>

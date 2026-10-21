@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useNotifyError } from "@/viewmodels/useNotify";
 import { adminApi } from "@/models/api/admin";
 import { ApiError } from "@/models/api/client";
 import { SLOTS, type Slot } from "@/models/domain/enums";
@@ -52,6 +53,7 @@ const fromTeam = (t: MetaTeam): TeamDraft => ({
 /** Criação/edição de equipes Meta do escopo selecionado. Erros 422 aparecem no formulário. */
 export function useMetaTeamEditorViewModel(scopeVm: MetaScopeViewModel, messages: { saved: string; deleted: string }) {
   const qc = useQueryClient();
+  const notifyError = useNotifyError();
   const { scope, mode, number, isDay } = scopeVm;
   const key = ["admin-meta-teams", scope, isDay ? mode : null, isDay ? number : null];
   const list = useQuery({
@@ -107,7 +109,7 @@ export function useMetaTeamEditorViewModel(scopeVm: MetaScopeViewModel, messages
       invalidate();
       toast.success(messages.deleted);
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => notifyError(e),
   });
 
   const teams = list.data ?? [];

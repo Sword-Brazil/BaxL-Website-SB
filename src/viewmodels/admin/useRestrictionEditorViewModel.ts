@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useNotifyError } from "@/viewmodels/useNotify";
 import { adminApi } from "@/models/api/admin";
 import { getDays } from "@/models/api/days";
 import { CRITERION_ATTRIBUTES, type CriterionAttribute, type DayMode } from "@/models/domain/enums";
@@ -26,6 +27,7 @@ const toCriteria = (draft: Draft): Criterion[] =>
 /** Edição manual da restrição de cada dia (combinação "E" de critérios). */
 export function useRestrictionEditorViewModel(mode: DayMode, messages: { saved: string; error: string }) {
   const qc = useQueryClient();
+  const notifyError = useNotifyError();
   const query = useQuery({ queryKey: ["days", mode], queryFn: () => getDays(mode) });
   const [drafts, setDrafts] = useState<Record<number, Draft>>({});
 
@@ -38,7 +40,7 @@ export function useRestrictionEditorViewModel(mode: DayMode, messages: { saved: 
       qc.invalidateQueries({ queryKey: ["day"] });
       toast.success(messages.saved);
     },
-    onError: (e: Error) => toast.error(`${messages.error}: ${e.message}`),
+    onError: (e: Error) => notifyError(e, messages.error),
   });
 
   const rows = (query.data ?? []).map((d) => {

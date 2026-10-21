@@ -275,5 +275,47 @@
     },
     "show": "Mostrar contraseña",
     "hide": "Ocultar contraseña"
+  },
+  "errors": {
+    "NETWORK": {
+      "title": "Sin conexión con el servidor",
+      "text": "Revisa tu internet. Lo que marcaste en este dispositivo no se pierde; inténtalo de nuevo cuando vuelva la conexión."
+    },
+    "DATABASE": {
+      "title": "Sin conexión con la base de datos",
+      "text": "El servidor no pudo acceder a los datos ahora. Inténtalo en unos instantes; si sigue, avisa a un administrador."
+    },
+    "SERVER": {
+      "title": "Error en el servidor",
+      "text": "Algo salió mal de nuestro lado. Inténtalo de nuevo; si sigue, avisa a un administrador."
+    },
+    "FORBIDDEN": {
+      "title": "Acceso denegado",
+      "text": "Tu cuenta no tiene permiso para esto. Si crees que es un error, habla con un administrador."
+    },
+    "SESSION_EXPIRED": {
+      "title": "Tu sesión terminó",
+      "text": "Por seguridad, entra de nuevo para continuar."
+    },
+    "RATE_LIMITED": {
+      "title": "Demasiados intentos seguidos. Espera unos minutos."
+    },
+    "CONFLICT": {
+      "title": "Los datos cambiaron en otro lugar al mismo tiempo."
+    },
+    "INVALID": {
+      "title": "Revisa los datos ingresados."
+    },
+    "NOT_FOUND": {
+      "title": "Elemento no encontrado."
+    },
+    "UNKNOWN": {
+      "title": "No se pudo completar la acción."
+    },
+    "actions": {
+      "signIn": "Entrar de nuevo",
+      "goHome": "Volver al inicio",
+      "dismiss": "Cerrar aviso"
+    }
   }
 }
