@@ -27,6 +27,8 @@ interface SelectionsState {
   /** Coloca o uniforme no slot; remove o mesmo agente de outro slot da equipe (invariante). */
   setSlot: (teamKey: TeamKey, slot: Slot, uniformId: string, agentOf: (uniformId: string) => string | undefined) => void;
   clearSlot: (teamKey: TeamKey, slot: Slot) => void;
+  /** Striker do personagem nesta posição (null tira). */
+  setStriker: (teamKey: TeamKey, slot: Slot, strikerUniformId: string | null) => void;
   /** Equipa (ou remove) o CTP de um personagem do usuário. */
   equipCtp: (agentId: string, ctpId: string | null) => void;
   applyTeam: (teamKey: TeamKey, team: UserTeam) => void;
@@ -86,8 +88,20 @@ export const useSelectionsStore = create<SelectionsState>()(
             for (const other of SLOTS) {
               if (other !== slot && team[other] && agentOf(team[other]!.uniformId) === agent) delete team[other];
             }
-            const keepCtp = team[slot]?.uniformId === uniformId ? team[slot]?.ctpId : undefined;
-            team[slot] = { uniformId, ctpId: keepCtp ?? null };
+            const same = team[slot]?.uniformId === uniformId;
+            team[slot] = {
+              uniformId,
+              ctpId: (same ? team[slot]?.ctpId : undefined) ?? null,
+              strikerUniformId: (same ? team[slot]?.strikerUniformId : undefined) ?? null,
+            };
+            return team;
+          }),
+        })),
+
+      setStriker: (teamKey, slot, strikerUniformId) =>
+        set(({ doc }) => ({
+          doc: withTeam(doc, teamKey, (team) => {
+            if (team[slot]) team[slot] = { ...team[slot]!, strikerUniformId };
             return team;
           }),
         })),

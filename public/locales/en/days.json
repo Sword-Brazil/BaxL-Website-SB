@@ -108,6 +108,13 @@
       "label": "Pick from every character",
       "help": "No roster needed: unlocks the whole catalog to build your teams. Each day's restrictions still apply.",
       "enable": "Unlock every character"
+    },
+    "striker": {
+      "label": "Striker",
+      "pick": "Pick a Striker (optional)",
+      "remove": "Remove Striker",
+      "none": "No character available",
+      "metaWas": "Meta: {{name}}"
     }
   }
 }

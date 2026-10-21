@@ -160,6 +160,41 @@ function SlotRow({
             </CtpPicker>
           </div>
         )}
+        {slot.pick && ref && (
+          // Striker (apoio da Transcendência 4) que o jogador usa com este personagem.
+          <div className="flex flex-col gap-1" onClick={(e) => e.stopPropagation()}>
+            <span className="flex flex-wrap items-center justify-between gap-x-2 text-xs">
+              <span className="flex items-center gap-1 font-medium text-spark">
+                <ZapIcon className="size-3.5" />
+                {t("days:myTeam.striker.label")}
+              </span>
+              {slot.metaStriker && slot.metaStriker.uniform.id !== slot.striker?.uniform.id && (
+                <span className="truncate text-muted-foreground">
+                  {t("days:myTeam.striker.metaWas", { name: slot.metaStriker.agent.name })}
+                </span>
+              )}
+            </span>
+            <div className="flex items-center gap-1">
+              <div className="min-w-0 flex-1">
+                <UniformPicker
+                  options={vm.strikerOptions(slot.slot)}
+                  value={slot.striker}
+                  onChange={(uniformId) => vm.setStriker(slot.slot, uniformId)}
+                  placeholder={t("days:myTeam.striker.pick")}
+                  searchPlaceholder={t("days:myTeam.search")}
+                  emptyText={t("days:myTeam.striker.none")}
+                  ariaLabel={`${t("days:myTeam.striker.label")} · ${ref.agent.name}`}
+                  disabled={!!vm.armedCtp}
+                />
+              </div>
+              {slot.striker && (
+                <Button type="button" size="icon-sm" variant="ghost" onClick={() => vm.setStriker(slot.slot, null)} aria-label={t("days:myTeam.striker.remove")}>
+                  <XIcon />
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
         {(slot.comparison || slot.pick) && (
           <div className="flex flex-wrap items-center gap-1">
             {slot.comparison && (

@@ -134,8 +134,9 @@ export function MemberChip({
   const label = `${slotLabel}: ${agent.name}${uniformLabel ? ` — ${uniformLabel}` : ""}`;
   const content = (
     <>
-      <SlotTag label={slotLabel} leader={leader} besideStriker={damageDealer} />
-      {damageDealer && <StrikerCorner striker={striker ?? null} />}
+      <SlotTag label={slotLabel} leader={leader} besideStriker={damageDealer || !!striker} />
+      {/* Causador de Dano da Meta: sempre (tracejado sem Striker). Minha equipe: quando escolhido. */}
+      {(damageDealer || striker) && <StrikerCorner striker={striker ?? null} />}
       <div className="relative">
         {/* A dica fica no retrato: o CTP e os selos têm as próprias dicas. */}
         <Hint label={href ? t("team.seeRotationOf", { name: agent.name }) : label}>
