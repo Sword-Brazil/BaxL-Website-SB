@@ -103,6 +103,11 @@
     "copyMeta": "Copiar Meta",
     "copyAlt": "Copiar Alternativa",
     "copied": "{{count}} agente(s) copiado(s) do seu elenco",
-    "copyNone": "Você não possui nenhum agente desta equipe. Monte com o seu elenco."
+    "copyNone": "Você não possui nenhum agente desta equipe. Monte com o seu elenco.",
+    "freePick": {
+      "label": "Escolher entre todos os personagens",
+      "help": "Sem preencher o elenco: libera todo o catálogo para montar suas equipes. As restrições de cada dia continuam valendo.",
+      "enable": "Liberar todos os personagens"
+    }
   }
 }

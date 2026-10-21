@@ -103,6 +103,11 @@
     "copyMeta": "Copiar Meta",
     "copyAlt": "Copiar Alternativa",
     "copied": "{{count}} agente(s) copiado(s) de tu plantilla",
-    "copyNone": "No tienes ningún agente de este equipo. Ármalo con tu plantilla."
+    "copyNone": "No tienes ningún agente de este equipo. Ármalo con tu plantilla.",
+    "freePick": {
+      "label": "Elegir entre todos los personajes",
+      "help": "Sin llenar el elenco: libera todo el catálogo para armar tus equipos. Las restricciones de cada día siguen valiendo.",
+      "enable": "Liberar todos los personajes"
+    }
   }
 }

@@ -13,7 +13,7 @@ import {
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { useTranslation } from "next-i18next/pages";
-import { CopyIcon, SparklesIcon, XIcon, ZapIcon } from "lucide-react";
+import { CopyIcon, SparklesIcon, UnlockIcon, XIcon, ZapIcon } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Switch } from "@/components/ui/switch";
 import { ctpColor, ctpTintStyle } from "@/models/domain/ctpColors";
 import { DISPLAY_SLOTS, type Slot } from "@/models/domain/enums";
 import type { Criterion, MetaTeam, PriorityLists } from "@/models/domain/types";
@@ -257,13 +258,36 @@ export function TeamBuilderPanel(props: { teamKey: TeamKey; criteria: Criterion[
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_21rem]">
         {/* Equipe */}
         <div className="flex min-w-0 flex-col gap-4">
-          {(!vm.hasRoster || vm.candidates.length === 0) && (
+          {/* Escolha livre: para quem não quer preencher o elenco; a restrição do dia continua valendo. */}
+          <label
+            className={cn(
+              "flex cursor-pointer items-start gap-3 rounded-lg border p-3",
+              vm.freePick ? "border-spark/50 bg-spark/5" : "border-border",
+            )}
+          >
+            <Switch checked={vm.freePick} onCheckedChange={vm.setFreePick} className="mt-0.5" />
+            <span className="flex min-w-0 flex-col gap-0.5">
+              <span className="flex items-center gap-1.5 text-sm font-medium">
+                <UnlockIcon className="size-3.5 text-spark" />
+                {t("days:myTeam.freePick.label")}
+              </span>
+              <span className="text-xs text-muted-foreground">{t("days:myTeam.freePick.help")}</span>
+            </span>
+          </label>
+
+          {!vm.freePick && (!vm.hasRoster || vm.candidates.length === 0) && (
             <Alert>
               <AlertDescription className="flex flex-wrap items-center justify-between gap-2">
                 {t("days:myTeam.noCandidates")}
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/meu-elenco">{t("days:myTeam.goRoster")}</Link>
-                </Button>
+                <span className="flex flex-wrap gap-2">
+                  <Button size="sm" variant="energy" onClick={() => vm.setFreePick(true)}>
+                    <UnlockIcon data-icon="inline-start" />
+                    {t("days:myTeam.freePick.enable")}
+                  </Button>
+                  <Button asChild size="sm" variant="outline">
+                    <Link href="/meu-elenco">{t("days:myTeam.goRoster")}</Link>
+                  </Button>
+                </span>
               </AlertDescription>
             </Alert>
           )}
