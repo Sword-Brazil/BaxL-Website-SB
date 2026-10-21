@@ -4,7 +4,7 @@ import type { Role } from "@/models/domain/enums";
 import type { SessionUser } from "@/models/domain/types";
 import { prisma } from "@/server/db";
 import { HttpError } from "@/server/http";
-import { sessionOptions } from "@/server/sessionOptions";
+import { isSessionActive, sessionOptions, shortSessionOptions } from "@/server/sessionOptions";
 
 export interface SessionData {
   userId?: string;
@@ -12,10 +12,17 @@ export interface SessionData {
   sid?: string;
   /** Início da sessão (ISO): avisos de "novo login" anteriores a ele não aparecem. */
   loginAt?: string;
+  /** "Manter logado" desmarcado: false (cookie de sessão + prazo curto em expiresAt). */
+  remember?: boolean;
+  /** Fim da sessão curta (ms desde 1970). */
+  expiresAt?: number;
 }
 
-export function getSession(req: NextApiRequest, res: NextApiResponse) {
-  return getIronSession<SessionData>(req, res, sessionOptions());
+export async function getSession(req: NextApiRequest, res: NextApiResponse) {
+  const session = await getIronSession<SessionData>(req, res, sessionOptions());
+  // Quem não marcou "manter logado" continua com cookie de sessão sempre que ela for regravada.
+  if (session.remember === false) session.updateConfig(shortSessionOptions());
+  return session;
 }
 
 export function toSessionUser(u: { id: string; username: string; nickname: string | null; role: string }): SessionUser {
@@ -26,6 +33,10 @@ export function toSessionUser(u: { id: string; username: string; nickname: strin
 export async function getSessionUser(req: NextApiRequest, res: NextApiResponse): Promise<SessionUser | null> {
   const session = await getSession(req, res);
   if (!session.userId) return null;
+  if (!isSessionActive(session)) {
+    session.destroy();
+    return null;
+  }
   const user = await prisma.user.findUnique({ where: { id: session.userId } });
   if (!user) {
     session.destroy();

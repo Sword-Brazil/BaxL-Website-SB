@@ -18,3 +18,17 @@ export function sessionOptions(): SessionOptions {
     },
   };
 }
+
+/** Sem "manter logado", a sessão vale no máximo isto (mesmo se o navegador restaurar o cookie). */
+export const SHORT_SESSION_MS = 12 * 60 * 60 * 1000;
+
+/** Opções para quem NÃO marcou "manter logado": cookie de sessão (some ao fechar o navegador). */
+export function shortSessionOptions(): SessionOptions {
+  const base = sessionOptions();
+  return { ...base, cookieOptions: { ...base.cookieOptions, maxAge: undefined } };
+}
+
+/** A sessão ainda vale? `expiresAt` só existe nas sessões sem "manter logado". */
+export function isSessionActive(data: { userId?: string; expiresAt?: number }, now = Date.now()): boolean {
+  return !!data.userId && (data.expiresAt === undefined || now < data.expiresAt);
+}
