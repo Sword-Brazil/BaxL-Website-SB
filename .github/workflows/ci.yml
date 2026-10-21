@@ -1,0 +1,60 @@
+# Integração contínua: todo PR e todo push na Dev/master passam por lint, traduções, testes e build.
+# O deploy é da Vercel (integração com o GitHub): preview em cada PR e produção a cada push na master.
+# A Vercel não aplica migrações; o job "migrate" faz isso no merge para a master.
+name: CI
+
+on:
+  pull_request:
+    branches: [Dev, master]
+  push:
+    branches: [Dev, master]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      # Só para o `prisma generate` e o build: nenhum passo acessa o banco (os testes usam PGlite).
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+      DIRECT_URL: postgresql://ci:ci@localhost:5432/ci
+      SESSION_SECRET: ci-secret-ci-secret-ci-secret-ci-secret
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npx tsc --noEmit
+      - run: npm run check:locales
+      - run: npm test
+      - run: npm run build
+
+  # Aplica as migrações novas no Supabase depois que a master passa nas verificações.
+  # Precisa dos secrets DATABASE_URL e DIRECT_URL (Settings → Secrets and variables → Actions),
+  # com as URLs completas (sem ${...}); sem eles o job é pulado.
+  migrate:
+    needs: check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DIRECT_URL: ${{ secrets.DIRECT_URL }}
+    steps:
+      - uses: actions/checkout@v4
+        if: env.DIRECT_URL != ''
+      - uses: actions/setup-node@v4
+        if: env.DIRECT_URL != ''
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+        if: env.DIRECT_URL != ''
+      - run: npx prisma migrate deploy
+        if: env.DIRECT_URL != ''
+      - run: echo "::notice::Secrets DATABASE_URL/DIRECT_URL não configurados; migrações não aplicadas."
+        if: env.DIRECT_URL == ''

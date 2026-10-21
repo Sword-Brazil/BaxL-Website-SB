@@ -103,6 +103,11 @@
     "copyMeta": "Copy Meta",
     "copyAlt": "Copy Alternative",
     "copied": "{{count}} agent(s) copied from your roster",
-    "copyNone": "You don't own any agent of this team. Build it with your roster."
+    "copyNone": "You don't own any agent of this team. Build it with your roster.",
+    "freePick": {
+      "label": "Pick from every character",
+      "help": "No roster needed: unlocks the whole catalog to build your teams. Each day's restrictions still apply.",
+      "enable": "Unlock every character"
+    }
   }
 }

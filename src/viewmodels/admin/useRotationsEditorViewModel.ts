@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { adminApi } from "@/models/api/admin";
 import { ApiError } from "@/models/api/client";
+import type { BossEffect } from "@/models/domain/enums";
 import type { Agent, Rotation } from "@/models/domain/types";
 import { AgentRotationsSchema } from "@/models/schemas/admin";
 import { ROTATIONS_KEY, useRotationsViewModel } from "@/viewmodels/useRotationsViewModel";
@@ -12,6 +13,8 @@ export interface RotationDraft {
   /** Chave só da tela (para a lista não se embaralhar ao reordenar). */
   key: string;
   uniformId: string | null;
+  /** Temporada (efeito do chefe); null = todas. */
+  effect: BossEffect | null;
   title: string;
   sequence: string;
   description: string;
@@ -24,10 +27,22 @@ const newKey = () => `r${++nextKey}`;
 const fromRotation = (r: Rotation): RotationDraft => ({
   key: newKey(),
   uniformId: r.uniformId,
+  effect: r.effect,
   title: r.title ?? "",
   sequence: r.sequence,
   description: r.description ?? "",
   videoUrl: r.videoUrl ?? "",
+});
+
+/** Rotação nova; `from` copia traje e temporada da anterior (o mais comum é variar só um deles). */
+const blankDraft = (from?: RotationDraft): RotationDraft => ({
+  key: newKey(),
+  uniformId: from?.uniformId ?? null,
+  effect: from?.effect ?? null,
+  title: "",
+  sequence: "",
+  description: "",
+  videoUrl: "",
 });
 
 /**
@@ -49,7 +64,7 @@ export function useRotationsEditorViewModel(messages: { saved: string }) {
     setError(null);
     setAgent(a);
     const current = rotations.rotationsOf(a.id).map(fromRotation);
-    setDrafts(current.length ? current : [{ key: newKey(), uniformId: null, title: "", sequence: "", description: "", videoUrl: "" }]);
+    setDrafts(current.length ? current : [blankDraft()]);
   };
 
   // Vindo do editor de Metas: abre o personagem pedido assim que os dados chegarem (uma vez).
@@ -75,6 +90,7 @@ export function useRotationsEditorViewModel(messages: { saved: string }) {
           .filter((d) => d.sequence.trim() || d.title.trim() || d.description.trim() || d.videoUrl.trim())
           .map((d) => ({
             uniformId: d.uniformId,
+            effect: d.effect,
             title: d.title || null,
             sequence: d.sequence,
             description: d.description || null,
@@ -112,8 +128,7 @@ export function useRotationsEditorViewModel(messages: { saved: string }) {
     isSaving: save.isPending,
     open,
     close: () => setAgent(null),
-    add: () =>
-      setDrafts((ds) => [...ds, { key: newKey(), uniformId: null, title: "", sequence: "", description: "", videoUrl: "" }]),
+    add: () => setDrafts((ds) => [...ds, blankDraft(ds.at(-1))]),
     remove: (key: string) => setDrafts((ds) => ds.filter((d) => d.key !== key)),
     move: (key: string, by: -1 | 1) =>
       setDrafts((ds) => {

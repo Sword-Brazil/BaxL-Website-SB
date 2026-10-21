@@ -16,6 +16,7 @@ type DbMetaTeam = {
     uniformId: string;
     ctpId: string | null;
     isDamageDealer: boolean;
+    strikerUniformId: string | null;
   }[];
 };
 
@@ -35,6 +36,7 @@ export function toMetaTeam(t: DbMetaTeam): MetaTeam {
         uniformId: m.uniformId,
         ctpId: m.ctpId,
         isDamageDealer: m.isDamageDealer,
+        strikerUniformId: m.strikerUniformId,
       })),
     updatedAt: t.updatedAt.toISOString(),
     updatedBy: t.updatedBy?.nickname ?? null,

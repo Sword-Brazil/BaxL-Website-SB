@@ -28,6 +28,7 @@ import { FontSizeMenu } from "./FontSizeMenu";
 import { SecurityNotices } from "./SecurityNotices";
 import { NicknameMenu } from "./NicknameMenu";
 import { SelectionsSyncDialog } from "./SelectionsSyncDialog";
+import { SupportButton, SupportFooter } from "./SupportFooter";
 
 const NAV = [
   { href: "/", key: "battle" },
@@ -206,7 +207,7 @@ export function AppLayout({ title, children, wide = false }: { title?: string; c
               </Sheet>
             )}
 
-            <BrandMark />
+            <BrandMark compact={isLoggedIn} />
 
             {isLoggedIn && (
               <NavigationMenu viewport={false} className="ml-4 hidden xl:flex">
@@ -230,6 +231,7 @@ export function AppLayout({ title, children, wide = false }: { title?: string; c
             )}
 
             <div className="ml-auto flex items-center gap-1">
+              {isLoggedIn && <SupportButton />}
               <LanguageMenu className="hidden sm:inline-flex" />
               <FontSizeMenu className="hidden sm:inline-flex" />
               <ThemeToggle className="hidden sm:inline-flex" />
@@ -252,6 +254,7 @@ export function AppLayout({ title, children, wide = false }: { title?: string; c
             <p className="font-heading tracking-wider text-energy/80 uppercase">{t("footer.alliance")}</p>
             <p>{t("footer.disclaimer")}</p>
             <p>{t("footer.credit")}</p>
+            <SupportFooter />
           </div>
         </footer>
       </div>

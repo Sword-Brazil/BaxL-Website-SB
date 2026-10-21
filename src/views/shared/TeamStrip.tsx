@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "next-i18next/pages";
 import { cn } from "@/lib/utils";
-import { DISPLAY_SLOTS, type Slot } from "@/models/domain/enums";
+import { DISPLAY_SLOTS, type BossEffect, type Slot } from "@/models/domain/enums";
 import type { Ctp, MetaTeamMember } from "@/models/domain/types";
 import type { CatalogViewModel } from "@/viewmodels/useCatalogViewModel";
 import { MemberChip } from "./MemberChip";
@@ -9,12 +9,12 @@ import { MemberChip } from "./MemberChip";
 export type TeamTone = "meta" | "alt" | "mine";
 
 export type StripMember = { slot: Slot; uniformId: string; ctpId?: string | null } & Partial<
-  Pick<MetaTeamMember, "isDamageDealer">
+  Pick<MetaTeamMember, "isDamageDealer" | "strikerUniformId">
 >;
 
-/** Tela de rotações do personagem, abrindo no traje usado na equipe. */
-export const rotationHref = (agentSlug: string, uniformSlug: string) =>
-  `/rotacoes/${agentSlug}?traje=${encodeURIComponent(uniformSlug)}`;
+/** Tela de rotações do personagem, abrindo no traje usado na equipe (e na temporada atual). */
+export const rotationHref = (agentSlug: string, uniformSlug: string, effect?: BossEffect) =>
+  `/rotacoes/${agentSlug}?traje=${encodeURIComponent(uniformSlug)}${effect ? `&efeito=${effect}` : ""}`;
 
 /**
  * Uma equipe (Meta, Alternativa ou a do usuário) em 3 colunas compactas: Esquerda · Líder · Direita.
@@ -27,6 +27,7 @@ export function TeamStrip({
   catalog,
   isOwned,
   equippedCtpOf,
+  effect,
   action,
 }: {
   label: string;
@@ -37,6 +38,8 @@ export function TeamStrip({
   isOwned?: (uniformId: string) => boolean;
   /** Para a equipe do usuário: CTP equipado no personagem. */
   equippedCtpOf?: (agentId: string) => Ctp | null;
+  /** Efeito da temporada no modo do dia: marca quem atordoa o chefe. */
+  effect?: BossEffect;
   action?: ReactNode;
 }) {
   const { t } = useTranslation("common");
@@ -72,13 +75,14 @@ export function TeamStrip({
               <MemberChip
                 refItem={ref}
                 ctp={ctp}
-                ctpTypeOnly={!isMine}
                 owned={!isMine && isOwned && m ? isOwned(m.uniformId) : undefined}
                 slotLabel={t(`team.slots.${slot}`)}
                 leader={slot === "SOLO"}
                 damageDealer={!isMine && !!m?.isDamageDealer}
+                striker={!isMine && m?.isDamageDealer && m.strikerUniformId ? catalog.uniformById(m.strikerUniformId) : null}
+                stunEffect={effect && ref?.uniform.effects.includes(effect) ? effect : undefined}
                 // Causador de Dano da Meta/Alternativa: tocar leva às rotações do personagem.
-                href={!isMine && m?.isDamageDealer && ref ? rotationHref(ref.agent.slug, ref.uniform.slug) : undefined}
+                href={!isMine && m?.isDamageDealer && ref ? rotationHref(ref.agent.slug, ref.uniform.slug, effect) : undefined}
               />
             </li>
           );

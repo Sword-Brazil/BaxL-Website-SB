@@ -6,6 +6,23 @@ import { metaTeamInclude } from "@/server/repositories/metaTeamRepository";
 import { assertCtpsExist, assertRestriction, findBattleDay, loadActiveUniforms } from "./curationGuards";
 import { toMetaTeam } from "./mappers";
 
+/** Strikers dos Causadores de Dano: trajes ativos do catálogo, de um personagem diferente do próprio. */
+async function assertStrikers(members: MetaTeamInput["members"], uniforms: { id: string; agentId: string }[]) {
+  const picks = members.filter((m) => m.isDamageDealer && m.strikerUniformId);
+  if (!picks.length) return;
+  const strikers = await prisma.uniform.findMany({
+    where: { id: { in: picks.map((m) => m.strikerUniformId!) }, active: true, agent: { active: true } },
+    select: { id: true, agentId: true },
+  });
+  for (const m of picks) {
+    const striker = strikers.find((s) => s.id === m.strikerUniformId);
+    if (!striker) throw new HttpError(400, "VALIDATION_ERROR", "Striker não encontrado no catálogo");
+    if (striker.agentId === uniforms.find((u) => u.id === m.uniformId)?.agentId) {
+      throw new HttpError(400, "VALIDATION_ERROR", "O Striker precisa ser outro personagem");
+    }
+  }
+}
+
 /** Cria (sem `id`) ou edita uma equipe Meta, validando catálogo e restrição do dia. */
 export async function saveMetaTeam(input: MetaTeamInput, userId: string, id?: string): Promise<MetaTeam> {
   const day = input.scope === "DAY" ? await findBattleDay(input.mode!, input.number!) : null;
@@ -16,6 +33,7 @@ export async function saveMetaTeam(input: MetaTeamInput, userId: string, id?: st
     throw new HttpError(400, "VALIDATION_ERROR", "O mesmo agente não pode ocupar dois slots");
   }
   await assertCtpsExist(input.members.flatMap((m) => (m.ctpId ? [m.ctpId] : [])));
+  await assertStrikers(input.members, uniforms);
   if (day) assertRestriction(uniforms, day.criteria);
 
   if (id && !(await prisma.metaTeam.findUnique({ where: { id } }))) {
@@ -35,6 +53,8 @@ export async function saveMetaTeam(input: MetaTeamInput, userId: string, id?: st
     uniformId: m.uniformId,
     ctpId: m.ctpId ?? null,
     isDamageDealer: !!m.isDamageDealer,
+    // Só o Causador de Dano tem Striker.
+    strikerUniformId: m.isDamageDealer ? (m.strikerUniformId ?? null) : null,
   }));
 
   const saved = await prisma.$transaction(async (tx) => {

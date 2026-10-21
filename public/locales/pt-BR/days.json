@@ -73,7 +73,7 @@
     "metaWas": "Meta: {{name}}",
     "suggestion": {
       "title": "Sugestão para seu elenco",
-      "text": "Melhor equipe possível com o que você tem: Meta, Alternativas e reservas da Sword Brazil, nessa ordem.",
+      "text": "Melhor equipe possível com o que você tem: Meta, Alternativas e reservas da Sword Brasil, nessa ordem.",
       "apply": "Aplicar sugestão",
       "none": "Ainda não há sugestão: nenhum agente seu está nas equipes ou reservas deste dia.",
       "applied": "Sugestão aplicada"
@@ -103,6 +103,11 @@
     "copyMeta": "Copiar Meta",
     "copyAlt": "Copiar Alternativa",
     "copied": "{{count}} agente(s) copiado(s) do seu elenco",
-    "copyNone": "Você não possui nenhum agente desta equipe. Monte com o seu elenco."
+    "copyNone": "Você não possui nenhum agente desta equipe. Monte com o seu elenco.",
+    "freePick": {
+      "label": "Escolher entre todos os personagens",
+      "help": "Sem preencher o elenco: libera todo o catálogo para montar suas equipes. As restrições de cada dia continuam valendo.",
+      "enable": "Liberar todos os personagens"
+    }
   }
 }

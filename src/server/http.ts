@@ -105,6 +105,10 @@ export function handler(handlers: Partial<Record<Method, Handler>>) {
     } catch (e) {
       if (e instanceof HttpError) return sendError(res, e.status, e.code, e.message, e.fields);
       console.error(e);
+      // Valor único repetido (ex.: dois trajes com o mesmo identificador): é um conflito, não um 500.
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
+        return sendError(res, 409, "CONFLICT", "Já existe um registro com esse identificador");
+      }
       if (isDatabaseUnavailable(e)) {
         res.setHeader("Retry-After", "5");
         return sendError(res, 503, "SERVICE_UNAVAILABLE", "Sem conexão com o banco de dados. Tente de novo em instantes.");

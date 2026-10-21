@@ -1,6 +1,7 @@
+import type * as React from "react";
 import Link from "next/link";
 import { useTranslation } from "next-i18next/pages";
-import { ExternalLinkIcon, PencilIcon, PlusIcon, SwordIcon, Trash2Icon, TriangleAlertIcon } from "lucide-react";
+import { ExternalLinkIcon, PencilIcon, PlusIcon, SwordIcon, Trash2Icon, TriangleAlertIcon, XIcon, ZapIcon } from "lucide-react";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import {
   AlertDialog,
@@ -23,6 +24,7 @@ import { Toggle } from "@/components/ui/toggle";
 import { Textarea } from "@/components/ui/textarea";
 import { DISPLAY_SLOTS } from "@/models/domain/enums";
 import type { Agent } from "@/models/domain/types";
+import type { CatalogViewModel, UniformRef } from "@/viewmodels/useCatalogViewModel";
 import type { MetaScopeViewModel } from "@/viewmodels/admin/useMetaScopeViewModel";
 import { useMetaTeamEditorViewModel } from "@/viewmodels/admin/useMetaTeamEditorViewModel";
 import { useRotationsViewModel } from "@/viewmodels/useRotationsViewModel";
@@ -36,17 +38,67 @@ import { QueryState } from "@/views/shared/QueryState";
 import { RestrictionBadges } from "@/views/shared/RestrictionBadges";
 import { UniformPicker } from "@/views/shared/UniformPicker";
 
-/** Ligado: o personagem é Causador de Dano nesta equipe e mostra quantas rotações ele já tem. */
+/** Strikers possíveis para um Causador de Dano: trajes ativos dos outros personagens. */
+const strikerOptions = (catalog: CatalogViewModel, agentId: string | undefined): UniformRef[] =>
+  catalog.agents
+    .filter((a) => a.active && a.id !== agentId)
+    .flatMap((a) => a.uniforms.filter((u) => u.active).map((uniform) => ({ agent: a, uniform })));
+
+/** Striker meta do Causador de Dano (apoio da Transcendência 4), com botão para tirar. */
+function StrikerPicker({
+  catalog,
+  agent,
+  value,
+  onChange,
+}: {
+  catalog: CatalogViewModel;
+  agent: Agent;
+  value: string | null;
+  onChange: (uniformId: string | null) => void;
+}) {
+  const { t } = useTranslation("admin");
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="flex items-center gap-1 text-xs font-medium text-spark">
+        <ZapIcon className="size-3.5" />
+        {t("metas.striker", { name: agent.name })}
+      </span>
+      <div className="flex items-center gap-1">
+        <div className="min-w-0 flex-1">
+          <UniformPicker
+            options={strikerOptions(catalog, agent.id)}
+            value={value ? catalog.uniformById(value) : null}
+            onChange={onChange}
+            placeholder={t("metas.pickStriker")}
+            searchPlaceholder={t("metas.searchAgent")}
+            emptyText={t("metas.noAgent")}
+            ariaLabel={t("metas.striker", { name: agent.name })}
+          />
+        </div>
+        {value && (
+          <Button type="button" size="icon-sm" variant="ghost" onClick={() => onChange(null)} aria-label={t("metas.removeStriker")}>
+            <XIcon />
+          </Button>
+        )}
+      </div>
+      <p className="text-xs text-muted-foreground">{t("metas.strikerHelp")}</p>
+    </div>
+  );
+}
+
+/** Ligado: o personagem é Causador de Dano nesta equipe, mostra quantas rotações ele já tem e o Striker. */
 function DamageDealerToggle({
   pressed,
   onChange,
   agent,
   rotationCount,
+  striker,
 }: {
   pressed: boolean;
   onChange: (pressed: boolean) => void;
   agent: Agent | null;
   rotationCount: number;
+  striker: React.ReactNode;
 }) {
   const { t } = useTranslation("admin");
   return (
@@ -70,6 +122,7 @@ function DamageDealerToggle({
           </Link>
         </p>
       )}
+      {pressed && agent && striker}
     </div>
   );
 }
@@ -219,6 +272,16 @@ export function MetaTeamEditorView({ scopeVm }: { scopeVm: MetaScopeViewModel })
                         agent={member.uniformId ? (catalog.uniformById(member.uniformId)?.agent ?? null) : null}
                         rotationCount={
                           member.uniformId ? rotations.rotationsOf(catalog.uniformById(member.uniformId)?.agent.id ?? "").length : 0
+                        }
+                        striker={
+                          member.uniformId && catalog.uniformById(member.uniformId) ? (
+                            <StrikerPicker
+                              catalog={catalog}
+                              agent={catalog.uniformById(member.uniformId)!.agent}
+                              value={member.strikerUniformId}
+                              onChange={(strikerUniformId) => vm.setMember(slot, { strikerUniformId })}
+                            />
+                          ) : null
                         }
                       />
                     </div>

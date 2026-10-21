@@ -5,7 +5,7 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useNotifyError } from "@/viewmodels/useNotify";
 import { adminApi } from "@/models/api/admin";
-import { UNKNOWN } from "@/models/domain/enums";
+import { UNKNOWN, type BossEffect } from "@/models/domain/enums";
 import type { Agent, RestrictableAttributes } from "@/models/domain/types";
 import { slugify } from "@/models/rules/slug";
 import { AgentSchema, ASSET_MAX_BYTES, type AgentInput, type AssetUploadInput } from "@/models/schemas/admin";
@@ -26,7 +26,7 @@ const blank: AgentInput = {
   slug: "",
   name: "",
   active: true,
-  uniforms: [{ slug: "padrao", name: "Padrão", imagePath: "", active: true, ...UNKNOWN_ATTRIBUTES }],
+  uniforms: [{ slug: "padrao", name: "Padrão", imagePath: "", active: true, effects: [], ...UNKNOWN_ATTRIBUTES }],
 };
 
 /** Traje novo começa com os atributos de um traje já cadastrado (ajuste o que for diferente). */
@@ -35,6 +35,7 @@ const newUniform = (from?: RestrictableAttributes): UniformInput => ({
   name: "",
   imagePath: "",
   active: true,
+  effects: [],
   ...(from ? attributesOf(from) : UNKNOWN_ATTRIBUTES),
 });
 
@@ -48,6 +49,7 @@ const toInput = (a: Agent): AgentInput => ({
     name: u.name,
     imagePath: u.imagePath,
     active: u.active,
+    effects: u.effects,
     ...attributesOf(u),
   })),
 });
@@ -134,6 +136,12 @@ export function useCatalogEditorViewModel(messages: { saved: string; uploaded: s
     addUniform: () => uniforms.prepend(newUniform(form.getValues("uniforms")[0])),
     setUniformAttribute: (index: number, name: keyof RestrictableAttributes, value: string) =>
       form.setValue(`uniforms.${index}.${name}`, value as never, { shouldDirty: true }),
+    /** Liga/desliga um efeito que o traje causa no chefe. */
+    toggleUniformEffect: (index: number, effect: BossEffect) => {
+      const current = form.getValues(`uniforms.${index}.effects`) ?? [];
+      const next = current.includes(effect) ? current.filter((e) => e !== effect) : [...current, effect];
+      form.setValue(`uniforms.${index}.effects`, next, { shouldDirty: true });
+    },
     removeImage: (index: number) => form.setValue(`uniforms.${index}.imagePath`, "", { shouldDirty: true }),
     onAgentNameChange: (name: string) => syncSlug("slug", name, form.getValues("name")),
     onUniformNameChange: (index: number, name: string) =>

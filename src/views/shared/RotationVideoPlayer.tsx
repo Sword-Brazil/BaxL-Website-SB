@@ -73,7 +73,7 @@ const fill = (box: number, media: number): CSSProperties => ({
 });
 
 /**
- * Vídeo de referência da rotação, ocupando toda a largura: capa com botão de play e, ao tocar,
+ * Vídeo de referência da rotação, na largura da caixa onde está (a tela limita): capa com botão de play e, ao tocar,
  * o vídeo em loop (YouTube sem cookies ou arquivo hospedado fora). A caixa segue a proporção do
  * vídeo; vídeos verticais (Shorts) ficam numa faixa central com a capa desfocada no fundo.
  */
@@ -142,8 +142,8 @@ export function RotationVideoPlayer({ url, title }: { url: string; title: string
               <video src={`${video.url}#t=0.1`} muted playsInline preload="metadata" aria-hidden onLoadedMetadata={onFileMetadata} className={fileMedia} />
             )}
             <span className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/20 transition-opacity group-hover/video:opacity-80" />
-            <span className="absolute top-1/2 left-1/2 flex size-14 -translate-1/2 items-center justify-center rounded-full bg-energy/90 text-background shadow-[0_0_32px_-4px_var(--energy)] ring-4 ring-energy/30 transition-transform group-hover/video:scale-110 group-focus-visible/video:ring-white sm:size-20">
-              <PlayIcon className="ml-1 size-6 fill-current sm:size-9" />
+            <span className="absolute top-1/2 left-1/2 flex size-14 -translate-1/2 items-center justify-center rounded-full bg-energy/90 text-background shadow-[0_0_32px_-4px_var(--energy)] ring-4 ring-energy/30 transition-transform group-hover/video:scale-110 group-focus-visible/video:ring-white sm:size-16">
+              <PlayIcon className="ml-1 size-6 fill-current sm:size-7" />
             </span>
             <span className="absolute inset-x-0 bottom-0 p-3 text-left sm:p-4">
               <span className="block font-heading text-[0.65rem] tracking-[0.2em] text-energy uppercase">{t("rotation.playVideo")}</span>
