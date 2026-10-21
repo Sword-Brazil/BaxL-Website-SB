@@ -240,5 +240,11 @@
     "doneAll": "Todas as suas equipes foram apagadas",
     "doneMode": "Equipes de {{mode}} apagadas",
     "button": "Limpar equipes"
+  },
+  "fontSize": {
+    "label": "Tamanho da fonte",
+    "sm": "Pequena",
+    "md": "Média",
+    "lg": "Grande"
   }
 }

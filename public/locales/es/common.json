@@ -240,5 +240,11 @@
     "doneAll": "Se borraron todos tus equipos",
     "doneMode": "Equipos de {{mode}} borrados",
     "button": "Limpiar equipos"
+  },
+  "fontSize": {
+    "label": "Tamaño de fuente",
+    "sm": "Pequeña",
+    "md": "Mediana",
+    "lg": "Grande"
   }
 }

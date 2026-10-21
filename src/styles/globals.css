@@ -238,8 +238,16 @@
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
+  /* Tamanho da fonte (acessibilidade): tudo no app é em rem, então escala junto. Média é o padrão. */
   html {
     @apply font-sans;
+    font-size: 106.25%;
+  }
+  html[data-font-size="sm"] {
+    font-size: 100%;
+  }
+  html[data-font-size="lg"] {
+    font-size: 115%;
   }
   h1,
   h2,

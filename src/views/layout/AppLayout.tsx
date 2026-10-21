@@ -22,6 +22,7 @@ import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useAuthViewModel } from "@/viewmodels/useAuthViewModel";
 import { BrandMark } from "./BrandMark";
+import { FontSizeMenu } from "./FontSizeMenu";
 import { SecurityNotices } from "./SecurityNotices";
 import { NicknameMenu } from "./NicknameMenu";
 
@@ -176,6 +177,7 @@ export function AppLayout({ title, children, wide = false }: { title?: string; c
                 <Separator />
                 <div className="flex items-center gap-1 px-4">
                   <LanguageMenu />
+                  <FontSizeMenu />
                   <ThemeToggle />
                 </div>
               </SheetContent>
@@ -204,6 +206,7 @@ export function AppLayout({ title, children, wide = false }: { title?: string; c
 
             <div className="ml-auto flex items-center gap-1">
               <LanguageMenu className="hidden sm:inline-flex" />
+              <FontSizeMenu className="hidden sm:inline-flex" />
               <ThemeToggle className="hidden sm:inline-flex" />
               <NicknameMenu />
               <StaffMenu />

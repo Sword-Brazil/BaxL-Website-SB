@@ -240,5 +240,11 @@
     "doneAll": "All your teams were deleted",
     "doneMode": "{{mode}} teams deleted",
     "button": "Clear teams"
+  },
+  "fontSize": {
+    "label": "Font size",
+    "sm": "Small",
+    "md": "Medium",
+    "lg": "Large"
   }
 }
