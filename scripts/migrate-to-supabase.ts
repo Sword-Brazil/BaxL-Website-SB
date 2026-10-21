@@ -12,10 +12,12 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
+import nextEnv from "@next/env";
 import { Prisma, PrismaClient } from "@prisma/client";
 import { ensureBucket, publicUrl, storageConfig } from "../src/server/storage";
 
-if (existsSync(".env.local")) process.loadEnvFile(".env.local");
+// .env.local com expansão de ${VAR} (ex.: a senha do banco dentro das URLs), como no Next.
+nextEnv.loadEnvConfig(process.cwd(), true, { info: () => {}, error: console.error });
 
 const args = process.argv.slice(2);
 const skipUploads = args.includes("--skip-uploads");

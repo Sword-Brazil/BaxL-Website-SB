@@ -23,13 +23,14 @@ Especificação, plano e tarefas: [`specs/001-alliance-battle-metas/`](specs/001
 ```bash
 npm install                    # também gera o Prisma Client (postinstall)
 cp .env.example .env.local     # preencha as conexões do Supabase, SESSION_SECRET e o administrador
-npx prisma migrate deploy      # cria as tabelas no Postgres
-npx prisma db seed             # CTPs, 48 dias de BAX/BAL, configurações e o Administrador padrão
+npm run db:deploy              # cria as tabelas no Postgres
+npm run db:seed                # CTPs, 48 dias de BAX/BAL, configurações e o Administrador padrão
 npm run dev                    # http://localhost:3000
 ```
 
-A CLI do Prisma lê `.env`, não `.env.local`: rode os comandos `npx prisma …` com as variáveis
-exportadas (`set -a; source .env.local; set +a` no bash) ou copie `DATABASE_URL`/`DIRECT_URL` para `.env`.
+Os scripts `npm run db:*` leem o `.env.local` como o Next (aceitam `${VAR}`, ex.: a senha do banco
+dentro das URLs). Use o **pooler** do Supabase (`aws-0-<região>.pooler.supabase.com`): a conexão
+direta `db.<ref>.supabase.co` é só IPv6 e não funciona no WSL nem na Vercel.
 
 Variáveis em `.env.local`:
 
@@ -52,7 +53,8 @@ Rodar `npx prisma db seed` de novo é seguro: ele não duplica nada e atualiza a
 | `npm run dev` | Servidor de desenvolvimento. |
 | `npm test` | Testes (Vitest): regras puras, schemas e services. Os services rodam num Postgres em memória (PGlite), sem Docker nem Supabase. |
 | `npm run build` / `npm start` | Build e servidor de produção. |
-| `npx prisma db seed` | Dados base e o Administrador padrão. |
+| `npm run db:deploy` | Aplica as migrações no Postgres (`prisma migrate deploy` com o `.env.local`). |
+| `npm run db:seed` | Dados base e o Administrador padrão. |
 | `npm run db:migrate-data` | Copia o antigo `prisma/dev.db` (SQLite) para o Postgres e envia `public/assets/uploads` ao Storage. Rode num banco vazio, antes do seed. |
 | `npm run import:guiabaxbal [-- --replace]` | Importa o snapshot do Guia BAX/BAL/BAI (`prisma/data/`): calendário de 28 dias, 115 personagens e trajes, equipes Meta e Alternativa de BAX/BAL/BAI. `--replace` substitui as equipes existentes. |
 | `npm run import:images` | Copia as fotos de `img/` (personagens, CTPs e ícones de restrição) para `public/assets` e liga cada retrato ao traje, conforme `prisma/data/images.json`. Rode depois de `import:guiabaxbal`. |
@@ -79,18 +81,19 @@ Rodar `npx prisma db seed` de novo é seguro: ele não duplica nada e atualiza a
 
 ## Deploy (Vercel + Supabase)
 
-1. **Supabase**: crie o projeto (região São Paulo, `sa-east-1`). Em *Connect* copie as strings do
+1. **Supabase**: crie o projeto (de preferência em São Paulo, `sa-east-1`). Em *Connect* copie as strings do
    *Transaction pooler* (`DATABASE_URL`) e do *Session pooler* (`DIRECT_URL`); em *API*, a URL e a
    chave secreta (`service_role`).
 2. **Banco** (do seu computador, com as variáveis do Supabase exportadas):
-   `npx prisma migrate deploy` → `npm run db:migrate-data` (só se for trazer o SQLite antigo) →
-   `npx prisma db seed`. As tabelas têm RLS ligado e nenhuma policy: a Data API do Supabase não
+   `npm run db:deploy` → `npm run db:migrate-data` (só se for trazer o SQLite antigo) →
+   `npm run db:seed`. As tabelas têm RLS ligado e nenhuma policy: a Data API do Supabase não
    lê nem grava nada; só o app (Prisma) acessa.
 3. **Vercel**: importe o repositório (branch `master`), framework Next.js, e cadastre em *Environment
    Variables* (Production): `DATABASE_URL`, `DIRECT_URL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`,
    `SUPABASE_STORAGE_BUCKET`, `SESSION_SECRET` (um novo, só da produção) e `APP_URL`. Em *Settings →
-   Functions*, escolha a região `gru1` (São Paulo), perto do banco.
-4. **Migrações futuras**: rode `npx prisma migrate deploy` contra o Supabase antes (ou junto) do deploy
+   Functions*, escolha a região da Vercel mais perto do banco: `gru1` para Supabase em São Paulo,
+   `iad1` para `us-east-1`.
+4. **Migrações futuras**: rode `npm run db:deploy` contra o Supabase antes (ou junto) do deploy
    que precisar delas; ou mude o *Build Command* da Vercel para `prisma migrate deploy && next build`.
 
 ## Backup
