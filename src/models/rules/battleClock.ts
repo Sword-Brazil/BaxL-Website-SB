@@ -36,8 +36,9 @@ const mod = (n: number, m: number) => ((n % m) + m) % m;
 /**
  * Calcula o dia de batalha atual a partir do horário de Brasília.
  * - O dia vira em `dayTurnoverHour` (12:00): é a única hora em que `cycleDay` muda.
- * - O reset semanal ocorre em `weeklyResetHour` (22:00) do último dia de cada semana
- *   e muda apenas `weekIndex` (a semana para a qual a pontuação conta).
+ * - O reset semanal ocorre na quinta-feira às `weeklyResetHour` (22:00), ou seja, no primeiro dia
+ *   de cada semana do ciclo (Dias 1, 8, 15 e 22: quinta 12:00 → sexta 12:00), e muda apenas
+ *   `weekIndex` (a semana para a qual a pontuação conta): até 21:59 ainda vale a semana anterior.
  */
 export function getBattleClock(now: Date, settings: Settings): BattleClock {
   const nowMs = now.getTime();
@@ -52,12 +53,12 @@ export function getBattleClock(now: Date, settings: Settings): BattleClock {
   const cycleDay = cycleIndex + 1;
   const dayStartWall = anchorWall + elapsedDays * DAY;
 
-  const isResetDay = cycleDay % WEEK_LENGTH === 0;
+  const isResetDay = cycleIndex % WEEK_LENGTH === 0;
   const resetOffset = mod(settings.weeklyResetHour - settings.dayTurnoverHour, 24) * HOUR;
   const beforeWeeklyReset = isResetDay && nowWall < dayStartWall + resetOffset;
 
   const baseWeek = Math.floor(cycleIndex / WEEK_LENGTH);
-  const weekIndex = isResetDay && !beforeWeeklyReset ? (baseWeek + 1) % WEEKS_PER_CYCLE : baseWeek;
+  const weekIndex = beforeWeeklyReset ? mod(baseWeek - 1, WEEKS_PER_CYCLE) : baseWeek;
 
   let daysToBai = 0;
   while (!isBaiDay(mod(cycleIndex + daysToBai, CYCLE_LENGTH) + 1)) daysToBai++;
