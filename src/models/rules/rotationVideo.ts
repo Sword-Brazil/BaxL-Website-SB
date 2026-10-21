@@ -3,7 +3,7 @@
 // arquivo .mp4/.webm hospedado em outro lugar.
 
 export type RotationVideo =
-  | { kind: "youtube"; id: string; start: number }
+  | { kind: "youtube"; id: string; start: number; vertical: boolean }
   | { kind: "file"; url: string };
 
 const YOUTUBE_ID = /^[A-Za-z0-9_-]{11}$/;
@@ -40,7 +40,8 @@ export function parseRotationVideo(input: string | null | undefined): RotationVi
             ? parts[1]
             : null;
     if (!id || !YOUTUBE_ID.test(id)) return null;
-    return { kind: "youtube", id, start: parseSeconds(url.searchParams.get("t") ?? url.searchParams.get("start")) };
+    const vertical = url.hostname !== "youtu.be" && parts[0] === "shorts";
+    return { kind: "youtube", id, start: parseSeconds(url.searchParams.get("t") ?? url.searchParams.get("start")), vertical };
   }
   return VIDEO_FILE.test(url.pathname) ? { kind: "file", url: url.toString() } : null;
 }
@@ -59,4 +60,9 @@ export function youtubeEmbedUrl(video: Extract<RotationVideo, { kind: "youtube" 
     ...(video.start ? { start: String(video.start) } : {}),
   });
   return `https://www.youtube-nocookie.com/embed/${video.id}?${params}`;
+}
+
+/** Capa do vídeo do YouTube (existe para todo vídeo, inclusive Shorts). */
+export function youtubeThumbnailUrl(video: Extract<RotationVideo, { kind: "youtube" }>): string {
+  return `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`;
 }

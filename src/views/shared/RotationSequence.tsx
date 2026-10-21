@@ -1,9 +1,8 @@
 import { Fragment } from "react";
 import { useTranslation } from "next-i18next/pages";
-import { ChevronRightIcon, ExternalLinkIcon } from "lucide-react";
+import { ChevronRightIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CANCELS, ULTIMATE_SKILL, parseRotation, type Cancel, type RotationPart, type RotationStep } from "@/models/rules/rotation";
-import { parseRotationVideo, youtubeEmbedUrl } from "@/models/rules/rotationVideo";
 
 const CANCEL_CLASS: Record<Cancel, string> = {
   c: "text-spark",
@@ -98,37 +97,5 @@ export function RotationText({ text, className }: { text: string; className?: st
     <RotationSequence parts={parsed.parts} className={className} />
   ) : (
     <p className={cn("text-sm font-medium whitespace-pre-wrap", className)}>{text}</p>
-  );
-}
-
-/**
- * Vídeo de referência em loop, mudo. Só é montado quando o painel de rotação abre, então não
- * pesa na tela; o vídeo vem do YouTube (sem cookies) ou de um arquivo hospedado fora.
- */
-export function RotationVideoPlayer({ url, title }: { url: string; title: string }) {
-  const { t } = useTranslation("common");
-  const video = parseRotationVideo(url);
-  if (!video) return null;
-  return (
-    <div className="flex max-w-sm flex-col gap-1">
-      <div className="overflow-hidden rounded-md border border-energy/20 bg-black">
-        {video.kind === "youtube" ? (
-          <iframe
-            src={youtubeEmbedUrl(video)}
-            title={title}
-            loading="lazy"
-            allow="autoplay; encrypted-media; picture-in-picture"
-            referrerPolicy="strict-origin-when-cross-origin"
-            className="aspect-video w-full"
-          />
-        ) : (
-          <video src={video.url} autoPlay muted loop playsInline preload="metadata" aria-label={title} className="aspect-video w-full" />
-        )}
-      </div>
-      <a href={url} target="_blank" rel="noreferrer noopener" className="flex items-center gap-1 self-start text-[0.7rem] text-energy hover:underline">
-        <ExternalLinkIcon className="size-3" />
-        {t("rotation.openVideo")}
-      </a>
-    </div>
   );
 }

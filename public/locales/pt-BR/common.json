@@ -72,7 +72,8 @@
       "qc": "Quick Cancel: cancelamento rápido logo após o comando.",
       "optional": "Trecho opcional ou \"recheio\" do combo antes do bônus principal."
     },
-    "openVideo": "Abrir o vídeo"
+    "openVideo": "Abrir o vídeo",
+    "playVideo": "Assistir à rotação"
   },
   "restriction": {
     "none": "Sem restrição",
@@ -239,5 +240,11 @@
     "doneAll": "Todas as suas equipes foram apagadas",
     "doneMode": "Equipes de {{mode}} apagadas",
     "button": "Limpar equipes"
+  },
+  "fontSize": {
+    "label": "Tamanho da fonte",
+    "sm": "Pequena",
+    "md": "Média",
+    "lg": "Grande"
   }
 }

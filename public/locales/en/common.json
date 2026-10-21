@@ -72,7 +72,8 @@
       "qc": "Quick Cancel: cancel immediately after the input.",
       "optional": "Optional part or combo \"filler\" before the main bonus."
     },
-    "openVideo": "Open the video"
+    "openVideo": "Open the video",
+    "playVideo": "Watch the rotation"
   },
   "restriction": {
     "none": "No restriction",
@@ -239,5 +240,11 @@
     "doneAll": "All your teams were deleted",
     "doneMode": "{{mode}} teams deleted",
     "button": "Clear teams"
+  },
+  "fontSize": {
+    "label": "Font size",
+    "sm": "Small",
+    "md": "Medium",
+    "lg": "Large"
   }
 }

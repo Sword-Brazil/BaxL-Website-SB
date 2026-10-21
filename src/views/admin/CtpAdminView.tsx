@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "next-i18next/pages";
 import { BanIcon, ImageUpIcon, LoaderIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
@@ -11,11 +11,13 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ctpColor } from "@/models/domain/ctpColors";
 import { CTP_QUALITIES, CTP_TYPES, type CtpQuality, type CtpType } from "@/models/domain/enums";
 import type { Catalog, Ctp } from "@/models/domain/types";
 import { adminApi } from "@/models/api/admin";
 import { ASSET_MAX_BYTES } from "@/models/schemas/admin";
 import { useCatalogViewModel } from "@/viewmodels/useCatalogViewModel";
+import { CtpQualityFx } from "@/views/shared/CtpQualityFx";
 
 type Draft = { id?: string; type: CtpType; quality: CtpQuality; imagePath: string; active: boolean };
 const TYPES: Record<string, "image/png" | "image/webp" | "image/jpeg"> = { "image/png": "image/png", "image/webp": "image/webp", "image/jpeg": "image/jpeg" };
@@ -25,6 +27,23 @@ const dataUrl = (file: File) => new Promise<string>((resolve, reject) => {
   reader.onerror = () => reject(reader.error);
   reader.readAsDataURL(file);
 });
+
+/** Foto do CTP num medalhão redondo com anel e brilho na cor do CTP (em vez da caixa quadrada). */
+function CtpMedallion({ ctp }: { ctp: Ctp }) {
+  const color = ctpColor(ctp);
+  return (
+    <span className="size-16 shrink-0 justify-self-start rounded-full" style={{ boxShadow: `0 0 18px -4px ${color}` }}>
+      <Avatar
+        className="isolate size-16 bg-[radial-gradient(circle,var(--secondary)_0%,var(--card)_75%)] ring-2 ring-offset-2 ring-offset-card after:hidden"
+        style={{ "--tw-ring-color": color } as CSSProperties}
+      >
+        <AvatarImage src={ctp.imagePath || undefined} alt="" className="object-contain p-1.5" />
+        <AvatarFallback className="bg-transparent font-heading text-xs">CTP</AvatarFallback>
+        <CtpQualityFx quality={ctp.quality} color={color} className="inset-1.5" />
+      </Avatar>
+    </span>
+  );
+}
 
 export function CtpAdminView() {
   const { t } = useTranslation(["admin", "common"]);
@@ -89,7 +108,7 @@ export function CtpAdminView() {
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {catalog.ctps.filter((ctp) => ctp.type === type).map((ctp) => <Card key={ctp.id} className={!ctp.active ? "opacity-60" : undefined}>
           <CardHeader className="flex-row items-center gap-3 space-y-0">
-            <Avatar className="size-16 rounded-none bg-secondary after:hidden"><AvatarImage src={ctp.imagePath || undefined} alt="" className="object-contain" /><AvatarFallback>CTP</AvatarFallback></Avatar>
+            <CtpMedallion ctp={ctp} />
             <div className="min-w-0 flex-1"><CardTitle className="text-base">{t(`common:ctp.${ctp.type}`)}</CardTitle><p className="text-sm text-muted-foreground">{t(`common:quality.${ctp.quality}`)}{!ctp.active && ` · ${t("admin:catalog.inactive")}`}</p></div>
           </CardHeader>
           <CardContent className="flex justify-end gap-2">
