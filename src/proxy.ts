@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { unsealData } from "iron-session";
-import { sessionOptions } from "@/server/sessionOptions";
+import { isSessionActive, sessionOptions } from "@/server/sessionOptions";
 import type { SessionData } from "@/server/session";
 
 /**
@@ -17,7 +17,7 @@ async function hasSession(request: NextRequest) {
   const seal = request.cookies.get(options.cookieName)?.value;
   if (!seal) return false;
   const data = await unsealData<SessionData>(seal, { password: options.password, ttl: options.ttl }).catch(() => ({}) as SessionData);
-  return !!data.userId;
+  return isSessionActive(data);
 }
 
 export async function proxy(request: NextRequest) {
@@ -26,7 +26,10 @@ export async function proxy(request: NextRequest) {
   if ((isApi ? PUBLIC_APIS : PUBLIC_PAGES).has(path)) return NextResponse.next();
   if (await hasSession(request)) return NextResponse.next();
 
-  if (isApi) {
+  // Dados das páginas (/_next/data) também levam 401, não redirect: o Next guardaria o redirect
+  // de um pré-carregamento (ex.: o link do logo na tela de login) e, depois de entrar, mandaria a
+  // pessoa de volta para /entrar. Com 401 ele faz a navegação completa, que cai no redirect abaixo.
+  if (isApi || request.headers.has("x-nextjs-data")) {
     return NextResponse.json({ error: { code: "UNAUTHENTICATED", message: "Faça login para continuar" } }, { status: 401 });
   }
   const login = request.nextUrl.clone();
