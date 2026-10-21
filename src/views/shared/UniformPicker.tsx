@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useTranslation } from "next-i18next/pages";
 import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AttributeLabel } from "./AttributeLabel";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
@@ -37,7 +37,6 @@ export function UniformPicker({
   disabled?: boolean;
   ariaLabel?: string;
 }) {
-  const { t } = useTranslation("common");
   const [open, setOpen] = useState(false);
   const byAgent = new Map<string, UniformRef[]>();
   for (const o of options) byAgent.set(o.agent.name, [...(byAgent.get(o.agent.name) ?? []), o]);
@@ -76,7 +75,7 @@ export function UniformPicker({
                     <Avatar
                       className={cn(
                         "chamfer-sm size-9 shrink-0 rounded-none ring-2 after:hidden",
-                        r.agent.side === "HERO" ? "ring-hero/60" : r.agent.side === "VILLAIN" ? "ring-villain/60" : "ring-border",
+                        r.uniform.side === "HERO" ? "ring-hero/60" : r.uniform.side === "VILLAIN" ? "ring-villain/60" : "ring-border",
                       )}
                     >
                       <AvatarImage src={r.uniform.portrait || undefined} alt="" loading="lazy" decoding="async" className="rounded-none" />
@@ -86,7 +85,7 @@ export function UniformPicker({
                       <span className="truncate font-medium">{r.agent.name}</span>
                       <span className="truncate text-xs text-muted-foreground">{r.uniform.name}</span>
                     </span>
-                    <span className="text-xs text-muted-foreground">{t(`values.${r.agent.side}`)}</span>
+                    <AttributeLabel value={r.uniform.side} className="text-xs text-muted-foreground" />
                     <CheckIcon className={cn(value?.uniform.id === r.uniform.id ? "opacity-100" : "opacity-0")} />
                   </CommandItem>
                 ))}

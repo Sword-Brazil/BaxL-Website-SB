@@ -23,12 +23,7 @@ export interface RestrictableAttributes {
   attackType: AttackType | Unknown;
 }
 
-/** Atributos próprios de um traje; null = herda do personagem. */
-export type UniformOverrides = {
-  [K in keyof RestrictableAttributes]: Exclude<RestrictableAttributes[K], Unknown> | null;
-};
-
-/** Traje com os atributos já resolvidos (próprios do traje ou herdados do personagem). */
+/** Traje: os atributos (gênero, lado, espécie, ataque) são de cada traje, não do personagem. */
 export interface Uniform extends RestrictableAttributes {
   id: string;
   agentId: string;
@@ -38,11 +33,9 @@ export interface Uniform extends RestrictableAttributes {
   /** Imagem a exibir: a do traje ou, se ele não tiver, o retrato do personagem ("" = iniciais). */
   portrait: string;
   active: boolean;
-  overrides: UniformOverrides;
 }
 
-/** Os atributos do personagem valem para todos os trajes que não tiverem os seus. */
-export interface Agent extends RestrictableAttributes {
+export interface Agent {
   id: string;
   slug: string;
   name: string;
@@ -68,6 +61,24 @@ export interface MetaTeamMember {
   uniformId: string;
   /** CTP recomendado. As equipes importadas trazem só o tipo; null = sem recomendação. */
   ctpId: string | null;
+  /** Causador de Dano (qualquer posição): leva às rotações do personagem. */
+  isDamageDealer: boolean;
+}
+
+/** Rotação de um personagem, em texto livre. `uniformId` null = vale para todos os trajes. */
+export interface Rotation {
+  id: string;
+  agentId: string;
+  uniformId: string | null;
+  position: number;
+  title: string | null;
+  /** Sequência em texto livre (a notação 1–6 / c / dc / qc vira "chips" quando reconhecida). */
+  sequence: string;
+  /** Quando usar, os delays, o que observar. */
+  description: string | null;
+  /** Vídeo de referência (YouTube ou .mp4/.webm externo). */
+  videoUrl: string | null;
+  updatedAt: string;
 }
 
 export interface MetaTeam {
@@ -114,10 +125,14 @@ export interface Settings {
 
 export interface SessionUser {
   id: string;
-  email: string;
+  /** Login (com a senha). Contas são criadas por um Administrador. */
+  username: string;
   nickname: string | null;
   role: Role;
 }
+
+/** Nome para exibir: apelido, senão o nome de usuário. */
+export const displayName = (u: Pick<SessionUser, "nickname" | "username">) => u.nickname || u.username;
 
 export interface BattleClock {
   /** Dia do ciclo (1–28). Muda somente na virada diária (12:00 BRT). */

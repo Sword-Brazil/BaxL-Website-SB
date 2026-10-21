@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useNotifyError } from "@/viewmodels/useNotify";
 import { adminApi } from "@/models/api/admin";
 import { ApiError } from "@/models/api/client";
 import { SLOTS, type Slot } from "@/models/domain/enums";
@@ -8,19 +9,28 @@ import type { MetaTeam } from "@/models/domain/types";
 import { MetaTeamSchema, type MetaTeamInput } from "@/models/schemas/admin";
 import type { MetaScopeViewModel } from "./useMetaScopeViewModel";
 
+export interface MemberDraft {
+  uniformId: string | null;
+  ctpId: string | null;
+  /** Causador de Dano: o jogador toca na foto e vê as rotações do personagem. */
+  isDamageDealer: boolean;
+}
+
 export interface TeamDraft {
   id?: string;
   isPrimary: boolean;
   label: string;
   notes: string;
-  members: Record<Slot, { uniformId: string | null; ctpId: string | null }>;
+  members: Record<Slot, MemberDraft>;
 }
+
+const emptyMember = (): MemberDraft => ({ uniformId: null, ctpId: null, isDamageDealer: false });
 
 const emptyDraft = (isPrimary: boolean): TeamDraft => ({
   isPrimary,
   label: "",
   notes: "",
-  members: Object.fromEntries(SLOTS.map((s) => [s, { uniformId: null, ctpId: null }])) as TeamDraft["members"],
+  members: Object.fromEntries(SLOTS.map((s) => [s, emptyMember()])) as TeamDraft["members"],
 });
 
 const fromTeam = (t: MetaTeam): TeamDraft => ({
@@ -28,12 +38,22 @@ const fromTeam = (t: MetaTeam): TeamDraft => ({
   isPrimary: t.isPrimary,
   label: t.label ?? "",
   notes: t.notes ?? "",
-  members: Object.fromEntries(t.members.map((m) => [m.slot, { uniformId: m.uniformId, ctpId: m.ctpId }])) as TeamDraft["members"],
+  members: Object.fromEntries(
+    t.members.map((m) => [
+      m.slot,
+      {
+        uniformId: m.uniformId,
+        ctpId: m.ctpId,
+        isDamageDealer: m.isDamageDealer,
+      },
+    ]),
+  ) as TeamDraft["members"],
 });
 
 /** Criação/edição de equipes Meta do escopo selecionado. Erros 422 aparecem no formulário. */
 export function useMetaTeamEditorViewModel(scopeVm: MetaScopeViewModel, messages: { saved: string; deleted: string }) {
   const qc = useQueryClient();
+  const notifyError = useNotifyError();
   const { scope, mode, number, isDay } = scopeVm;
   const key = ["admin-meta-teams", scope, isDay ? mode : null, isDay ? number : null];
   const list = useQuery({
@@ -61,7 +81,15 @@ export function useMetaTeamEditorViewModel(scopeVm: MetaScopeViewModel, messages
         isPrimary: d.isPrimary,
         label: d.label || null,
         notes: d.notes || null,
-        members: SLOTS.map((slot) => ({ slot, uniformId: d.members[slot].uniformId ?? "", ctpId: d.members[slot].ctpId ?? null })),
+        members: SLOTS.map((slot) => {
+          const m = d.members[slot];
+          return {
+            slot,
+            uniformId: m.uniformId ?? "",
+            ctpId: m.ctpId ?? null,
+            isDamageDealer: m.isDamageDealer,
+          };
+        }),
       };
       const parsed = MetaTeamSchema.safeParse(input);
       if (!parsed.success) throw new ApiError(400, "VALIDATION_ERROR", parsed.error.issues[0]?.message ?? "Dados inválidos");
@@ -81,7 +109,7 @@ export function useMetaTeamEditorViewModel(scopeVm: MetaScopeViewModel, messages
       invalidate();
       toast.success(messages.deleted);
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => notifyError(e),
   });
 
   const teams = list.data ?? [];

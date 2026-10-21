@@ -4,10 +4,13 @@
  */
 export const VALIDATION = {
   passwordRequired: "Informe a senha",
-  emailInvalid: "E-mail inválido",
+  loginRequired: "Informe o nome de usuário",
+  usernameFormat: "Use de 3 a 30 letras, números, espaço, ponto, hífen ou sublinhado",
   passwordMin: "Mínimo de 8 caracteres",
-  passwordLetter: "Precisa conter uma letra",
+  passwordLower: "Precisa conter uma letra minúscula",
+  passwordUpper: "Precisa conter uma letra maiúscula",
   passwordDigit: "Precisa conter um número",
+  passwordSymbol: "Precisa conter um símbolo (ex.: ! . @ #)",
   baiDay: "Dia reservado à BAI",
   teamKey: "Chave de equipe inválida",
   sameAgentTwoSlots: "O mesmo agente não pode ocupar dois slots",
@@ -22,6 +25,8 @@ export const VALIDATION = {
   slugFormat: "Use kebab-case (ex.: scarlet-witch)",
   uniformRequired: "Cadastre ao menos um uniforme",
   uniformRepeated: "Uniforme repetido",
+  rotationVideo: "Link de vídeo inválido: use um link https do YouTube ou de um arquivo .mp4/.webm",
+  rotationRequired: "Escreva a rotação",
 } as const;
 
 export type ValidationCode = keyof typeof VALIDATION;

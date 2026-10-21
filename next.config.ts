@@ -1,7 +1,44 @@
 import type { NextConfig } from "next";
 import i18nConfig from "./next-i18next.config.js";
 
+const isDev = process.env.NODE_ENV !== "production";
+
+/**
+ * Política de conteúdo: só o próprio site, imagens do Supabase Storage e do YouTube (capas),
+ * vídeos do YouTube sem cookies e arquivos de vídeo https. Ninguém pode colocar o site num iframe.
+ * Em desenvolvimento, o Next precisa de eval e do WebSocket do recarregamento automático.
+ */
+const CSP = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https://*.supabase.co https://i.ytimg.com",
+  "font-src 'self' data:",
+  `connect-src 'self' https://*.supabase.co https://i.ytimg.com${isDev ? " ws: wss:" : ""}`,
+  "media-src 'self' blob: https:",
+  "frame-src https://www.youtube-nocookie.com",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+  ...(isDev ? [] : ["upgrade-insecure-requests"]),
+].join("; ");
+
+const SECURITY_HEADERS = [
+  { key: "Content-Security-Policy", value: CSP },
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  ...(isDev ? [] : [{ key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" }]),
+];
+
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
+  async headers() {
+    return [{ source: "/:path*", headers: SECURITY_HEADERS }];
+  },
   i18n: i18nConfig.i18n,
   turbopack: {
     rules: {

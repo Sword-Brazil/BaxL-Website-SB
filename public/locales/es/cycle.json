@@ -32,5 +32,17 @@
   "endsIn": "Cambia en {{time}} (12 h de Brasilia)",
   "cycleDays": "Días del ciclo",
   "metaUpdated": "Meta actualizada",
-  "metaUpdatedShort": "Actualizada"
+  "metaUpdatedShort": "Actualizada",
+  "export": {
+    "button": "Exportar tabla (HTML)",
+    "title": "Equipos de la Batalla de Alianza",
+    "titleOf": "Equipos de la Batalla de Alianza · {{name}}",
+    "subtitle": "Meta, Alternativas y mis equipos por día · {{week}} · Sword Brazil",
+    "day": "Día",
+    "mode": "Modo",
+    "restriction": "Restricción",
+    "team": "Equipo",
+    "allReleased": "Todos los agentes permitidos",
+    "generatedAt": "Generado el {{date}}. ⚔ = Causante de daño."
+  }
 }

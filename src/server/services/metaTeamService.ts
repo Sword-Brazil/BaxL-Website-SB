@@ -30,7 +30,12 @@ export async function saveMetaTeam(input: MetaTeamInput, userId: string, id?: st
     notes: input.notes || null,
     updatedById: userId,
   };
-  const members = input.members.map((m) => ({ slot: m.slot, uniformId: m.uniformId, ctpId: m.ctpId ?? null }));
+  const members = input.members.map((m) => ({
+    slot: m.slot,
+    uniformId: m.uniformId,
+    ctpId: m.ctpId ?? null,
+    isDamageDealer: !!m.isDamageDealer,
+  }));
 
   const saved = await prisma.$transaction(async (tx) => {
     if (input.isPrimary) {

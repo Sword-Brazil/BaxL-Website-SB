@@ -1,9 +1,9 @@
 // Importa o snapshot do Guia BAX/BAL/BAI (prisma/data/guiabaxbal-*.json) para o banco:
 // agentes e trajes, restrições dos 28 dias e equipes Meta e Alternativa (BAX, BAL e BAI). As listas
 // da sugestão saem das equipes na hora (effectivePriority); reservas cadastradas são mantidas. Uso: npm run import:guiabaxbal [-- --replace | --attributes-only]
-// - Agentes: cria os que faltam; atributos só são preenchidos onde ainda estão "não informados".
-// - Trajes: atributos próprios (deduzidos das equipes) só onde o traje ainda não tem e o valor
-//   difere do personagem (ex.: Jean Grey "Fênix Negra" vilã).
+// - Agentes e trajes: cria os que faltam. Os atributos são de cada traje: os deduzidos para o
+//   traje (ex.: Jean Grey "Fênix Negra" vilã) ou, sem isso, os do personagem no guia; só são
+//   preenchidos onde o traje ainda está "não informado".
 // - Equipes: só substitui as existentes com --replace.
 // - --attributes-only: só agentes, trajes e atributos; não mexe em restrições nem equipes.
 import { existsSync, readdirSync, readFileSync } from "node:fs";
@@ -33,18 +33,11 @@ async function main() {
 
   // Agentes e trajes
   const uniformId = new Map<string, string>(); // "agente|traje" → id
-  let overridden = 0;
+  let filled = 0;
   for (const a of agents) {
-    const current = await prisma.agent.findUnique({ where: { slug: a.slug } });
-    const attrs = Object.fromEntries(
-      CRITERION_ATTRIBUTES.map((k) => {
-        const mine = current?.[FIELD[k]];
-        return [FIELD[k], mine && mine !== UNKNOWN ? mine : a.attributes[k]];
-      }),
-    ) as Record<(typeof FIELD)[keyof typeof FIELD], string>;
-    const agent = current
-      ? await prisma.agent.update({ where: { id: current.id }, data: attrs })
-      : await prisma.agent.create({ data: { slug: a.slug, name: a.name, ...attrs } });
+    const agent =
+      (await prisma.agent.findUnique({ where: { slug: a.slug } })) ??
+      (await prisma.agent.create({ data: { slug: a.slug, name: a.name } }));
     for (const name of a.uniforms) {
       const slug = name === DEFAULT_UNIFORM ? "padrao" : slugify(name);
       let u = await prisma.uniform.upsert({
@@ -52,20 +45,21 @@ async function main() {
         update: {},
         create: { agentId: agent.id, slug, name, imagePath: "" },
       });
-      const own = Object.fromEntries(
-        Object.entries(a.uniformAttributes[name] ?? {}).flatMap(([k, value]) => {
-          const field = FIELD[k as keyof typeof FIELD];
-          return u[field] === null && agent[field] !== value ? [[field, value]] : [];
+      const own = a.uniformAttributes[name] ?? {};
+      const missing = Object.fromEntries(
+        CRITERION_ATTRIBUTES.flatMap((k) => {
+          const value = own[k] ?? a.attributes[k];
+          return u[FIELD[k]] === UNKNOWN && value && value !== UNKNOWN ? [[FIELD[k], value]] : [];
         }),
       );
-      if (Object.keys(own).length) {
-        u = await prisma.uniform.update({ where: { id: u.id }, data: own });
-        overridden++;
+      if (Object.keys(missing).length) {
+        u = await prisma.uniform.update({ where: { id: u.id }, data: missing });
+        filled++;
       }
       uniformId.set(`${a.name}|${name}`, u.id);
     }
   }
-  console.log(`✔ agentes e trajes (${overridden} trajes com atributos próprios novos)`);
+  console.log(`✔ agentes e trajes (${filled} trajes com atributos preenchidos)`);
   if (attributesOnly) return;
 
   // As equipes do guia trazem só o tipo do CTP: guardamos a linha "Brilhante" do tipo.
@@ -104,10 +98,10 @@ async function main() {
   await writeTeams("BAI", null, bai);
   console.log("✔ equipes da BAI");
 
-  const unknown = await prisma.agent.count({
+  const unknown = await prisma.uniform.count({
     where: { OR: Object.values(FIELD).map((f) => ({ [f]: UNKNOWN })) },
   });
-  console.log(`\n${unknown} agentes com algum atributo "não informado": complete em /admin/catalogo.`);
+  console.log(`\n${unknown} trajes com algum atributo "não informado": complete em /admin/catalogo.`);
 }
 
 main()

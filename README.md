@@ -14,38 +14,48 @@ Especificação, plano e tarefas: [`specs/001-alliance-battle-metas/`](specs/001
 
 - Node.js 22 LTS e npm **do Linux** (no WSL, o `npm` do Windows não funciona em caminhos do WSL).
   Com nvm: `nvm install 22 && nvm use 22`.
-- Nenhum serviço externo: o banco é SQLite em arquivo (`prisma/dev.db`).
+- Um projeto no [Supabase](https://supabase.com) (plano gratuito): Postgres para o banco e Storage para
+  as imagens enviadas pela curadoria. Para desenvolver sem Supabase, qualquer Postgres serve
+  (ex.: `docker run -e POSTGRES_PASSWORD=dev -p 5432:5432 postgres:17-alpine`).
 
 ## Configuração
 
 ```bash
-npm install
-cp .env.example .env.local     # preencha SESSION_SECRET e as contas do seed
-echo 'DATABASE_URL="file:./dev.db"' > .env   # lido pela CLI do Prisma
-npx prisma migrate dev         # cria o banco
-npx prisma db seed             # CTPs, 48 dias de BAX/BAL, configurações e as contas ADMIN e USER
+npm install                    # também gera o Prisma Client (postinstall)
+cp .env.example .env.local     # preencha as conexões do Supabase, SESSION_SECRET e o administrador
+npm run db:deploy              # cria as tabelas no Postgres
+npm run db:seed                # CTPs, 48 dias de BAX/BAL, configurações e o Administrador padrão
 npm run dev                    # http://localhost:3000
 ```
+
+Os scripts `npm run db:*` leem o `.env.local` como o Next (aceitam `${VAR}`, ex.: a senha do banco
+dentro das URLs). Use o **pooler** do Supabase (`aws-0-<região>.pooler.supabase.com`): a conexão
+direta `db.<ref>.supabase.co` é só IPv6 e não funciona no WSL nem na Vercel.
 
 Variáveis em `.env.local`:
 
 | Variável | Uso |
 |----------|-----|
+| `SUPABASE_DB_PASSWORD` | Senha do banco (só letras e números). Entra nas duas URLs abaixo com `${SUPABASE_DB_PASSWORD}` (só no `.env.local`; na Vercel use as URLs completas). |
+| `DATABASE_URL` | Postgres pelo *Transaction pooler* do Supabase (porta 6543, `?pgbouncer=true&connection_limit=5&pool_timeout=20`). |
+| `DIRECT_URL` | *Session pooler* (porta 5432): usada pelas migrações. |
+| `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` | Storage das imagens enviadas (chave secreta, só no servidor). Sem elas, no ambiente local, os uploads vão para `public/assets/uploads`. |
+| `SUPABASE_STORAGE_BUCKET` | Bucket público das imagens (padrão `assets`). |
 | `SESSION_SECRET` | ≥ 32 caracteres aleatórios. Sem ele o servidor não inicia. |
-| `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` | Sua conta de Administrador. |
-| `SEED_USER_EMAIL` / `SEED_USER_PASSWORD` | Sua conta de usuário comum. |
-| `APP_URL` | Base dos links de confirmação de e-mail e de redefinição de senha. |
+| `SEED_ADMIN_USERNAME` / `SEED_ADMIN_PASSWORD` | Administrador padrão (ex.: `Sword Menezes`). Ele cria as demais contas. |
 
-Rodar `npx prisma db seed` de novo é seguro: ele não duplica nada e atualiza a senha das contas do seed.
+Rodar `npm run db:seed` de novo é seguro: ele não duplica nada e atualiza a senha do administrador.
 
 ## Comandos
 
 | Comando | O que faz |
 |---------|-----------|
 | `npm run dev` | Servidor de desenvolvimento. |
-| `npm test` | Testes (Vitest): regras de calendário, restrição, comparação, sugestão, schemas e services. |
+| `npm test` | Testes (Vitest): regras puras, schemas e services. Os services rodam num Postgres em memória (PGlite), sem Docker nem Supabase. |
 | `npm run build` / `npm start` | Build e servidor de produção. |
-| `npx prisma db seed` | Dados base e contas. |
+| `npm run db:deploy` | Aplica as migrações no Postgres (`prisma migrate deploy` com o `.env.local`). |
+| `npm run db:seed` | Dados base e o Administrador padrão. |
+| `npm run db:migrate-data` | Copia o antigo `prisma/dev.db` (SQLite) para o Postgres e envia `public/assets/uploads` ao Storage. Rode num banco vazio, antes do seed. |
 | `npm run import:guiabaxbal [-- --replace]` | Importa o snapshot do Guia BAX/BAL/BAI (`prisma/data/`): calendário de 28 dias, 115 personagens e trajes, equipes Meta e Alternativa de BAX/BAL/BAI. `--replace` substitui as equipes existentes. |
 | `npm run import:images` | Copia as fotos de `img/` (personagens, CTPs e ícones de restrição) para `public/assets` e liga cada retrato ao traje, conforme `prisma/data/images.json`. Rode depois de `import:guiabaxbal`. |
 | `npm run seed:demo` | **Só para desenvolvimento**: 12 agentes e 3 equipes Meta de exemplo (não use junto com a importação). |
@@ -54,24 +64,76 @@ Rodar `npx prisma db seed` de novo é seguro: ele não duplica nada e atualiza a
 
 ## Uso
 
-- **Público** (sem login): `/` é a tela central da Batalha de Aliança, com os 28 dias, BAX e BAL lado
+- **Site privado da aliança**: sem login, nada é exibido além de `/entrar` (páginas e APIs exigem
+  sessão). Todo login é **nome de usuário + senha** (sem e-mail).
+- **Membros**: `/` é a tela central da Batalha de Aliança, com os 28 dias, BAX e BAL lado
   a lado (Meta e Alternativa), a BAI ocupando o dia inteiro e o dia atual destacado. Também há
   `/meu-elenco` (personagens, trajes e CTPs equipados), `/estatisticas` (gráficos) e `/bal/livre`.
-- **Conta opcional**: sincroniza o elenco e as equipes entre aparelhos. Sem conta, tudo fica salvo no
-  aparelho, com exportar e importar backup em JSON.
+- **Contas**: só Administradores criam contas e trocam senhas de quem esqueceu, em `/admin/usuarios`.
+  O elenco, as equipes, os CTPs e o nome no jogo ficam na conta e iguais em todo aparelho; ao sair,
+  o aparelho é limpo.
 - **Admin** (`/admin`, Curadores e Administradores): restrições dos dias, equipes Meta, listas de
   prioridade, catálogo e imagens, e chefes da BAI. Usuários e configurações do calendário são só para
   Administradores.
 - **Calendário** (horário de Brasília): o dia vira às 12h, o reset semanal da pontuação é às 22h e o
   3º dia de cada semana é a BAI. Ajuste a âncora do ciclo em `/admin/config` se o "Dia atual" estiver
   diferente do jogo.
-- **E-mail**: sem servidor de e-mail no modo local. Os links de confirmação e de recuperação aparecem
-  no log do servidor, e Administradores podem redefinir senhas em `/admin/usuarios`.
+- **Login**: "Manter logado" deixa a pessoa conectada por 30 dias; sem marcar, a sessão termina ao
+  fechar o navegador (e em no máximo 12 h). Senhas novas precisam ser fortes (8+ caracteres, com
+  minúscula, MAIÚSCULA, número e símbolo).
+- **Avisos de segurança** (novo login, senha trocada, papel alterado, bloqueio) aparecem no app.
+- **Erros**: os graves (sem conexão, banco fora do ar, erro no servidor, acesso negado, sessão
+  encerrada) aparecem num alerta fixo no topo; os leves, numa notificação.
+- **Segurança**: CSRF bloqueado (só requisições do próprio site e em JSON), cabeçalhos de segurança
+  (CSP, sem iframe de terceiros, HSTS…), limite de tentativas de login por conta e por IP, e só o
+  Prisma acessa o banco (RLS ligado no Supabase).
+
+## Deploy (Vercel + Supabase)
+
+O banco já está no Supabase (projeto `trmvrhunlmrankshppvs`, região **us-east-1**), com as tabelas,
+os dados e o administrador **Sword Menezes**. Falta publicar o site:
+
+1. **Gerar o segredo da produção** (diferente do local):
+   `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`.
+2. **Importar na Vercel**: *Add New → Project* → `Sword-Brazil/BaxL-Website-Mff-Sword-Brazil`. Se o
+   repositório não aparecer, um dono da organização precisa liberar o app da Vercel no GitHub.
+   Framework **Next.js** (detectado), pasta raiz = raiz do repositório, comandos padrão.
+3. **Environment Variables** (marque só *Production*; *Preview* ficaria ligado ao banco de produção):
+
+   | Variável | Valor |
+   |----------|-------|
+   | `DATABASE_URL` | `postgresql://postgres.<ref>:<SENHA>@aws-0-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=5&pool_timeout=20` |
+   | `DIRECT_URL` | `postgresql://postgres.<ref>:<SENHA>@aws-0-us-east-1.pooler.supabase.com:5432/postgres` |
+   | `SUPABASE_URL` | `https://<ref>.supabase.co` |
+   | `SUPABASE_SERVICE_ROLE_KEY` | chave secreta do Supabase (*Project Settings → API Keys*) |
+   | `SUPABASE_STORAGE_BUCKET` | `assets` |
+   | `SESSION_SECRET` | o segredo do passo 1 |
+
+   A Vercel não expande `${...}`: escreva a senha dentro das URLs (símbolos precisam ser
+   codificados, ex.: `!` → `%21`).
+4. **Settings → Build and Deployment**: *Node.js Version* **22.x**; *Production Branch* `master`.
+5. **Settings → Functions**: *Function Region* **Washington, D.C. (`iad1`)**, a mesma região do
+   banco (`gru1` só se o Supabase estiver em São Paulo).
+6. **Publicar**: faça o merge do PR `Dev → master`; a Vercel constrói e publica sozinha. Acompanhe em
+   *Deployments*. Depois, abra a URL e entre como Sword Menezes.
+7. **Conferir em produção**: aba anônima cai no login; login, Admin → Usuários (criar um jogador),
+   envio de uma imagem (URL do `supabase.co/storage`) e os cabeçalhos de segurança
+   (`curl -I https://<seu-site>`).
+8. **Domínio (opcional)**: *Settings → Domains*.
+
+Depois disso:
+
+- **Migrações novas**: rode `npm run db:deploy` contra o Supabase antes do merge que trouxer a
+  migração (ou mude o *Build Command* para `prisma migrate deploy && next build`).
+- **Novo projeto Supabase do zero**: `npm run db:deploy` → `npm run db:migrate-data` (só para trazer
+  um `dev.db` antigo) → `npm run db:seed`, nessa ordem.
+- **Plano gratuito do Supabase**: projetos sem uso por um tempo podem ser pausados; reative pelo
+  painel se o site mostrar "Sem conexão com o banco de dados".
 
 ## Backup
 
-Todo o conteúdo fica em `prisma/dev.db` (e as imagens enviadas, em `public/assets/uploads/`).
-Para fazer backup, copie esses arquivos com o servidor parado.
+O banco fica no Supabase e as imagens enviadas, no Storage. O que o seu plano guarda de backup
+aparece em *Database → Backups* no painel. Para ter uma cópia própria: `pg_dump "$DIRECT_URL" > backup.sql`.
 
 ## Arquitetura (MVVM)
 
@@ -80,6 +142,7 @@ src/models/      Model: tipos, enums, schemas Zod, regras puras (calendário, re
 src/viewmodels/  ViewModel: hooks use*ViewModel (TanStack Query + Zustand)
 src/views/       View: composições de componentes shadcn/ui, sem regra de negócio
 src/pages/       Pages Router: páginas e API Routes (pages/api)
+src/proxy.ts     Site privado: exige sessão em toda página e API (Next 16 "proxy", antes "middleware")
 src/server/      Somente servidor: Prisma, sessão (iron-session), repositórios e services
 src/components/  shadcn/ui (restilizado com os tokens MFF em src/styles/globals.css)
 ```

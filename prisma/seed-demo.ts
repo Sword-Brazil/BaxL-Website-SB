@@ -60,12 +60,21 @@ async function main() {
     const agent = await prisma.agent.upsert({
       where: { slug },
       update: {},
-      create: { slug, name, gender, side, species, attackType },
+      create: { slug, name },
     });
     await prisma.uniform.upsert({
       where: { agentId_slug: { agentId: agent.id, slug: "padrao" } },
       update: {},
-      create: { agentId: agent.id, slug: "padrao", name: "Padrão", imagePath: `/assets/agents/${slug}/padrao.png` },
+      create: {
+        agentId: agent.id,
+        slug: "padrao",
+        name: "Padrão",
+        imagePath: `/assets/agents/${slug}/padrao.png`,
+        gender,
+        side,
+        species,
+        attackType,
+      },
     });
   }
 

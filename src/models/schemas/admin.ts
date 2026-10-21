@@ -5,7 +5,6 @@ import {
   criterionAttributeSchema,
   dayModeSchema,
   dayNumberSchema,
-  emailSchema,
   genderSchema,
   idSchema,
   passwordSchema,
@@ -13,7 +12,9 @@ import {
   slotSchema,
   speciesSchema,
   teamScopeSchema,
+  usernameSchema,
 } from "./common";
+import { parseRotationVideo } from "@/models/rules/rotationVideo";
 import { VALIDATION } from "./messages";
 
 const distinct = <T>(items: T[], key: (t: T) => unknown) => new Set(items.map(key)).size === items.length;
@@ -33,7 +34,13 @@ export const RestrictionSchema = z.object({
 });
 export type RestrictionInput = z.infer<typeof RestrictionSchema>;
 
-export const MetaTeamMemberSchema = z.object({ slot: slotSchema, uniformId: idSchema, ctpId: idSchema.nullable().optional() });
+export const MetaTeamMemberSchema = z.object({
+  slot: slotSchema,
+  uniformId: idSchema,
+  ctpId: idSchema.nullable().optional(),
+  /** Causador de Dano: o jogador toca na foto e vê as rotações do personagem. */
+  isDamageDealer: z.boolean().optional(),
+});
 
 export const MetaTeamSchema = z
   .object({
@@ -90,20 +97,16 @@ export const UniformInputSchema = z.object({
   name: z.string().trim().min(1).max(80),
   imagePath: z.string().max(300), // vazio = sem imagem (mostra as iniciais)
   active: z.boolean().optional(),
-  // Atributos próprios do traje; null/ausente = herda do personagem.
-  gender: genderSchema.nullable().optional(),
-  side: sideSchema.nullable().optional(),
-  species: speciesSchema.nullable().optional(),
-  attackType: attackTypeSchema.nullable().optional(),
+  // Atributos são de cada traje (UNKNOWN = não informado; não bloqueia restrições).
+  gender: genderSchema.or(z.literal(UNKNOWN)),
+  side: sideSchema.or(z.literal(UNKNOWN)),
+  species: speciesSchema.or(z.literal(UNKNOWN)),
+  attackType: attackTypeSchema.or(z.literal(UNKNOWN)),
 });
 
 export const AgentSchema = z.object({
   slug: slugSchema,
   name: z.string().trim().min(1).max(80),
-  gender: genderSchema.or(z.literal(UNKNOWN)),
-  side: sideSchema.or(z.literal(UNKNOWN)),
-  species: speciesSchema.or(z.literal(UNKNOWN)),
-  attackType: attackTypeSchema.or(z.literal(UNKNOWN)),
   active: z.boolean().optional(),
   uniforms: z
     .array(UniformInputSchema)
@@ -128,13 +131,14 @@ export const SettingsSchema = z.object({
 });
 export type SettingsInput = z.infer<typeof SettingsSchema>;
 
-export const CreateStaffSchema = z.object({
-  email: emailSchema,
+/** Conta criada por um Administrador (não há cadastro aberto): nome de usuário + senha forte. */
+export const CreateUserSchema = z.object({
+  username: usernameSchema,
   password: passwordSchema,
   nickname: z.string().trim().max(30).optional(),
-  role: z.enum(["CURATOR", "ADMIN"]),
+  role: z.enum(["USER", "CURATOR", "ADMIN"]),
 });
-export type CreateStaffInput = z.infer<typeof CreateStaffSchema>;
+export type CreateUserInput = z.infer<typeof CreateUserSchema>;
 
 export const ChangeRoleSchema = z.object({ role: z.enum(["USER", "CURATOR", "ADMIN"]) });
 export const AdminResetPasswordSchema = z.object({ password: passwordSchema });
@@ -146,3 +150,22 @@ export const AssetUploadSchema = z.object({
   base64: z.string().min(4).max(Math.ceil((ASSET_MAX_BYTES * 4) / 3) + 8),
 });
 export type AssetUploadInput = z.infer<typeof AssetUploadSchema>;
+
+/** Rotação em texto livre (sem formato obrigatório); o vídeo precisa ser YouTube ou .mp4/.webm. */
+export const RotationInputSchema = z.object({
+  uniformId: idSchema.nullable(),
+  title: z.string().trim().max(80).optional().nullable(),
+  sequence: z.string().trim().min(1, { message: VALIDATION.rotationRequired }).max(1000),
+  description: z.string().trim().max(3000).optional().nullable(),
+  videoUrl: z
+    .string()
+    .trim()
+    .max(300)
+    .refine((v) => !v || !!parseRotationVideo(v), { message: VALIDATION.rotationVideo })
+    .optional()
+    .nullable(),
+});
+export type RotationInput = z.infer<typeof RotationInputSchema>;
+
+export const AgentRotationsSchema = z.object({ rotations: z.array(RotationInputSchema).max(40) });
+export type AgentRotationsInput = z.infer<typeof AgentRotationsSchema>;

@@ -1,0 +1,18 @@
+{
+  "title": "Rotaciones",
+  "subtitle": "Rotaciones de los causantes de daño de las Metas, por traje, con descripción y vídeo de referencia.",
+  "titleOf": "Rotaciones de {{name}}",
+  "all": "Todos los personajes",
+  "legendTitle": "Cómo leer la notación",
+  "count_one": "{{count}} rotación",
+  "count_other": "{{count}} rotaciones",
+  "emptyAll": "Aún no hay rotaciones registradas.",
+  "empty": "Aún no hay rotaciones registradas para {{name}}.",
+  "notFound": "Personaje no encontrado.",
+  "uniform": "Traje",
+  "allUniforms": "Vale para",
+  "allUniformsTitle": "Todos los trajes",
+  "uniforms": "Trajes con rotación",
+  "usedInTeam": "Traje usado en el equipo que abriste",
+  "untitled": "Rotación {{n}}"
+}

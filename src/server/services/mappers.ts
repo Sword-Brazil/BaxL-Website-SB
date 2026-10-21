@@ -11,7 +11,12 @@ type DbMetaTeam = {
   updatedAt: Date;
   battleDay: { mode: string; number: number } | null;
   updatedBy: { nickname: string | null } | null;
-  members: { slot: string; uniformId: string; ctpId: string | null }[];
+  members: {
+    slot: string;
+    uniformId: string;
+    ctpId: string | null;
+    isDamageDealer: boolean;
+  }[];
 };
 
 export function toMetaTeam(t: DbMetaTeam): MetaTeam {
@@ -25,7 +30,12 @@ export function toMetaTeam(t: DbMetaTeam): MetaTeam {
     notes: t.notes,
     members: [...t.members]
       .sort((a, b) => SLOTS.indexOf(a.slot as Slot) - SLOTS.indexOf(b.slot as Slot))
-      .map((m) => ({ slot: m.slot as Slot, uniformId: m.uniformId, ctpId: m.ctpId })),
+      .map((m) => ({
+        slot: m.slot as Slot,
+        uniformId: m.uniformId,
+        ctpId: m.ctpId,
+        isDamageDealer: m.isDamageDealer,
+      })),
     updatedAt: t.updatedAt.toISOString(),
     updatedBy: t.updatedBy?.nickname ?? null,
   };

@@ -1,11 +1,12 @@
 import type { Role, TeamScope } from "@/models/domain/enums";
-import type { BaiBoss, Ctp, Criterion, MetaTeam, PriorityLists, SessionUser, Settings } from "@/models/domain/types";
+import type { BaiBoss, Ctp, Criterion, MetaTeam, PriorityLists, Rotation, SessionUser, Settings } from "@/models/domain/types";
 import type {
   AgentInput,
+  AgentRotationsInput,
   CtpInput,
   AssetUploadInput,
   BaiBossesInput,
-  CreateStaffInput,
+  CreateUserInput,
   MetaTeamInput,
   PriorityInput,
   PriorityTarget,
@@ -17,7 +18,6 @@ const priorityPath = (t: PriorityTarget) =>
   t.scope === "DAY" ? `/api/admin/priority/DAY/${t.mode}/${t.number}` : "/api/admin/priority/BAI";
 
 export interface AdminUser extends SessionUser {
-  emailVerified: boolean;
   createdAt: string;
 }
 
@@ -41,8 +41,11 @@ export const adminApi = {
 
   createAgent: (body: AgentInput) => apiFetch<unknown>("/api/admin/agents", { method: "POST", body }),
   updateAgent: (id: string, body: AgentInput) => apiFetch<unknown>(`/api/admin/agents/${id}`, { method: "PUT", body }),
+  saveRotations: (agentId: string, body: AgentRotationsInput) =>
+    apiFetch<Rotation[]>(`/api/admin/agents/${agentId}/rotations`, { method: "PUT", body }),
   createCtp: (body: CtpInput) => apiFetch<Ctp>("/api/admin/ctps", { method: "POST", body }),
   updateCtp: (id: string, body: CtpInput) => apiFetch<Ctp>(`/api/admin/ctps/${id}`, { method: "PUT", body }),
+  deleteCtp: (id: string) => apiFetch<void>(`/api/admin/ctps/${id}`, { method: "DELETE" }),
   uploadAsset: (body: AssetUploadInput) => apiFetch<{ imagePath: string }>("/api/admin/assets", { method: "POST", body }),
 
   getSettings: () => apiFetch<Settings>("/api/admin/settings"),
@@ -52,7 +55,7 @@ export const adminApi = {
     apiFetch<{ total: number; page: number; pageSize: number; users: AdminUser[] }>(
       `/api/admin/users?${new URLSearchParams({ ...(q ? { q } : {}), page: String(page) })}`,
     ),
-  createStaff: (body: CreateStaffInput) => apiFetch<SessionUser>("/api/admin/users", { method: "POST", body }),
+  createUser: (body: CreateUserInput) => apiFetch<SessionUser>("/api/admin/users", { method: "POST", body }),
   changeRole: (id: string, role: Role) => apiFetch<SessionUser>(`/api/admin/users/${id}/role`, { method: "PATCH", body: { role } }),
   resetPassword: (id: string, password: string) =>
     apiFetch<void>(`/api/admin/users/${id}/reset-password`, { method: "POST", body: { password } }),

@@ -5,25 +5,25 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// Postgres do Supabase: DATABASE_URL é o pooler (app/serverless) e DIRECT_URL a conexão
+// direta, usada pelo `prisma migrate`.
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ---------- Catálogo ----------
 
 model Agent {
-  id         String    @id @default(cuid())
-  slug       String    @unique
-  name       String
-  gender     String
-  side       String
-  species    String
-  attackType String
-  active     Boolean   @default(true)
-  uniforms   Uniform[]
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id        String     @id @default(cuid())
+  slug      String     @unique
+  name      String
+  active    Boolean    @default(true)
+  uniforms  Uniform[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  rotations Rotation[]
 }
 
 model Uniform {
@@ -33,14 +33,15 @@ model Uniform {
   slug            String
   name            String
   imagePath       String
-  // Atributos próprios do traje (ex.: Fênix Negra é vilã); null = herda do personagem.
-  gender          String?
-  side            String?
-  species         String?
-  attackType      String?
+  // Atributos são do traje (ex.: Fênix Negra é vilã), não do personagem. UNKNOWN = não informado.
+  gender          String           @default("UNKNOWN")
+  side            String           @default("UNKNOWN")
+  species         String           @default("UNKNOWN")
+  attackType      String           @default("UNKNOWN")
   active          Boolean          @default(true)
   metaMembers     MetaTeamMember[]
   priorityEntries PriorityEntry[]
+  rotations       Rotation[]
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
@@ -118,18 +119,40 @@ model MetaTeam {
 }
 
 model MetaTeamMember {
-  id         String   @id @default(cuid())
-  metaTeamId String
-  metaTeam   MetaTeam @relation(fields: [metaTeamId], references: [id], onDelete: Cascade)
-  slot       String
-  uniformId  String
-  uniform    Uniform  @relation(fields: [uniformId], references: [id])
-  ctpId      String?
-  ctp        Ctp?     @relation(fields: [ctpId], references: [id])
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id             String   @id @default(cuid())
+  metaTeamId     String
+  metaTeam       MetaTeam @relation(fields: [metaTeamId], references: [id], onDelete: Cascade)
+  slot           String
+  uniformId      String
+  uniform        Uniform  @relation(fields: [uniformId], references: [id])
+  ctpId          String?
+  ctp            Ctp?     @relation(fields: [ctpId], references: [id])
+  // Causador de Dano (qualquer posição): as rotações dele ficam em Rotation (por personagem/traje).
+  isDamageDealer Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   @@unique([metaTeamId, slot])
+}
+
+// Rotação de um personagem (Causador de Dano), em texto livre, com descrição e vídeo opcional.
+// uniformId null = vale para todos os trajes do personagem.
+model Rotation {
+  id          String   @id @default(cuid())
+  agentId     String
+  agent       Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  uniformId   String?
+  uniform     Uniform? @relation(fields: [uniformId], references: [id], onDelete: Cascade)
+  position    Int
+  title       String?
+  sequence    String
+  description String?
+  // Link do YouTube ou de um .mp4/.webm externo: o sistema não hospeda vídeo.
+  videoUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([agentId, position])
 }
 
 model PriorityEntry {
@@ -160,31 +183,31 @@ model BaiBoss {
   updatedAt DateTime @updatedAt
 }
 
-// ---------- Usuários e autenticação ----------
+// ---------- Curadoria (login só de curadores e administradores) ----------
+// Jogadores não têm conta: elenco, equipes e nome no jogo ficam no aparelho (localStorage).
 
+// Todo login é nome de usuário + senha (sem e-mail). Só administradores criam contas e trocam
+// senhas (não há cadastro nem "esqueci a senha").
 model User {
-  id              String             @id @default(cuid())
-  email           String             @unique
-  passwordHash    String
-  nickname        String?
-  role            String             @default("USER")
-  emailVerifiedAt DateTime?
-  tokens          AuthToken[]
-  selections      UserSelectionsDoc?
-  metaTeams       MetaTeam[]
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
+  id           String             @id @default(cuid())
+  // Guardado em minúsculas, com espaços simples (ex.: "sword menezes").
+  username     String             @unique
+  passwordHash String
+  nickname     String?
+  role         String             @default("USER")
+  selections   UserSelectionsDoc?
+  metaTeams    MetaTeam[]
+  notices      SecurityNotice[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
 }
 
-model AuthToken {
-  id        String    @id @default(cuid())
-  userId    String
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  kind      String
-  tokenHash String    @unique
-  expiresAt DateTime
-  usedAt    DateTime?
-  createdAt DateTime  @default(now())
+// Elenco, equipes, CTPs e nome no jogo do jogador logado (documento JSON), iguais em todo aparelho.
+model UserSelectionsDoc {
+  userId    String   @id
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  json      String
+  updatedAt DateTime @updatedAt
 }
 
 model LoginAttempt {
@@ -195,9 +218,20 @@ model LoginAttempt {
   updatedAt   DateTime  @updatedAt
 }
 
-model UserSelectionsDoc {
-  userId    String   @id
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  json      String
-  updatedAt DateTime @updatedAt
+// Aviso persistente de segurança (atenção/crítico): some quando o usuário dispensa ou resolve.
+// Um aviso aberto por tipo e usuário: eventos repetidos atualizam o mesmo aviso.
+model SecurityNotice {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type            String
+  // JSON com parâmetros não sensíveis (ex.: {"role":"CURATOR"}).
+  params          String?
+  // Sessão que causou o evento: o aviso de "novo login" não aparece nela mesma.
+  originSessionId String?
+  dismissedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId, dismissedAt])
 }

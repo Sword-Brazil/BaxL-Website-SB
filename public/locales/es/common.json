@@ -7,12 +7,14 @@
   "nav": {
     "roster": "Mi plantilla",
     "admin": "Admin",
-    "login": "Entrar",
     "logout": "Salir",
     "menu": "Menú",
     "account": "Mi cuenta",
     "battle": "Batalla de Alianza",
-    "stats": "Estadísticas"
+    "stats": "Estadísticas",
+    "rotations": "Rotaciones",
+    "login": "Entrar",
+    "synced": "Sincronizado con tu cuenta"
   },
   "modes": {
     "BAX": "Batalla de Alianza Extrema",
@@ -44,11 +46,35 @@
     "unavailable": "No disponible",
     "slots": {
       "SOLO": "Líder",
-      "SUPPORT_1": "Pos. 1",
-      "SUPPORT_2": "Pos. 2"
+      "SUPPORT_1": "Izquierda",
+      "SUPPORT_2": "Derecha"
     },
     "owned": "Tienes",
-    "notOwned": "No lo tienes"
+    "notOwned": "No lo tienes",
+    "damageDealer": "Causante de daño",
+    "emptySlot": "Vacío",
+    "seeRotation": "Ver rotación",
+    "seeRotationOf": "Ver las rotaciones de {{name}}"
+  },
+  "rotation": {
+    "title": "Rotación",
+    "skill": "Habilidad {{n}}",
+    "ultimate": "Habilidad 6 (Ultimate / Despertada / Tier-4)",
+    "optional": "Opcional",
+    "cancels": {
+      "c": "cancelar justo después de usar",
+      "dc": "cancelar con retraso",
+      "qc": "cancelación rápida"
+    },
+    "legend": {
+      "numbers": "Habilidades en el orden de la pantalla. 6 = Ultimate, Despertada o Tier-4.",
+      "c": "Cancel: cancela la animación justo después de usarla, soltando la siguiente habilidad.",
+      "dc": "Delayed Cancel: espera una fracción de segundo (el efecto del golpe o el fin de la animación) antes de cancelar y pulsar la siguiente.",
+      "qc": "Quick Cancel: cancelación rápida justo después del comando.",
+      "optional": "Tramo opcional o \"relleno\" del combo antes del bono principal."
+    },
+    "openVideo": "Abrir el vídeo",
+    "playVideo": "Ver la rotación"
   },
   "restriction": {
     "none": "Sin restricción",
@@ -117,12 +143,6 @@
     "notFound": "Página no encontrada.",
     "forbidden": "Acceso denegado."
   },
-  "sync": {
-    "title": "Elige qué selecciones mantener",
-    "text": "Este dispositivo y tu cuenta tienen plantillas/equipos distintos. ¿Qué versión quieres mantener? La otra será reemplazada.",
-    "keepLocal": "Mantener las de este dispositivo",
-    "keepRemote": "Usar las de la cuenta"
-  },
   "ctpPicker": {
     "choose": "Elegir CTP",
     "change": "Cambiar",
@@ -151,10 +171,13 @@
   },
   "validation": {
     "passwordRequired": "Ingresa la contraseña",
-    "emailInvalid": "Correo inválido",
+    "loginRequired": "Introduce tu nombre de usuario",
+    "usernameFormat": "Usa de 3 a 30 letras, números, espacio, punto, guion o guion bajo",
     "passwordMin": "Mínimo de 8 caracteres",
-    "passwordLetter": "Debe contener una letra",
+    "passwordLower": "Debe contener una letra minúscula",
+    "passwordUpper": "Debe contener una letra mayúscula",
     "passwordDigit": "Debe contener un número",
+    "passwordSymbol": "Debe contener un símbolo (ej.: ! . @ #)",
     "baiDay": "Día reservado para la BAI",
     "teamKey": "Clave de equipo inválida",
     "sameAgentTwoSlots": "El mismo agente no puede ocupar dos posiciones",
@@ -168,6 +191,131 @@
     "positionRepeated": "Posición repetida",
     "slugFormat": "Usa kebab-case (ej.: scarlet-witch)",
     "uniformRequired": "Registra al menos un uniforme",
-    "uniformRepeated": "Uniforme repetido"
+    "uniformRepeated": "Uniforme repetido",
+    "rotationVideo": "Enlace de vídeo inválido: usa un enlace https de YouTube o de un archivo .mp4/.webm",
+    "rotationRequired": "Escribe la rotación"
+  },
+  "security": {
+    "label": "Avisos de seguridad de la cuenta",
+    "dismiss": "Descartar aviso",
+    "notMe": "¿No fuiste tú? Pide a un administrador que cambie tu contraseña.",
+    "roles": {
+      "USER": "Usuario",
+      "CURATOR": "Curador",
+      "ADMIN": "Administrador"
+    },
+    "toast": {
+      "SESSION_EXPIRED": "Tu sesión expiró. Inicia sesión de nuevo para seguir sincronizando.",
+      "SELECTIONS_SYNCED": "Plantel y equipos sincronizados con tu cuenta."
+    },
+    "notices": {
+      "NEW_LOGIN": {
+        "title": "Nuevo inicio de sesión en tu cuenta",
+        "text": "Se accedió a tu cuenta desde otro dispositivo o navegador el {{date}}."
+      },
+      "FAILED_LOGINS": {
+        "title": "Intentos de inicio de sesión con contraseña incorrecta",
+        "text": "Hubo varios intentos de entrar en tu cuenta con una contraseña incorrecta el {{date}}."
+      },
+      "PASSWORD_RESET": {
+        "title": "Contraseña restablecida",
+        "text": "La contraseña de tu cuenta se restableció el {{date}}."
+      },
+      "ROLE_CHANGED": {
+        "title": "Rol de la cuenta cambiado",
+        "text": "Tu cuenta ahora tiene el rol {{role}} (cambiado el {{date}})."
+      },
+      "ACCOUNT_LOCKED": {
+        "title": "Cuenta bloqueada temporalmente",
+        "text": "El inicio de sesión se bloqueó unos minutos el {{date}} tras demasiados intentos con la contraseña incorrecta."
+      }
+    }
+  },
+  "nickname": {
+    "label": "Tu nombre en el juego",
+    "placeholder": "Tu nombre en el juego",
+    "hint": "Queda solo en este dispositivo, con tu plantel y tus equipos. No necesitas cuenta."
+  },
+  "resetTeams": {
+    "title": "Limpiar mis equipos",
+    "text": "Borra los equipos que armaste: todos a la vez o solo de un modo. El plantel, los CTP equipados y tu nombre se mantienen.",
+    "all": "Todos los equipos",
+    "confirmAll": "¿Borrar todos tus equipos de BAX, BAL y BAI?",
+    "confirmMode": "¿Borrar tus equipos de {{mode}}?",
+    "doneAll": "Se borraron todos tus equipos",
+    "doneMode": "Equipos de {{mode}} borrados",
+    "button": "Limpiar equipos"
+  },
+  "fontSize": {
+    "label": "Tamaño de fuente",
+    "sm": "Pequeña",
+    "md": "Mediana",
+    "lg": "Grande"
+  },
+  "sync": {
+    "title": "Elige qué selecciones mantener",
+    "text": "Este dispositivo y tu cuenta tienen plantillas/equipos distintos. ¿Qué versión quieres mantener? La otra será reemplazada.",
+    "keepLocal": "Mantener las de este dispositivo",
+    "keepRemote": "Usar las de la cuenta"
+  },
+  "password": {
+    "strength": "Fuerza de la contraseña",
+    "levels": {
+      "1": "Débil",
+      "2": "Aceptable",
+      "3": "Buena",
+      "4": "Fuerte"
+    },
+    "rules": {
+      "length": "8+ caracteres",
+      "lower": "minúscula",
+      "upper": "MAYÚSCULA",
+      "digit": "número",
+      "symbol": "símbolo"
+    },
+    "show": "Mostrar contraseña",
+    "hide": "Ocultar contraseña"
+  },
+  "errors": {
+    "NETWORK": {
+      "title": "Sin conexión con el servidor",
+      "text": "Revisa tu internet. Lo que marcaste en este dispositivo no se pierde; inténtalo de nuevo cuando vuelva la conexión."
+    },
+    "DATABASE": {
+      "title": "Sin conexión con la base de datos",
+      "text": "El servidor no pudo acceder a los datos ahora. Inténtalo en unos instantes; si sigue, avisa a un administrador."
+    },
+    "SERVER": {
+      "title": "Error en el servidor",
+      "text": "Algo salió mal de nuestro lado. Inténtalo de nuevo; si sigue, avisa a un administrador."
+    },
+    "FORBIDDEN": {
+      "title": "Acceso denegado",
+      "text": "Tu cuenta no tiene permiso para esto. Si crees que es un error, habla con un administrador."
+    },
+    "SESSION_EXPIRED": {
+      "title": "Tu sesión terminó",
+      "text": "Por seguridad, entra de nuevo para continuar."
+    },
+    "RATE_LIMITED": {
+      "title": "Demasiados intentos seguidos. Espera unos minutos."
+    },
+    "CONFLICT": {
+      "title": "Los datos cambiaron en otro lugar al mismo tiempo."
+    },
+    "INVALID": {
+      "title": "Revisa los datos ingresados."
+    },
+    "NOT_FOUND": {
+      "title": "Elemento no encontrado."
+    },
+    "UNKNOWN": {
+      "title": "No se pudo completar la acción."
+    },
+    "actions": {
+      "signIn": "Entrar de nuevo",
+      "goHome": "Volver al inicio",
+      "dismiss": "Cerrar aviso"
+    }
   }
 }

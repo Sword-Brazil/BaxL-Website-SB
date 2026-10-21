@@ -7,12 +7,14 @@
   "nav": {
     "roster": "My roster",
     "admin": "Admin",
-    "login": "Sign in",
     "logout": "Sign out",
     "menu": "Menu",
     "account": "My account",
     "battle": "Alliance Battle",
-    "stats": "Statistics"
+    "stats": "Statistics",
+    "rotations": "Rotations",
+    "login": "Sign in",
+    "synced": "Synced with your account"
   },
   "modes": {
     "BAX": "Alliance Battle Extreme",
@@ -44,11 +46,35 @@
     "unavailable": "Unavailable",
     "slots": {
       "SOLO": "Leader",
-      "SUPPORT_1": "Slot 1",
-      "SUPPORT_2": "Slot 2"
+      "SUPPORT_1": "Left",
+      "SUPPORT_2": "Right"
     },
     "owned": "Owned",
-    "notOwned": "Not owned"
+    "notOwned": "Not owned",
+    "damageDealer": "Damage dealer",
+    "emptySlot": "Empty",
+    "seeRotation": "See rotation",
+    "seeRotationOf": "See {{name}} rotations"
+  },
+  "rotation": {
+    "title": "Rotation",
+    "skill": "Skill {{n}}",
+    "ultimate": "Skill 6 (Ultimate / Awakened / Tier-4)",
+    "optional": "Optional",
+    "cancels": {
+      "c": "cancel right after use",
+      "dc": "delayed cancel",
+      "qc": "quick cancel"
+    },
+    "legend": {
+      "numbers": "Skills in on-screen order. 6 = Ultimate, Awakened or Tier-4.",
+      "c": "Cancel: cancel the animation right after using it, firing the next skill.",
+      "dc": "Delayed Cancel: wait a split second (the hit effect or the end of the animation) before cancelling into the next one.",
+      "qc": "Quick Cancel: cancel immediately after the input.",
+      "optional": "Optional part or combo \"filler\" before the main bonus."
+    },
+    "openVideo": "Open the video",
+    "playVideo": "Watch the rotation"
   },
   "restriction": {
     "none": "No restriction",
@@ -117,12 +143,6 @@
     "notFound": "Page not found.",
     "forbidden": "Access denied."
   },
-  "sync": {
-    "title": "Choose which selections to keep",
-    "text": "This device and your account have different rosters/teams. Which version do you want to keep? The other will be replaced.",
-    "keepLocal": "Keep this device's",
-    "keepRemote": "Use the account's"
-  },
   "ctpPicker": {
     "choose": "Choose CTP",
     "change": "Change",
@@ -151,10 +171,13 @@
   },
   "validation": {
     "passwordRequired": "Enter your password",
-    "emailInvalid": "Invalid e-mail",
+    "loginRequired": "Enter your username",
+    "usernameFormat": "Use 3 to 30 letters, digits, space, dot, hyphen or underscore",
     "passwordMin": "At least 8 characters",
-    "passwordLetter": "Must contain a letter",
+    "passwordLower": "Must contain a lowercase letter",
+    "passwordUpper": "Must contain an uppercase letter",
     "passwordDigit": "Must contain a number",
+    "passwordSymbol": "Must contain a symbol (e.g. ! . @ #)",
     "baiDay": "Day reserved for BAI",
     "teamKey": "Invalid team key",
     "sameAgentTwoSlots": "The same agent can't take two slots",
@@ -168,6 +191,131 @@
     "positionRepeated": "Repeated position",
     "slugFormat": "Use kebab-case (e.g. scarlet-witch)",
     "uniformRequired": "Add at least one uniform",
-    "uniformRepeated": "Repeated uniform"
+    "uniformRepeated": "Repeated uniform",
+    "rotationVideo": "Invalid video link: use an https YouTube link or a .mp4/.webm file",
+    "rotationRequired": "Write the rotation"
+  },
+  "security": {
+    "label": "Account security notices",
+    "dismiss": "Dismiss notice",
+    "notMe": "Wasn't you? Ask an administrator to change your password.",
+    "roles": {
+      "USER": "User",
+      "CURATOR": "Curator",
+      "ADMIN": "Administrator"
+    },
+    "toast": {
+      "SESSION_EXPIRED": "Your session expired. Sign in again to keep syncing.",
+      "SELECTIONS_SYNCED": "Roster and teams synced with your account."
+    },
+    "notices": {
+      "NEW_LOGIN": {
+        "title": "New sign-in to your account",
+        "text": "Your account was accessed from another device or browser on {{date}}."
+      },
+      "FAILED_LOGINS": {
+        "title": "Sign-in attempts with a wrong password",
+        "text": "There were several attempts to sign in to your account with a wrong password on {{date}}."
+      },
+      "PASSWORD_RESET": {
+        "title": "Password reset",
+        "text": "Your account password was reset on {{date}}."
+      },
+      "ROLE_CHANGED": {
+        "title": "Account role changed",
+        "text": "Your account now has the {{role}} role (changed on {{date}})."
+      },
+      "ACCOUNT_LOCKED": {
+        "title": "Account temporarily locked",
+        "text": "Sign-in was locked for a few minutes on {{date}} after too many wrong password attempts."
+      }
+    }
+  },
+  "nickname": {
+    "label": "Your in-game name",
+    "placeholder": "Your in-game name",
+    "hint": "Stays on this device only, with your roster and teams. No account needed."
+  },
+  "resetTeams": {
+    "title": "Clear my teams",
+    "text": "Deletes the teams you built: all at once or one mode only. Your roster, equipped CTPs and name are kept.",
+    "all": "All teams",
+    "confirmAll": "Delete all your BAX, BAL and BAI teams?",
+    "confirmMode": "Delete your {{mode}} teams?",
+    "doneAll": "All your teams were deleted",
+    "doneMode": "{{mode}} teams deleted",
+    "button": "Clear teams"
+  },
+  "fontSize": {
+    "label": "Font size",
+    "sm": "Small",
+    "md": "Medium",
+    "lg": "Large"
+  },
+  "sync": {
+    "title": "Choose which selections to keep",
+    "text": "This device and your account have different rosters/teams. Which version do you want to keep? The other will be replaced.",
+    "keepLocal": "Keep this device's",
+    "keepRemote": "Use the account's"
+  },
+  "password": {
+    "strength": "Password strength",
+    "levels": {
+      "1": "Weak",
+      "2": "Fair",
+      "3": "Good",
+      "4": "Strong"
+    },
+    "rules": {
+      "length": "8+ characters",
+      "lower": "lowercase",
+      "upper": "UPPERCASE",
+      "digit": "digit",
+      "symbol": "symbol"
+    },
+    "show": "Show password",
+    "hide": "Hide password"
+  },
+  "errors": {
+    "NETWORK": {
+      "title": "Can't reach the server",
+      "text": "Check your internet. What you marked on this device is not lost; try again when you're back online."
+    },
+    "DATABASE": {
+      "title": "Can't reach the database",
+      "text": "The server couldn't access the data right now. Try again in a moment; if it keeps happening, tell an administrator."
+    },
+    "SERVER": {
+      "title": "Server error",
+      "text": "Something went wrong on our side. Try again; if it keeps happening, tell an administrator."
+    },
+    "FORBIDDEN": {
+      "title": "Access denied",
+      "text": "Your account isn't allowed to do this. If you think it's a mistake, talk to an administrator."
+    },
+    "SESSION_EXPIRED": {
+      "title": "Your session ended",
+      "text": "For your security, sign in again to continue."
+    },
+    "RATE_LIMITED": {
+      "title": "Too many attempts in a row. Wait a few minutes."
+    },
+    "CONFLICT": {
+      "title": "The data changed somewhere else at the same time."
+    },
+    "INVALID": {
+      "title": "Check the data you entered."
+    },
+    "NOT_FOUND": {
+      "title": "Item not found."
+    },
+    "UNKNOWN": {
+      "title": "Couldn't complete the action."
+    },
+    "actions": {
+      "signIn": "Sign in again",
+      "goHome": "Back to home",
+      "dismiss": "Close alert"
+    }
   }
 }

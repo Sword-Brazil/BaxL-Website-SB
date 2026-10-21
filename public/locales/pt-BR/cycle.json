@@ -32,5 +32,17 @@
   "endsIn": "Vira em {{time}} (12h de Brasília)",
   "cycleDays": "Dias do ciclo",
   "metaUpdated": "Meta atualizada",
-  "metaUpdatedShort": "Atualizada"
+  "metaUpdatedShort": "Atualizada",
+  "export": {
+    "button": "Exportar tabela (HTML)",
+    "title": "Equipes da Batalha de Aliança",
+    "titleOf": "Equipes da Batalha de Aliança · {{name}}",
+    "subtitle": "Meta, Alternativas e minhas equipes por dia · {{week}} · Sword Brazil",
+    "day": "Dia",
+    "mode": "Modo",
+    "restriction": "Restrição",
+    "team": "Equipe",
+    "allReleased": "Todos os agentes liberados",
+    "generatedAt": "Gerado em {{date}}. ⚔ = Causador de Dano."
+  }
 }

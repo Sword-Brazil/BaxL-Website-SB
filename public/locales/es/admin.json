@@ -8,7 +8,8 @@
     "ctps": "CTPs",
     "bai": "BAI",
     "users": "Usuarios",
-    "settings": "Configuración"
+    "settings": "Configuración",
+    "rotations": "Rotaciones"
   },
   "guard": {
     "forbidden": "Acceso denegado",
@@ -23,8 +24,9 @@
     "catalog": "Agentes, uniformes e imágenes.",
     "ctps": "Tipos, fotos y disponibilidad de los CTPs.",
     "bai": "Secuencia de jefes de la BAI.",
-    "users": "Curadores y administradores.",
-    "settings": "Ancla del ciclo y horarios de cambio."
+    "users": "Jugadores, curadores y administradores: cuentas, roles y contraseñas.",
+    "settings": "Ancla del ciclo y horarios de cambio.",
+    "rotations": "Rotaciones de los personajes (causantes de daño), por traje, con descripción y vídeo."
   },
   "common": {
     "saved": "Cambios guardados",
@@ -78,7 +80,13 @@
     "week": "Sem. {{n}}",
     "reserves": "Reservas",
     "reservesHint": "Personajes extra para la sugerencia de quien no tiene los de la Meta y las Alternativas. Orden usado: Meta → Alternativas → reservas.",
-    "addReserve": "+ Añadir reserva"
+    "addReserve": "+ Añadir reserva",
+    "damageDealer": "Causante de daño",
+    "rotationsCount_one": "{{name}} tiene {{count}} rotación registrada.",
+    "rotationsCount_other": "{{name}} tiene {{count}} rotaciones registradas.",
+    "noRotations": "{{name}} aún no tiene rotación registrada.",
+    "manageRotations": "Gestionar rotaciones",
+    "addRotations": "Registrar rotación"
   },
   "priority": {
     "solo": "Solistas",
@@ -113,21 +121,22 @@
     "slugAuto": "Generado a partir del nombre; edítalo solo si hace falta.",
     "photos": "{{n}}/{{total}} con foto",
     "quickUniform": "Uniforme",
-    "baseAttributes": "Atributos del personaje",
-    "baseAttributesHint": "Valen para todos los uniformes, salvo los que tengan atributos propios.",
     "uniformAttributes": "Atributos de este uniforme",
-    "inheritedHint": "Punteado = heredado del personaje. Toca otro valor para personalizar solo este uniforme.",
-    "customized": "Personalizado",
-    "resetAttributes": "Heredar todo del personaje"
+    "uniformsHint": "Cada traje tiene sus propios atributos (género, lado, especie y ataque): las restricciones de los días se verifican por el traje usado. Un traje nuevo empieza con los atributos del primer traje.",
+    "variedUniforms_one": "{{count}} traje con atributos distintos",
+    "variedUniforms_other": "{{count}} trajes con atributos distintos"
   },
   "ctps": {
     "title": "Catálogo de CTPs",
-    "help": "Añade CTPs y actualiza sus fotos. Al eliminar, el elemento se desactiva para conservar equipos y selecciones anteriores.",
+    "help": "Añade, edita y elimina CTP. Desactivar oculta el CTP de las opciones y mantiene los equipos antiguos; eliminar lo borra para siempre.",
     "add": "Nuevo CTP",
     "edit": "Editar CTP",
     "quality": "Calidad",
-    "remove": "Eliminar",
-    "restore": "Reactivar"
+    "restore": "Reactivar",
+    "deactivate": "Desactivar",
+    "delete": "Eliminar CTP",
+    "deleteConfirm": "¿Eliminar {{name}} para siempre? Los equipos Meta y reservas que lo recomiendan quedarán sin CTP. No se puede deshacer.",
+    "deleted": "CTP eliminado"
   },
   "bai": {
     "title": "Jefes de la BAI",
@@ -140,22 +149,23 @@
   },
   "users": {
     "title": "Usuarios y roles",
-    "search": "Buscar por correo o apodo…",
-    "newStaff": "Nuevo administrador/curador",
+    "search": "Buscar por usuario o apodo…",
     "role": "Rol",
     "roles": {
-      "USER": "Usuario",
+      "USER": "Jugador",
       "CURATOR": "Curador",
       "ADMIN": "Administrador"
     },
-    "changeRoleConfirm": "¿Cambiar el rol de {{email}} a {{role}}?",
+    "changeRoleConfirm": "¿Cambiar el rol de {{name}} a {{role}}?",
     "resetPassword": "Restablecer contraseña",
-    "verified": "Confirmado",
-    "unverified": "No confirmado",
     "created": "Cuenta creada",
     "passwordReset": "Contraseña restablecida",
     "lastAdmin": "No se puede degradar al último administrador.",
-    "help": "Los administradores promueven y quitan curadores. Siempre debe haber al menos un administrador."
+    "help": "Solo los administradores crean cuentas y cambian contraseñas. Todos entran con nombre de usuario y contraseña. Siempre debe haber al menos un administrador.",
+    "newUser": "Nueva cuenta",
+    "username": "Nombre de usuario",
+    "usernameHint": "Se usa para entrar. Ej.: el nick del juego (3 a 30 letras, números, espacio, punto, guion o guion bajo). Mayúsculas no importan.",
+    "resetHelp": "Define una contraseña nueva y pásala a la persona. La anterior deja de funcionar al momento."
   },
   "settings": {
     "title": "Configuración del calendario",
@@ -164,5 +174,32 @@
     "turnover": "Cambio de día (hora, Brasilia)",
     "reset": "Reinicio semanal (hora, Brasilia)",
     "help": "Ajusta el ancla si el \"Día actual\" difiere del juego."
+  },
+  "rotations": {
+    "subtitle": "Rotaciones de cada personaje: por traje o para todos, en texto libre, con descripción y vídeo.",
+    "help": "En Metas, marca quién es el causante de daño del equipo; aquí quedan las rotaciones del personaje. El jugador toca la foto del causante de daño y las ve.",
+    "onlyWith": "Solo con rotación",
+    "count_one": "{{count}} rotación",
+    "count_other": "{{count}} rotaciones",
+    "none": "Sin rotación",
+    "editTitle": "Rotaciones de {{name}}",
+    "editHelp": "Una rotación por situación o traje. Este orden es el que ve el jugador.",
+    "item": "Rotación {{n}}",
+    "moveUp": "Subir",
+    "moveDown": "Bajar",
+    "uniform": "Traje",
+    "allUniforms": "Todos los trajes",
+    "titleLabel": "Título (opcional)",
+    "titlePlaceholder": "Ej.: Apertura, Fase 2, Contra jefes",
+    "sequence": "Rotación",
+    "sequencePlaceholder": "Ej.: 1 2c (3dc 4) 6 — o escríbela a tu manera",
+    "sequenceHint": "Texto libre. Si usas la notación de la comunidad (1–6, c, dc, qc, paréntesis), aparece en bloques.",
+    "legendTitle": "Notación de la comunidad",
+    "legendFree": "La notación es opcional: escribe como mejor se explique.",
+    "description": "Descripción",
+    "descriptionPlaceholder": "Cuándo usarla, cuánto esperar en cada delay, qué observar…",
+    "video": "Vídeo de referencia (opcional)",
+    "videoHint": "Enlace de YouTube (vídeo o Shorts; usa ?t= para empezar en el momento justo) o de un archivo .mp4/.webm. Se reproduce sin sonido y en bucle; el vídeo no se guarda en el sistema.",
+    "add": "Añadir rotación"
   }
 }

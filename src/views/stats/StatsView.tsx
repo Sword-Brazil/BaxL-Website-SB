@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useTranslation } from "next-i18next/pages";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { Badge } from "@/components/ui/badge";
+import { MODE_VISUALS } from "@/views/shared/modeVisuals";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -72,7 +73,7 @@ function RepetitionChart({ vm }: { vm: ReturnType<typeof useStatsViewModel> }) {
             aria-label={t("stats:repetition.mode")}
           >
             {(["ALL", "BAX", "BAL", "BAI"] as const).map((m) => (
-              <ToggleGroupItem key={m} value={m}>
+              <ToggleGroupItem key={m} value={m} className={m === "ALL" ? undefined : MODE_VISUALS[m].active}>
                 {m === "ALL" ? t("cycle:all") : m}
               </ToggleGroupItem>
             ))}
@@ -194,7 +195,7 @@ function MyTeamsCard({ vm }: { vm: ReturnType<typeof useStatsViewModel> }) {
                 />
                 <div className="flex flex-wrap gap-1">
                   {c.usages.map((u) => (
-                    <Badge key={`${u.mode}-${u.day}`} variant={u.mode === "BAI" ? "brazil" : "outline"}>
+                    <Badge key={`${u.mode}-${u.day}`} variant={MODE_VISUALS[u.mode].badge}>
                       {u.day ? `${u.mode} · ${t("common:day", { number: u.day })}` : u.mode}
                     </Badge>
                   ))}

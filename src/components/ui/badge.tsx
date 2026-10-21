@@ -24,6 +24,10 @@ const badgeVariants = cva(
         antihero: "border-antihero/40 bg-antihero/15 text-antihero",
         energy: "border-energy/40 bg-energy/10 text-energy uppercase tracking-wider",
         brazil: "border-brazil-green/40 bg-brazil-green/15 text-brazil-green",
+        // Modos da Batalha de Aliança (cores do jogo)
+        bax: "border-bax/50 bg-bax/15 text-bax uppercase tracking-wider",
+        bal: "border-bal/50 bg-bal/15 text-bal uppercase tracking-wider",
+        bai: "border-bai/50 bg-bai/15 text-bai uppercase tracking-wider",
         "ctp-normal": "border-ctp-normal/40 bg-ctp-normal/15 text-ctp-normal",
         "ctp-mighty": "border-ctp-mighty/40 bg-ctp-mighty/15 text-ctp-mighty",
         "ctp-brilliant": "border-ctp-brilliant/50 bg-ctp-brilliant/15 text-ctp-brilliant",

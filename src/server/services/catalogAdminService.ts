@@ -5,10 +5,6 @@ import { HttpError } from "@/server/http";
 const agentData = (input: AgentInput) => ({
   slug: input.slug,
   name: input.name,
-  gender: input.gender,
-  side: input.side,
-  species: input.species,
-  attackType: input.attackType,
   active: input.active ?? true,
 });
 
@@ -17,10 +13,10 @@ const uniformData = (u: AgentInput["uniforms"][number]) => ({
   name: u.name,
   imagePath: u.imagePath,
   active: u.active ?? true,
-  gender: u.gender ?? null,
-  side: u.side ?? null,
-  species: u.species ?? null,
-  attackType: u.attackType ?? null,
+  gender: u.gender,
+  side: u.side,
+  species: u.species,
+  attackType: u.attackType,
 });
 
 async function assertSlugFree(slug: string, exceptId?: string) {
@@ -82,4 +78,17 @@ export async function saveCtp(input: CtpInput, id?: string) {
     create: { type: input.type, quality: input.quality, imagePath: input.imagePath, active: input.active ?? true },
     update: { imagePath: input.imagePath, active: input.active ?? true },
   });
+}
+
+/**
+ * Exclui o CTP de vez. As equipes Meta e as reservas que o recomendavam ficam sem CTP; nos
+ * aparelhos dos jogadores, um CTP equipado que não existe mais simplesmente não aparece.
+ */
+export async function deleteCtp(id: string) {
+  if (!(await prisma.ctp.findUnique({ where: { id } }))) throw new HttpError(404, "NOT_FOUND", "CTP não encontrado");
+  await prisma.$transaction([
+    prisma.metaTeamMember.updateMany({ where: { ctpId: id }, data: { ctpId: null } }),
+    prisma.priorityEntry.updateMany({ where: { ctpId: id }, data: { ctpId: null } }),
+    prisma.ctp.delete({ where: { id } }),
+  ]);
 }

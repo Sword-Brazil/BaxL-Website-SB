@@ -8,7 +8,8 @@
     "ctps": "CTPs",
     "bai": "BAI",
     "users": "Users",
-    "settings": "Settings"
+    "settings": "Settings",
+    "rotations": "Rotations"
   },
   "guard": {
     "forbidden": "Access denied",
@@ -23,8 +24,9 @@
     "catalog": "Agents, uniforms and images.",
     "ctps": "CTP types, photos and availability.",
     "bai": "BAI boss sequence.",
-    "users": "Curators and administrators.",
-    "settings": "Cycle anchor and turnover times."
+    "users": "Players, curators and administrators: accounts, roles and passwords.",
+    "settings": "Cycle anchor and turnover times.",
+    "rotations": "Character rotations (damage dealers), per uniform, with a description and video."
   },
   "common": {
     "saved": "Changes saved",
@@ -78,7 +80,13 @@
     "week": "Wk {{n}}",
     "reserves": "Reserves",
     "reservesHint": "Extra characters for the suggestion when players lack the Meta and Alternative ones. Order used: Meta → Alternatives → reserves.",
-    "addReserve": "+ Add reserve"
+    "addReserve": "+ Add reserve",
+    "damageDealer": "Damage dealer",
+    "rotationsCount_one": "{{name}} has {{count}} rotation.",
+    "rotationsCount_other": "{{name}} has {{count}} rotations.",
+    "noRotations": "{{name}} has no rotation yet.",
+    "manageRotations": "Manage rotations",
+    "addRotations": "Add a rotation"
   },
   "priority": {
     "solo": "Solos",
@@ -113,21 +121,22 @@
     "slugAuto": "Generated from the name; edit only if needed.",
     "photos": "{{n}}/{{total}} with photo",
     "quickUniform": "Uniform",
-    "baseAttributes": "Character attributes",
-    "baseAttributesHint": "Apply to every uniform, except those with their own attributes.",
     "uniformAttributes": "This uniform's attributes",
-    "inheritedHint": "Dashed = inherited from the character. Tap another value to customize this uniform only.",
-    "customized": "Customized",
-    "resetAttributes": "Inherit all from character"
+    "uniformsHint": "Each uniform has its own attributes (gender, side, species and attack): day restrictions are checked against the uniform used. A new uniform starts with the first uniform's attributes.",
+    "variedUniforms_one": "{{count}} uniform with different attributes",
+    "variedUniforms_other": "{{count}} uniforms with different attributes"
   },
   "ctps": {
     "title": "CTP catalog",
-    "help": "Add CTPs and update their photos. Deleting deactivates an item to preserve existing teams and selections.",
+    "help": "Add, edit and delete CTPs. Deactivating hides the CTP from choices and keeps old teams; deleting removes it for good.",
     "add": "New CTP",
     "edit": "Edit CTP",
     "quality": "Quality",
-    "remove": "Delete",
-    "restore": "Restore"
+    "restore": "Restore",
+    "deactivate": "Deactivate",
+    "delete": "Delete CTP",
+    "deleteConfirm": "Delete {{name}} for good? Meta teams and reserves recommending it will have no CTP. This can't be undone.",
+    "deleted": "CTP deleted"
   },
   "bai": {
     "title": "BAI bosses",
@@ -140,22 +149,23 @@
   },
   "users": {
     "title": "Users and roles",
-    "search": "Search by email or nickname…",
-    "newStaff": "New administrator/curator",
+    "search": "Search by username or nickname…",
     "role": "Role",
     "roles": {
-      "USER": "User",
+      "USER": "Player",
       "CURATOR": "Curator",
       "ADMIN": "Administrator"
     },
-    "changeRoleConfirm": "Change {{email}} role to {{role}}?",
+    "changeRoleConfirm": "Change {{name}} role to {{role}}?",
     "resetPassword": "Reset password",
-    "verified": "Confirmed",
-    "unverified": "Not confirmed",
     "created": "Account created",
     "passwordReset": "Password reset",
     "lastAdmin": "The last administrator cannot be demoted.",
-    "help": "Administrators promote and remove curators. There must always be at least one administrator."
+    "help": "Only administrators create accounts and change passwords. Everyone signs in with a username and password. There must always be at least one administrator.",
+    "newUser": "New account",
+    "username": "Username",
+    "usernameHint": "Used to sign in. E.g. the in-game nick (3 to 30 letters, digits, space, dot, hyphen or underscore). Case doesn't matter.",
+    "resetHelp": "Set a new password and hand it to the person. The old password stops working right away."
   },
   "settings": {
     "title": "Calendar settings",
@@ -164,5 +174,32 @@
     "turnover": "Day turnover (hour, Brasília)",
     "reset": "Weekly reset (hour, Brasília)",
     "help": "Adjust the anchor if the \"Current day\" differs from the game."
+  },
+  "rotations": {
+    "subtitle": "Each character's rotations: per uniform or for all, free text, with a description and video.",
+    "help": "In Metas, mark the team's damage dealer; the character's rotations live here. Players tap the damage dealer's photo to see them.",
+    "onlyWith": "Only with rotations",
+    "count_one": "{{count}} rotation",
+    "count_other": "{{count}} rotations",
+    "none": "No rotation",
+    "editTitle": "{{name}} rotations",
+    "editHelp": "One rotation per situation or uniform. This order is the order players see.",
+    "item": "Rotation {{n}}",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "uniform": "Uniform",
+    "allUniforms": "All uniforms",
+    "titleLabel": "Title (optional)",
+    "titlePlaceholder": "E.g. Opener, Phase 2, Against bosses",
+    "sequence": "Rotation",
+    "sequencePlaceholder": "E.g. 1 2c (3dc 4) 6 — or write it your way",
+    "sequenceHint": "Free text. If you use the community notation (1–6, c, dc, qc, parentheses), it shows as blocks.",
+    "legendTitle": "Community notation",
+    "legendFree": "The notation is optional: write it however explains it best.",
+    "description": "Description",
+    "descriptionPlaceholder": "When to use it, how long each delay is, what to watch for…",
+    "video": "Reference video (optional)",
+    "videoHint": "YouTube link (video or Shorts; add ?t= to start at the right moment) or a .mp4/.webm file. It plays muted and looped; the video is not stored in the system.",
+    "add": "Add rotation"
   }
 }

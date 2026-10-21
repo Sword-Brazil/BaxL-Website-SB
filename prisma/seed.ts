@@ -1,36 +1,41 @@
-// Seed idempotente: CTPs, dias de BAX/BAL, Settings e as contas ADMIN e USER do dono do projeto.
+// Seed idempotente: CTPs, dias de BAX/BAL, Settings e o Administrador padrão (as demais contas,
+// de jogadores e da curadoria, são criadas por ele em Admin → Usuários).
 // Uso: npx prisma db seed  (lê .env.local)
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import path from "node:path";
+import { loadEnvConfig } from "@next/env";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { BATTLE_DAY_NUMBERS, CTP_QUALITIES, CTP_TYPES, DAY_MODES, type Role } from "../src/models/domain/enums";
 
-if (existsSync(".env.local")) process.loadEnvFile(".env.local");
+// .env.local com expansão de ${VAR} (ex.: a senha do banco dentro das URLs), como no Next.
+loadEnvConfig(process.cwd(), true, { info: () => {}, error: console.error });
 
 const prisma = new PrismaClient();
 
 /** Quinta-feira 12:00 BRT mais recente (início do Dia 1). */
-function lastThursdayNoonBrt(now = new Date()): Date {
-  const brtNow = new Date(now.getTime() - 3 * 3_600_000); // BRT = UTC-3 (sem horário de verão)
-  const daysSinceThu = (brtNow.getUTCDay() - 4 + 7) % 7;
-  const d = new Date(Date.UTC(brtNow.getUTCFullYear(), brtNow.getUTCMonth(), brtNow.getUTCDate() - daysSinceThu, 15));
-  return d.getTime() > now.getTime() ? new Date(d.getTime() - 7 * 86_400_000) : d;
-}
+/**
+ * Início do Dia 1 de um ciclo real: quinta-feira, 01/10/2026, 12h de Brasília (o Dia 19 começou
+ * em 19/10/2026 às 12h). O ciclo se repete a cada 28 dias, então a data vale para qualquer época.
+ */
+const CYCLE_ANCHOR = new Date("2026-10-01T15:00:00.000Z");
 
-async function seedUser(email: string | undefined, password: string | undefined, role: Role) {
-  if (!email || !password) {
-    console.warn(`⚠ SEED_${role}_EMAIL/SEED_${role}_PASSWORD ausentes em .env.local; conta ${role} não criada.`);
+/** Administrador padrão: SEED_ADMIN_USERNAME (ex.: "Sword Menezes") + SEED_ADMIN_PASSWORD. Se já existe, atualiza a senha. */
+async function seedAdmin() {
+  const display = process.env.SEED_ADMIN_USERNAME?.trim().replace(/\s+/g, " ");
+  const password = process.env.SEED_ADMIN_PASSWORD;
+  if (!display || !password) {
+    console.warn("⚠ Defina SEED_ADMIN_USERNAME e SEED_ADMIN_PASSWORD em .env.local; administrador não criado.");
     return;
   }
+  const username = display.toLowerCase();
   const passwordHash = await bcrypt.hash(password, 12);
-  const normalized = email.trim().toLowerCase();
   await prisma.user.upsert({
-    where: { email: normalized },
-    update: { passwordHash, role },
-    create: { email: normalized, passwordHash, role, emailVerifiedAt: new Date() },
+    where: { username },
+    update: { passwordHash, role: "ADMIN" satisfies Role },
+    create: { username, passwordHash, role: "ADMIN" satisfies Role, nickname: display },
   });
-  console.log(`✔ Conta ${role}: ${normalized}`);
+  console.log(`✔ Administrador: ${display}`);
 }
 
 /** Ícone de cada tipo de CTP, com a extensão do arquivo em public/assets/ctp (manifesto de imagens). */
@@ -63,12 +68,11 @@ async function main() {
   await prisma.settings.upsert({
     where: { id: 1 },
     update: {},
-    create: { id: 1, cycleAnchor: lastThursdayNoonBrt() },
+    create: { id: 1, cycleAnchor: CYCLE_ANCHOR },
   });
   console.log("✔ Settings");
 
-  await seedUser(process.env.SEED_ADMIN_EMAIL, process.env.SEED_ADMIN_PASSWORD, "ADMIN");
-  await seedUser(process.env.SEED_USER_EMAIL, process.env.SEED_USER_PASSWORD, "USER");
+  await seedAdmin();
 }
 
 main()

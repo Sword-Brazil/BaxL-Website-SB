@@ -4,9 +4,9 @@ import { HttpError } from "@/server/http";
 import { deleteMetaTeam, saveMetaTeam } from "@/server/services/metaTeamService";
 import { setRestriction } from "@/server/services/restrictionService";
 import { savePriority } from "@/server/services/priorityService";
-import { changeRole, createStaff } from "@/server/services/usersService";
+import { changeRole, createUser as createAccount, listUsers } from "@/server/services/usersService";
 import { createAgent, createUser, ctpId, dayId, seedBase } from "./fixtures";
-import { saveCtp } from "@/server/services/catalogAdminService";
+import { deleteCtp, saveCtp } from "@/server/services/catalogAdminService";
 
 const status = (s: number) => (e: unknown) => e instanceof HttpError && e.status === s;
 
@@ -38,6 +38,20 @@ describe("curadoria", () => {
     ...extra,
   });
 
+  it("qualquer posição pode ser Causador de Dano, um ou mais por equipe", async () => {
+    const base = team(fem);
+    const saved = await saveMetaTeam(
+      { ...base, members: base.members.map((m) => ({ ...m, isDamageDealer: m.slot !== "SOLO" })) },
+      curatorId,
+    );
+    expect(Object.fromEntries(saved.members.map((m) => [m.slot, m.isDamageDealer]))).toEqual({
+      SOLO: false,
+      SUPPORT_1: true,
+      SUPPORT_2: true,
+    });
+  });
+
+
   it("publicar com agente fora da restrição gera 422 RESTRICTION_VIOLATION", async () => {
     const err = await saveMetaTeam(team([maleMutant, fem[1], fem[2]]), curatorId).catch((e) => e);
     expect(err).toBeInstanceOf(HttpError);
@@ -64,6 +78,18 @@ describe("curadoria", () => {
     await expect(savePriority({ scope: "BAI" }, { solo: [{ uniformId: fem[0], ctpId: ctp }], support: [] })).rejects.toSatisfy(
       status(400),
     );
+  });
+
+  it("excluir um CTP tira ele das equipes e reservas, sem apagar as equipes", async () => {
+    const saved = await saveMetaTeam(team(fem), curatorId);
+    await savePriority({ scope: "BAI" }, { solo: [{ uniformId: fem[0], ctpId: ctp }], support: [] });
+    await deleteCtp(ctp);
+    expect(await prisma.ctp.findUnique({ where: { id: ctp } })).toBeNull();
+    const members = await prisma.metaTeamMember.findMany({ where: { metaTeamId: saved.id } });
+    expect(members).toHaveLength(3);
+    expect(members.every((m) => m.ctpId === null)).toBe(true);
+    expect((await prisma.priorityEntry.findFirstOrThrow()).ctpId).toBeNull();
+    await expect(deleteCtp(ctp)).rejects.toSatisfy(status(404));
   });
 
   it("publicar com uniforme inativo gera 400", async () => {
@@ -130,19 +156,25 @@ describe("curadoria", () => {
   });
 
   describe("usuários", () => {
-    it("createStaff cria conta verificada com o papel pedido; e-mail repetido gera 409", async () => {
-      const u = await createStaff({ email: "novo@sword.br", password: "senha1234", role: "ADMIN" });
-      expect(u.role).toBe("ADMIN");
+    it("cria conta com nome de usuário (minúsculo); usuário repetido gera 409", async () => {
+      const u = await createAccount({ username: "Sword Menezes", password: "Desenho.2020!", role: "ADMIN" });
+      expect(u).toMatchObject({ username: "sword menezes", role: "ADMIN" });
       const row = await prisma.user.findUniqueOrThrow({ where: { id: u.id } });
-      expect(row.emailVerifiedAt).not.toBeNull();
-      expect(row.passwordHash).not.toBe("senha1234");
-      await expect(createStaff({ email: "NOVO@sword.br", password: "senha1234", role: "CURATOR" })).rejects.toSatisfy(status(409));
+      expect(row.passwordHash).not.toBe("Desenho.2020!");
+      await expect(createAccount({ username: "SWORD MENEZES", password: "Desenho.2020!", role: "USER" })).rejects.toSatisfy(status(409));
+    });
+
+    it("a busca acha por usuário ou apelido, sem diferenciar maiúsculas", async () => {
+      await createAccount({ username: "tenmenezes", nickname: "Ten Menezes", password: "senha1234", role: "USER" });
+      await createAccount({ username: "curador", password: "senha1234", role: "CURATOR" });
+      expect((await listUsers({ q: "MENEZES" })).users.map((u) => u.username)).toEqual(["tenmenezes"]);
+      expect((await listUsers({ q: "Curad" })).users.map((u) => u.username)).toEqual(["curador"]);
     });
 
     it("rebaixar o último ADMIN gera 409", async () => {
       const admin = await createUser("ADMIN");
       await expect(changeRole(admin.id, "USER")).rejects.toSatisfy(status(409));
-      await createUser("ADMIN", "outro@sword.br");
+      await createUser("ADMIN", "outro");
       await expect(changeRole(admin.id, "CURATOR")).resolves.toMatchObject({ role: "CURATOR" });
     });
   });

@@ -3,33 +3,44 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { useNotifyError } from "@/viewmodels/useNotify";
 import { adminApi } from "@/models/api/admin";
+import { UNKNOWN } from "@/models/domain/enums";
 import type { Agent, RestrictableAttributes } from "@/models/domain/types";
 import { slugify } from "@/models/rules/slug";
 import { AgentSchema, ASSET_MAX_BYTES, type AgentInput, type AssetUploadInput } from "@/models/schemas/admin";
 import { useCatalogViewModel } from "@/viewmodels/useCatalogViewModel";
 
+type UniformInput = AgentInput["uniforms"][number];
+
+const UNKNOWN_ATTRIBUTES: RestrictableAttributes = { gender: UNKNOWN, side: UNKNOWN, species: UNKNOWN, attackType: UNKNOWN };
+
+const attributesOf = (u: RestrictableAttributes): RestrictableAttributes => ({
+  gender: u.gender,
+  side: u.side,
+  species: u.species,
+  attackType: u.attackType,
+});
+
 const blank: AgentInput = {
   slug: "",
   name: "",
-  gender: "MALE",
-  side: "HERO",
-  species: "HUMAN",
-  attackType: "COMBAT",
   active: true,
-  uniforms: [{ slug: "padrao", name: "Padrão", imagePath: "", active: true }],
+  uniforms: [{ slug: "padrao", name: "Padrão", imagePath: "", active: true, ...UNKNOWN_ATTRIBUTES }],
 };
 
-/** Traje novo herda todos os atributos do personagem. */
-const newUniform = () => ({ slug: "", name: "", imagePath: "", active: true });
+/** Traje novo começa com os atributos de um traje já cadastrado (ajuste o que for diferente). */
+const newUniform = (from?: RestrictableAttributes): UniformInput => ({
+  slug: "",
+  name: "",
+  imagePath: "",
+  active: true,
+  ...(from ? attributesOf(from) : UNKNOWN_ATTRIBUTES),
+});
 
 const toInput = (a: Agent): AgentInput => ({
   slug: a.slug,
   name: a.name,
-  gender: a.gender,
-  side: a.side,
-  species: a.species,
-  attackType: a.attackType,
   active: a.active,
   uniforms: a.uniforms.map((u) => ({
     id: u.id,
@@ -37,7 +48,7 @@ const toInput = (a: Agent): AgentInput => ({
     name: u.name,
     imagePath: u.imagePath,
     active: u.active,
-    ...u.overrides,
+    ...attributesOf(u),
   })),
 });
 
@@ -57,6 +68,7 @@ const fileToBase64 = (file: File) =>
  */
 export function useCatalogEditorViewModel(messages: { saved: string; uploaded: string; tooBig: string; badType: string }) {
   const qc = useQueryClient();
+  const notifyError = useNotifyError();
   const catalog = useCatalogViewModel();
   const [search, setSearch] = useState("");
   const [editingId, setEditingId] = useState<string | null | undefined>(undefined); // undefined = fechado, null = novo
@@ -91,7 +103,7 @@ export function useCatalogEditorViewModel(messages: { saved: string; uploaded: s
       form.setValue(`uniforms.${index}.imagePath`, imagePath, { shouldDirty: true, shouldValidate: true });
     },
     onSuccess: () => toast.success(messages.uploaded),
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => notifyError(e),
     onSettled: () => setUploadingIndex(null),
   });
 
@@ -116,12 +128,11 @@ export function useCatalogEditorViewModel(messages: { saved: string; uploaded: s
     },
     openEdit: (a: Agent, withNewUniform = false) => {
       form.reset(toInput(a));
-      if (withNewUniform) uniforms.prepend(newUniform());
+      if (withNewUniform) uniforms.prepend(newUniform(a.uniforms[0]));
       setEditingId(a.id);
     },
-    addUniform: () => uniforms.prepend(newUniform()),
-    /** null = o traje volta a herdar o atributo do personagem. */
-    setUniformAttribute: (index: number, name: keyof RestrictableAttributes, value: string | null) =>
+    addUniform: () => uniforms.prepend(newUniform(form.getValues("uniforms")[0])),
+    setUniformAttribute: (index: number, name: keyof RestrictableAttributes, value: string) =>
       form.setValue(`uniforms.${index}.${name}`, value as never, { shouldDirty: true }),
     removeImage: (index: number) => form.setValue(`uniforms.${index}.imagePath`, "", { shouldDirty: true }),
     onAgentNameChange: (name: string) => syncSlug("slug", name, form.getValues("name")),

@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { getRemoteSelections, putRemoteSelections } from "@/models/api/auth";
 import { ApiError } from "@/models/api/client";
 import { mergeDecision } from "@/models/rules/selectionsSync";
 import type { UserSelections } from "@/models/schemas/selections";
 import { useSelectionsStore } from "./stores/selectionsStore";
 import { useAuthViewModel } from "./useAuthViewModel";
+import { useNotify, useNotifyError } from "./useNotify";
 
 const DEBOUNCE_MS = 2000;
 
@@ -17,6 +19,9 @@ const DEBOUNCE_MS = 2000;
  */
 export function useSelectionsSyncViewModel() {
   const { user } = useAuthViewModel();
+  const qc = useQueryClient();
+  const notify = useNotify();
+  const notifyError = useNotifyError();
   const { doc, hydrated, syncUserId, syncBase, syncedLocalAt, replaceAll, markSynced } = useSelectionsStore();
   const [conflict, setConflict] = useState<UserSelections | null>(null);
   const checkedFor = useRef<string | null>(null);
@@ -27,7 +32,8 @@ export function useSelectionsSyncViewModel() {
     checkedFor.current = user.id;
     (async () => {
       const remote = await getRemoteSelections().catch(() => undefined);
-      if (remote === undefined) return;
+      // Saiu da conta enquanto a checagem estava em andamento: não religa o aparelho.
+      if (remote === undefined || qc.getQueryData<{ id: string } | null>(["me"])?.id !== user.id) return;
       const state = useSelectionsStore.getState();
       const linked = state.syncUserId === user.id;
       const localDirty = state.doc.updatedAt !== state.syncedLocalAt;
@@ -35,19 +41,29 @@ export function useSelectionsSyncViewModel() {
       if (linked && remote && remote.updatedAt !== state.syncBase && !localDirty) {
         replaceAll(remote);
         markSynced(remote.updatedAt, user.id);
+        notify("SELECTIONS_SYNCED");
         return;
       }
       if (linked && (!remote || remote.updatedAt === state.syncBase)) return;
 
       switch (mergeDecision(state.doc, remote)) {
         case "UPLOAD_LOCAL": {
-          const saved = await putRemoteSelections(state.doc, remote?.updatedAt ?? null);
-          markSynced(saved.updatedAt, user.id);
+          try {
+            const saved = await putRemoteSelections(state.doc, remote?.updatedAt ?? null);
+            markSynced(saved.updatedAt, user.id);
+            notify("SELECTIONS_SYNCED");
+          } catch (e) {
+            // Outro aparelho salvou na conta ao mesmo tempo: pergunta qual versão manter.
+            const latest = e instanceof ApiError && e.status === 409 ? await getRemoteSelections().catch(() => null) : null;
+            if (latest) setConflict(latest);
+            else notifyError(e);
+          }
           break;
         }
         case "USE_REMOTE":
           replaceAll(remote!);
           markSynced(remote!.updatedAt, user.id);
+          notify("SELECTIONS_SYNCED");
           break;
         case "IN_SYNC":
           markSynced(remote?.updatedAt ?? null, user.id);
@@ -57,7 +73,7 @@ export function useSelectionsSyncViewModel() {
           break;
       }
     })();
-  }, [hydrated, user, replaceAll, markSynced]);
+  }, [hydrated, user, replaceAll, markSynced, notify, notifyError, qc]);
 
   // Envio das mudanças locais (debounce).
   const dirty = doc.updatedAt !== syncedLocalAt;
@@ -71,20 +87,29 @@ export function useSelectionsSyncViewModel() {
         if (e instanceof ApiError && e.status === 409) {
           const remote = await getRemoteSelections().catch(() => null);
           if (remote) setConflict(remote);
+        } else {
+          // Sessão encerrada, sem conexão etc.: o padrão de erros decide como avisar.
+          if (e instanceof ApiError && e.status === 401) qc.setQueryData(["me"], null);
+          notifyError(e);
         }
       }
     }, DEBOUNCE_MS);
     return () => clearTimeout(id);
-  }, [user, syncUserId, syncBase, dirty, doc, conflict, markSynced]);
+  }, [user, syncUserId, syncBase, dirty, doc, conflict, markSynced, qc, notify, notifyError]);
 
   return {
     conflict: !!conflict,
     /** Mantém o que está no aparelho e sobrescreve a conta. */
     keepLocal: async () => {
       if (!user || !conflict) return;
-      const saved = await putRemoteSelections(useSelectionsStore.getState().doc, conflict.updatedAt);
-      markSynced(saved.updatedAt, user.id);
-      setConflict(null);
+      try {
+        const saved = await putRemoteSelections(useSelectionsStore.getState().doc, conflict.updatedAt);
+        markSynced(saved.updatedAt, user.id);
+        setConflict(null);
+        notify("SELECTIONS_SYNCED");
+      } catch (e) {
+        notifyError(e);
+      }
     },
     /** Usa o que está na conta e substitui o aparelho. */
     keepRemote: () => {
@@ -92,6 +117,7 @@ export function useSelectionsSyncViewModel() {
       replaceAll(conflict);
       markSynced(conflict.updatedAt, user.id);
       setConflict(null);
+      notify("SELECTIONS_SYNCED");
     },
   };
 }

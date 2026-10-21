@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "next-i18next/pages";
-import { ImageUpIcon, LoaderIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { BanIcon, ImageUpIcon, LoaderIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
+import { useNotifyError } from "@/viewmodels/useNotify";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,11 +12,14 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ctpColor } from "@/models/domain/ctpColors";
 import { CTP_QUALITIES, CTP_TYPES, type CtpQuality, type CtpType } from "@/models/domain/enums";
 import type { Catalog, Ctp } from "@/models/domain/types";
 import { adminApi } from "@/models/api/admin";
 import { ASSET_MAX_BYTES } from "@/models/schemas/admin";
 import { useCatalogViewModel } from "@/viewmodels/useCatalogViewModel";
+import { CtpQualityFx } from "@/views/shared/CtpQualityFx";
+import { Hint } from "@/views/shared/Hint";
 
 type Draft = { id?: string; type: CtpType; quality: CtpQuality; imagePath: string; active: boolean };
 const TYPES: Record<string, "image/png" | "image/webp" | "image/jpeg"> = { "image/png": "image/png", "image/webp": "image/webp", "image/jpeg": "image/jpeg" };
@@ -25,8 +30,26 @@ const dataUrl = (file: File) => new Promise<string>((resolve, reject) => {
   reader.readAsDataURL(file);
 });
 
+/** Foto do CTP num medalhão redondo com anel e brilho na cor do CTP (em vez da caixa quadrada). */
+function CtpMedallion({ ctp }: { ctp: Ctp }) {
+  const color = ctpColor(ctp);
+  return (
+    <span className="size-16 shrink-0 justify-self-start rounded-full" style={{ boxShadow: `0 0 18px -4px ${color}` }}>
+      <Avatar
+        className="isolate size-16 bg-[radial-gradient(circle,var(--secondary)_0%,var(--card)_75%)] ring-2 ring-offset-2 ring-offset-card after:hidden"
+        style={{ "--tw-ring-color": color } as CSSProperties}
+      >
+        <AvatarImage src={ctp.imagePath || undefined} alt="" className="object-contain p-1.5" />
+        <AvatarFallback className="bg-transparent font-heading text-xs">CTP</AvatarFallback>
+        <CtpQualityFx quality={ctp.quality} color={color} className="inset-1.5" />
+      </Avatar>
+    </span>
+  );
+}
+
 export function CtpAdminView() {
   const { t } = useTranslation(["admin", "common"]);
+  const notifyError = useNotifyError();
   const catalog = useCatalogViewModel();
   const qc = useQueryClient();
   const [draft, setDraft] = useState<Draft | null>(null);
@@ -46,7 +69,17 @@ export function CtpAdminView() {
       setDraft(null);
       toast.success(t("admin:common.saved"));
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => notifyError(e),
+  });
+  /** Exclusão definitiva: as equipes e reservas que usavam o CTP ficam sem CTP. */
+  const remove = useMutation({
+    mutationFn: (id: string) => adminApi.deleteCtp(id),
+    onSuccess: (_, id) => {
+      qc.setQueryData<Catalog>(["catalog"], (current) => current && { ...current, ctps: current.ctps.filter((ctp) => ctp.id !== id) });
+      qc.invalidateQueries({ queryKey: ["cycle"] });
+      toast.success(t("admin:ctps.deleted"));
+    },
+    onError: (e: Error) => notifyError(e),
   });
   const edit = (ctp: Ctp) => setDraft({ id: ctp.id, type: ctp.type, quality: ctp.quality, imagePath: ctp.imagePath, active: ctp.active });
   /** Qualidades ainda livres no tipo (a do próprio CTP em edição continua disponível). */
@@ -64,7 +97,7 @@ export function CtpAdminView() {
       const result = await adminApi.uploadAsset({ fileName: file.name, mimeType: TYPES[file.type], base64: await dataUrl(file) });
       patchDraft({ imagePath: result.imagePath });
       toast.success(t("admin:catalog.uploaded"));
-    } catch (error) { toast.error(error instanceof Error ? error.message : String(error)); }
+    } catch (error) { notifyError(error); }
     finally { setUploading(false); }
   };
 
@@ -78,12 +111,19 @@ export function CtpAdminView() {
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {catalog.ctps.filter((ctp) => ctp.type === type).map((ctp) => <Card key={ctp.id} className={!ctp.active ? "opacity-60" : undefined}>
           <CardHeader className="flex-row items-center gap-3 space-y-0">
-            <Avatar className="size-16 rounded-none bg-secondary after:hidden"><AvatarImage src={ctp.imagePath || undefined} alt="" className="object-contain" /><AvatarFallback>CTP</AvatarFallback></Avatar>
+            <CtpMedallion ctp={ctp} />
             <div className="min-w-0 flex-1"><CardTitle className="text-base">{t(`common:ctp.${ctp.type}`)}</CardTitle><p className="text-sm text-muted-foreground">{t(`common:quality.${ctp.quality}`)}{!ctp.active && ` · ${t("admin:catalog.inactive")}`}</p></div>
           </CardHeader>
           <CardContent className="flex justify-end gap-2">
             <Button size="sm" variant="outline" onClick={() => edit(ctp)}><PencilIcon data-icon="inline-start" />{t("admin:common.edit")}</Button>
-            {ctp.active ? <Button size="sm" variant="destructive" onClick={() => save.mutate({ id: ctp.id, type: ctp.type, quality: ctp.quality, imagePath: ctp.imagePath, active: false })}><Trash2Icon data-icon="inline-start" />{t("admin:ctps.remove")}</Button> : <Button size="sm" variant="outline" onClick={() => save.mutate({ id: ctp.id, type: ctp.type, quality: ctp.quality, imagePath: ctp.imagePath, active: true })}>{t("admin:ctps.restore")}</Button>}
+            {ctp.active ? <Button size="sm" variant="outline" onClick={() => save.mutate({ id: ctp.id, type: ctp.type, quality: ctp.quality, imagePath: ctp.imagePath, active: false })}><BanIcon data-icon="inline-start" />{t("admin:ctps.deactivate")}</Button> : <Button size="sm" variant="outline" onClick={() => save.mutate({ id: ctp.id, type: ctp.type, quality: ctp.quality, imagePath: ctp.imagePath, active: true })}>{t("admin:ctps.restore")}</Button>}
+            <AlertDialog>
+              <Hint label={t("admin:ctps.delete")}><AlertDialogTrigger asChild><Button size="icon-sm" variant="ghost" aria-label={t("admin:ctps.delete")}><Trash2Icon className="text-destructive" /></Button></AlertDialogTrigger></Hint>
+              <AlertDialogContent>
+                <AlertDialogHeader><AlertDialogTitle>{t("admin:ctps.delete")}</AlertDialogTitle><AlertDialogDescription>{t("admin:ctps.deleteConfirm", { name: `${t(`common:ctp.${ctp.type}`)} · ${t(`common:quality.${ctp.quality}`)}` })}</AlertDialogDescription></AlertDialogHeader>
+                <AlertDialogFooter><AlertDialogCancel>{t("admin:common.cancel")}</AlertDialogCancel><AlertDialogAction variant="destructive" onClick={() => remove.mutate(ctp.id)}>{t("admin:ctps.delete")}</AlertDialogAction></AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </CardContent>
         </Card>)}
       </div>

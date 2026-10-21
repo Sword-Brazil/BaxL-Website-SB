@@ -1,12 +1,5 @@
 import type { UserSelections } from "@/models/schemas/selections";
-
-export const emptySelections = (): UserSelections => ({
-  version: 1,
-  updatedAt: new Date(0).toISOString(),
-  roster: { ownedUniformIds: [] },
-  teams: {},
-  equipment: { ctpByAgent: {} },
-});
+import { emptySelections } from "./selections";
 
 /** Representação canônica do conteúdo (ignora updatedAt e ordem). */
 function contentKey(doc: UserSelections): string {
@@ -15,7 +8,7 @@ function contentKey(doc: UserSelections): string {
     .map((k) => [k, doc.teams[k]] as const)
     .filter(([, t]) => Object.values(t).some(Boolean));
   const equipment = Object.entries(doc.equipment?.ctpByAgent ?? {}).sort(([a], [b]) => a.localeCompare(b));
-  return JSON.stringify([[...doc.roster.ownedUniformIds].sort(), teams, equipment]);
+  return JSON.stringify([[...doc.roster.ownedUniformIds].sort(), teams, equipment, doc.nickname ?? ""]);
 }
 
 export const isEmptySelections = (doc: UserSelections) => contentKey(doc) === contentKey(emptySelections());

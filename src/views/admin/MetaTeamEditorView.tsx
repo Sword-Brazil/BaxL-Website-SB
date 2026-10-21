@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { useTranslation } from "next-i18next/pages";
-import { PencilIcon, PlusIcon, Trash2Icon, TriangleAlertIcon } from "lucide-react";
+import { ExternalLinkIcon, PencilIcon, PlusIcon, SwordIcon, Trash2Icon, TriangleAlertIcon } from "lucide-react";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import {
   AlertDialog,
@@ -14,13 +15,17 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { Toggle } from "@/components/ui/toggle";
 import { Textarea } from "@/components/ui/textarea";
-import { SLOTS } from "@/models/domain/enums";
+import { DISPLAY_SLOTS } from "@/models/domain/enums";
+import type { Agent } from "@/models/domain/types";
 import type { MetaScopeViewModel } from "@/viewmodels/admin/useMetaScopeViewModel";
 import { useMetaTeamEditorViewModel } from "@/viewmodels/admin/useMetaTeamEditorViewModel";
+import { useRotationsViewModel } from "@/viewmodels/useRotationsViewModel";
 import { MetaCycleBoard } from "./MetaCycleBoard";
 import { ReservesEditor } from "./ReservesEditor";
 import { TeamStrip } from "@/views/shared/TeamStrip";
@@ -31,11 +36,50 @@ import { QueryState } from "@/views/shared/QueryState";
 import { RestrictionBadges } from "@/views/shared/RestrictionBadges";
 import { UniformPicker } from "@/views/shared/UniformPicker";
 
+/** Ligado: o personagem é Causador de Dano nesta equipe e mostra quantas rotações ele já tem. */
+function DamageDealerToggle({
+  pressed,
+  onChange,
+  agent,
+  rotationCount,
+}: {
+  pressed: boolean;
+  onChange: (pressed: boolean) => void;
+  agent: Agent | null;
+  rotationCount: number;
+}) {
+  const { t } = useTranslation("admin");
+  return (
+    <div className="flex flex-col gap-1.5 sm:col-span-2">
+      <Toggle
+        variant="outline"
+        size="sm"
+        pressed={pressed}
+        onPressedChange={onChange}
+        className="self-start data-[state=on]:border-spark data-[state=on]:bg-spark/15 data-[state=on]:text-spark"
+      >
+        <SwordIcon />
+        {t("metas.damageDealer")}
+      </Toggle>
+      {pressed && agent && (
+        <p className="flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
+          {rotationCount ? t("metas.rotationsCount", { count: rotationCount, name: agent.name }) : t("metas.noRotations", { name: agent.name })}
+          <Link href={`/admin/rotacoes?personagem=${agent.slug}`} target="_blank" className="flex items-center gap-1 text-energy hover:underline">
+            {rotationCount ? t("metas.manageRotations") : t("metas.addRotations")}
+            <ExternalLinkIcon className="size-3" />
+          </Link>
+        </p>
+      )}
+    </div>
+  );
+}
+
 /** Equipes do escopo. Dias de BAX/BAL: quadro do ciclo inteiro; BAL livre e BAI: lista do escopo. */
 export function MetaTeamEditorView({ scopeVm }: { scopeVm: MetaScopeViewModel }) {
   const { t } = useTranslation(["admin", "common"]);
   const vm = useMetaTeamEditorViewModel(scopeVm, { saved: t("admin:common.saved"), deleted: t("admin:metas.deleted") });
   const { catalog } = scopeVm;
+  const rotations = useRotationsViewModel();
 
   return (
     <div className="flex flex-col gap-4">
@@ -132,10 +176,17 @@ export function MetaTeamEditorView({ scopeVm }: { scopeVm: MetaScopeViewModel })
                     <AlertTitle>{vm.error}</AlertTitle>
                   </Alert>
                 )}
-                {SLOTS.map((slot) => {
+                {DISPLAY_SLOTS.map((slot) => {
                   const member = vm.draft!.members[slot];
                   return (
-                    <div key={slot} className="grid gap-2 rounded-lg border border-energy/10 p-3 sm:grid-cols-[1fr_14rem]">
+                    <div
+                      key={slot}
+                      className={cn(
+                        "grid gap-2 rounded-lg border p-3 sm:grid-cols-[1fr_14rem]",
+                        slot === "SOLO" ? "energy-glow border-energy/40 bg-energy/5" : "border-energy/10",
+                        member.isDamageDealer && "border-spark/50",
+                      )}
+                    >
                       <Field>
                         <FieldLabel className="font-heading tracking-widest text-energy uppercase">
                           {t(`common:team.slots.${slot}`)}
@@ -162,6 +213,14 @@ export function MetaTeamEditorView({ scopeVm }: { scopeVm: MetaScopeViewModel })
                           targetName={member.uniformId ? catalog.uniformById(member.uniformId)?.agent.name : undefined}
                         />
                       </Field>
+                      <DamageDealerToggle
+                        pressed={member.isDamageDealer}
+                        onChange={(isDamageDealer) => vm.setMember(slot, { isDamageDealer })}
+                        agent={member.uniformId ? (catalog.uniformById(member.uniformId)?.agent ?? null) : null}
+                        rotationCount={
+                          member.uniformId ? rotations.rotationsOf(catalog.uniformById(member.uniformId)?.agent.id ?? "").length : 0
+                        }
+                      />
                     </div>
                   );
                 })}

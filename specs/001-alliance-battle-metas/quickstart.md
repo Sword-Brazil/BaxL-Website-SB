@@ -1,73 +1,71 @@
 # Quickstart & Validation: Plataforma de Metas da BA
 
-**Feature**: `001-alliance-battle-metas` | **Date**: 2026-10-17
+**Feature**: `001-alliance-battle-metas` | **Date**: 2026-10-17 | **Atualizado**: 2026-10-21
 
 Guia para rodar localmente e validar a feature de ponta a ponta. Contratos em
-[contracts/api.md](./contracts/api.md) e entidades em [data-model.md](./data-model.md).
+[contracts/api.md](./contracts/api.md) e entidades em [data-model.md](./data-model.md). O passo a
+passo para publicar na Vercel está no [README](../../README.md#deploy-vercel--supabase).
 
 ## Pré-requisitos
 
-- Node.js 20 LTS ou superior e npm.
-- Nenhum serviço externo: o banco é SQLite (`prisma/dev.db`).
+- Node.js 22 LTS e npm do Linux (no WSL, não use o npm do Windows).
+- Projeto no Supabase (Postgres + Storage). Para desenvolver sem ele, qualquer Postgres serve.
 
 ## Setup
 
 ```bash
-npm install
-cp .env.example .env.local
-```
-
-Variáveis de `.env.local`:
-
-| Variável | Uso |
-|----------|-----|
-| `DATABASE_URL` | `"file:./dev.db"` |
-| `SESSION_SECRET` | ≥ 32 caracteres aleatórios |
-| `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD` | sua conta ADMIN |
-| `SEED_USER_EMAIL`, `SEED_USER_PASSWORD` | sua conta USER comum |
-
-```bash
-npx prisma migrate dev     # cria o banco
-npx prisma db seed         # 18 CTPs, 48 BattleDays (BAX/BAL), Settings, contas ADMIN e USER
-npm run assets:import      # opcional: baixa imagens do manifesto para public/assets
+npm install                # também gera o Prisma Client
+cp .env.example .env.local # preencha conforme a tabela abaixo
+npm run db:deploy          # cria as tabelas (prisma migrate deploy com o .env.local)
+npm run db:seed            # 18 CTPs, 48 dias de BAX/BAL, Settings e o Administrador padrão
 npm run dev                # http://localhost:3000
 ```
 
+| Variável | Uso |
+|----------|-----|
+| `SUPABASE_DB_PASSWORD` | Senha do banco (só letras e números; entra nas URLs abaixo via `${...}`) |
+| `DATABASE_URL` | *Transaction pooler* (6543) com `?pgbouncer=true&connection_limit=5&pool_timeout=20` |
+| `DIRECT_URL` | *Session pooler* (5432), usado pelas migrações |
+| `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_STORAGE_BUCKET` | Storage das imagens enviadas (chave secreta, só no servidor) |
+| `SESSION_SECRET` | ≥ 32 caracteres aleatórios |
+| `SEED_ADMIN_USERNAME`, `SEED_ADMIN_PASSWORD` | Administrador padrão (ex.: `Sword Menezes`) |
+
+Migrar de um `prisma/dev.db` (SQLite) antigo: `npm run db:deploy` → `npm run db:migrate-data` →
+`npm run db:seed`, nessa ordem (o seed por último).
+
 ## Testes automatizados
 
-> Vitest (autorizado em 2026-10-17).
-
 ```bash
-npm test
+npm test          # Vitest; os services rodam num Postgres em memória (PGlite)
+npm run lint
+npm run check:locales
+npm run build
 ```
 
-Devem passar:
-- `getBattleClock`: viradas às 11:59/12:00 BRT, dia de reset antes e depois das 22:00, dias de
-  BAI 3/10/17/24, usuário em outro fuso (ex.: `TZ=Asia/Tokyo`).
-- `matchesRestriction`: critério único, combinação "E" e sem restrição.
-- `compareWithMeta` e `suggestTeam`, incluindo um elenco sem agentes válidos (retorna `null`).
-- Schemas Zod: login, cadastro, `CreateStaffSchema`, `MetaTeamSchema` (3 slots, sem repetição),
-  `UserSelectionsSchema`.
+Cobrem, entre outros: calendário (viradas às 12:00 e 22:00 BRT, fusos), restrições, comparação e
+sugestão, schemas Zod (login, `CreateUserSchema`, senha forte, nome de usuário), login (bloqueios
+por conta+IP e por conta), contas, sincronização (409 entre aparelhos), avisos de segurança,
+CSRF/origem, destino seguro depois do login, classificação de erros e detecção de banco fora do ar.
 
 ## Cenários de validação manual
 
 | # | Passos | Esperado | Ref. |
 |---|--------|----------|------|
-| 1 | Abrir `/` no celular (DevTools 390px) sem login | Dia atual de BAX e BAL (ou destaque da BAI) com restrição, equipe Meta, uniformes e CTPs em ≤ 5 s | US1, SC-001 |
-| 2 | Em `/`, tocar em BAL e depois no Dia 18 | Detalhe do Dia 18 em 2 interações | FR-004 |
-| 3 | Abrir `/bax` | Os dias 3, 10, 17 e 24 não aparecem | FR-003 |
-| 4 | Alterar o relógio do sistema para 11:59 e 12:00 BRT, e 21:59 e 22:00 do dia de reset | O número do dia muda só às 12:00. Às 22:00 do dia de reset aparece o aviso de nova semana com o mesmo número de dia. Tudo atualiza sem recarregar | FR-001/002 |
-| 5 | Trocar o idioma para EN e ES | Textos traduzidos; BAX/BAL/BAI/CTP e nomes de agentes mantidos | FR-028 |
-| 6 | Alternar o tema claro/escuro e recarregar | Tema preservado | FR-028 |
-| 7 | Em `/meu-elenco`, marcar agentes; em `/bax/4` (restrição "Vilão") montar a equipe | Só aparecem vilões possuídos; comparação com a Meta sinalizada | US2 |
-| 8 | Arrastar "Fúria Brilhante" para o Solador; repetir por toque (tocar no CTP e depois no agente) e por teclado | CTP aplicado; outro CTP substitui; "remover CTP" funciona | US3 |
-| 9 | Exportar o backup, limpar os dados do site e importar | Seleções restauradas | FR-017 |
-| 10 | Entrar com a conta USER do seed em dois navegadores | Mesmas seleções; um conflito pede escolha | FR-018 |
-| 11 | Entrar com a conta USER e abrir `/admin` | Acesso negado | US5 |
-| 12 | Entrar com a conta ADMIN: editar a restrição do BAX Dia 6 para "Feminino + Mutante" e publicar uma Meta com um agente masculino | Bloqueio 422 com o motivo | FR-026 |
-| 13 | ADMIN cria um novo ADMIN com e-mail inválido e depois válido | Erro de validação Zod no formulário; depois, sucesso | FR-024 |
-| 14 | ADMIN tenta rebaixar a si mesmo sendo o único ADMIN | 409 "último administrador" | FR-024 |
-| 15 | Errar a senha 5 vezes | 6ª tentativa bloqueada temporariamente (429) | FR-019 |
-| 16 | "Esqueci minha senha" no modo local | Link de redefinição exibido no console do servidor | research R6 |
-| 17 | Exportar a imagem da equipe do dia | PNG baixado com a equipe | FR-022 |
-| 18 | Rodapé de qualquer página | Aviso de projeto de fã, não oficial e sem fins comerciais | FR-029 |
+| 1 | Aba anônima: abrir `/`, `/meu-elenco`, `/admin`, `/en` | Todas levam a "Entrar", sem menu | FR-018 |
+| 2 | Entrar como `Sword Menezes` (testar também `sword  MENEZES`) | Entra; volta para a página que tentou abrir | FR-019 |
+| 3 | Senha errada; depois 5 vezes seguidas | Mensagem genérica no formulário; 6ª tentativa bloqueada (429) | FR-019 |
+| 4 | Entrar **sem** "Manter logado", fechar o navegador e abrir de novo | Pede login | FR-018 |
+| 5 | Entrar **com** "Manter logado", fechar e abrir | Entra direto | FR-018 |
+| 6 | Admin → Usuários → Nova conta (Jogador) com senha fraca e depois forte | Medidor de força; senha fraca recusada; conta criada | FR-019 |
+| 7 | Redefinir a senha do jogador | A senha antiga para de funcionar; aviso de segurança para ele | FR-019 |
+| 8 | Como jogador: marcar elenco, equipar CTPs, montar equipe; entrar em outro navegador | Mesmos dados; ao sair, o aparelho fica vazio | FR-017 |
+| 9 | Como jogador, abrir `/admin` | Acesso negado | US5 |
+| 10 | Em `/`, ver o dia atual e chegar a qualquer dia | Restrição, Meta, uniformes e CTPs; qualquer dia em ≤ 2 interações | US1 |
+| 11 | Arrastar um CTP para um agente; repetir por toque | CTP aplicado; outro substitui; remover funciona | US3 |
+| 12 | Curador publica Meta que viola a restrição do dia | Bloqueio 422 com o motivo | FR-026 |
+| 13 | Admin → Catálogo/CTPs: enviar uma foto | Aparece; o endereço é do `supabase.co/storage` | research R11 |
+| 14 | Rotações: abrir um vídeo | Capa em largura total; toca na própria página | — |
+| 15 | Trocar idioma (EN/ES), tema e tamanho de fonte (AA) | Textos traduzidos; preferências mantidas | FR-028 |
+| 16 | Celular (390px), tablet (768px) e notebook (1366px) | Sem rolagem horizontal; menu ☰ abaixo de 1280px | FR-028 |
+| 17 | Com o servidor sem acesso ao banco (ou sem internet) | Alerta fixo "Sem conexão…" com "Tentar novamente" | FE-001 |
+| 18 | Rodapé | Aviso de projeto de fã, não oficial e sem fins comerciais | FR-029 |

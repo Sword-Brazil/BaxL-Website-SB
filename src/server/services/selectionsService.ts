@@ -1,3 +1,4 @@
+// Elenco, equipes, CTPs e nome no jogo do jogador logado, iguais em todos os aparelhos.
 import { Prisma } from "@prisma/client";
 import { UserSelectionsSchema, type UserSelections } from "@/models/schemas/selections";
 import { prisma } from "@/server/db";
@@ -28,7 +29,7 @@ async function createDoc(userId: string, json: string, updatedAt: Date) {
  * Caso contrário outro aparelho salvou antes: 409 (o cliente pergunta qual versão manter).
  */
 export async function putSelections(userId: string, doc: UserSelections, baseUpdatedAt?: string | null): Promise<UserSelections> {
-  const json = JSON.stringify({ version: doc.version, roster: doc.roster, teams: doc.teams, equipment: doc.equipment });
+  const json = JSON.stringify({ version: doc.version, nickname: doc.nickname, roster: doc.roster, teams: doc.teams, equipment: doc.equipment });
   const base = baseUpdatedAt ? new Date(baseUpdatedAt) : null;
   if (base && Number.isNaN(base.getTime())) throw conflict();
 

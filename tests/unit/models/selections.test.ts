@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { emptySelections, mergeDecision } from "@/models/rules/selectionsSync";
+import { emptySelections } from "@/models/rules/selections";
+import { mergeDecision } from "@/models/rules/selectionsSync";
 import { UserSelectionsSchema, type UserSelections } from "@/models/schemas/selections";
 
 const doc = (patch: Partial<UserSelections> = {}): UserSelections => ({
@@ -49,7 +50,8 @@ describe("mergeDecision", () => {
     expect(mergeDecision(emptySelections(), null)).toBe("IN_SYNC");
   });
 
-  it("conteúdos diferentes nos dois lados: ASK_USER", () => {
+  it("conteúdos diferentes nos dois lados (inclusive só o nome no jogo): ASK_USER", () => {
     expect(mergeDecision(filled, doc({ roster: { ownedUniformIds: ["u2"] } }))).toBe("ASK_USER");
+    expect(mergeDecision(filled, { ...filled, nickname: "Outro" })).toBe("ASK_USER");
   });
 });

@@ -1,44 +1,42 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getIronSession, type SessionOptions } from "iron-session";
+import { getIronSession } from "iron-session";
 import type { Role } from "@/models/domain/enums";
 import type { SessionUser } from "@/models/domain/types";
 import { prisma } from "@/server/db";
 import { HttpError } from "@/server/http";
+import { isSessionActive, sessionOptions, shortSessionOptions } from "@/server/sessionOptions";
 
 export interface SessionData {
   userId?: string;
+  /** Identifica esta sessão (avisos de "novo login" não aparecem na sessão que entrou). */
+  sid?: string;
+  /** Início da sessão (ISO): avisos de "novo login" anteriores a ele não aparecem. */
+  loginAt?: string;
+  /** "Manter logado" desmarcado: false (cookie de sessão + prazo curto em expiresAt). */
+  remember?: boolean;
+  /** Fim da sessão curta (ms desde 1970). */
+  expiresAt?: number;
 }
 
-function sessionOptions(): SessionOptions {
-  const password = process.env.SESSION_SECRET;
-  if (!password || password.length < 32) {
-    throw new Error("SESSION_SECRET ausente ou com menos de 32 caracteres. Configure em .env.local.");
-  }
-  return {
-    password,
-    cookieName: "mff_session",
-    ttl: 60 * 60 * 24 * 30, // 30 dias
-    cookieOptions: {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-    },
-  };
+export async function getSession(req: NextApiRequest, res: NextApiResponse) {
+  const session = await getIronSession<SessionData>(req, res, sessionOptions());
+  // Quem não marcou "manter logado" continua com cookie de sessão sempre que ela for regravada.
+  if (session.remember === false) session.updateConfig(shortSessionOptions());
+  return session;
 }
 
-export function getSession(req: NextApiRequest, res: NextApiResponse) {
-  return getIronSession<SessionData>(req, res, sessionOptions());
-}
-
-export function toSessionUser(u: { id: string; email: string; nickname: string | null; role: string }): SessionUser {
-  return { id: u.id, email: u.email, nickname: u.nickname, role: u.role as Role };
+export function toSessionUser(u: { id: string; username: string; nickname: string | null; role: string }): SessionUser {
+  return { id: u.id, username: u.username, nickname: u.nickname, role: u.role as Role };
 }
 
 /** Usuário da sessão, lido do banco a cada requisição (mudança de papel vale na hora). */
 export async function getSessionUser(req: NextApiRequest, res: NextApiResponse): Promise<SessionUser | null> {
   const session = await getSession(req, res);
   if (!session.userId) return null;
+  if (!isSessionActive(session)) {
+    session.destroy();
+    return null;
+  }
   const user = await prisma.user.findUnique({ where: { id: session.userId } });
   if (!user) {
     session.destroy();

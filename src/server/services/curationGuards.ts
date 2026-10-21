@@ -1,6 +1,6 @@
 import { isBaiDay, type DayMode } from "@/models/domain/enums";
-import type { Criterion, RestrictableAttributes, UniformOverrides } from "@/models/domain/types";
-import { matchesRestriction, resolveAttributes } from "@/models/rules/restriction";
+import type { Criterion, RestrictableAttributes } from "@/models/domain/types";
+import { matchesRestriction } from "@/models/rules/restriction";
 import { prisma } from "@/server/db";
 import { HttpError } from "@/server/http";
 import { toCriteria } from "./mappers";
@@ -35,17 +35,14 @@ export async function assertCtpsExist(ctpIds: string[]) {
   if (count !== unique.length) throw new HttpError(400, "VALIDATION_ERROR", "CTP não encontrado ou desativado");
 }
 
-/** 422 se algum traje (com seus atributos próprios ou herdados) não atender à restrição do dia. */
+/** 422 se algum traje (pelos atributos dele) não atender à restrição do dia. */
 export function assertRestriction(
   uniforms: Awaited<ReturnType<typeof loadActiveUniforms>>,
   criteria: Criterion[],
 ) {
   const offenders = uniforms.filter(
     (u) =>
-      !matchesRestriction(
-        resolveAttributes(u.agent as RestrictableAttributes, u as Partial<UniformOverrides>),
-        criteria,
-      ),
+      !matchesRestriction(u as RestrictableAttributes, criteria),
   );
   if (offenders.length > 0) {
     throw new HttpError(

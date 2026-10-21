@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/server/db";
 
 export const userRepository = {
-  findByEmail: (email: string) => prisma.user.findUnique({ where: { email } }),
+  findByUsername: (username: string) => prisma.user.findUnique({ where: { username } }),
   findById: (id: string) => prisma.user.findUnique({ where: { id } }),
 
   getAttempt: (key: string) => prisma.loginAttempt.findUnique({ where: { key } }),

@@ -2,12 +2,15 @@ import "@/styles/globals.css";
 import { useEffect, useMemo, useState } from "react";
 import type { AppProps } from "next/app";
 import { useRouter } from "next/router";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { appWithTranslation, useTranslation } from "next-i18next/pages";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ApiError } from "@/models/api/client";
+import { APP_ERRORS, classifyError } from "@/models/domain/appErrors";
 import { useSelectionsStore } from "@/viewmodels/stores/selectionsStore";
+import { notifyErrorClient } from "@/viewmodels/useNotify";
 import { bodyFont, displayFont } from "@/styles/fonts";
 import { setZodLocale } from "@/lib/zodLocale";
 
@@ -33,9 +36,31 @@ function App({ Component, pageProps }: AppProps) {
   const { locale } = useRouter();
   // Antes de renderizar a página: as validações dos formulários usam o idioma escolhido.
   useMemo(() => setZodLocale(locale), [locale]);
-  const [queryClient] = useState(
-    () => new QueryClient({ defaultOptions: { queries: { staleTime: 60_000, refetchOnWindowFocus: false } } }),
-  );
+  const { i18n } = useTranslation();
+  const [queryClient] = useState(() => {
+    // Erros graves (rede, banco, servidor, acesso negado, sessão) viram o alerta fixo na tela, de
+    // qualquer consulta ou ação; os leves ficam com cada tela (notificação ou o aviso da própria tela).
+    const onError = (e: Error) => {
+      // Senha errada (401) e bloqueio (429) no login aparecem no próprio formulário.
+      if (e instanceof ApiError && e.url?.startsWith("/api/auth/")) return;
+      if (e instanceof ApiError && e.status === 401) client.setQueryData(["me"], null);
+      if (APP_ERRORS[classifyError(e)] !== "INFO") notifyErrorClient(i18n.t.bind(i18n), e);
+    };
+    const client = new QueryClient({
+      queryCache: new QueryCache({ onError }),
+      mutationCache: new MutationCache({ onError }),
+      defaultOptions: {
+        queries: {
+          staleTime: 60_000,
+          refetchOnWindowFocus: false,
+          // Só repete falhas passageiras (rede, banco, servidor); acesso negado, sessão encerrada e
+          // dados inválidos não mudam com nova tentativa e aparecem na hora.
+          retry: (count, e) => count < 2 && ["NETWORK", "DATABASE", "SERVER"].includes(classifyError(e)),
+        },
+      },
+    });
+    return client;
+  });
 
   useEffect(() => {
     // Seleções do usuário salvas no aparelho (localStorage).

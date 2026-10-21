@@ -43,14 +43,23 @@ export const dayNumberSchema = z
 /** Mesmo que dayNumberSchema, mas aceitando string (parâmetros de rota). */
 export const dayNumberParamSchema = z.coerce.number().pipe(dayNumberSchema);
 
-export const emailSchema = z.string().trim().toLowerCase().pipe(z.email({ message: VALIDATION.emailInvalid }));
+/** Nome de usuário (login): guardado em minúsculas, com espaços simples (ex.: "sword menezes"). */
+export const usernameSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .transform((s) => s.replace(/\s+/g, " "))
+  .pipe(z.string().regex(/^[a-z0-9][a-z0-9 ._-]{1,28}[a-z0-9]$/, { message: VALIDATION.usernameFormat }));
 
+/** Senha nova (criada ou trocada por um administrador): forte. O login aceita qualquer senha já salva. */
 export const passwordSchema = z
   .string()
   .min(8, { message: VALIDATION.passwordMin })
   .max(128)
-  .regex(/[A-Za-z]/, { message: VALIDATION.passwordLetter })
-  .regex(/\d/, { message: VALIDATION.passwordDigit });
+  .regex(/[a-z]/, { message: VALIDATION.passwordLower })
+  .regex(/[A-Z]/, { message: VALIDATION.passwordUpper })
+  .regex(/\d/, { message: VALIDATION.passwordDigit })
+  .regex(/[^A-Za-z0-9]/, { message: VALIDATION.passwordSymbol });
 
 export const idSchema = z.string().min(1).max(64);
 

@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-17
 
-**Status**: Draft
+**Status**: Implementada (atualizada em 2026-10-21 com o estado atual do sistema)
 
 **Input**: User description: "Construa uma plataforma onde o usuário possa escolher os personagens e
 uniformes que ele tem para cada dia de BAX e BAL, podendo selecionar os CTPs por meio de Drag and
@@ -102,6 +102,34 @@ definir tecnologia."
   indicados ao usuário por **toast**; áreas inexistentes ou ainda não liberadas usam a **tela de
   404 / em desenvolvimento**.
 
+### Session 2026-10-21 (site privado, contas, Supabase e Vercel)
+
+Decisões que substituem as anteriores onde houver conflito (FR-017 a FR-019 e o padrão de
+notificações foram revisados de acordo):
+
+- Q: Quem pode ver o site? → A: **Só membros logados.** O site é privado da aliança: sem login,
+  nada além da tela de entrar é exibido (páginas e dados).
+- Q: Como o membro entra? → A: **Nome de usuário + senha**, sem e-mail. O nome de usuário não
+  diferencia maiúsculas e aceita espaços (ex.: "Sword Menezes").
+- Q: Quem cria contas e troca senhas? → A: **Só Administradores** (contas de Jogador, Curador ou
+  Administrador). Não há cadastro aberto nem "esqueci a senha": quem esquece pede a um
+  Administrador. O Administrador padrão vem do seed (`SEED_ADMIN_USERNAME`).
+- Q: Senha forte? → A: Sim, para toda senha nova: 8+ caracteres, com minúscula, MAIÚSCULA,
+  número e símbolo, com medidor de força animado e botão de mostrar/ocultar.
+- Q: "Manter logado"? → A: Opcional no login. Desmarcado (padrão), a sessão termina ao fechar o
+  navegador (e em no máximo 12 h); marcado, dura 30 dias.
+- Q: Onde ficam os dados do jogador? → A: Na conta (sincronizados entre aparelhos) e no
+  aparelho; ao sair, o aparelho é limpo. Se aparelho e conta divergirem, o jogador escolhe qual
+  versão manter.
+- Q: Banco e hospedagem? → A: **Postgres no Supabase** (com RLS ligado e nenhuma policy: só o app
+  acessa), imagens enviadas no **Supabase Storage** e o site na **Vercel**.
+- Q: Como os erros aparecem? → A: Pelo mesmo padrão de gravidade das notificações: erros graves
+  (sem conexão, banco fora do ar, erro no servidor, acesso indevido, sessão encerrada) num alerta
+  fixo; os leves em notificação (toast). Ver "Padrão de erros" no fim do documento.
+- Visual: CTPs Poderoso e Brilhante animados (estrelas; Brilhante com galáxia roxa), ícone de CTP
+  maior nas equipes, vídeo das rotações em largura total, fonte ajustável (Pequena, Média,
+  Grande) e dicas com o Tooltip do design system.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Consultar a equipe Meta do dia (Priority: P1)
@@ -114,7 +142,7 @@ pode navegar para qualquer outro dia de BAX/BAL do ciclo (1 a 28, exceto os dias
 **Why this priority**: é o propósito central da plataforma (Constituição, princípios II e V) e
 já entrega valor sem nenhum recurso de personalização.
 
-**Independent Test**: com as metas cadastradas, abrir a plataforma sem login e verificar que o
+**Independent Test**: com as metas cadastradas, entrar com uma conta de membro e verificar que o
 dia atual de BAX e BAL aparece com restrição, agentes, uniformes e CTPs, e que qualquer dia é
 alcançável em no máximo 2 interações.
 
@@ -158,7 +186,7 @@ agentes permitidos pela restrição e que a comparação com a Meta está corret
 3. **Given** a equipe Meta do dia exige um uniforme que o usuário não marcou, **When** ele vê a
    comparação, **Then** o agente aparece sinalizado como "uniforme Meta não possuído".
 4. **Given** o usuário montou equipes para vários dias, **When** sai e volta à plataforma,
-   **Then** suas seleções continuam salvas no dispositivo, mesmo sem login.
+   **Then** suas seleções continuam salvas na conta.
 5. **Given** o usuário entrou com sua conta no celular e montou equipes, **When** entra com a
    mesma conta no computador, **Then** vê as mesmas seleções.
 6. **Given** o Dia 5 da BAX tem uma Meta cujo Solador o usuário não possui, **When** ele abre o
@@ -256,8 +284,10 @@ com a nova data de atualização, sem alteração de código.
   "Dia atual" deve se atualizar sem que o usuário precise recarregar manualmente.
 - Conflito entre as seleções locais e as da conta ao entrar: o usuário escolhe quais manter, e
   nada é descartado sem confirmação.
-- E-mail já cadastrado no cadastro, senha incorreta ou link de recuperação expirado: mostrar
-  mensagens claras, sem revelar se um e-mail existe na plataforma.
+- Usuário inexistente ou senha incorreta: a mesma mensagem genérica, sem revelar quais contas
+  existem. Quem esqueceu a senha pede a um Administrador.
+- Visitante sem login: qualquer página leva à tela de entrar (voltando depois para onde ia) e
+  qualquer dado responde 401.
 - Muitas tentativas de login falhas seguidas: a plataforma limita novas tentativas
   temporariamente.
 - Elenco do usuário sem nenhum agente das listas de prioridade do dia: a sugestão informa que
@@ -294,7 +324,7 @@ com a nova data de atualização, sem alteração de código.
   BRT) e, nos demais dias, mostrar data e hora de início da próxima BAI. O conteúdo da BAI fica
   consultável a qualquer momento.
 
-**Exibição das Metas (público, sem login)**
+**Exibição das Metas (só para membros logados)**
 
 - **FR-006**: Para cada dia de BAX e BAL, a plataforma MUST exibir a restrição, a(s) equipe(s)
   Meta (Solador + 2 Suportes), o uniforme Meta e o CTP Meta (tipo e qualidade) de cada agente.
@@ -318,17 +348,20 @@ com a nova data de atualização, sem alteração de código.
   partir de uma paleta com os 6 tipos de CTP PVE em 3 qualidades, com alternativa por toque.
 - **FR-016**: Cada agente de uma equipe MUST ter no máximo um CTP. Soltar outro CTP substitui o
   anterior, e deve existir uma ação para remover o CTP.
-- **FR-017**: As seleções do usuário (elenco, equipes, CTPs) MUST persistir no dispositivo sem
-  exigir login, e o usuário MUST poder exportar e importar um backup delas.
-- **FR-018**: Usuários MUST poder, opcionalmente, entrar com uma conta para sincronizar as
-  seleções entre dispositivos. Ao entrar pela primeira vez, as seleções locais são levadas para a
-  conta. Se já houver dados na conta, o usuário escolhe quais manter.
-- **FR-019**: Contas MUST ser criadas com e-mail e senha, com confirmação do e-mail e
-  recuperação de senha. Enquanto a plataforma roda só localmente, os links de confirmação e
-  recuperação são exibidos no log do servidor, e Administradores podem redefinir senhas
-  manualmente. Contas ainda não confirmadas podem entrar e sincronizar. Exigir a confirmação
-  passará a valer quando houver envio real de e-mail. Senhas MUST NOT ser armazenadas em texto
-  puro, e tentativas de login falhas repetidas MUST ser limitadas temporariamente.
+- **FR-017**: (Revisado em 2026-10-21) As seleções do jogador (elenco, equipes, CTPs equipados e
+  o **nome no jogo**) MUST ficar salvas na **conta** e iguais em todos os aparelhos, com cópia no
+  aparelho (localStorage). Ao sair da conta, o que estiver pendente é enviado e o aparelho é
+  limpo. O jogador MUST poder exportar e importar um backup e apagar as equipes montadas (todas
+  ou de um modo).
+- **FR-018**: (Revisado em 2026-10-21) O site é **privado da aliança**: toda página e todo dado
+  MUST exigir login; sem sessão, só a tela de entrar é exibida. Não há cadastro aberto nem
+  recuperação de senha por e-mail. O login tem a opção "Manter logado" (30 dias); sem ela, a
+  sessão termina ao fechar o navegador (e em no máximo 12 h).
+- **FR-019**: (Revisado em 2026-10-21) Todos entram com **nome de usuário e senha** (sem e-mail).
+  Só Administradores criam contas (Jogador, Curador ou Administrador) e redefinem senhas. Senhas
+  novas MUST ser fortes (8+ caracteres, minúscula, MAIÚSCULA, número e símbolo) e MUST NOT ser
+  armazenadas em texto puro. Tentativas de login falhas MUST ser limitadas por conta+IP e por
+  conta (qualquer IP).
 - **FR-020**: Quando o usuário não possuir agentes ou uniformes da Meta, a plataforma MUST
   sugerir a melhor equipe possível com o elenco dele para aquele dia (e para a BAI). A sugestão
   segue listas de prioridade de Soladores e Suportes cadastradas pelos curadores e respeita a
@@ -382,6 +415,18 @@ com a nova data de atualização, sem alteração de código.
 - **FR-034**: Endereços inexistentes MUST abrir a tela de **404** da Sword Brazil (no tema e no
   idioma da plataforma), com opções de voltar e de ir para a Batalha de Aliança, e com o aviso
   de que a área pode estar em desenvolvimento.
+- **FR-035**: Curadores MUST poder marcar, em cada equipe Meta/Alternativa, quais membros são
+  **Causadores de Dano** (qualquer posição: Esquerda, Líder ou Direita; um ou mais). As
+  **rotações ficam no personagem**, numa aba própria do admin ("Rotações"): cada rotação vale
+  para um traje ou para todos, tem título opcional, sequência em **texto livre** (sem formato
+  obrigatório; a notação da comunidade 1–6 / `c` / `dc` / `qc` / `( )` vira blocos quando
+  usada), descrição (delays, quando usar, o que observar) e **vídeo de referência** opcional
+  (YouTube ou .mp4/.webm hospedado fora, mudo e em loop; o sistema não armazena vídeo). Na
+  visão pública, tocar na foto do Causador de Dano leva à tela de rotações do personagem,
+  separada por traje com a prévia de cada traje, já no traje usado na equipe; `/rotacoes`
+  lista todos os personagens com rotação.
+- **FR-036**: As equipes MUST aparecer na ordem **Esquerda · Líder · Direita**, com o Líder no meio
+  e em destaque (um pouco maior, com brilho), em todas as telas.
 
 ### Key Entities
 
@@ -407,9 +452,9 @@ com a nova data de atualização, sem alteração de código.
   com Uniforme e CTP de cada agente.
 - **Lista de Prioridade**: para um Dia de Batalha (ou para a BAI), a ordem de preferência de
   Soladores e de Suportes (com uniforme e CTP recomendados), usada para gerar sugestões.
-- **Conta do Usuário** (opcional): identifica o usuário para sincronizar seu Elenco e suas
-  Equipes entre dispositivos. Atributos: e-mail (único), senha (nunca armazenada em texto puro),
-  apelido no jogo (opcional) e papel (usuário, Curador ou Administrador).
+- **Conta**: criada por um Administrador para cada membro. Atributos: nome de usuário (único,
+  sem diferenciar maiúsculas), senha (nunca armazenada em texto puro), apelido (opcional) e papel
+  (Jogador, Curador ou Administrador). Guarda também as seleções do jogador.
 - **Curador**: Conta do Usuário com permissão de criar, editar e publicar conteúdo.
 - **Administrador**: Curador que também pode promover e remover Curadores e Administradores. Deve
   existir sempre pelo menos um Administrador.
@@ -428,7 +473,7 @@ com a nova data de atualização, sem alteração de código.
   em torno das 12h (virada de dia) e das 22h (reset semanal), no horário de Brasília, inclusive
   para usuários em outros fusos.
 - **SC-005**: Um curador atualiza a equipe Meta de um dia em menos de 2 minutos, e a mudança
-  fica visível ao público imediatamente após a publicação.
+  fica visível para todos os membros imediatamente após a publicação.
 - **SC-006**: Pelo menos 80% dos membros consultados avaliam a plataforma como "mais fácil de
   entender" que as referências (guiabaxbal e thanosvibs).
 - **SC-007**: Nenhuma equipe publicada viola a restrição do seu dia (0 ocorrências).
@@ -447,34 +492,68 @@ com a nova data de atualização, sem alteração de código.
 - Os "principais CTPs para PVE" são os 6 listados, cada um com 3 qualidades.
 - O catálogo de agentes, uniformes e CTPs é mantido manualmente pelos curadores. Não há integração
   com o jogo nem com as contas dos jogadores (Constituição, Restrições de Domínio).
-- A visão pública das metas e a personalização local não exigem login. A conta (e-mail e senha)
-  é opcional, só para sincronizar, e a curadoria exige login com papel de Curador.
+- (Revisado em 2026-10-21) Todo o site exige login; cada membro tem conta criada por um
+  Administrador. Banco Postgres no Supabase, imagens no Supabase Storage e site na Vercel.
 - O conteúdo da BAI é único e vale para todas as semanas. Não há histórico por semana.
 - As sugestões seguem a Meta, as Alternativas e as reservas cadastradas pelos curadores, nessa
   ordem. Não há cálculo de dano nem simulação de batalha.
 - Fora de escopo nesta feature: rankings, chat, calculadora de dano e outros modos de jogo além
   da Batalha de Aliança.
 
-## Futuro (fora do escopo atual)
+## Padrão de notificações de segurança (Notification pattern)
 
-### Padrão de notificações de segurança (Notification pattern)
-
-Registrado em 2026-10-18 para implementação futura; **não implementar agora**. O sistema deve
-continuar simples: um único ponto de entrada (`notify(evento)`) decide o canal pela gravidade do
-evento, sem filas, serviços externos novos ou infraestrutura além do serviço de e-mail que já
-existe.
+Registrado em 2026-10-18, implementado em 2026-10-19 (Phase 13) e revisado em 2026-10-21: as
+contas não têm mais e-mail, então o canal "fora do app" saiu e os eventos críticos ficam no aviso
+persistente. Um único ponto de entrada (`notify(evento)`) decide o canal pela gravidade.
 
 - **FN-001**: As questões de segurança MUST ser notificadas por **3 canais**, conforme a gravidade:
   1. **Informativo → toast**: efêmero, na sessão atual (ex.: sessão expirada, dados sincronizados,
      senha alterada com sucesso nesta tela).
   2. **Atenção → aviso persistente na tela** (faixa/alerta que só some quando o usuário dispensa
-     ou resolve): ex. e-mail ainda não confirmado, papel da conta alterado, login em outro
-     aparelho, muitas tentativas de login falhas.
-  3. **Crítico → fora do app (e-mail) + aviso persistente**: ex. senha redefinida, conta promovida
-     ou rebaixada (Curador/Administrador), conta bloqueada temporariamente.
+     ou resolve): ex. login em outro aparelho, muitas tentativas de login falhas.
+  3. **Crítico → aviso persistente**: ex. senha redefinida, papel da conta alterado, conta
+     bloqueada temporariamente. (Até 2026-10-20 também ia por e-mail.)
 - **FN-002**: Cada evento de segurança MUST ter gravidade fixa num catálogo único (tipo do evento →
   canal), para que telas e serviços não escolham o canal por conta própria.
 - **FN-003**: Os avisos MUST seguir o idioma e o tema da plataforma e nunca expor dados sensíveis
-  (senha, token, e-mail completo de terceiros).
-- **FN-004**: A implementação MUST reaproveitar o toast atual (sonner), o padrão de avisos da
-  plataforma e o `MailService` existente.
+  (senha, token, dados de terceiros).
+- **FN-004**: A implementação MUST reaproveitar o toast atual (sonner) e o padrão de avisos da
+  plataforma.
+
+Decisões da implementação:
+
+- Catálogo em `src/models/domain/securityEvents.ts`; `notify` do servidor
+  (`notificationService`) grava o aviso; `useNotify` do cliente mostra o toast.
+- Avisos persistentes ficam na tabela `SecurityNotice`, um aberto por tipo e usuário (evento
+  repetido atualiza o mesmo aviso). Aparecem no topo de todas as telas para quem está logado.
+- "Login em outro aparelho" = login feito em outra sessão depois de esta começar (sem
+  identificação de aparelho). Tentativas falhas avisam a partir da 3ª seguida; a 5ª bloqueia.
+- Nas falhas de login o aviso é disparado sem esperar, para o tempo de resposta não revelar se a
+  conta existe.
+
+## Padrão de erros (2026-10-21)
+
+Mesmo padrão das notificações: cada erro tem um tipo com gravidade fixa e a gravidade decide o
+canal (`src/models/domain/appErrors.ts`, `notifyErrorClient` em `src/viewmodels/useNotify.ts`).
+
+- **FE-001**: Erros **graves** MUST aparecer num alerta fixo no topo da tela, que só sai quando o
+  usuário age (tentar de novo, entrar de novo, voltar ao início) ou fecha: sem conexão com o
+  servidor (rede), banco de dados fora do ar (503), erro no servidor (500), acesso indevido (403)
+  e sessão encerrada (401).
+- **FE-002**: **Atenção** (muitas tentativas, 429) MUST virar notificação de alerta; erros
+  **leves** (dados inválidos, conflito, item não encontrado) MUST virar notificação (toast).
+- **FE-003**: O mesmo erro MUST ser avisado uma única vez (handler global do React Query + telas).
+  Erros do login ficam só no formulário de login.
+- **FE-004**: A API MUST responder 503 `SERVICE_UNAVAILABLE` quando o banco estiver inacessível, e
+  as consultas só repetem automaticamente falhas passageiras (rede, banco, servidor).
+
+## Segurança (2026-10-21)
+
+- Site privado: `src/proxy.ts` exige sessão em toda página e API (exceto o login e arquivos
+  estáticos) e cada API de dados também confere o usuário no banco.
+- CSRF: requisições que alteram dados MUST vir do próprio site (Origin/Referer) e em JSON.
+- O destino depois do login (`?next=`) só aceita caminhos do próprio site.
+- Cabeçalhos: CSP, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy, COOP e HSTS.
+- Banco: só o Prisma (consultas parametrizadas, sem SQL manual); RLS ligado em todas as tabelas
+  do Supabase, sem policies.
+

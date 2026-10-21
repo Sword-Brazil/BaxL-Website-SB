@@ -8,7 +8,8 @@
     "ctps": "CTPs",
     "bai": "BAI",
     "users": "Usuários",
-    "settings": "Configurações"
+    "settings": "Configurações",
+    "rotations": "Rotações"
   },
   "guard": {
     "forbidden": "Acesso negado",
@@ -23,8 +24,9 @@
     "catalog": "Agentes, uniformes e imagens.",
     "ctps": "Tipos, fotos e disponibilidade dos CTPs.",
     "bai": "Sequência de chefes da BAI.",
-    "users": "Curadores e administradores.",
-    "settings": "Âncora do ciclo e horários de virada."
+    "users": "Jogadores, curadores e administradores: criar contas, papéis e senhas.",
+    "settings": "Âncora do ciclo e horários de virada.",
+    "rotations": "Rotações dos personagens (Causadores de Dano), por traje, com descrição e vídeo."
   },
   "common": {
     "saved": "Alterações salvas",
@@ -78,7 +80,13 @@
     "week": "Sem. {{n}}",
     "reserves": "Reservas",
     "reservesHint": "Personagens extras para a sugestão de quem não tem os da Meta e das Alternativas. Ordem usada: Meta → Alternativas → reservas.",
-    "addReserve": "+ Adicionar reserva"
+    "addReserve": "+ Adicionar reserva",
+    "damageDealer": "Causador de Dano",
+    "rotationsCount_one": "{{name}} tem {{count}} rotação cadastrada.",
+    "rotationsCount_other": "{{name}} tem {{count}} rotações cadastradas.",
+    "noRotations": "{{name}} ainda não tem rotação cadastrada.",
+    "manageRotations": "Gerenciar rotações",
+    "addRotations": "Cadastrar rotação"
   },
   "priority": {
     "solo": "Soladores",
@@ -113,21 +121,22 @@
     "slugAuto": "Gerado a partir do nome; edite só se precisar.",
     "photos": "{{n}}/{{total}} com foto",
     "quickUniform": "Traje",
-    "baseAttributes": "Atributos do personagem",
-    "baseAttributesHint": "Valem para todos os trajes, exceto os que tiverem atributos próprios.",
     "uniformAttributes": "Atributos deste traje",
-    "inheritedHint": "Tracejado = herdado do personagem. Toque em outro valor para personalizar só este traje.",
-    "customized": "Personalizado",
-    "resetAttributes": "Herdar tudo do personagem"
+    "uniformsHint": "Cada traje tem os próprios atributos (gênero, lado, espécie e ataque): as restrições dos dias são conferidas pelo traje usado. Um traje novo começa com os atributos do primeiro traje.",
+    "variedUniforms_one": "{{count}} traje com atributos diferentes",
+    "variedUniforms_other": "{{count}} trajes com atributos diferentes"
   },
   "ctps": {
     "title": "Catálogo de CTPs",
-    "help": "Adicione e atualize fotos dos CTPs. Excluir desativa o item para preservar equipes e seleções antigas.",
+    "help": "Adicione, edite e exclua CTPs. Desativar esconde o CTP das escolhas e mantém as equipes antigas; excluir apaga de vez.",
     "add": "Novo CTP",
     "edit": "Editar CTP",
     "quality": "Qualidade",
-    "remove": "Excluir",
-    "restore": "Reativar"
+    "restore": "Reativar",
+    "deactivate": "Desativar",
+    "delete": "Excluir CTP",
+    "deleteConfirm": "Excluir {{name}} de vez? As equipes Meta e reservas que o recomendam ficam sem CTP. Não dá para desfazer.",
+    "deleted": "CTP excluído"
   },
   "bai": {
     "title": "Chefes da BAI",
@@ -140,22 +149,23 @@
   },
   "users": {
     "title": "Usuários e papéis",
-    "search": "Buscar por e-mail ou apelido…",
-    "newStaff": "Novo administrador/curador",
+    "search": "Buscar por usuário ou apelido…",
     "role": "Papel",
     "roles": {
-      "USER": "Usuário",
+      "USER": "Jogador",
       "CURATOR": "Curador",
       "ADMIN": "Administrador"
     },
-    "changeRoleConfirm": "Alterar o papel de {{email}} para {{role}}?",
+    "changeRoleConfirm": "Alterar o papel de {{name}} para {{role}}?",
     "resetPassword": "Redefinir senha",
-    "verified": "Confirmado",
-    "unverified": "Não confirmado",
     "created": "Conta criada",
     "passwordReset": "Senha redefinida",
     "lastAdmin": "Não é possível rebaixar o último administrador.",
-    "help": "Administradores promovem e removem curadores. Sempre deve existir ao menos um administrador."
+    "help": "Só administradores criam contas e trocam senhas. Todos entram com nome de usuário e senha. Sempre deve existir ao menos um administrador.",
+    "newUser": "Nova conta",
+    "username": "Nome de usuário",
+    "usernameHint": "Usado para entrar. Ex.: o nick do jogo (3 a 30 letras, números, espaço, ponto, hífen ou sublinhado). Maiúsculas não importam.",
+    "resetHelp": "Defina uma senha nova e passe para a pessoa. A senha antiga deixa de funcionar na hora."
   },
   "settings": {
     "title": "Configurações do calendário",
@@ -164,5 +174,32 @@
     "turnover": "Virada do dia (hora, Brasília)",
     "reset": "Reset semanal (hora, Brasília)",
     "help": "Ajuste a âncora se o \"Dia atual\" estiver diferente do jogo."
+  },
+  "rotations": {
+    "subtitle": "Rotações de cada personagem: por traje ou para todos, em texto livre, com descrição e vídeo.",
+    "help": "Nas Metas, marque quem é o Causador de Dano da equipe; aqui ficam as rotações do personagem. O jogador toca na foto do Causador de Dano e vê estas rotações.",
+    "onlyWith": "Só com rotação",
+    "count_one": "{{count}} rotação",
+    "count_other": "{{count}} rotações",
+    "none": "Sem rotação",
+    "editTitle": "Rotações de {{name}}",
+    "editHelp": "Uma rotação por situação ou traje. A ordem aqui é a ordem na tela do jogador.",
+    "item": "Rotação {{n}}",
+    "moveUp": "Subir",
+    "moveDown": "Descer",
+    "uniform": "Traje",
+    "allUniforms": "Todos os trajes",
+    "titleLabel": "Título (opcional)",
+    "titlePlaceholder": "Ex.: Abertura, Fase 2, Contra chefes",
+    "sequence": "Rotação",
+    "sequencePlaceholder": "Ex.: 1 2c (3dc 4) 6 — ou escreva do seu jeito",
+    "sequenceHint": "Texto livre. Se usar a notação da comunidade (1–6, c, dc, qc, parênteses), aparece em blocos.",
+    "legendTitle": "Notação da comunidade",
+    "legendFree": "A notação é opcional: escreva do jeito que explicar melhor.",
+    "description": "Descrição",
+    "descriptionPlaceholder": "Quando usar, quanto esperar em cada delay, o que observar…",
+    "video": "Vídeo de referência (opcional)",
+    "videoHint": "Link do YouTube (vídeo ou Shorts; use ?t= para começar no trecho certo) ou de um arquivo .mp4/.webm. Toca mudo e em loop; o vídeo não é guardado no sistema.",
+    "add": "Adicionar rotação"
   }
 }

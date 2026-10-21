@@ -3,17 +3,7 @@ import { DndContext, KeyboardSensor, PointerSensor, TouchSensor, useDroppable, u
 import { useTranslation } from "next-i18next/pages";
 import { CheckIcon, DownloadIcon, SearchIcon, SlidersHorizontalIcon, UploadIcon, XIcon, ZapIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { AttributeLabel } from "@/views/shared/AttributeLabel";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -24,13 +14,15 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/in
 import { Skeleton } from "@/components/ui/skeleton";
 import { Toggle } from "@/components/ui/toggle";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { CRITERION_ATTRIBUTES, CRITERION_VALUES, MODES } from "@/models/domain/enums";
+import { CRITERION_ATTRIBUTES, CRITERION_VALUES } from "@/models/domain/enums";
 import { ctpColor } from "@/models/domain/ctpColors";
 import type { Agent } from "@/models/domain/types";
 import { useRosterViewModel } from "@/viewmodels/useRosterViewModel";
 import { CtpPalette } from "@/views/day/CtpPalette";
 import { CtpBadge } from "@/views/shared/CtpBadge";
+import { Hint } from "@/views/shared/Hint";
 import { CtpDragOverlay } from "@/views/shared/CtpDragOverlay";
+import { ResetTeamsOptions } from "@/views/shared/ResetTeamsOptions";
 import { CtpPicker } from "@/views/shared/CtpPicker";
 import { HelpHint } from "@/views/layout/HelpHint";
 import { QueryState } from "@/views/shared/QueryState";
@@ -44,6 +36,9 @@ function AgentRosterCard({ agent, vm, dragging }: { agent: Agent; vm: RosterVm; 
   const ownedCount = activeUniforms.filter((u) => vm.isOwned(u.id)).length;
   const isOwned = ownedCount > 0;
   const ctp = vm.equippedCtpOf(agent.id);
+  // Atributos são do traje: o cartão mostra os lados de todos os trajes e o resumo do principal.
+  const main = activeUniforms.find((u) => u.slug === "padrao") ?? activeUniforms[0] ?? agent.uniforms[0];
+  const sides = [...new Set(activeUniforms.map((u) => u.side))].filter((s) => s !== "UNKNOWN");
   const { setNodeRef, isOver } = useDroppable({ id: `agent:${agent.id}`, disabled: !isOwned });
   return (
     <li
@@ -67,13 +62,23 @@ function AgentRosterCard({ agent, vm, dragging }: { agent: Agent; vm: RosterVm; 
         <CardHeader>
           <CardTitle className="flex min-w-0 items-center justify-between gap-2">
             <span className="truncate font-heading">{agent.name}</span>
-            {agent.side !== "UNKNOWN" && (
-              <Badge variant={agent.side === "HERO" ? "hero" : "villain"}>{t(`common:values.${agent.side}`)}</Badge>
-            )}
+            <span className="flex shrink-0 gap-1">
+              {sides.map((side) => (
+                <Badge key={side} variant={side === "HERO" ? "hero" : "villain"}>
+                  <AttributeLabel value={side} />
+                </Badge>
+              ))}
+            </span>
           </CardTitle>
           <CardDescription className="flex min-w-0 flex-wrap items-center justify-between gap-1">
             <span className="truncate">
-              {t(`common:values.${agent.species}`)} · {t(`common:values.${agent.attackType}`)}
+              {main && (
+                <span className="inline-flex items-center gap-1.5">
+                  <AttributeLabel value={main.species} />
+                  <span aria-hidden>·</span>
+                  <AttributeLabel value={main.attackType} />
+                </span>
+              )}
             </span>
             <Button
               size="xs"
@@ -92,22 +97,27 @@ function AgentRosterCard({ agent, vm, dragging }: { agent: Agent; vm: RosterVm; 
             {activeUniforms.map((u) => {
               const owned = vm.isOwned(u.id);
               return (
-                <Toggle
-                  key={u.id}
-                  pressed={owned}
-                  onPressedChange={() => vm.toggle(u.id)}
-                  onClick={(e) => e.stopPropagation()}
-                  variant="outline"
-                  className={cn("h-auto min-h-11 max-w-full gap-2 py-1 pr-3 pl-1", owned && "border-energy/60 bg-energy/10")}
-                  aria-label={`${agent.name} — ${u.name}`}
-                >
-                  <Avatar className="chamfer-sm size-9 shrink-0 rounded-none after:hidden">
-                    <AvatarImage src={u.portrait || undefined} alt="" loading="lazy" decoding="async" className={cn("rounded-none", !owned && "grayscale")} />
-                    <AvatarFallback className="rounded-none text-xs">{agent.name.slice(0, 2)}</AvatarFallback>
-                  </Avatar>
-                  <span className="min-w-0 truncate text-xs">{u.name}</span>
-                  {owned && <CheckIcon className="shrink-0 text-energy" />}
-                </Toggle>
+                <Hint key={u.id} label={`${u.name} · ${t(`common:values.${u.side}`)}`}>
+                  <Toggle
+                    pressed={owned}
+                    onPressedChange={() => vm.toggle(u.id)}
+                    onClick={(e) => e.stopPropagation()}
+                    variant="outline"
+                    className={cn(
+                      "h-auto min-h-11 max-w-full gap-2 border-l-2 py-1 pr-3 pl-1",
+                      u.side === "HERO" ? "border-l-hero" : u.side === "VILLAIN" ? "border-l-villain" : "",
+                      owned && "border-energy/60 bg-energy/10",
+                    )}
+                    aria-label={`${agent.name} — ${u.name}`}
+                  >
+                    <Avatar className="chamfer-sm size-9 shrink-0 rounded-none after:hidden">
+                      <AvatarImage src={u.portrait || undefined} alt="" loading="lazy" decoding="async" className={cn("rounded-none", !owned && "grayscale")} />
+                      <AvatarFallback className="rounded-none text-xs">{agent.name.slice(0, 2)}</AvatarFallback>
+                    </Avatar>
+                    <span className="min-w-0 truncate text-xs">{u.name}</span>
+                    {owned && <CheckIcon className="shrink-0 text-energy" />}
+                  </Toggle>
+                </Hint>
               );
             })}
           </div>
@@ -158,7 +168,6 @@ export function RosterView() {
   const vm = useRosterViewModel({
     imported: t("roster:backup.imported"),
     invalid: t("roster:backup.invalid"),
-    reset: (mode) => t("roster:reset.done", { mode }),
   });
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -238,8 +247,8 @@ export function RosterView() {
                     className="flex-wrap"
                   >
                     {CRITERION_VALUES[attr].map((v) => (
-                      <ToggleGroupItem key={v} value={v}>
-                        {t(`common:values.${v}`)}
+                      <ToggleGroupItem key={v} value={v} className="gap-1">
+                        <AttributeLabel value={v} />
                       </ToggleGroupItem>
                     ))}
                   </ToggleGroup>
@@ -335,29 +344,11 @@ export function RosterView() {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>{t("roster:reset.title")}</CardTitle>
-              <CardDescription>{t("roster:reset.text")}</CardDescription>
+              <CardTitle>{t("common:resetTeams.title")}</CardTitle>
+              <CardDescription>{t("common:resetTeams.text")}</CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-wrap gap-2">
-              {MODES.map((mode) => (
-                <AlertDialog key={mode}>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="destructive">{mode}</Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>{t("roster:reset.title")}</AlertDialogTitle>
-                      <AlertDialogDescription>{t("roster:reset.confirm", { mode })}</AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>{t("common:actions.cancel")}</AlertDialogCancel>
-                      <AlertDialogAction variant="destructive" onClick={() => vm.resetMode(mode)}>
-                        {t("common:actions.confirm")}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              ))}
+            <CardContent>
+              <ResetTeamsOptions />
             </CardContent>
           </Card>
         </div>

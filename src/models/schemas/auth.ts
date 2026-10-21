@@ -1,25 +1,19 @@
 import { z } from "zod";
-import { emailSchema, passwordSchema } from "./common";
 import { VALIDATION } from "./messages";
 
+/** Login por nome de usuário (sem diferenciar maiúsculas) e senha. */
 export const LoginSchema = z.object({
-  email: emailSchema,
+  username: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .min(1, { message: VALIDATION.loginRequired })
+    .max(60)
+    .transform((s) => s.replace(/\s+/g, " ")),
   password: z.string().min(1, { message: VALIDATION.passwordRequired }).max(128),
+  /** "Manter logado": sem marcar, a sessão acaba ao fechar o navegador. */
+  remember: z.boolean().default(false),
 });
 export type LoginInput = z.infer<typeof LoginSchema>;
-
-export const RegisterSchema = z.object({
-  email: emailSchema,
-  password: passwordSchema,
-  nickname: z.string().trim().max(30).optional().or(z.literal("").transform(() => undefined)),
-});
-export type RegisterInput = z.infer<typeof RegisterSchema>;
-
-export const ForgotPasswordSchema = z.object({ email: emailSchema });
-
-export const TokenSchema = z.object({ token: z.string().min(16).max(256) });
-
-export const ResetPasswordSchema = z.object({
-  token: z.string().min(16).max(256),
-  password: passwordSchema,
-});
+/** Valores do formulário (antes do default de `remember`). */
+export type LoginFormValues = z.input<typeof LoginSchema>;

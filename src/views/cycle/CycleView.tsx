@@ -1,27 +1,36 @@
 import { useTranslation } from "next-i18next/pages";
-import { CalendarClockIcon, InfinityIcon, PencilIcon, PlusIcon, SparklesIcon, SwordsIcon, TimerResetIcon } from "lucide-react";
+import { CalendarClockIcon, FileDownIcon, InfinityIcon, PencilIcon, PlusIcon, SparklesIcon, SwordsIcon, TimerResetIcon, Trash2Icon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitle, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { SLOTS, type DayMode, type Slot } from "@/models/domain/enums";
+import { SLOTS, type DayMode } from "@/models/domain/enums";
 import type { CycleDay, CycleModeDay, MetaTeam } from "@/models/domain/types";
 import type { UserTeam } from "@/models/schemas/selections";
 import { useCycleViewModel, type CycleViewModel, type WeekFilter } from "@/viewmodels/useCycleViewModel";
 import { useMetaUpdatesNotice } from "@/viewmodels/useMetaUpdatesNotice";
+import { useTeamsExportViewModel } from "@/viewmodels/useTeamsExportViewModel";
 import { HelpHint } from "@/views/layout/HelpHint";
-import { TeamStrip as SharedTeamStrip, type TeamTone } from "@/views/shared/TeamStrip";
+import { TeamStrip as SharedTeamStrip, type StripMember, type TeamTone } from "@/views/shared/TeamStrip";
 import { QueryState } from "@/views/shared/QueryState";
+import { MODE_VISUALS } from "@/views/shared/modeVisuals";
+import { ResetTeamsOptions } from "@/views/shared/ResetTeamsOptions";
 import { RestrictionBadges } from "@/views/shared/RestrictionBadges";
 import { TeamBuilderPanel } from "./TeamBuilderPanel";
 
 type Vm = CycleViewModel;
 
 /** Faixa de equipe ligada ao ViewModel da tela central. */
-function TeamStrip(props: { label: string; tone: TeamTone; team: { slot: Slot; uniformId: string; ctpId?: string | null }[]; vm: Vm }) {
+function TeamStrip(props: {
+  label: string;
+  tone: TeamTone;
+  team: StripMember[];
+  vm: Vm;
+}) {
   const { vm } = props;
   return (
     <SharedTeamStrip
@@ -71,11 +80,13 @@ function ModePanel({
   const { t } = useTranslation(["cycle", "common"]);
   const [meta, ...alts] = data?.metaTeams ?? [];
   const mine = userMembers(vm.userTeam(mode, day));
+  const look = MODE_VISUALS[mode];
   return (
-    <div className="flex min-w-0 flex-col gap-2 p-3">
+    // Faixa e fundo na cor do modo (BAX azul, BAL laranja), como no jogo.
+    <div className={cn("flex min-w-0 flex-col gap-2 border-t-2 p-3", look.accentBar, look.tint)}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="flex items-center gap-1.5">
-          <Badge variant="energy" className="h-6 px-2.5 font-heading text-sm">
+          <Badge variant={look.badge} className="h-6 px-2.5 font-heading text-sm">
             {mode}
           </Badge>
           {updated && <MetaUpdatedBadge short />}
@@ -105,10 +116,10 @@ function BaiPanel({ day, vm }: { day: number; vm: Vm }) {
   const [meta, ...alts] = vm.bai?.metaTeams ?? [];
   const mine = userMembers(vm.userTeam("BAI", day));
   return (
-    <div className="flex flex-col gap-3 p-3">
+    <div className={cn("flex flex-col gap-3 border-t-2 p-3", MODE_VISUALS.BAI.accentBar, MODE_VISUALS.BAI.tint)}>
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="flex items-center gap-2 font-heading text-lg font-bold text-energy">
+          <p className="flex items-center gap-2 font-heading text-lg font-bold text-bai">
             <InfinityIcon className="size-5 shrink-0" />
             {t("cycle:bai.title")}
           </p>
@@ -156,8 +167,9 @@ function DayRow({ day, vm, updated }: { day: CycleDay; vm: Vm; updated: Readonly
       className={cn(
         // overflow-clip (e não hidden): hidden cria um contêiner de rolagem e o navegador ignora o scroll-mt.
         "scroll-mt-20 overflow-clip rounded-xl md:scroll-mt-32 bg-card ring-1 ring-foreground/10",
+        day.isBai && "bg-linear-to-r from-card via-bai/8 to-card ring-bai/30",
+        // Depois da BAI: o destaque de "Hoje" vale mesmo num dia de BAI.
         isToday && "energy-glow ring-2 ring-energy",
-        day.isBai && "bg-linear-to-r from-card via-energy/5 to-card",
       )}
     >
       <header className={cn("flex items-center gap-3 border-b px-3 py-2", isToday ? "bg-energy/10" : "bg-muted/40")}>
@@ -165,7 +177,7 @@ function DayRow({ day, vm, updated }: { day: CycleDay; vm: Vm; updated: Readonly
         <span className="font-heading text-sm tracking-widest text-muted-foreground uppercase">
           {t(`common:weekdays.${day.weekday}`)}
         </span>
-        {day.isBai && <Badge variant="energy">BAI</Badge>}
+        {day.isBai && <Badge variant="bai">BAI</Badge>}
         {anyUpdated && <MetaUpdatedBadge className="ml-auto" />}
         {isToday && (
           <Badge className={cn("animate-pulse bg-energy text-primary-foreground", !anyUpdated && "ml-auto")}>
@@ -189,7 +201,7 @@ function DayRow({ day, vm, updated }: { day: CycleDay; vm: Vm; updated: Readonly
       {day.isBai ? (
         <BaiPanel day={day.number} vm={vm} />
       ) : (
-        <div className="grid divide-y md:grid-cols-2 md:divide-x md:divide-y-0">
+        <div className="grid divide-y *:min-w-0 md:grid-cols-2 md:divide-x md:divide-y-0">
           <ModePanel mode="BAX" day={day.number} data={day.bax} vm={vm} updated={isUpdated("BAX")} />
           <ModePanel mode="BAL" day={day.number} data={day.bal} vm={vm} updated={isUpdated("BAL")} />
         </div>
@@ -210,7 +222,14 @@ function BuilderDialog({ vm }: { vm: Vm }) {
       {/* Celular: tela cheia. Notebook/PC: até 72rem, com rolagem interna. */}
       <DialogContent className="top-0 left-0 flex h-dvh max-h-dvh w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-0 overflow-hidden rounded-none p-0 sm:top-1/2 sm:left-1/2 sm:h-[min(92dvh,60rem)] sm:w-[calc(100vw-3rem)] sm:max-w-6xl sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-xl">
         <DialogHeader className="shrink-0 gap-1 border-b border-energy/15 px-4 py-3 pr-12 text-left sm:px-6">
-          <DialogTitle className="font-heading text-lg sm:text-xl">{b ? t("cycle:builderTitle", { mode: b.mode, day: b.day }) : ""}</DialogTitle>
+          <DialogTitle className="flex items-center gap-2 font-heading text-lg sm:text-xl">
+            {b && (
+              <Badge variant={MODE_VISUALS[b.mode].badge} className="font-heading">
+                {b.mode}
+              </Badge>
+            )}
+            {b ? t("cycle:builderTitle", { mode: b.mode, day: b.day }) : ""}
+          </DialogTitle>
           <DialogDescription className="text-xs sm:text-sm">{t("days:myTeam.subtitle")}</DialogDescription>
           {data && <RestrictionBadges criteria={data.criteria} />}
         </DialogHeader>
@@ -248,7 +267,7 @@ function DayStrip({ vm }: { vm: Vm }) {
                 className={cn(
                   "flex h-11 w-9 flex-col items-center justify-center rounded-md border text-xs leading-none transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
                   d.number % 7 === 1 && d.number > 1 && "ml-2",
-                  d.isBai ? "border-energy/40 bg-energy/10 text-energy" : "border-border bg-card",
+                  d.isBai ? "border-bai/50 bg-bai/10 text-bai" : "border-border bg-card",
                   isPast && !isToday && "opacity-50",
                   isToday && "scale-110 border-energy bg-energy font-bold text-primary-foreground shadow-[0_0_14px_-2px_var(--glow)]",
                 )}
@@ -267,6 +286,7 @@ function DayStrip({ vm }: { vm: Vm }) {
 export function CycleView() {
   const { t } = useTranslation(["cycle", "common", "days"]);
   const vm = useCycleViewModel();
+  const exporter = useTeamsExportViewModel(vm);
   const updated = useMetaUpdatesNotice(vm.cycle);
   const resetNotice = vm.clock?.isResetDay ? (vm.clock.beforeWeeklyReset ? "before" : "after") : null;
 
@@ -277,13 +297,30 @@ export function CycleView() {
           <h1 className="font-heading text-3xl font-bold">{t("cycle:title")}</h1>
           <p className="text-sm text-muted-foreground">{t("cycle:subtitle")}</p>
         </div>
-        <HelpHint title={t("cycle:legend.title")}>
-          <p>{t("cycle:legend.owned")}</p>
-          <p>{t("cycle:legend.dim")}</p>
-          <p>{t("cycle:legend.ctp")}</p>
-          <p>{t("cycle:legend.hero")}</p>
-          <p>{t("cycle:legend.reset")}</p>
-        </HelpHint>
+        <div className="flex items-center gap-1">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="sm">
+                <Trash2Icon data-icon="inline-start" />
+                {t("common:resetTeams.button")}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="flex w-80 flex-col gap-3">
+              <PopoverHeader>
+                <PopoverTitle>{t("common:resetTeams.title")}</PopoverTitle>
+                <PopoverDescription>{t("common:resetTeams.text")}</PopoverDescription>
+              </PopoverHeader>
+              <ResetTeamsOptions />
+            </PopoverContent>
+          </Popover>
+          <HelpHint title={t("cycle:legend.title")}>
+            <p>{t("cycle:legend.owned")}</p>
+            <p>{t("cycle:legend.dim")}</p>
+            <p>{t("cycle:legend.ctp")}</p>
+            <p>{t("cycle:legend.hero")}</p>
+            <p>{t("cycle:legend.reset")}</p>
+          </HelpHint>
+        </div>
       </div>
 
       <DayStrip vm={vm} />
@@ -313,6 +350,10 @@ export function CycleView() {
             </ToggleGroupItem>
           ))}
         </ToggleGroup>
+        <Button variant="outline" size="sm" className="ml-auto" onClick={exporter.exportHtml} disabled={!exporter.canExport}>
+          <FileDownIcon data-icon="inline-start" />
+          {t("cycle:export.button")}
+        </Button>
       </div>
 
       {resetNotice && (

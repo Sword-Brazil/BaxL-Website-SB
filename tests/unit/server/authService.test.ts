@@ -6,8 +6,8 @@ import { hashPassword, login } from "@/server/services/authService";
 
 const IP = "10.0.0.1";
 
-async function createUser(email = "jogador@sword.br", password = "senha1234") {
-  return prisma.user.create({ data: { email, passwordHash: await hashPassword(password), role: "USER" } });
+async function createUser(username = "jogador", password = "senha1234", role = "CURATOR") {
+  return prisma.user.create({ data: { username, passwordHash: await hashPassword(password), role } });
 }
 
 async function expectHttpError(p: Promise<unknown>, status: number) {
@@ -17,15 +17,30 @@ async function expectHttpError(p: Promise<unknown>, status: number) {
 describe("authService.login", () => {
   it("login correto retorna o SessionUser (sem hash)", async () => {
     const u = await createUser();
-    const user = await login({ email: " Jogador@Sword.BR ", password: "senha1234", ip: IP });
-    expect(user).toEqual({ id: u.id, email: "jogador@sword.br", nickname: null, role: "USER" });
+    const user = await login({ username: "  Jogador ", password: "senha1234", ip: IP });
+    expect(user).toEqual({ id: u.id, username: "jogador", nickname: null, role: "CURATOR" });
     expect(user).not.toHaveProperty("passwordHash");
   });
 
-  it("senha errada e e-mail inexistente dão o mesmo erro genérico 401", async () => {
+  it("jogador (USER) entra com o nome de usuário, sem diferenciar maiúsculas", async () => {
+    const u = await prisma.user.create({ data: { username: "tenmenezes", passwordHash: await hashPassword("senha1234"), role: "USER" } });
+    const user = await login({ username: " TenMenezes ", password: "senha1234", ip: IP });
+    expect(user).toEqual({ id: u.id, username: "tenmenezes", nickname: null, role: "USER" });
+  });
+
+  it("usuário inexistente e senha errada dão o mesmo 401", async () => {
+    await prisma.user.create({ data: { username: "tenmenezes", passwordHash: await hashPassword("senha1234"), role: "USER" } });
+    const wrong = await login({ username: "tenmenezes", password: "errada123", ip: IP }).catch((e) => e);
+    const missing = await login({ username: "ninguem", password: "senha1234", ip: IP }).catch((e) => e);
+    expect(wrong.status).toBe(401);
+    expect(missing.status).toBe(401);
+    expect(wrong.message).toBe(missing.message);
+  });
+
+  it("senha errada e usuário inexistente dão o mesmo erro genérico 401", async () => {
     await createUser();
-    const wrong = login({ email: "jogador@sword.br", password: "errada123", ip: IP }).catch((e) => e);
-    const missing = login({ email: "ninguem@sword.br", password: "errada123", ip: IP }).catch((e) => e);
+    const wrong = login({ username: "jogador", password: "errada123", ip: IP }).catch((e) => e);
+    const missing = login({ username: "ninguem", password: "errada123", ip: IP }).catch((e) => e);
     const [a, b] = await Promise.all([wrong, missing]);
     expect(a).toBeInstanceOf(HttpError);
     expect(a.status).toBe(401);
@@ -38,25 +53,25 @@ describe("authService.login", () => {
     const t0 = new Date("2026-10-17T12:00:00Z");
     for (let i = 0; i < 5; i++) {
       await expectHttpError(
-        login({ email: "jogador@sword.br", password: "errada123", ip: IP, now: new Date(t0.getTime() + i * 60_000) }),
+        login({ username: "jogador", password: "errada123", ip: IP, now: new Date(t0.getTime() + i * 60_000) }),
         401,
       );
     }
     const blockedAt = new Date(t0.getTime() + 5 * 60_000);
-    await expectHttpError(login({ email: "jogador@sword.br", password: "senha1234", ip: IP, now: blockedAt }), 429);
+    await expectHttpError(login({ username: "jogador", password: "senha1234", ip: IP, now: blockedAt }), 429);
 
     const after = new Date(t0.getTime() + 4 * 60_000 + 15 * 60_000 + 1000);
-    await expect(login({ email: "jogador@sword.br", password: "senha1234", ip: IP, now: after })).resolves.toBeTruthy();
+    await expect(login({ username: "jogador", password: "senha1234", ip: IP, now: after })).resolves.toBeTruthy();
   });
 
   it("falhas em paralelo contam todas: não dá para escapar do bloqueio com requisições simultâneas", async () => {
     await createUser();
-    const attempts = Array.from({ length: 10 }, () => login({ email: "jogador@sword.br", password: "errada123", ip: IP }).catch((e) => e));
+    const attempts = Array.from({ length: 10 }, () => login({ username: "jogador", password: "errada123", ip: IP }).catch((e) => e));
     await Promise.all(attempts);
-    const row = await prisma.loginAttempt.findUniqueOrThrow({ where: { key: `jogador@sword.br|${IP}` } });
+    const row = await prisma.loginAttempt.findUniqueOrThrow({ where: { key: `jogador|${IP}` } });
     expect(row.failedCount).toBeGreaterThanOrEqual(5);
     expect(row.lockedUntil).not.toBeNull();
-    await expectHttpError(login({ email: "jogador@sword.br", password: "senha1234", ip: IP }), 429);
+    await expectHttpError(login({ username: "jogador", password: "senha1234", ip: IP }), 429);
   });
 
   it("falhas espalhadas por mais de 15 min não bloqueiam", async () => {
@@ -64,7 +79,7 @@ describe("authService.login", () => {
     const t0 = Date.parse("2026-10-17T12:00:00Z");
     for (let i = 0; i < 6; i++) {
       await expectHttpError(
-        login({ email: "jogador@sword.br", password: "errada123", ip: IP, now: new Date(t0 + i * 4 * 60_000) }),
+        login({ username: "jogador", password: "errada123", ip: IP, now: new Date(t0 + i * 4 * 60_000) }),
         401,
       );
     }
@@ -73,19 +88,26 @@ describe("authService.login", () => {
   it("login bem-sucedido zera as falhas", async () => {
     await createUser();
     for (let i = 0; i < 4; i++) {
-      await expectHttpError(login({ email: "jogador@sword.br", password: "errada123", ip: IP }), 401);
+      await expectHttpError(login({ username: "jogador", password: "errada123", ip: IP }), 401);
     }
-    await login({ email: "jogador@sword.br", password: "senha1234", ip: IP });
+    await login({ username: "jogador", password: "senha1234", ip: IP });
     for (let i = 0; i < 4; i++) {
-      await expectHttpError(login({ email: "jogador@sword.br", password: "errada123", ip: IP }), 401);
+      await expectHttpError(login({ username: "jogador", password: "errada123", ip: IP }), 401);
     }
   });
 
-  it("conta com e-mail não confirmado pode entrar", async () => {
+  it("nome de usuário com espaços: espaços extras e maiúsculas não importam", async () => {
+    await createUser("sword menezes", "Desenho.2020!", "ADMIN");
+    await expect(login({ username: "  SWORD   Menezes ", password: "Desenho.2020!", ip: IP })).resolves.toMatchObject({ role: "ADMIN" });
+  });
+
+  it("trocar de IP a cada tentativa não escapa do bloqueio por conta (20 falhas)", async () => {
     await createUser();
-    const u = await prisma.user.findUniqueOrThrow({ where: { email: "jogador@sword.br" } });
-    expect(u.emailVerifiedAt).toBeNull();
-    await expect(login({ email: "jogador@sword.br", password: "senha1234", ip: IP })).resolves.toBeTruthy();
+    const t0 = Date.parse("2026-10-21T12:00:00Z");
+    for (let i = 0; i < 20; i++) {
+      await login({ username: "jogador", password: "errada123", ip: `10.1.0.${i}`, now: new Date(t0 + i * 1000) }).catch(() => null);
+    }
+    await expectHttpError(login({ username: "jogador", password: "senha1234", ip: "10.9.9.9", now: new Date(t0 + 30_000) }), 429);
   });
 
   it("o hash nunca é igual à senha e usa bcrypt custo 12", async () => {
