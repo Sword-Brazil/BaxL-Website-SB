@@ -108,6 +108,13 @@
       "label": "Elegir entre todos los personajes",
       "help": "Sin llenar el elenco: libera todo el catálogo para armar tus equipos. Las restricciones de cada día siguen valiendo.",
       "enable": "Liberar todos los personajes"
+    },
+    "striker": {
+      "label": "Striker",
+      "pick": "Elegir Striker (opcional)",
+      "remove": "Quitar Striker",
+      "none": "Ningún personaje disponible",
+      "metaWas": "Meta: {{name}}"
     }
   }
 }
