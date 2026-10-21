@@ -8,4 +8,5 @@ export const emptySelections = (): UserSelections => ({
   roster: { ownedUniformIds: [] },
   teams: {},
   equipment: { ctpByAgent: {} },
+  freePick: false,
 });

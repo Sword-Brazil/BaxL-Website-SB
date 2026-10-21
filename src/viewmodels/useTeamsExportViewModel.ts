@@ -17,10 +17,10 @@ export function useTeamsExportViewModel(vm: CycleViewModel) {
   const { locale } = useRouter();
   const nickname = useSelectionsStore((s) => s.doc.nickname);
 
-  const ctpName = (ctpId: string | null | undefined, typeOnly: boolean) => {
+  const ctpName = (ctpId: string | null | undefined) => {
     const ctp = vm.catalog.ctpById(ctpId);
     if (!ctp) return null;
-    return typeOnly ? t(`common:ctp.${ctp.type}`) : `${t(`common:ctp.${ctp.type}`)} · ${t(`common:quality.${ctp.quality}`)}`;
+    return `${t(`common:ctp.${ctp.type}`)} · ${t(`common:quality.${ctp.quality}`)}`;
   };
 
   const member = (uniformId: string, opts: { ctpId?: string | null; damageDealer?: boolean; mine?: boolean }): ExportMember | undefined => {
@@ -30,7 +30,7 @@ export function useTeamsExportViewModel(vm: CycleViewModel) {
     return {
       name: ref.agent.name,
       uniform: ref.uniform.slug === "padrao" ? null : ref.uniform.name,
-      ctp: ctpName(ctpId, !opts.mine),
+      ctp: ctpName(ctpId),
       damageDealer: !!opts.damageDealer,
       portrait: ref.uniform.portrait ? new URL(ref.uniform.portrait, window.location.origin).toString() : null,
     };

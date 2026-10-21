@@ -20,13 +20,14 @@ import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldLegen
 import { Input } from "@/components/ui/input";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Switch } from "@/components/ui/switch";
-import { UNKNOWN } from "@/models/domain/enums";
+import { DAY_MODES, EFFECTS_BY_MODE, UNKNOWN } from "@/models/domain/enums";
 import type { Agent } from "@/models/domain/types";
 import { useCatalogEditorViewModel } from "@/viewmodels/admin/useCatalogEditorViewModel";
 import { QueryState } from "@/views/shared/QueryState";
 import { useValidationMessage } from "@/views/shared/useValidationMessage";
 import { ATTRIBUTE_FIELDS, AttributeBadgePicker } from "./AttributeBadgePicker";
 import { AttributeLabel } from "@/views/shared/AttributeLabel";
+import { BossEffectIcon, bossEffectTint } from "@/views/shared/BossEffect";
 
 type Vm = ReturnType<typeof useCatalogEditorViewModel>;
 
@@ -58,6 +59,44 @@ function UniformAttributes({ index, vm }: { index: number; vm: Vm }) {
       <span className="text-xs font-semibold tracking-wider uppercase">{t("catalog.uniformAttributes")}</span>
       {ATTRIBUTE_FIELDS.map((f, i) => (
         <AttributeBadgePicker key={f.name} field={f} value={values[i]} onChange={(v) => vm.setUniformAttribute(index, f.name, v)} />
+      ))}
+      <UniformEffects index={index} vm={vm} />
+    </div>
+  );
+}
+
+/** Efeitos que o traje causa no chefe (vários): na temporada desse efeito, ele atordoa o chefe. */
+function UniformEffects({ index, vm }: { index: number; vm: Vm }) {
+  const { t } = useTranslation(["admin", "common"]);
+  const selected = vm.form.watch(`uniforms.${index}.effects`) ?? [];
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="text-xs font-medium text-muted-foreground">{t("admin:catalog.effects")}</span>
+      {DAY_MODES.map((mode) => (
+        <div key={mode} className="flex flex-col gap-1" role="group" aria-label={`${t("admin:catalog.effects")} · ${mode}`}>
+          <span className="font-heading text-[0.65rem] tracking-wider text-muted-foreground">{mode}</span>
+          <div className="flex flex-wrap gap-1.5">
+            {EFFECTS_BY_MODE[mode].map((effect) => {
+              const on = selected.includes(effect);
+              return (
+                <button
+                  key={effect}
+                  type="button"
+                  aria-pressed={on}
+                  onClick={() => vm.toggleUniformEffect(index, effect)}
+                  className={cn(
+                    "inline-flex h-7 cursor-pointer items-center gap-1 rounded-full border px-2 pl-1 text-xs transition-opacity",
+                    !on && "border-border opacity-55 hover:opacity-100",
+                  )}
+                  style={on ? bossEffectTint(effect) : undefined}
+                >
+                  <BossEffectIcon effect={effect} colored={on} />
+                  {t(`common:effects.${effect}`)}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       ))}
     </div>
   );
@@ -232,7 +271,11 @@ export function CatalogEditorView() {
                   </span>
                   <span className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
                     {t("admin:catalog.photos", { n: withPhoto, total: a.uniforms.length })}
-                    {varied > 0 && <Badge variant="energy">{t("admin:catalog.variedUniforms", { count: varied })}</Badge>}
+                    {varied > 0 && (
+                      <Badge variant="energy" className="h-auto max-w-full py-0.5 text-left whitespace-normal">
+                        {t("admin:catalog.variedUniforms", { count: varied })}
+                      </Badge>
+                    )}
                   </span>
                 </button>
                 <div className="flex shrink-0 gap-1">

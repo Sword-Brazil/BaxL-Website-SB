@@ -22,6 +22,8 @@ interface SelectionsState {
   setNickname: (nickname: string) => void;
   toggleOwnedUniform: (uniformId: string) => void;
   setOwnedUniforms: (uniformIds: string[], owned: boolean) => void;
+  /** Liga/desliga a escolha livre: todos os personagens nas equipes, sem depender do elenco. */
+  setFreePick: (on: boolean) => void;
   /** Coloca o uniforme no slot; remove o mesmo agente de outro slot da equipe (invariante). */
   setSlot: (teamKey: TeamKey, slot: Slot, uniformId: string, agentOf: (uniformId: string) => string | undefined) => void;
   clearSlot: (teamKey: TeamKey, slot: Slot) => void;
@@ -56,6 +58,8 @@ export const useSelectionsStore = create<SelectionsState>()(
       hydrated: false,
 
       setNickname: (nickname) => set(({ doc }) => ({ doc: touch(doc, { nickname: nickname.trim().slice(0, 30) }) })),
+
+      setFreePick: (on) => set(({ doc }) => ({ doc: touch(doc, { freePick: on }) })),
 
       toggleOwnedUniform: (uniformId) =>
         set(({ doc }) => {
@@ -125,7 +129,7 @@ export const useSelectionsStore = create<SelectionsState>()(
       partialize: ({ doc, syncBase, syncUserId, syncedLocalAt }) => ({ doc, syncBase, syncUserId, syncedLocalAt }),
       // Reidratado no cliente (src/pages/_app.tsx) para não divergir do HTML estático.
       skipHydration: true,
-      // Documentos antigos não têm "equipment" (CTP por personagem) nem "nickname".
+      // Documentos antigos não têm "equipment" (CTP por personagem), "nickname" nem "freePick".
       merge: (persisted, current) => {
         const p = persisted as Partial<SelectionsState> | undefined;
         return {
@@ -133,7 +137,7 @@ export const useSelectionsStore = create<SelectionsState>()(
           syncBase: p?.syncBase ?? null,
           syncUserId: p?.syncUserId ?? null,
           syncedLocalAt: p?.syncedLocalAt ?? null,
-          doc: { ...current.doc, ...p?.doc, equipment: p?.doc?.equipment ?? { ctpByAgent: {} }, nickname: p?.doc?.nickname ?? "" },
+          doc: { ...current.doc, ...p?.doc, equipment: p?.doc?.equipment ?? { ctpByAgent: {} }, nickname: p?.doc?.nickname ?? "", freePick: p?.doc?.freePick ?? false },
         };
       },
       onRehydrateStorage: () => () => useSelectionsStore.setState({ hydrated: true }),

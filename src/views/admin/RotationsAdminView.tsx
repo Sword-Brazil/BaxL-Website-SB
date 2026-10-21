@@ -7,9 +7,10 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { DAY_MODES, EFFECTS_BY_MODE, type BossEffect } from "@/models/domain/enums";
 import type { Agent } from "@/models/domain/types";
 import { parseRotationVideo } from "@/models/rules/rotationVideo";
 import { useRotationsEditorViewModel, type RotationDraft } from "@/viewmodels/admin/useRotationsEditorViewModel";
@@ -17,13 +18,14 @@ import { HelpHint } from "@/views/layout/HelpHint";
 import { QueryState } from "@/views/shared/QueryState";
 import { RotationLegend, RotationText } from "@/views/shared/RotationSequence";
 import { RotationVideoPlayer } from "@/views/shared/RotationVideoPlayer";
+import { BossEffectBadge, BossEffectIcon } from "@/views/shared/BossEffect";
 import { UniformPreview } from "@/views/rotations/UniformPreview";
 
 type Vm = ReturnType<typeof useRotationsEditorViewModel>;
 
 const ALL = "__all";
 
-/** Uma rotação: traje, título, sequência livre (com prévia), descrição e vídeo. */
+/** Uma rotação: traje, temporada, título, sequência livre (com prévia), descrição e vídeo. */
 function RotationEditor({ draft, index, total, agent, vm }: { draft: RotationDraft; index: number; total: number; agent: Agent; vm: Vm }) {
   const { t } = useTranslation(["admin", "common"]);
   const id = (name: string) => `${name}-${draft.key}`;
@@ -34,6 +36,7 @@ function RotationEditor({ draft, index, total, agent, vm }: { draft: RotationDra
       <div className="flex items-center gap-2">
         <UniformPreview uniform={uniform} name={agent.name} fallbackSrc={agent.uniforms.find((u) => u.portrait)?.portrait} className="size-12" />
         <span className="font-heading text-xs tracking-widest text-spark uppercase">{t("admin:rotations.item", { n: index + 1 })}</span>
+        {draft.effect && <BossEffectBadge effect={draft.effect} />}
         <div className="ml-auto flex gap-1">
           <Button type="button" size="icon-sm" variant="ghost" disabled={index === 0} onClick={() => vm.move(draft.key, -1)} aria-label={t("admin:rotations.moveUp")}>
             <ArrowUpIcon />
@@ -46,7 +49,29 @@ function RotationEditor({ draft, index, total, agent, vm }: { draft: RotationDra
           </Button>
         </div>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-3">
+        <Field>
+          <FieldLabel htmlFor={id("effect")}>{t("admin:rotations.effect")}</FieldLabel>
+          <Select value={draft.effect ?? ALL} onValueChange={(v) => vm.update(draft.key, { effect: v === ALL ? null : (v as BossEffect) })}>
+            <SelectTrigger id={id("effect")} className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL}>{t("common:effects.all")}</SelectItem>
+              {DAY_MODES.map((mode) => (
+                <SelectGroup key={mode}>
+                  <SelectLabel>{mode}</SelectLabel>
+                  {EFFECTS_BY_MODE[mode].map((e) => (
+                    <SelectItem key={e} value={e}>
+                      <BossEffectIcon effect={e} />
+                      {t(`common:effects.${e}`)}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              ))}
+            </SelectContent>
+          </Select>
+        </Field>
         <Field>
           <FieldLabel htmlFor={id("uniform")}>{t("admin:rotations.uniform")}</FieldLabel>
           <Select value={draft.uniformId ?? ALL} onValueChange={(v) => vm.update(draft.key, { uniformId: v === ALL ? null : v })}>
@@ -120,7 +145,11 @@ function RotationEditor({ draft, index, total, agent, vm }: { draft: RotationDra
         <FieldDescription className={videoInvalid ? "text-destructive" : undefined}>
           {videoInvalid ? t("common:validation.rotationVideo") : t("admin:rotations.videoHint")}
         </FieldDescription>
-        {!videoInvalid && draft.videoUrl.trim() && <RotationVideoPlayer url={draft.videoUrl} title={agent.name} />}
+        {!videoInvalid && draft.videoUrl.trim() && (
+          <div className="w-full max-w-md">
+            <RotationVideoPlayer url={draft.videoUrl} title={agent.name} />
+          </div>
+        )}
       </Field>
     </li>
   );

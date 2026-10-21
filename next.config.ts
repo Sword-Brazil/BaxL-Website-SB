@@ -40,6 +40,11 @@ const nextConfig: NextConfig = {
     return [{ source: "/:path*", headers: SECURITY_HEADERS }];
   },
   i18n: i18nConfig.i18n,
+  // /rotacoes/[slug] gera a página na hora (fallback: "blocking") e o serverSideTranslations lê a
+  // config e os JSON do disco; sem isto a função da Vercel não os tem e a página dá 500.
+  outputFileTracingIncludes: {
+    "/rotacoes/*": ["./next-i18next.config.js", "./public/locales/**/*.json"],
+  },
   turbopack: {
     rules: {
       "*.css": {

@@ -18,6 +18,7 @@ const agent = (id: string, side: "HERO" | "VILLAIN" = "HERO"): Agent => {
         name: "Padrão",
         imagePath: "",
         portrait: "",
+        effects: [],
         active: true,
         ...attrs,
       },

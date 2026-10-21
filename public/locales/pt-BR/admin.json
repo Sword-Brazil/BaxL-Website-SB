@@ -13,7 +13,7 @@
   },
   "guard": {
     "forbidden": "Acesso negado",
-    "forbiddenText": "Esta área é exclusiva para curadores e administradores da Sword Brazil.",
+    "forbiddenText": "Esta área é exclusiva para curadores e administradores da Sword Brasil.",
     "goHome": "Voltar ao início"
   },
   "overview": {
@@ -47,7 +47,12 @@
     "subtitle": "Defina a restrição de cada dia. Critérios diferentes são combinados com \"E\".",
     "any": "Qualquer",
     "day": "Dia",
-    "help": "Escolha um valor por atributo. Deixe \"Qualquer\" para não restringir aquele atributo. Os dias de BAI (3, 10, 17, 24) não aparecem aqui."
+    "help": "Escolha um valor por atributo. Deixe \"Qualquer\" para não restringir aquele atributo. Os dias de BAI (3, 10, 17, 24) não aparecem aqui.",
+    "season": {
+      "title": "Temporada atual",
+      "help": "Efeito que atordoa o chefe nesta temporada (28 dias). Vale para todos os dias do modo; troque quando a temporada mudar.",
+      "effectOf": "Efeito da {{mode}}"
+    }
   },
   "metas": {
     "title": "Equipes Meta",
@@ -86,7 +91,11 @@
     "rotationsCount_other": "{{name}} tem {{count}} rotações cadastradas.",
     "noRotations": "{{name}} ainda não tem rotação cadastrada.",
     "manageRotations": "Gerenciar rotações",
-    "addRotations": "Cadastrar rotação"
+    "addRotations": "Cadastrar rotação",
+    "striker": "Striker meta de {{name}}",
+    "pickStriker": "Escolher Striker",
+    "removeStriker": "Tirar Striker",
+    "strikerHelp": "Apoio liberado na Transcendência 4: entra na partida e usa uma única skill para dar dano extra."
   },
   "priority": {
     "solo": "Soladores",
@@ -124,7 +133,8 @@
     "uniformAttributes": "Atributos deste traje",
     "uniformsHint": "Cada traje tem os próprios atributos (gênero, lado, espécie e ataque): as restrições dos dias são conferidas pelo traje usado. Um traje novo começa com os atributos do primeiro traje.",
     "variedUniforms_one": "{{count}} traje com atributos diferentes",
-    "variedUniforms_other": "{{count}} trajes com atributos diferentes"
+    "variedUniforms_other": "{{count}} trajes com atributos diferentes",
+    "effects": "Efeitos no chefe (atordoa na temporada do efeito)"
   },
   "ctps": {
     "title": "Catálogo de CTPs",
@@ -200,6 +210,7 @@
     "descriptionPlaceholder": "Quando usar, quanto esperar em cada delay, o que observar…",
     "video": "Vídeo de referência (opcional)",
     "videoHint": "Link do YouTube (vídeo ou Shorts; use ?t= para começar no trecho certo) ou de um arquivo .mp4/.webm. Toca mudo e em loop; o vídeo não é guardado no sistema.",
-    "add": "Adicionar rotação"
+    "add": "Adicionar rotação",
+    "effect": "Temporada"
   }
 }

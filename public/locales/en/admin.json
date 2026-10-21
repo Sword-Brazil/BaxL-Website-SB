@@ -47,7 +47,12 @@
     "subtitle": "Set each day's restriction. Different criteria are combined with \"AND\".",
     "any": "Any",
     "day": "Day",
-    "help": "Pick one value per attribute. Leave \"Any\" to not restrict that attribute. BAI days (3, 10, 17, 24) are not listed."
+    "help": "Pick one value per attribute. Leave \"Any\" to not restrict that attribute. BAI days (3, 10, 17, 24) are not listed.",
+    "season": {
+      "title": "Current season",
+      "help": "Effect that stuns the boss this season (28 days). Applies to every day of the mode; change it when the season changes.",
+      "effectOf": "{{mode}} effect"
+    }
   },
   "metas": {
     "title": "Meta teams",
@@ -86,7 +91,11 @@
     "rotationsCount_other": "{{name}} has {{count}} rotations.",
     "noRotations": "{{name}} has no rotation yet.",
     "manageRotations": "Manage rotations",
-    "addRotations": "Add a rotation"
+    "addRotations": "Add a rotation",
+    "striker": "{{name}}'s meta Striker",
+    "pickStriker": "Pick a Striker",
+    "removeStriker": "Remove Striker",
+    "strikerHelp": "Support unlocked at Transcendence 4: joins the fight and uses a single skill for extra damage."
   },
   "priority": {
     "solo": "Solos",
@@ -124,7 +133,8 @@
     "uniformAttributes": "This uniform's attributes",
     "uniformsHint": "Each uniform has its own attributes (gender, side, species and attack): day restrictions are checked against the uniform used. A new uniform starts with the first uniform's attributes.",
     "variedUniforms_one": "{{count}} uniform with different attributes",
-    "variedUniforms_other": "{{count}} uniforms with different attributes"
+    "variedUniforms_other": "{{count}} uniforms with different attributes",
+    "effects": "Boss effects (stuns in that effect's season)"
   },
   "ctps": {
     "title": "CTP catalog",
@@ -200,6 +210,7 @@
     "descriptionPlaceholder": "When to use it, how long each delay is, what to watch for…",
     "video": "Reference video (optional)",
     "videoHint": "YouTube link (video or Shorts; add ?t= to start at the right moment) or a .mp4/.webm file. It plays muted and looped; the video is not stored in the system.",
-    "add": "Add rotation"
+    "add": "Add rotation",
+    "effect": "Season"
   }
 }

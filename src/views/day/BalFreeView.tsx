@@ -7,6 +7,7 @@ import { useBalFreeViewModel } from "@/viewmodels/useDayViewModel";
 import { HelpHint } from "@/views/layout/HelpHint";
 import { EmptyTeam } from "@/views/shared/EmptyTeam";
 import { QueryState } from "@/views/shared/QueryState";
+import { ScrollToTopButton } from "@/views/shared/ScrollToTopButton";
 import { TeamStrip } from "@/views/shared/TeamStrip";
 
 export function BalFreeView() {
@@ -56,6 +57,7 @@ export function BalFreeView() {
           </div>
         )}
       </QueryState>
+      <ScrollToTopButton />
     </div>
   );
 }

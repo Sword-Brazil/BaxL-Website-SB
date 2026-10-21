@@ -1,14 +1,16 @@
+import type { BossEffect } from "@/models/domain/enums";
 import type { Rotation } from "@/models/domain/types";
 import type { AgentRotationsInput } from "@/models/schemas/admin";
 import { prisma } from "@/server/db";
 import { HttpError } from "@/server/http";
 
-type DbRotation = Omit<Rotation, "updatedAt"> & { updatedAt: Date };
+type DbRotation = Omit<Rotation, "updatedAt" | "effect"> & { effect: string | null; updatedAt: Date };
 
 const toRotation = (r: DbRotation): Rotation => ({
   id: r.id,
   agentId: r.agentId,
   uniformId: r.uniformId,
+  effect: r.effect as BossEffect | null,
   position: r.position,
   title: r.title,
   sequence: r.sequence,
@@ -42,6 +44,7 @@ export async function saveAgentRotations(agentId: string, input: AgentRotationsI
         data: {
           agentId,
           uniformId: r.uniformId,
+          effect: r.effect ?? null,
           position,
           title: r.title || null,
           sequence: r.sequence,

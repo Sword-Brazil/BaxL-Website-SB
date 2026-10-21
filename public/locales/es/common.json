@@ -1,8 +1,8 @@
 {
   "brand": {
-    "name": "Sword Brazil",
+    "name": "Sword Brasil",
     "tagline": "Metas de la Batalla de Alianza",
-    "title": "Sword Brazil · Metas BA"
+    "title": "Sword Brasil · Metas BA"
   },
   "nav": {
     "roster": "Mi plantilla",
@@ -35,8 +35,17 @@
   },
   "footer": {
     "disclaimer": "Proyecto de fans, no oficial y sin fines comerciales. Marvel Future Fight es propiedad de Netmarble; los personajes son propiedad de Marvel.",
-    "alliance": "Hecho para la alianza Sword Brazil.",
-    "credit": "Calendario y equipos base: Guia BAX/BAL/BAI (guiabaxbal.web.app), con curaduría de Sword Brazil."
+    "alliance": "Hecho para la alianza Sword Brasil.",
+    "credit": "Calendario y equipos base: Guia BAX/BAL/BAI (guiabaxbal.web.app), con curaduría de Sword Brasil.",
+    "support": {
+      "dev": "Desarrollado y mantenido por un único dev.",
+      "text": "¿Quieres ayudar con el Pack Stark? Haz un Pix (Brasil):",
+      "copy": "Copiar clave",
+      "copied": "Clave Pix copiada.",
+      "copyFailed": "No se pudo copiar. Selecciona la clave y cópiala manualmente.",
+      "button": "Apoyar",
+      "keyType": "Celular"
+    }
   },
   "team": {
     "empty": "Sin equipo definido",
@@ -54,7 +63,9 @@
     "damageDealer": "Causante de daño",
     "emptySlot": "Vacío",
     "seeRotation": "Ver rotación",
-    "seeRotationOf": "Ver las rotaciones de {{name}}"
+    "seeRotationOf": "Ver las rotaciones de {{name}}",
+    "striker": "Striker: {{name}}",
+    "noStriker": "Striker por definir"
   },
   "rotation": {
     "title": "Rotación",
@@ -156,7 +167,7 @@
     "toastText": "Esta función aún se está desarrollando.",
     "toastFeature": "{{feature}}: aún en desarrollo.",
     "pageTitle": "En desarrollo",
-    "pageText": "Sword Brazil aún está construyendo esta área. Vuelve pronto."
+    "pageText": "Sword Brasil aún está construyendo esta área. Vuelve pronto."
   },
   "notFound": {
     "title": "Página no encontrada",
@@ -317,5 +328,19 @@
       "goHome": "Volver al inicio",
       "dismiss": "Cerrar aviso"
     }
+  },
+  "scrollTop": "Volver arriba",
+  "effects": {
+    "SILENCE": "Silencio",
+    "PARALYSIS": "Parálisis",
+    "BURN": "Quemadura",
+    "FRACTURE": "Fractura",
+    "SHOCK": "Choque",
+    "TRAP": "Trampa",
+    "all": "Todas las temporadas"
+  },
+  "season": {
+    "stunHint": "Temporada actual: aturde al jefe con {{effect}}",
+    "stuns": "Aturde al jefe ({{effect}})"
   }
 }

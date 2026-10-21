@@ -39,7 +39,7 @@ privado, login por nome de usuário, Postgres/Supabase)
 |--------|------|--------|----------|
 | GET | `/api/clock` | user | `{ clock: BattleClock, settings: Settings }` |
 | GET | `/api/catalog` | user | `{ agents: Agent[] (com uniforms[]), ctps: Ctp[] }` (ETag) |
-| GET | `/api/cycle` | user | os 28 dias com BAX, BAL e BAI (tela central) |
+| GET | `/api/cycle` | user | `season` (`{ BAX, BAL }`: efeito da temporada) e os 28 dias com BAX, BAL e BAI (tela central) |
 | GET | `/api/days?mode=BAX\|BAL` | user | `DaySummary[]` |
 | GET | `/api/days/{mode}/{number}` | user | `DayDetail` (criteria[], metaTeams[], priority) |
 | GET | `/api/bal-free` | user | `MetaTeam[]` |
@@ -73,12 +73,13 @@ recuperação de senha: contas e senhas são geridas por Administradores.
 | Método | Rota | Acesso | Corpo |
 |--------|------|--------|-------|
 | PUT | `/api/admin/days/{mode}/{number}/restriction` | curator | `RestrictionSchema` {criteria: [{attribute, value}]} |
-| GET / POST | `/api/admin/meta-teams` | curator | `MetaTeamSchema` (3 membros) → 422 se violar a restrição |
+| GET / POST | `/api/admin/meta-teams` | curator | `MetaTeamSchema` (3 membros; Causador de Dano com `strikerUniformId` opcional) → 422 se violar a restrição |
 | PUT / DELETE | `/api/admin/meta-teams/{id}` | curator | idem |
 | GET / PUT | `/api/admin/priority/{scope}/{mode?}/{number?}` | curator | `PrioritySchema` {solo[], support[]} |
 | GET / PUT | `/api/admin/bai/bosses` | curator | `BaiBossesSchema` |
 | POST / PUT | `/api/admin/agents[/{id}]` | curator | `AgentSchema` (+ uniformes) |
-| PUT | `/api/admin/agents/{id}/rotations` | curator | rotações (sequência, descrição, vídeo https do YouTube ou .mp4/.webm) |
+| PUT | `/api/admin/agents/{id}/rotations` | curator | rotações (temporada, sequência, descrição, vídeo https do YouTube ou .mp4/.webm) |
+| GET / PUT | `/api/admin/season` | curator | `SeasonSchema` (`{ BAX: SILENCE\|PARALYSIS\|BURN, BAL: FRACTURE\|SHOCK\|TRAP }`) |
 | POST | `/api/admin/assets` | curator | `AssetUploadSchema` {fileName, mimeType: png\|webp\|jpeg, base64} (≤ 2 MB; o conteúdo é conferido) → `{ imagePath }` = URL pública no Supabase Storage (`public/assets/uploads` só no ambiente local sem Supabase) |
 | POST / PUT / DELETE | `/api/admin/ctps[/{id}]` | admin | CTPs (tipo, qualidade, imagem, ativo) |
 | GET / PUT | `/api/admin/settings` | admin | `SettingsSchema` |

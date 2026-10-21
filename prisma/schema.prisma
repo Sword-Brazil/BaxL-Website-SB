@@ -38,10 +38,13 @@ model Uniform {
   side            String           @default("UNKNOWN")
   species         String           @default("UNKNOWN")
   attackType      String           @default("UNKNOWN")
+  // Efeitos que o traje causa no chefe da BA (SILENCE, PARALYSIS, BURN, FRACTURE, SHOCK, TRAP).
+  effects         String[]         @default([])
   active          Boolean          @default(true)
-  metaMembers     MetaTeamMember[]
+  metaMembers     MetaTeamMember[] @relation("MemberUniform")
   priorityEntries PriorityEntry[]
-  rotations       Rotation[]
+  rotations       Rotation[]       @relation("RotationUniform")
+  strikerOf       MetaTeamMember[] @relation("MemberStriker")
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
@@ -70,6 +73,9 @@ model Settings {
   dayTurnoverHour Int      @default(12)
   weeklyResetHour Int      @default(22)
   baiWeekday      Int      @default(3)
+  // Temporada atual: efeito que atordoa o chefe em todos os dias de BAX e de BAL.
+  baxEffect       String   @default("PARALYSIS")
+  balEffect       String   @default("SHOCK")
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
@@ -119,18 +125,21 @@ model MetaTeam {
 }
 
 model MetaTeamMember {
-  id             String   @id @default(cuid())
-  metaTeamId     String
-  metaTeam       MetaTeam @relation(fields: [metaTeamId], references: [id], onDelete: Cascade)
-  slot           String
-  uniformId      String
-  uniform        Uniform  @relation(fields: [uniformId], references: [id])
-  ctpId          String?
-  ctp            Ctp?     @relation(fields: [ctpId], references: [id])
+  id               String   @id @default(cuid())
+  metaTeamId       String
+  metaTeam         MetaTeam @relation(fields: [metaTeamId], references: [id], onDelete: Cascade)
+  slot             String
+  uniformId        String
+  uniform          Uniform  @relation("MemberUniform", fields: [uniformId], references: [id])
+  ctpId            String?
+  ctp              Ctp?     @relation(fields: [ctpId], references: [id])
   // Causador de Dano (qualquer posição): as rotações dele ficam em Rotation (por personagem/traje).
-  isDamageDealer Boolean  @default(false)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  isDamageDealer   Boolean  @default(false)
+  // Striker meta (apoio da Transcendência 4) do Causador de Dano nesta equipe.
+  strikerUniformId String?
+  striker          Uniform? @relation("MemberStriker", fields: [strikerUniformId], references: [id], onDelete: SetNull)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   @@unique([metaTeamId, slot])
 }
@@ -142,7 +151,9 @@ model Rotation {
   agentId     String
   agent       Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
   uniformId   String?
-  uniform     Uniform? @relation(fields: [uniformId], references: [id], onDelete: Cascade)
+  uniform     Uniform? @relation("RotationUniform", fields: [uniformId], references: [id], onDelete: Cascade)
+  // Temporada (efeito do chefe) da rotação; null = vale para todas.
+  effect      String?
   position    Int
   title       String?
   sequence    String

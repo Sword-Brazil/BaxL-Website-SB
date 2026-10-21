@@ -39,6 +39,8 @@ export const UserSelectionsSchema = z.object({
   roster: z.object({ ownedUniformIds: z.array(idSchema).max(5000) }),
   teams: z.record(teamKeySchema, UserTeamSchema),
   equipment: EquipmentSchema.default({ ctpByAgent: {} }),
+  /** Montar equipes escolhendo entre todos os personagens (só a restrição do dia vale), sem elenco. */
+  freePick: z.boolean().default(false),
 });
 export type UserSelections = z.infer<typeof UserSelectionsSchema>;
 

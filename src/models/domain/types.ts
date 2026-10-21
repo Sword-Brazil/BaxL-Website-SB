@@ -1,6 +1,9 @@
 import type {
   Unknown,
   AttackType,
+  BalEffect,
+  BaxEffect,
+  BossEffect,
   CriterionAttribute,
   CtpQuality,
   CtpType,
@@ -33,6 +36,8 @@ export interface Uniform extends RestrictableAttributes {
   /** Imagem a exibir: a do traje ou, se ele não tiver, o retrato do personagem ("" = iniciais). */
   portrait: string;
   active: boolean;
+  /** Efeitos que o traje causa no chefe da BA (para atordoá-lo na temporada certa). */
+  effects: BossEffect[];
 }
 
 export interface Agent {
@@ -63,6 +68,8 @@ export interface MetaTeamMember {
   ctpId: string | null;
   /** Causador de Dano (qualquer posição): leva às rotações do personagem. */
   isDamageDealer: boolean;
+  /** Striker meta (apoio da Transcendência 4) do Causador de Dano; null = não indicado. */
+  strikerUniformId: string | null;
 }
 
 /** Rotação de um personagem, em texto livre. `uniformId` null = vale para todos os trajes. */
@@ -70,6 +77,8 @@ export interface Rotation {
   id: string;
   agentId: string;
   uniformId: string | null;
+  /** Temporada (efeito do chefe) em que a rotação vale; null = todas. */
+  effect: BossEffect | null;
   position: number;
   title: string | null;
   /** Sequência em texto livre (a notação 1–6 / c / dc / qc vira "chips" quando reconhecida). */
@@ -79,6 +88,12 @@ export interface Rotation {
   /** Vídeo de referência (YouTube ou .mp4/.webm externo). */
   videoUrl: string | null;
   updatedAt: string;
+}
+
+/** Temporada atual: efeito que atordoa o chefe em todos os dias de cada modo. */
+export interface Season {
+  BAX: BaxEffect;
+  BAL: BalEffect;
 }
 
 export interface MetaTeam {
@@ -207,6 +222,7 @@ export interface CycleDay {
 
 /** O ciclo inteiro de 28 dias para a tela central, mais o conteúdo único da BAI. */
 export interface CycleOverview {
+  season: Season;
   days: CycleDay[];
   bai: { metaTeams: MetaTeam[]; bosses: BaiBoss[]; priority: PriorityLists; reserves: PriorityLists };
 }

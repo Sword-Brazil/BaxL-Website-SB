@@ -51,6 +51,35 @@ describe("curadoria", () => {
     });
   });
 
+  it("o Causador de Dano guarda o Striker meta; quem não é Causador de Dano não tem Striker", async () => {
+    const base = team(fem);
+    const saved = await saveMetaTeam(
+      {
+        ...base,
+        members: base.members.map((m) => ({ ...m, isDamageDealer: m.slot === "SOLO", strikerUniformId: maleMutant })),
+      },
+      curatorId,
+    );
+    expect(Object.fromEntries(saved.members.map((m) => [m.slot, m.strikerUniformId]))).toEqual({
+      SOLO: maleMutant,
+      SUPPORT_1: null,
+      SUPPORT_2: null,
+    });
+  });
+
+  it("recusa Striker inexistente ou do próprio personagem", async () => {
+    const base = team(fem);
+    const withStriker = (strikerUniformId: string) => ({
+      ...base,
+      members: base.members.map((m) => (m.slot === "SOLO" ? { ...m, isDamageDealer: true, strikerUniformId } : m)),
+    });
+    for (const id of ["nao-existe", fem[0]]) {
+      const err = await saveMetaTeam(withStriker(id), curatorId).catch((e) => e);
+      expect(err).toBeInstanceOf(HttpError);
+      expect(err.status).toBe(400);
+    }
+  });
+
 
   it("publicar com agente fora da restrição gera 422 RESTRICTION_VIOLATION", async () => {
     const err = await saveMetaTeam(team([maleMutant, fem[1], fem[2]]), curatorId).catch((e) => e);

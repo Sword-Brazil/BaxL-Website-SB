@@ -9,7 +9,8 @@ import { useSelectionsStore } from "./stores/selectionsStore";
 import { useCatalogViewModel, type UniformRef } from "./useCatalogViewModel";
 
 /**
- * Equipe pessoal de um dia (ou da BAI): candidatos do elenco que atendem à restrição,
+ * Equipe pessoal de um dia (ou da BAI): candidatos do elenco (ou, na escolha livre, de todo o
+ * catálogo) que atendem à restrição,
  * comparação com a Meta, sugestão, cópia da Meta/Alternativa e CTPs equipados nos personagens
  * (arrastar e soltar, toque ou teclado).
  */
@@ -26,10 +27,19 @@ export function useTeamBuilderViewModel({
   priority: PriorityLists;
 }) {
   const catalog = useCatalogViewModel();
-  const { doc, hydrated, setSlot, clearSlot, equipCtp, applyTeam } = useSelectionsStore();
+  const { doc, hydrated, setSlot, clearSlot, equipCtp, applyTeam, setFreePick } = useSelectionsStore();
   const [armedCtp, setArmedCtp] = useState<string | null>(null);
 
   const owned = useMemo(() => new Set(doc.roster.ownedUniformIds), [doc.roster.ownedUniformIds]);
+  const freePick = !!doc.freePick;
+  // Personagens que podem entrar na equipe: o elenco ou, na escolha livre, todo traje ativo.
+  const pool = useMemo(
+    () =>
+      freePick
+        ? new Set(catalog.agents.filter((a) => a.active).flatMap((a) => a.uniforms.filter((u) => u.active).map((u) => u.id)))
+        : owned,
+    [freePick, owned, catalog.agents],
+  );
   const equipment = useMemo(() => doc.equipment?.ctpByAgent ?? {}, [doc.equipment]);
   const agentIdOf = (uniformId: string) => catalog.uniformById(uniformId)?.agent.id;
   const team = useMemo(() => doc.teams[teamKey] ?? {}, [doc.teams, teamKey]);
@@ -41,17 +51,17 @@ export function useTeamBuilderViewModel({
         .filter((a) => a.active)
         .flatMap((agent) =>
           agent.uniforms
-            .filter((u) => u.active && owned.has(u.id) && matchesRestriction(u, criteria))
+            .filter((u) => u.active && pool.has(u.id) && matchesRestriction(u, criteria))
             .map((uniform) => ({ agent, uniform })),
         ),
-    [catalog.agents, criteria, owned],
+    [catalog.agents, criteria, pool],
   );
 
   const comparison = useMemo(
     () =>
       meta
         ? compareWithMeta(team, meta, {
-            ownedUniformIds: owned,
+            ownedUniformIds: pool,
             agentOf: (u) => catalog.uniformById(u)?.agent.id,
             ctpTypeOf: (c) => catalog.ctpById(c)?.type,
             equippedCtpOf: (u) => equipment[catalog.uniformById(u)?.agent.id ?? ""],
@@ -59,19 +69,19 @@ export function useTeamBuilderViewModel({
         : null,
     // catalog.* são derivados de catalog.agents/ctps
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [team, meta, owned, equipment, catalog.agents, catalog.ctps],
+    [team, meta, pool, equipment, catalog.agents, catalog.ctps],
   );
 
   const suggestion = useMemo(
-    () => suggestTeam(owned, priority, criteria, (u) => catalog.uniformById(u)?.agent),
+    () => suggestTeam(pool, priority, criteria, (u) => catalog.uniformById(u)?.agent),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [owned, priority, criteria, catalog.agents],
+    [pool, priority, criteria, catalog.agents],
   );
 
-  /** Copia uma equipe Meta/Alternativa mantendo só o que o usuário possui. */
+  /** Copia uma equipe Meta/Alternativa mantendo só o que o usuário possui (na escolha livre, tudo). */
   const copyTeam = (source: MetaTeam) => {
     const next: UserTeam = {};
-    for (const m of source.members) if (owned.has(m.uniformId)) next[m.slot] = { uniformId: m.uniformId, ctpId: null };
+    for (const m of source.members) if (pool.has(m.uniformId)) next[m.slot] = { uniformId: m.uniformId, ctpId: null };
     applyTeam(teamKey, next);
     return Object.keys(next).length;
   };
@@ -99,6 +109,9 @@ export function useTeamBuilderViewModel({
     }),
     candidates,
     hasRoster: owned.size > 0,
+    /** Escolha livre: todos os personagens, só com a restrição do dia (sem preencher o elenco). */
+    freePick,
+    setFreePick,
     isOwned: (uniformId: string) => owned.has(uniformId),
     suggestion,
     hydrated,

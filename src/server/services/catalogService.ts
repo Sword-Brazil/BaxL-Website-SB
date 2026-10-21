@@ -1,4 +1,4 @@
-import { CTP_QUALITIES, CTP_TYPES, type AttackType, type CtpQuality, type CtpType, type Gender, type Side, type Species } from "@/models/domain/enums";
+import { CTP_QUALITIES, CTP_TYPES, type AttackType, type BossEffect, type CtpQuality, type CtpType, type Gender, type Side, type Species } from "@/models/domain/enums";
 import type { Agent, Catalog, Ctp } from "@/models/domain/types";
 import { catalogRepository } from "@/server/repositories/catalogRepository";
 
@@ -32,6 +32,7 @@ export async function getCatalog(): Promise<Catalog> {
           side: u.side as Side,
           species: u.species as Species,
           attackType: u.attackType as AttackType,
+          effects: u.effects as BossEffect[],
         })),
       };
     }),

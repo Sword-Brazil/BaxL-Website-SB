@@ -21,6 +21,7 @@ público `assets`) e o `imagePath` guarda a URL pública. Os "enums" são `Strin
 | `CriterionAttribute` | `GENDER`, `SIDE`, `SPECIES`, `ATTACK_TYPE` |
 | `CtpType` | `RAGE` (Fúria), `LIBERATION` (Liberação), `INSIGHT` (Percepção), `COMPETITION` (Competição), `JUDGEMENT` (Julgamento), `ASCENT` (Salto) |
 | `CtpQuality` | `NORMAL`, `MIGHTY` (Poderoso), `BRILLIANT` (Brilhante) |
+| `BossEffect` | BAX: `SILENCE` (Silêncio), `PARALYSIS` (Paralisia), `BURN` (Queimadura) · BAL: `FRACTURE` (Fratura), `SHOCK` (Choque), `TRAP` (Armadilha). Efeito que atordoa o chefe numa temporada |
 | `Slot` | `SOLO` (Solador), `SUPPORT_1`, `SUPPORT_2` |
 | `TeamScope` | `DAY`, `BAL_FREE`, `BAI` |
 
@@ -45,6 +46,7 @@ Relações: 1–N `Uniform`. O personagem não tem atributos: eles são de cada 
 | name | string | 1–80 caracteres; "Padrão" para o visual base |
 | imagePath | string | caminho em `public/assets/agents/...` |
 | gender, side, species, attackType | enum ou `UNKNOWN` | atributos do traje (ex.: Fênix Negra vilã); restrições e o selo herói/vilão usam o traje |
+| effects | `BossEffect[]` | efeitos que o traje causa no chefe; na temporada do efeito, a tela de BA marca o traje (atordoa o chefe). Omitido no PUT = mantém |
 | active | boolean | |
 
 ### Rotation
@@ -52,6 +54,7 @@ Relações: 1–N `Uniform`. O personagem não tem atributos: eles são de cada 
 |-------|------|--------|
 | agentId | FK Agent | cascade |
 | uniformId | FK Uniform? | traje do próprio personagem; null = vale para todos os trajes |
+| effect | `BossEffect`? | temporada em que a rotação vale; null = todas |
 | position | int | ordem na tela do jogador |
 | title | string? | ≤ 80 caracteres |
 | sequence | string | texto livre, 1–1000 caracteres (sem formato obrigatório) |
@@ -77,6 +80,8 @@ O nome exibido vem do i18n (`ctp.RAGE` → "Fúria"), não do banco.
 | dayTurnoverHour | int | padrão 12 (BRT) |
 | weeklyResetHour | int | padrão 22 (BRT) |
 | baiWeekday | int | padrão 3 (3º dia da semana) |
+| baxEffect | `BossEffect` (BAX) | temporada atual da BAX, vale para todos os dias; padrão `PARALYSIS` |
+| balEffect | `BossEffect` (BAL) | temporada atual da BAL, vale para todos os dias; padrão `SHOCK` |
 
 ### BattleDay
 | Campo | Tipo | Regras |
@@ -122,6 +127,7 @@ aba Admin.
 | uniformId | FK Uniform | o agente é derivado do uniforme |
 | ctpId | FK Ctp | obrigatório |
 | isDamageDealer | boolean | Causador de Dano (qualquer slot); default false. As rotações ficam em `Rotation` |
+| strikerUniformId | FK Uniform? | Striker meta (apoio da Transcendência 4) do Causador de Dano: traje ativo de outro personagem; null fora do Causador de Dano; set null se o traje for apagado |
 
 **Validações ao publicar** (FR-026):
 - Três slots preenchidos, sem agente repetido.
