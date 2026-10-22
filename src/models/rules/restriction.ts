@@ -12,11 +12,16 @@ export const RESTRICTABLE_FIELDS = Object.values(FIELD);
 
 /**
  * Regra "E": o traje atende ao dia se atender a todos os critérios. Sem critérios = sem restrição.
- * Atributo "não informado" (UNKNOWN) não bloqueia: os curadores completam no catálogo.
+ * Atributo "não informado" (UNKNOWN) não bloqueia na curadoria (os curadores completam no
+ * catálogo); com `strict` (montagem do jogador), só entra quem tem exatamente as tags do dia.
  */
-export function matchesRestriction(subject: RestrictableAttributes, criteria: readonly Criterion[]): boolean {
+export function matchesRestriction(
+  subject: RestrictableAttributes,
+  criteria: readonly Criterion[],
+  { strict = false }: { strict?: boolean } = {},
+): boolean {
   return criteria.every((c) => {
     const value = subject[FIELD[c.attribute]];
-    return value === UNKNOWN || value === c.value;
+    return value === c.value || (!strict && value === UNKNOWN);
   });
 }

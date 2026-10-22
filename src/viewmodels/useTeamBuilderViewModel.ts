@@ -51,7 +51,7 @@ export function useTeamBuilderViewModel({
         .filter((a) => a.active)
         .flatMap((agent) =>
           agent.uniforms
-            .filter((u) => u.active && pool.has(u.id) && matchesRestriction(u, criteria))
+            .filter((u) => u.active && pool.has(u.id) && matchesRestriction(u, criteria, { strict: true }))
             .map((uniform) => ({ agent, uniform })),
         ),
     [catalog.agents, criteria, pool],
