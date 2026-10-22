@@ -8,7 +8,7 @@ import { requireRole } from "@/server/session";
 /** Substitui as rotações do personagem (curadoria). */
 export default handler({
   PUT: async (req, res) => {
-    await requireRole(req, res, "CURATOR");
+    await requireRole(req, res, "ADMIN");
     const { id } = parseQuery(z.object({ id: idSchema }), req);
     res.status(200).json(await saveAgentRotations(id, parseBody(AgentRotationsSchema, req)));
   },

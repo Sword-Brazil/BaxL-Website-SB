@@ -13,7 +13,7 @@
   },
   "guard": {
     "forbidden": "Acesso negado",
-    "forbiddenText": "Esta área é exclusiva para curadores e administradores da Sword Brasil.",
+    "forbiddenText": "Esta área é exclusiva para os administradores da Sword Brasil.",
     "goHome": "Voltar ao início"
   },
   "overview": {
@@ -24,7 +24,7 @@
     "catalog": "Agentes, uniformes e imagens.",
     "ctps": "Tipos, fotos e disponibilidade dos CTPs.",
     "bai": "Sequência de chefes da BAI.",
-    "users": "Jogadores, curadores e administradores: criar contas, papéis e senhas.",
+    "users": "Membros e administradores: criar contas, papéis e senhas.",
     "settings": "Âncora do ciclo e horários de virada.",
     "rotations": "Rotações dos personagens (Causadores de Dano), por traje, com descrição e vídeo."
   },
@@ -168,8 +168,7 @@
     "search": "Buscar por usuário ou apelido…",
     "role": "Papel",
     "roles": {
-      "USER": "Jogador",
-      "CURATOR": "Curador",
+      "USER": "Membro",
       "ADMIN": "Administrador"
     },
     "changeRoleConfirm": "Alterar o papel de {{name}} para {{role}}?",

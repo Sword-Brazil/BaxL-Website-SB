@@ -9,7 +9,7 @@ const Params = z.object({ mode: dayModeSchema, number: dayNumberParamSchema });
 
 export default handler({
   PUT: async (req, res) => {
-    await requireRole(req, res, "CURATOR");
+    await requireRole(req, res, "ADMIN");
     const { mode, number } = parseQuery(Params, req);
     const { criteria } = parseBody(RestrictionSchema, req);
     res.status(200).json({ criteria: await setRestriction(mode, number, criteria) });

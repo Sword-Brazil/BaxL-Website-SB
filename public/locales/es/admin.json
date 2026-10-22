@@ -13,7 +13,7 @@
   },
   "guard": {
     "forbidden": "Acceso denegado",
-    "forbiddenText": "Esta área es exclusiva para curadores y administradores de Sword Brasil.",
+    "forbiddenText": "Esta área es exclusiva para los administradores de Sword Brasil.",
     "goHome": "Volver al inicio"
   },
   "overview": {
@@ -24,7 +24,7 @@
     "catalog": "Agentes, uniformes e imágenes.",
     "ctps": "Tipos, fotos y disponibilidad de los CTPs.",
     "bai": "Secuencia de jefes de la BAI.",
-    "users": "Jugadores, curadores y administradores: cuentas, roles y contraseñas.",
+    "users": "Miembros y administradores: cuentas, roles y contraseñas.",
     "settings": "Ancla del ciclo y horarios de cambio.",
     "rotations": "Rotaciones de los personajes (causantes de daño), por traje, con descripción y vídeo."
   },
@@ -168,8 +168,7 @@
     "search": "Buscar por usuario o apodo…",
     "role": "Rol",
     "roles": {
-      "USER": "Jugador",
-      "CURATOR": "Curador",
+      "USER": "Miembro",
       "ADMIN": "Administrador"
     },
     "changeRoleConfirm": "¿Cambiar el rol de {{name}} a {{role}}?",

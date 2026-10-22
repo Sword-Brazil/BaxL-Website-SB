@@ -29,7 +29,7 @@ export async function listUsers({ q, page = 1 }: { q?: string; page?: number }) 
   };
 }
 
-/** Cadastro de contas (jogadores, curadores e administradores): só um Administrador cria. */
+/** Cadastro de contas (membros e administradores): só um Administrador cria. */
 export async function createUser(input: CreateUserInput) {
   const username = input.username.trim().toLowerCase().replace(/\s+/g, " ");
   if (await prisma.user.findUnique({ where: { username } })) {

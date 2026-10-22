@@ -6,7 +6,7 @@ import { hashPassword, login } from "@/server/services/authService";
 
 const IP = "10.0.0.1";
 
-async function createUser(username = "jogador", password = "senha1234", role = "CURATOR") {
+async function createUser(username = "jogador", password = "senha1234", role = "ADMIN") {
   return prisma.user.create({ data: { username, passwordHash: await hashPassword(password), role } });
 }
 
@@ -18,7 +18,7 @@ describe("authService.login", () => {
   it("login correto retorna o SessionUser (sem hash)", async () => {
     const u = await createUser();
     const user = await login({ username: "  Jogador ", password: "senha1234", ip: IP });
-    expect(user).toEqual({ id: u.id, username: "jogador", nickname: null, role: "CURATOR" });
+    expect(user).toEqual({ id: u.id, username: "jogador", nickname: null, role: "ADMIN" });
     expect(user).not.toHaveProperty("passwordHash");
   });
 

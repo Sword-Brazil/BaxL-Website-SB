@@ -9,12 +9,12 @@ const Params = z.object({ id: idSchema });
 
 export default handler({
   PUT: async (req, res) => {
-    const user = await requireRole(req, res, "CURATOR");
+    const user = await requireRole(req, res, "ADMIN");
     const { id } = parseQuery(Params, req);
     res.status(200).json(await saveMetaTeam(parseBody(MetaTeamSchema, req), user.id, id));
   },
   DELETE: async (req, res) => {
-    await requireRole(req, res, "CURATOR");
+    await requireRole(req, res, "ADMIN");
     await deleteMetaTeam(parseQuery(Params, req).id);
     res.status(204).end();
   },

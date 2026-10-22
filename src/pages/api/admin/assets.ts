@@ -8,7 +8,7 @@ export const config = { api: { bodyParser: { sizeLimit: "3mb" } } };
 
 export default handler({
   POST: async (req, res) => {
-    await requireRole(req, res, "CURATOR");
+    await requireRole(req, res, "ADMIN");
     res.status(201).json(await saveUpload(parseBody(AssetUploadSchema, req)));
   },
 });

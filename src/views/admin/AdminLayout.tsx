@@ -18,17 +18,17 @@ const NAV = [
   { href: "/admin/metas", key: "metas" },
   { href: "/admin/catalogo", key: "catalog" },
   { href: "/admin/rotacoes", key: "rotations" },
-  { href: "/admin/ctps", key: "ctps", adminOnly: true },
+  { href: "/admin/ctps", key: "ctps" },
   { href: "/admin/bai", key: "bai" },
-  { href: "/admin/usuarios", key: "users", adminOnly: true },
-  { href: "/admin/config", key: "settings", adminOnly: true },
+  { href: "/admin/usuarios", key: "users" },
+  { href: "/admin/config", key: "settings" },
 ] as const;
 
-/** Sem sessão → /entrar; papel USER (ou não-ADMIN em página de ADMIN) → acesso negado. */
-export function AdminGuard({ adminOnly = false, children }: { adminOnly?: boolean; children: ReactNode }) {
+/** Sem sessão → /entrar; membro comum (USER) → acesso negado: a administração é só do ADMIN. */
+export function AdminGuard({ children }: { children: ReactNode }) {
   const { t } = useTranslation("admin");
   const router = useRouter();
-  const { user, isLoading, isCurator, isAdmin } = useAuthViewModel();
+  const { user, isLoading, isAdmin } = useAuthViewModel();
 
   useEffect(() => {
     if (!isLoading && !user) router.replace({ pathname: "/entrar", query: { next: router.asPath } });
@@ -41,7 +41,7 @@ export function AdminGuard({ adminOnly = false, children }: { adminOnly?: boolea
       </LoadingState>
     );
   }
-  if (!isCurator || (adminOnly && !isAdmin)) {
+  if (!isAdmin) {
     return (
       <Card variant="panel" className="mx-auto max-w-lg">
         <CardHeader>
@@ -66,26 +66,22 @@ export function AdminLayout({
   title,
   subtitle,
   help,
-  adminOnly = false,
   children,
 }: {
   title: string;
   subtitle?: string;
   help?: string;
-  adminOnly?: boolean;
   children: ReactNode;
 }) {
   const { t } = useTranslation("admin");
   const { pathname } = useRouter();
-  const { isAdmin } = useAuthViewModel();
-
   return (
     <AppLayout title={`${t("title")} · ${title}`} wide>
-      <AdminGuard adminOnly={adminOnly}>
+      <AdminGuard>
         <div className="flex flex-col gap-4 sm:gap-6">
           {/* Todas as seções sempre visíveis: quebram em linhas no celular, sem rolagem escondida. */}
           <nav className="-mx-1 flex flex-wrap gap-1" aria-label={t("title")}>
-            {NAV.filter((n) => !("adminOnly" in n) || isAdmin).map((n) => (
+            {NAV.map((n) => (
               <Button
                 key={n.href}
                 asChild

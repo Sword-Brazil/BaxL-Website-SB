@@ -12,11 +12,11 @@ function target(req: NextApiRequest) {
 
 export default handler({
   GET: async (req, res) => {
-    await requireRole(req, res, "CURATOR");
+    await requireRole(req, res, "ADMIN");
     res.status(200).json(await getPriority(target(req)));
   },
   PUT: async (req, res) => {
-    await requireRole(req, res, "CURATOR");
+    await requireRole(req, res, "ADMIN");
     res.status(200).json(await savePriority(target(req), parseBody(PrioritySchema, req)));
   },
 });

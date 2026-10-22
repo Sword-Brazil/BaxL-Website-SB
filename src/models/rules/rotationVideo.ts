@@ -1,4 +1,4 @@
-// Vídeo de referência da rotação: o sistema não hospeda vídeo (fica leve e gratuito). O curador
+// Vídeo de referência da rotação: o sistema não hospeda vídeo (fica leve e gratuito). O administrador
 // cola um link do YouTube (vídeo, Shorts ou youtu.be, com tempo de início opcional) ou de um
 // arquivo .mp4/.webm hospedado em outro lugar.
 

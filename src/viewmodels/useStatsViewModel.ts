@@ -13,7 +13,7 @@ import { useCatalogViewModel } from "./useCatalogViewModel";
 
 const TOP = 15;
 
-/** Origem da repetição: equipes Meta dos curadores ou equipes montadas pelo usuário. */
+/** Origem da repetição: equipes Meta da administração ou equipes montadas pelo usuário. */
 export type RepetitionSource = "META" | "MINE";
 
 /**

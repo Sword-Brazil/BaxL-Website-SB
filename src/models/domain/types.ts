@@ -213,7 +213,7 @@ export interface CycleModeDay {
   metaTeams: MetaTeam[];
   /** Usada na sugestão: gerada das equipes, seguida das reservas. */
   priority: PriorityLists;
-  /** Reservas cadastradas pelos curadores (além das equipes). */
+  /** Reservas cadastradas pela administração (além das equipes). */
   reserves: PriorityLists;
 }
 
