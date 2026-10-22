@@ -3,31 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import { getCycle } from "@/models/api/cycle";
 import { toast } from "sonner";
 import { CRITERION_ATTRIBUTES, type CriterionAttribute } from "@/models/domain/enums";
-import type { Agent, CycleOverview } from "@/models/domain/types";
+import type { Agent } from "@/models/domain/types";
 import { matchesRestriction } from "@/models/rules/restriction";
+import { ownedAgentIds, rosterAgents, uniformsInTeams, visibleUniforms } from "@/models/rules/roster";
 import { UserSelectionsSchema } from "@/models/schemas/selections";
 import { useSelectionsStore } from "./stores/selectionsStore";
 import { useCatalogViewModel } from "./useCatalogViewModel";
 
 type Filters = Partial<Record<CriterionAttribute, string>>;
-
-/** Uniformes usados em alguma equipe (Meta/Alternativa) do ciclo ou da BAI. */
-function uniformsInTeams(cycle: CycleOverview | undefined): Set<string> {
-  const teams = cycle
-    ? [...cycle.days.flatMap((d) => [...(d.bax?.metaTeams ?? []), ...(d.bal?.metaTeams ?? [])]), ...cycle.bai.metaTeams]
-    : [];
-  return new Set(teams.flatMap((t) => t.members.map((m) => m.uniformId)));
-}
-
-/**
- * Trajes exibidos no elenco: o "Padrão" some quando o personagem tem outros trajes e o Padrão
- * não é usado em nenhuma equipe (o personagem é jogado com traje).
- */
-function visibleUniforms(agent: Agent, used: Set<string>) {
-  const active = agent.uniforms.filter((u) => u.active);
-  const hasCostume = active.some((u) => u.slug !== "padrao");
-  return active.filter((u) => !(u.slug === "padrao" && hasCostume && !used.has(u.id)));
-}
 
 /** Elenco do usuário: marcação de uniformes, busca/filtros, backup e redefinição por modo. */
 export function useRosterViewModel(messages: { imported: string; invalid: string }) {
@@ -41,7 +24,8 @@ export function useRosterViewModel(messages: { imported: string; invalid: string
   const [filters, setFilters] = useState<Filters>({});
 
   const owned = useMemo(() => new Set(doc.roster.ownedUniformIds), [doc.roster.ownedUniformIds]);
-  const activeAgents = useMemo(() => catalog.agents.filter((a) => a.active), [catalog.agents]);
+  const activeAgents = useMemo(() => rosterAgents(catalog.agents, usedUniforms), [catalog.agents, usedUniforms]);
+  const ownedAgents = useMemo(() => ownedAgentIds(catalog.agents, owned, usedUniforms), [catalog.agents, owned, usedUniforms]);
 
   const agents = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -49,10 +33,7 @@ export function useRosterViewModel(messages: { imported: string; invalid: string
     return activeAgents.filter((a) => (!q || a.name.toLowerCase().includes(q)) && a.uniforms.some((u) => matchesRestriction(u, criteria)));
   }, [activeAgents, search, filters]);
 
-  const ownedAgentCount = activeAgents.filter((a) => a.uniforms.some((u) => owned.has(u.id))).length;
-
-  const isAgentOwned = (agentId: string) =>
-    activeAgents.some((a) => a.id === agentId && a.uniforms.some((u) => owned.has(u.id)));
+  const isAgentOwned = (agentId: string) => ownedAgents.has(agentId);
 
   return {
     agents,
@@ -78,7 +59,7 @@ export function useRosterViewModel(messages: { imported: string; invalid: string
       const agent = activeAgents.find((a) => a.id === agentId);
       if (agent) setOwnedUniforms(visibleUniforms(agent, usedUniforms).map((u) => u.id), isOwned);
     },
-    ownedAgentCount,
+    ownedAgentCount: ownedAgents.size,
     totalAgents: activeAgents.length,
     search,
     setSearch,

@@ -10,7 +10,9 @@ import { cn } from "@/lib/utils";
 export function BrandMark({ compact = false }: { compact?: boolean }) {
   const { t } = useTranslation("common");
   return (
-    <Link href="/" className="flex items-center gap-2.5 rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
+    // xl:shrink-0: ao lado do menu completo, o nome e o subtítulo não são espremidos (quebravam em
+    // duas linhas e invadiam o menu). Abaixo disso, o subtítulo pode quebrar como antes.
+    <Link href="/" className="flex items-center gap-2.5 rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50 xl:shrink-0">
       <Image
         src="/brand/sword-brazil-mark.png"
         alt=""

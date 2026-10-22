@@ -43,6 +43,10 @@
     "restriction": "Restriction",
     "team": "Team",
     "allReleased": "All agents allowed",
-    "generatedAt": "Generated on {{date}}. ⚔ = Damage dealer."
+    "generatedAt": "Generated on {{date}}. ⚔ = Damage dealer.",
+    "all": "Full table (Metas and my teams)",
+    "mine": "My teams only",
+    "subtitleMine": "My teams per day · {{week}} · Sword Brazil",
+    "noMine": "No team built"
   }
 }

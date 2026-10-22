@@ -181,16 +181,20 @@ export function AppLayout({ title, children, wide = false }: { title?: string; c
         <meta property="og:image" content="/brand/og.jpg" />
       </Head>
       <div className="flex min-h-dvh flex-col">
-        <header className="sticky top-0 z-40 border-b border-energy/15 bg-background/80 backdrop-blur-md">
+        <header className="sticky top-0 z-40 border-b border-energy/15 bg-background/95">
           <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4">
             {isLoggedIn && (
               <Sheet>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon-touch" className="xl:hidden" aria-label={t("nav.menu")}>
-                    <MenuIcon />
+                    <MenuIcon className="size-6" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-72">
+                {/* Desliza inteiro da esquerda ao abrir e volta para a esquerda ao fechar. */}
+                <SheetContent
+                  side="left"
+                  className="w-72 ease-out data-closed:duration-200 data-closed:slide-out-to-left! data-open:duration-300 data-open:slide-in-from-left!"
+                >
                   <SheetHeader>
                     <SheetTitle className="sr-only">{t("nav.menu")}</SheetTitle>
                     <BrandMark />

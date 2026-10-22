@@ -115,6 +115,11 @@
       "remove": "Remove Striker",
       "none": "No character available",
       "metaWas": "Meta: {{name}}"
+    },
+    "dayCtp": {
+      "default": "Character default",
+      "thisDay": "This day only",
+      "useDefault": "Use default"
     }
   }
 }

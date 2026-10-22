@@ -1,14 +1,45 @@
 @import "tailwindcss";
 
+/*
+ * Neon do cartão com CTP no elenco: o brilho fica fixo no cartão e uma camada (::after) com o
+ * brilho mais forte só varia a opacidade. Animar box-shadow repintava cada cartão a cada quadro.
+ */
 @keyframes roster-ctp-glow {
-  0%, 100% { box-shadow: 0 0 5px 1px color-mix(in srgb, var(--ctp-neon) 65%, transparent), 0 0 11px 2px color-mix(in srgb, var(--ctp-neon) 35%, transparent); }
-  50% { box-shadow: 0 0 7px 1px color-mix(in srgb, var(--ctp-neon) 72%, transparent), 0 0 15px 3px color-mix(in srgb, var(--ctp-neon) 42%, transparent); }
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
 }
 
 .roster-ctp-neon {
+  position: relative;
   border-radius: 0.75rem;
+  box-shadow: 0 0 5px 1px color-mix(in srgb, var(--ctp-neon) 65%, transparent), 0 0 11px 2px color-mix(in srgb, var(--ctp-neon) 35%, transparent);
+}
+.roster-ctp-neon::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: 0 0 7px 1px color-mix(in srgb, var(--ctp-neon) 72%, transparent), 0 0 15px 3px color-mix(in srgb, var(--ctp-neon) 42%, transparent);
   animation: roster-ctp-glow 3.6s ease-in-out infinite;
 }
+
+/* Efeitos de qualidade do CTP (CtpQualityFx): só opacidade e transform, poucas camadas. */
+@keyframes ctp-twinkle {
+  0%, 100% { opacity: 0; }
+  18%, 58% { opacity: 1; }
+  78% { opacity: 0; }
+}
+@keyframes ctp-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes ctp-galaxy-in {
+  from { opacity: 0; transform: scale(0.6); }
+}
+.ctp-twinkle { animation: ctp-twinkle 3.2s ease-in-out infinite both; }
+/* Desenhada uma vez numa camada própria e só girada pela GPU. */
+.ctp-spin { animation: ctp-spin 36s linear infinite; will-change: transform; }
+.ctp-galaxy-in { animation: ctp-galaxy-in 2.4s ease-out 0.8s both; }
 
 .roster-ctp-card[data-variant="panel"] {
   clip-path: none;
@@ -16,7 +47,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .roster-ctp-neon { animation: none; box-shadow: 0 0 6px 1px color-mix(in srgb, var(--ctp-neon) 65%, transparent), 0 0 13px 2px color-mix(in srgb, var(--ctp-neon) 40%, transparent); }
+  .roster-ctp-neon::after { animation: none; opacity: 0; }
 }
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -229,10 +260,20 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  /*
+   * Fundo fixo numa camada própria: `background-attachment: fixed` repintava a página inteira a
+   * cada rolagem no PC (o celular ignora essa propriedade, por isso lá não pesava).
+   */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
     background-image:
       radial-gradient(60rem 30rem at 50% -10rem, var(--glow), transparent 70%),
       linear-gradient(to bottom, transparent, color-mix(in oklch, var(--background) 85%, black));
-    background-attachment: fixed;
   }
   button:not(:disabled),
   [role="button"]:not(:disabled) {

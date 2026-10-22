@@ -140,7 +140,7 @@ export function MetaCycleBoard({ scopeVm, vm }: { scopeVm: MetaScopeViewModel; v
   return (
     <div className="flex flex-col gap-3">
       <p className="text-sm text-muted-foreground">{t("admin:metas.boardHint")}</p>
-      <div className="sticky top-16 z-20 -mx-4 flex flex-wrap items-center gap-2 border-b border-energy/15 bg-background/90 px-4 py-2 backdrop-blur-md">
+      <div className="sticky top-16 z-20 -mx-4 flex flex-wrap items-center gap-2 border-b border-energy/15 bg-background/95 px-4 py-2">
         <ToggleGroup type="single" size="sm" variant="outline" value={week} onValueChange={(v) => v && setWeek(v)} className="max-w-full overflow-x-auto">
           <ToggleGroupItem value="all">{t("admin:metas.allWeeks")}</ToggleGroupItem>
           {[1, 2, 3, 4].map((n) => (

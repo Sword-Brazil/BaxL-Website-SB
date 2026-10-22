@@ -145,8 +145,14 @@ function SlotRow({
                 {slot.ctp ? (
                   <>
                     <CtpBadge ctp={slot.ctp} size="sm" />
-                    <span className="min-w-0 flex-1 truncate">
-                      {t(`common:ctp.${slot.ctp.type}`)} · {t(`common:quality.${slot.ctp.quality}`)}
+                    <span className="flex min-w-0 flex-1 flex-col">
+                      <span className="truncate">
+                        {t(`common:ctp.${slot.ctp.type}`)} · {t(`common:quality.${slot.ctp.quality}`)}
+                      </span>
+                      {/* Padrão do personagem (elenco) ou escolhido só para este dia. */}
+                      <span className="truncate text-[0.65rem] text-muted-foreground">
+                        {slot.ctpIsDefault ? t("days:myTeam.dayCtp.default") : t("days:myTeam.dayCtp.thisDay")}
+                      </span>
                     </span>
                     <span className="shrink-0 text-energy">{t("common:ctpPicker.change")}</span>
                   </>
@@ -209,7 +215,7 @@ function SlotRow({
             )}
             {slot.pick && (
               <span className="ml-auto flex gap-1">
-                {slot.ctp && (
+                {slot.ctp && !slot.ctpIsDefault && (
                   <Button
                     size="xs"
                     variant="ghost"
@@ -219,7 +225,7 @@ function SlotRow({
                     }}
                   >
                     <XIcon data-icon="inline-start" />
-                    {t("days:myTeam.palette.remove")}
+                    {slot.hasDefaultCtp ? t("days:myTeam.dayCtp.useDefault") : t("days:myTeam.palette.remove")}
                   </Button>
                 )}
                 <Button

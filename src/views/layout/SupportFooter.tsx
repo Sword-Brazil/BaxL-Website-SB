@@ -58,9 +58,11 @@ export function SupportButton() {
           size="sm"
           className="border-spark/50 text-spark hover:bg-spark/10 hover:text-spark"
           aria-label={t("footer.support.button")}
+          title={t("footer.support.button")}
         >
           <HeartHandshakeIcon data-icon="inline-start" />
-          <span className="hidden sm:inline">{t("footer.support.button")}</span>
+          {/* Com o menu completo no cabeçalho (xl), só o ícone, para caber o nome da aliança. */}
+          <span className="hidden sm:inline xl:hidden">{t("footer.support.button")}</span>
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" collisionPadding={16} className="w-80 max-w-[calc(100vw-2rem)] text-sm">
