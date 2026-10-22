@@ -3,7 +3,8 @@
   "subtitle": "Anota tu puntuación de cada día y modo y sigue tus ganancias y pérdidas por día, semana y temporada.",
   "help": {
     "text1": "Completa la puntuación de cada modo en el día de juego (el día cambia a las 12h). Como la BA se reinicia cada 28 días, cada día y semana se compara con el mismo día y semana del mes anterior: verde subió, rojo bajó.",
-    "text2": "Se guarda en el dispositivo y, si inicias sesión, también en tu cuenta. Solo tú ves tus puntuaciones."
+    "text2": "Se guarda en el dispositivo y, si inicias sesión, también en tu cuenta. Solo tú ves tus puntuaciones.",
+    "text3": "En el día del reset (jueves, Días 1, 8, 15 y 22), anota dos veces: lo que hiciste antes de las 22h cuenta en la semana que termina; después de las 22h la puntuación se reinicia y cuenta en la semana nueva."
   },
   "locked": {
     "title": "Se libera hoy a las 22h",
@@ -32,7 +33,13 @@
     "invalid": "Solo números (puedes usar punto para separar los miles).",
     "myTeam": "Mi equipo del día",
     "noTeam": "No armaste equipo para este día.",
-    "buildTeam": "Armar equipo"
+    "buildTeam": "Armar equipo",
+    "phase": {
+      "pre": "Antes del reset (12h–22h)",
+      "post": "Después del reset (22h–12h)"
+    },
+    "countsFor": "cuenta en la Semana {{n}}",
+    "now": "ahora"
   },
   "chart": {
     "title": "Rendimiento",
@@ -62,6 +69,7 @@
     "mode": "Modo",
     "points": "Puntos",
     "delta": "vs. mes anterior",
-    "team": "Equipo"
+    "team": "Equipo",
+    "preReset": "antes del reset"
   }
 }
