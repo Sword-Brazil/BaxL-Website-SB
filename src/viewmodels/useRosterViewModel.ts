@@ -4,6 +4,7 @@ import { getCycle } from "@/models/api/cycle";
 import { toast } from "sonner";
 import { CRITERION_ATTRIBUTES, type CriterionAttribute } from "@/models/domain/enums";
 import type { Agent } from "@/models/domain/types";
+import type { CtpSlot } from "@/models/rules/ctpAssign";
 import { matchesRestriction } from "@/models/rules/restriction";
 import { ownedAgentIds, rosterAgents, uniformsInTeams, visibleUniforms } from "@/models/rules/roster";
 import { UserSelectionsSchema } from "@/models/schemas/selections";
@@ -21,6 +22,7 @@ export function useRosterViewModel(messages: { imported: string; invalid: string
   const [search, setSearch] = useState("");
   const [armedCtp, setArmedCtp] = useState<string | null>(null);
   const equipment = doc.equipment?.ctpByAgent ?? {};
+  const equipment2 = doc.equipment?.ctp2ByAgent ?? {};
   const [filters, setFilters] = useState<Filters>({});
 
   const owned = useMemo(() => new Set(doc.roster.ownedUniformIds), [doc.roster.ownedUniformIds]);
@@ -38,18 +40,18 @@ export function useRosterViewModel(messages: { imported: string; invalid: string
   return {
     agents,
     visibleUniforms: (agent: Agent) => visibleUniforms(agent, usedUniforms),
-    // CTP equipado em cada personagem possuído (arrastar e soltar, ou tocar no CTP e depois no personagem).
+    // CTPs 1 e 2 de cada personagem possuído (arrastar e soltar, ou tocar no CTP e depois no slot).
     ctps: catalog.ctps.filter((ctp) => ctp.active),
-    equippedCtpOf: (agentId: string) => catalog.ctpById(equipment[agentId]),
+    equippedCtpOf: (agentId: string, slot: CtpSlot = 1) => catalog.ctpById((slot === 2 ? equipment2 : equipment)[agentId]),
     isAgentOwned,
     armedCtp,
     armCtp: (ctpId: string | null) => setArmedCtp((cur) => (cur === ctpId ? null : ctpId)),
-    equip: (agentId: string, ctpId: string | null) => {
-      if (isAgentOwned(agentId) || ctpId === null) equipCtp(agentId, ctpId);
+    equip: (agentId: string, ctpId: string | null, slot: CtpSlot = 1) => {
+      if (isAgentOwned(agentId) || ctpId === null) equipCtp(agentId, ctpId, slot);
     },
-    tapAgent: (agentId: string) => {
+    tapAgent: (agentId: string, slot: CtpSlot = 1) => {
       if (armedCtp && isAgentOwned(agentId)) {
-        equipCtp(agentId, armedCtp);
+        equipCtp(agentId, armedCtp, slot);
         setArmedCtp(null);
       }
     },

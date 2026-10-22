@@ -17,6 +17,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { CRITERION_ATTRIBUTES, CRITERION_VALUES } from "@/models/domain/enums";
 import { ctpColor } from "@/models/domain/ctpColors";
 import type { Agent } from "@/models/domain/types";
+import { CTP_SLOTS, type CtpSlot } from "@/models/rules/ctpAssign";
 import { useRosterViewModel } from "@/viewmodels/useRosterViewModel";
 import { CtpPalette } from "@/views/day/CtpPalette";
 import { CtpBadge } from "@/views/shared/CtpBadge";
@@ -29,7 +30,73 @@ import { QueryState } from "@/views/shared/QueryState";
 
 type RosterVm = ReturnType<typeof useRosterViewModel>;
 
-/** Cartão do agente: uniformes possuídos e o CTP equipado (alvo de arrastar e soltar). */
+/**
+ * Um dos dois CTPs do personagem (alvo de arrastar e soltar e do toque com CTP selecionado). O 1 é
+ * o padrão; o 2 é opcional e cada equipe do dia escolhe qual usa.
+ */
+function RosterCtpSlot({ agent, vm, n, dragging }: { agent: Agent; vm: RosterVm; n: CtpSlot; dragging: boolean }) {
+  const { t } = useTranslation(["roster", "common"]);
+  const ctp = vm.equippedCtpOf(agent.id, n);
+  const { setNodeRef, isOver } = useDroppable({ id: `agent:${agent.id}:${n}` });
+  return (
+    <div
+      ref={setNodeRef}
+      // Com um CTP selecionado na paleta, tocar no slot equipa (sem abrir a gaveta).
+      onClickCapture={(e) => {
+        if (!vm.armedCtp) return;
+        e.preventDefault();
+        e.stopPropagation();
+        vm.tapAgent(agent.id, n);
+      }}
+      onClick={(e) => e.stopPropagation()}
+      className={cn(
+        "flex items-center gap-1 rounded-md transition-[transform,box-shadow,background-color] duration-200",
+        (vm.armedCtp || dragging) && "cursor-copy ring-2 ring-energy/70 motion-safe:animate-pulse",
+        isOver && "scale-[1.02] bg-energy/15 ring-4 ring-energy motion-safe:animate-none",
+      )}
+    >
+      <span className="w-11 shrink-0 text-center font-heading text-[0.65rem] font-bold tracking-wider text-energy">
+        {t("common:ctpSlot.label", { n })}
+      </span>
+      <CtpPicker ctps={vm.ctps} value={ctp?.id ?? null} onChange={(id) => vm.equip(agent.id, id, n)} targetName={agent.name}>
+        <button
+          type="button"
+          className="flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-md border border-dashed border-energy/40 px-2 py-1 text-left text-xs transition-colors hover:bg-energy/10 active:bg-energy/15"
+        >
+          {ctp ? (
+            <>
+              <CtpBadge
+                key={ctp.id}
+                ctp={ctp}
+                size="sm"
+                className="motion-safe:animate-in motion-safe:zoom-in-50 motion-safe:fade-in motion-safe:duration-300"
+              />
+              <span className="min-w-0 flex-1 truncate">
+                {t(`common:ctp.${ctp.type}`)} · {t(`common:quality.${ctp.quality}`)}
+              </span>
+              <span className="shrink-0 text-energy">{t("common:ctpPicker.change")}</span>
+            </>
+          ) : (
+            <>
+              <ZapIcon className="size-4 shrink-0 text-energy" />
+              <span className="min-w-0 flex-1 truncate font-medium text-energy">
+                {n === 2 ? t("roster:ctp2Optional") : t("common:ctpPicker.choose")}
+              </span>
+              <span className="hidden truncate text-muted-foreground lg:inline">{t("roster:ctpDrop")}</span>
+            </>
+          )}
+        </button>
+      </CtpPicker>
+      {ctp && (
+        <Button size="icon-touch" variant="ghost" aria-label={t("common:ctpPicker.remove")} onClick={() => vm.equip(agent.id, null, n)}>
+          <XIcon />
+        </Button>
+      )}
+    </div>
+  );
+}
+
+/** Cartão do agente: uniformes possuídos e os CTPs 1 e 2 equipados (alvos de arrastar e soltar). */
 function AgentRosterCard({ agent, vm, dragging }: { agent: Agent; vm: RosterVm; dragging: boolean }) {
   const { t } = useTranslation(["roster", "common", "days"]);
   const activeUniforms = vm.visibleUniforms(agent);
@@ -39,10 +106,8 @@ function AgentRosterCard({ agent, vm, dragging }: { agent: Agent; vm: RosterVm; 
   // Atributos são do traje: o cartão mostra os lados de todos os trajes e o resumo do principal.
   const main = activeUniforms.find((u) => u.slug === "padrao") ?? activeUniforms[0] ?? agent.uniforms[0];
   const sides = [...new Set(activeUniforms.map((u) => u.side))].filter((s) => s !== "UNKNOWN");
-  const { setNodeRef, isOver } = useDroppable({ id: `agent:${agent.id}`, disabled: !isOwned });
   return (
     <li
-      ref={setNodeRef}
       className={cn("min-w-0", ctp && "roster-ctp-neon")}
       style={ctp ? ({ "--ctp-neon": ctpColor(ctp) } as React.CSSProperties) : undefined}
     >
@@ -54,8 +119,6 @@ function AgentRosterCard({ agent, vm, dragging }: { agent: Agent; vm: RosterVm; 
         className={cn(
           "h-full border transition-[transform,box-shadow,background-color] duration-200",
           ctp && "roster-ctp-card",
-          isOwned && (vm.armedCtp || dragging) && "cursor-copy ring-2 ring-energy/70 motion-safe:animate-pulse",
-          isOver && "scale-[1.02] bg-energy/15 ring-4 ring-energy motion-safe:animate-none",
         )}
         onClick={() => vm.tapAgent(agent.id)}
       >
@@ -122,39 +185,10 @@ function AgentRosterCard({ agent, vm, dragging }: { agent: Agent; vm: RosterVm; 
             })}
           </div>
           {isOwned && (
-            <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-              <CtpPicker ctps={vm.ctps} value={ctp?.id ?? null} onChange={(id) => vm.equip(agent.id, id)} targetName={agent.name}>
-                <button
-                  type="button"
-                  className="flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-md border border-dashed border-energy/40 px-2 py-1 text-left text-xs transition-colors hover:bg-energy/10 active:bg-energy/15"
-                >
-                  {ctp ? (
-                    <>
-                      <CtpBadge
-                        key={ctp.id}
-                        ctp={ctp}
-                        size="sm"
-                        className="motion-safe:animate-in motion-safe:zoom-in-50 motion-safe:fade-in motion-safe:duration-300"
-                      />
-                      <span className="min-w-0 flex-1 truncate">
-                        {t(`common:ctp.${ctp.type}`)} · {t(`common:quality.${ctp.quality}`)}
-                      </span>
-                      <span className="shrink-0 text-energy">{t("common:ctpPicker.change")}</span>
-                    </>
-                  ) : (
-                    <>
-                      <ZapIcon className="size-4 shrink-0 text-energy" />
-                      <span className="min-w-0 flex-1 truncate font-medium text-energy">{t("common:ctpPicker.choose")}</span>
-                      <span className="hidden truncate text-muted-foreground lg:inline">{t("roster:ctpDrop")}</span>
-                    </>
-                  )}
-                </button>
-              </CtpPicker>
-              {ctp && (
-                <Button size="icon-touch" variant="ghost" aria-label={t("common:ctpPicker.remove")} onClick={() => vm.equip(agent.id, null)}>
-                  <XIcon />
-                </Button>
-              )}
+            <div className="flex flex-col gap-1.5">
+              {CTP_SLOTS.map((n) => (
+                <RosterCtpSlot key={n} agent={agent} vm={vm} n={n} dragging={dragging} />
+              ))}
             </div>
           )}
         </CardContent>
@@ -179,7 +213,9 @@ export function RosterView() {
   const activeFilters = Object.values(vm.filters).filter(Boolean).length;
   const onDragEnd = ({ active, over }: DragEndEvent) => {
     setDraggingCtp(null);
-    if (over) vm.equip(String(over.id).replace("agent:", ""), String(active.data.current?.ctpId ?? ""));
+    if (!over) return;
+    const [, agentId, n] = String(over.id).split(":");
+    vm.equip(agentId, String(active.data.current?.ctpId ?? ""), Number(n) === 2 ? 2 : 1);
   };
   const palette = (idPrefix: string) => (
     <CtpPalette ctps={vm.ctps} armedCtp={vm.armedCtp} onArm={vm.armCtp} idPrefix={idPrefix} />

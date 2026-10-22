@@ -51,6 +51,28 @@ describe("curadoria", () => {
     });
   });
 
+  it("CTPs 1/2 ficam no personagem: a equipe escolhe o slot e trocar o CTP do slot atualiza todos os dias", async () => {
+    const insight = await ctpId("INSIGHT", "NORMAL");
+    const base = team(fem);
+    const withSlots = (slotOfSolo: 1 | 2, agentCtps: object = {}) =>
+      base.members.map((m) => ({ ...m, ctpId: null, ctpSlot: m.slot === "SOLO" ? slotOfSolo : (1 as const), ...(m.slot === "SOLO" ? agentCtps : {}) }));
+
+    const day6 = await saveMetaTeam({ ...base, members: withSlots(2, { agentCtp1Id: ctp, agentCtp2Id: insight }) }, curatorId);
+    const solo = day6.members.find((m) => m.slot === "SOLO")!;
+    expect(solo).toMatchObject({ ctpSlot: 2, ctpId: insight });
+    // Sem CTPs no personagem, o slot 1 fica sem CTP.
+    expect(day6.members.find((m) => m.slot === "SUPPORT_1")).toMatchObject({ ctpSlot: 1, ctpId: null });
+
+    const agentId = (await prisma.uniform.findUniqueOrThrow({ where: { id: fem[0] } })).agentId;
+    expect(await prisma.agent.findUniqueOrThrow({ where: { id: agentId } })).toMatchObject({ metaCtp1Id: ctp, metaCtp2Id: insight });
+
+    // Outra equipe troca o CTP 2 do personagem: a do dia 6 (slot 2) acompanha.
+    const liberation = await ctpId("LIBERATION", "MIGHTY");
+    await saveMetaTeam({ ...base, isPrimary: false, members: withSlots(1, { agentCtp2Id: liberation }) }, curatorId);
+    const again = await prisma.metaTeamMember.findFirstOrThrow({ where: { metaTeamId: day6.id, slot: "SOLO" } });
+    expect(again.ctpId).toBe(liberation);
+  });
+
   it("o Causador de Dano guarda o Striker meta; quem não é Causador de Dano não tem Striker", async () => {
     const base = team(fem);
     const saved = await saveMetaTeam(

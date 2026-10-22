@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { useTranslation } from "next-i18next/pages";
 import { cn } from "@/lib/utils";
 import { DISPLAY_SLOTS, type BossEffect, type Slot } from "@/models/domain/enums";
-import type { Ctp, MetaTeamMember } from "@/models/domain/types";
+import type { MetaTeamMember } from "@/models/domain/types";
 import type { CatalogViewModel } from "@/viewmodels/useCatalogViewModel";
 import { MemberChip } from "./MemberChip";
 
@@ -26,7 +26,6 @@ export function TeamStrip({
   members,
   catalog,
   isOwned,
-  equippedCtpOf,
   effect,
   action,
 }: {
@@ -36,8 +35,6 @@ export function TeamStrip({
   catalog: CatalogViewModel;
   /** Indica posse nas equipes Meta/Alternativa (omitir quando o usuário não tem elenco). */
   isOwned?: (uniformId: string) => boolean;
-  /** Para a equipe do usuário: CTP padrão do personagem (vale quando o dia não tem CTP próprio). */
-  equippedCtpOf?: (agentId: string) => Ctp | null;
   /** Efeito da temporada no modo do dia: marca quem atordoa o chefe. */
   effect?: BossEffect;
   action?: ReactNode;
@@ -69,10 +66,8 @@ export function TeamStrip({
         {DISPLAY_SLOTS.map((slot) => {
           const m = members.find((x) => x.slot === slot);
           const ref = m ? catalog.uniformById(m.uniformId) : null;
-          // Minha equipe: o CTP deste dia ou, sem ele, o padrão do personagem.
-          const ctp = isMine
-            ? (catalog.ctpById(m?.ctpId) ?? (ref && equippedCtpOf ? equippedCtpOf(ref.agent.id) : null))
-            : catalog.ctpById(m?.ctpId);
+          // Minha equipe: quem monta a faixa já passa o CTP do slot usado no dia.
+          const ctp = catalog.ctpById(m?.ctpId);
           return (
             <li key={slot} className="min-w-0">
               <MemberChip

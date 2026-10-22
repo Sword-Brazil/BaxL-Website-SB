@@ -15,6 +15,7 @@ type DbMetaTeam = {
     slot: string;
     uniformId: string;
     ctpId: string | null;
+    ctpSlot: number | null;
     isDamageDealer: boolean;
     strikerUniformId: string | null;
   }[];
@@ -35,6 +36,7 @@ export function toMetaTeam(t: DbMetaTeam): MetaTeam {
         slot: m.slot as Slot,
         uniformId: m.uniformId,
         ctpId: m.ctpId,
+        ctpSlot: m.ctpSlot === 1 || m.ctpSlot === 2 ? m.ctpSlot : null,
         isDamageDealer: m.isDamageDealer,
         strikerUniformId: m.strikerUniformId,
       })),

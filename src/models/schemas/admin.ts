@@ -37,7 +37,16 @@ export type RestrictionInput = z.infer<typeof RestrictionSchema>;
 export const MetaTeamMemberSchema = z.object({
   slot: slotSchema,
   uniformId: idSchema,
+  /** CTP só desta equipe (equipes antigas, sem slot). Com `ctpSlot`, o servidor usa o CTP do slot. */
   ctpId: idSchema.nullable().optional(),
+  /** Slot de CTP do personagem usado nesta equipe (1 = padrão, 2 = alternativo). */
+  ctpSlot: z.union([z.literal(1), z.literal(2)]).nullable().optional(),
+  /**
+   * CTPs da Meta do personagem (valem em todas as equipes dele). Ausente = mantém os do catálogo;
+   * null tira.
+   */
+  agentCtp1Id: idSchema.nullable().optional(),
+  agentCtp2Id: idSchema.nullable().optional(),
   /** Causador de Dano: o jogador toca na foto e vê as rotações do personagem. */
   isDamageDealer: z.boolean().optional(),
   /** Striker meta do Causador de Dano (ignorado em quem não é Causador de Dano). */
@@ -110,6 +119,8 @@ export const UniformInputSchema = z.object({
     .max(BOSS_EFFECTS.length)
     .refine((es) => new Set(es).size === es.length)
     .optional(),
+  /** Striker meta (tag do catálogo). Ausente = mantém. */
+  isMetaStriker: z.boolean().optional(),
 });
 
 export const AgentSchema = z.object({

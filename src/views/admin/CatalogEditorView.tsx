@@ -9,6 +9,7 @@ import {
   SearchIcon,
   Trash2Icon,
   TriangleAlertIcon,
+  ZapIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Alert, AlertTitle } from "@/components/ui/alert";
@@ -61,6 +62,30 @@ function UniformAttributes({ index, vm }: { index: number; vm: Vm }) {
         <AttributeBadgePicker key={f.name} field={f} value={values[i]} onChange={(v) => vm.setUniformAttribute(index, f.name, v)} />
       ))}
       <UniformEffects index={index} vm={vm} />
+      <MetaStrikerTag index={index} vm={vm} />
+    </div>
+  );
+}
+
+/** Tag de Striker meta: só os trajes marcados aparecem no seletor de Striker dos Causadores de Dano. */
+function MetaStrikerTag({ index, vm }: { index: number; vm: Vm }) {
+  const { t } = useTranslation("admin");
+  const on = !!vm.form.watch(`uniforms.${index}.isMetaStriker`);
+  return (
+    <div className="flex flex-col gap-1">
+      <button
+        type="button"
+        aria-pressed={on}
+        onClick={() => vm.form.setValue(`uniforms.${index}.isMetaStriker`, !on, { shouldDirty: true })}
+        className={cn(
+          "inline-flex h-7 cursor-pointer items-center gap-1 self-start rounded-full border px-2 pl-1.5 text-xs transition-opacity",
+          on ? "border-spark bg-spark/15 text-spark" : "border-border opacity-55 hover:opacity-100",
+        )}
+      >
+        <ZapIcon className="size-3.5" />
+        {t("catalog.metaStriker")}
+      </button>
+      <span className="text-[0.7rem] text-muted-foreground">{t("catalog.metaStrikerHelp")}</span>
     </div>
   );
 }
@@ -383,7 +408,7 @@ export function CatalogEditorView() {
             <Button variant="outline" onClick={vm.close}>
               {t("admin:common.cancel")}
             </Button>
-            <Button type="submit" form="agent-form" variant="energy" disabled={vm.isSaving || vm.uploadingIndex !== null}>
+            <Button type="submit" form="agent-form" variant="energy" disabled={vm.uploadingIndex !== null} loading={vm.isSaving}>
               {vm.isSaving ? t("admin:common.saving") : t("admin:common.save")}
             </Button>
           </DialogFooter>

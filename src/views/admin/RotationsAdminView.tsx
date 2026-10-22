@@ -117,7 +117,7 @@ function RotationEditor({ draft, index, total, agent, vm }: { draft: RotationDra
           value={draft.sequence}
           onChange={(e) => vm.update(draft.key, { sequence: e.target.value })}
         />
-        {draft.sequence.trim() ? <RotationText text={draft.sequence} /> : <FieldDescription>{t("admin:rotations.sequenceHint")}</FieldDescription>}
+        {draft.sequence.trim() ? <RotationText text={draft.sequence} preview /> : <FieldDescription>{t("admin:rotations.sequenceHint")}</FieldDescription>}
       </Field>
       <Field>
         <FieldLabel htmlFor={id("description")}>{t("admin:rotations.description")}</FieldLabel>
@@ -242,7 +242,7 @@ export function RotationsAdminView() {
             <Button variant="outline" onClick={vm.close}>
               {t("admin:common.cancel")}
             </Button>
-            <Button variant="energy" onClick={vm.submit} disabled={vm.isSaving}>
+            <Button variant="energy" onClick={vm.submit} loading={vm.isSaving}>
               {vm.isSaving ? t("admin:common.saving") : t("admin:common.save")}
             </Button>
           </DialogFooter>

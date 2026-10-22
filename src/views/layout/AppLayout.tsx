@@ -7,6 +7,7 @@ import { useTheme } from "next-themes";
 import { CloudCheckIcon, LanguagesIcon, LogInIcon, LogOutIcon, MenuIcon, MoonIcon, ShieldIcon, SunIcon, UserRoundIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -116,7 +117,14 @@ function AccountMenu() {
   const { t } = useTranslation("common");
   const { user, isCurator, isLoading, logout } = useAuthViewModel();
   const router = useRouter();
-  if (isLoading) return null;
+  // Enquanto confere a sessão: um spinner no lugar do botão (sem pular o layout).
+  if (isLoading) {
+    return (
+      <span className="flex size-11 items-center justify-center" role="status" aria-label={t("states.loading")}>
+        <Spinner className="text-muted-foreground" />
+      </span>
+    );
+  }
   if (!user) {
     return (
       <Button asChild variant="ghost" size="icon-touch" className="sm:w-auto sm:px-3" aria-label={t("nav.login")}>

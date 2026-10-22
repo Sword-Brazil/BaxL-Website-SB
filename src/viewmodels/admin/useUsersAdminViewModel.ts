@@ -88,5 +88,6 @@ export function useUsersAdminViewModel(messages: { created: string; saved: strin
     resetUserId,
     setResetUserId,
     submitReset: resetForm.handleSubmit((v) => resetUserId && resetPassword.mutate({ id: resetUserId, password: v.password })),
+    isResetting: resetPassword.isPending,
   };
 }

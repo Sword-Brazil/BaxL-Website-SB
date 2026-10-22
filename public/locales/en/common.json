@@ -39,7 +39,7 @@
     "credit": "Base calendar and teams: Guia BAX/BAL/BAI (guiabaxbal.web.app), curated by Sword Brazil.",
     "support": {
       "dev": "Built and maintained by a single developer.",
-      "text": "Want to help with the Stark Pack? Send a Pix (Brazil):",
+      "text": "Wanna give the Stark Pack a little boost? Drop a Pix (Brazil):",
       "copy": "Copy key",
       "copied": "Pix key copied.",
       "copyFailed": "Couldn't copy. Select the key and copy it manually.",
@@ -82,10 +82,34 @@
       "c": "Cancel: cancel the animation right after using it, firing the next skill.",
       "dc": "Delayed Cancel: wait a split second (the hit effect or the end of the animation) before cancelling into the next one.",
       "qc": "Quick Cancel: cancel immediately after the input.",
-      "optional": "Optional part or combo \"filler\" before the main bonus."
+      "optional": "Optional part or combo \"filler\" before the main bonus.",
+      "start": "Rotation start (shown automatically at the beginning of each rotation).",
+      "end": "End of the current rotation.",
+      "next": "Starts the next rotation (new line).",
+      "restart": "Goes back to the start and repeats the rotation."
+    },
+    "markers": {
+      "start": "Rotation start",
+      "end": "End of rotation",
+      "next": "Next rotation",
+      "restart": "Restart from the beginning"
+    },
+    "errors": {
+      "empty": "Write the rotation.",
+      "token": "Couldn't read “{{token}}”: use 1–6 (with c, dc or qc), parentheses, |, / or *.",
+      "unclosedGroup": "A parenthesis is not closed.",
+      "unopenedGroup": "There is a “)” without a “(” before it.",
+      "nestedGroup": "You can't open a parenthesis inside another.",
+      "emptyGroup": "There is an empty parenthesis.",
+      "markerInGroup": "|, / and * can't go inside parentheses.",
+      "tooLong": "Rotation too long (30 steps max)."
     },
     "openVideo": "Open the video",
     "playVideo": "Watch the rotation"
+  },
+  "ctpSlot": {
+    "label": "CTP {{n}}",
+    "use": "CTP used on this day"
   },
   "restriction": {
     "none": "No restriction",
@@ -150,6 +174,7 @@
   },
   "states": {
     "loading": "Loading…",
+    "slow": "This is taking longer than usual: the server may be waking up. Just a few more seconds.",
     "error": "Could not load the data.",
     "notFound": "Page not found.",
     "forbidden": "Access denied."

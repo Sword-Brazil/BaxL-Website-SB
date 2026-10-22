@@ -118,7 +118,7 @@ export function ReservesEditor({
                 <RotateCcwIcon data-icon="inline-start" />
                 {t("admin:common.cancel")}
               </Button>
-              <Button size="sm" variant="energy" disabled={vm.isSaving} onClick={vm.save}>
+              <Button size="sm" variant="energy" loading={vm.isSaving} onClick={vm.save}>
                 <SaveIcon data-icon="inline-start" />
                 {vm.isSaving ? t("admin:common.saving") : t("admin:common.save")}
               </Button>

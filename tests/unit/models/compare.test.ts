@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { MetaTeam } from "@/models/domain/types";
 
-const NO_ROTATION = { isDamageDealer: false, strikerUniformId: null, rotation: null, rotationNotes: null, rotationVideoUrl: null };
+const NO_ROTATION = { isDamageDealer: false, strikerUniformId: null, ctpSlot: null, rotation: null, rotationNotes: null, rotationVideoUrl: null };
 import { compareWithMeta, type CompareContext } from "@/models/rules/compare";
 
 // agentes: a (uniformes a1, a2), b (b1), c (c1), d (d1)

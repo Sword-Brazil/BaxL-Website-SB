@@ -36,6 +36,14 @@ describe("catálogo (admin)", () => {
     expect(saved.uniforms.map((u) => [u.slug, u.name])).toEqual([["classico", "Clássico"]]);
   });
 
+  it("marca o traje como Striker meta; sem o campo, a tag fica como está", async () => {
+    const { agent } = await createAgent("rocket");
+    const input = await inputOf(agent.id);
+    input.uniforms[0] = { ...input.uniforms[0], isMetaStriker: true };
+    expect((await updateAgent(agent.id, input)).uniforms[0].isMetaStriker).toBe(true);
+    expect((await updateAgent(agent.id, await inputOf(agent.id))).uniforms[0].isMetaStriker).toBe(true);
+  });
+
   it("renomeia um traje para o nome que outro está deixando", async () => {
     const { agent } = await createAgent("thor");
     await prisma.uniform.create({ data: { agentId: agent.id, slug: "ragnarok", name: "Ragnarok", imagePath: "" } });

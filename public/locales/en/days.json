@@ -117,9 +117,8 @@
       "metaWas": "Meta: {{name}}"
     },
     "dayCtp": {
-      "default": "Character default",
-      "thisDay": "This day only",
-      "useDefault": "Use default"
+      "slot": "Character's CTP {{n}} · applies to every day using CTP {{n}}",
+      "legacy": "This day only (pick CTP 1 or 2 to unify)"
     }
   }
 }

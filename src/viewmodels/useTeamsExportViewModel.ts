@@ -8,8 +8,15 @@ import type { UserTeam } from "@/models/schemas/selections";
 import { useSelectionsStore } from "./stores/selectionsStore";
 import type { CycleViewModel } from "./useCycleViewModel";
 
-/** Tabela completa (Meta, Alternativas e a equipe do jogador) ou só as equipes do jogador. */
-export type ExportScope = "all" | "mine";
+/** Tabela completa (Meta, Alternativas e a equipe do jogador), só as Metas ou só as equipes do jogador. */
+export type ExportScope = "all" | "meta" | "mine";
+
+const SUBTITLE: Record<ExportScope, string> = {
+  all: "cycle:export.subtitle",
+  meta: "cycle:export.subtitleMeta",
+  mine: "cycle:export.subtitleMine",
+};
+const FILE_PREFIX: Record<ExportScope, string> = { all: "equipes", meta: "metas", mine: "minhas-equipes" };
 
 /**
  * Exporta as equipes dos dias mostrados na tela (respeita o filtro de semana) num documento HTML
@@ -26,11 +33,10 @@ export function useTeamsExportViewModel(vm: CycleViewModel) {
     return `${t(`common:ctp.${ctp.type}`)} · ${t(`common:quality.${ctp.quality}`)}`;
   };
 
-  const member = (uniformId: string, opts: { ctpId?: string | null; damageDealer?: boolean; mine?: boolean }): ExportMember | undefined => {
+  const member = (uniformId: string, opts: { ctpId?: string | null; damageDealer?: boolean }): ExportMember | undefined => {
     const ref = vm.catalog.uniformById(uniformId);
     if (!ref) return undefined;
-    // Minha equipe: o CTP do dia ou, sem ele, o padrão do personagem.
-    const ctpId = opts.mine ? (opts.ctpId ?? vm.equippedCtpOf(ref.agent.id)?.id ?? null) : opts.ctpId;
+    const ctpId = opts.ctpId;
     return {
       name: ref.agent.name,
       uniform: ref.uniform.slug === "padrao" ? null : ref.uniform.name,
@@ -57,12 +63,18 @@ export function useTeamsExportViewModel(vm: CycleViewModel) {
     const members = Object.fromEntries(
       SLOTS.flatMap((slot) => {
         const pick = team[slot];
-        const em = pick ? member(pick.uniformId, { ctpId: pick.ctpId, mine: true }) : undefined;
+        // Minha equipe: o CTP do slot (1 ou 2) que o personagem usa no dia.
+        const em = pick ? member(pick.uniformId, { ctpId: vm.dayCtpIdOf(pick) }) : undefined;
         return em ? [[slot, em]] : [];
       }),
     ) as Partial<Record<Slot, ExportMember>>;
     return Object.keys(members).length ? [{ kind: "MINE", label: t("cycle:mine"), members }] : [];
   };
+
+  const teamsOf = (scope: ExportScope, meta: MetaTeam[], own: UserTeam | null) => [
+    ...(scope !== "mine" ? metaTeams(meta) : []),
+    ...(scope !== "meta" ? mine(own) : []),
+  ];
 
   const restriction = (criteria: Criterion[]) =>
     criteria.length ? criteria.map((c) => t(`common:values.${c.value}`)).join(" + ") : t("common:restriction.none");
@@ -77,7 +89,7 @@ export function useTeamsExportViewModel(vm: CycleViewModel) {
             weekday,
             mode: "BAI" as Mode,
             restriction: t("cycle:export.allReleased"),
-            teams: [...(scope === "all" ? metaTeams(vm.bai?.metaTeams ?? []) : []), ...mine(vm.userTeam("BAI", day.number))],
+            teams: teamsOf(scope, vm.bai?.metaTeams ?? [], vm.userTeam("BAI", day.number)),
           },
         ];
       }
@@ -88,7 +100,7 @@ export function useTeamsExportViewModel(vm: CycleViewModel) {
           weekday,
           mode,
           restriction: restriction(data?.criteria ?? []),
-          teams: [...(scope === "all" ? metaTeams(data?.metaTeams ?? []) : []), ...mine(vm.userTeam(mode, day.number))],
+          teams: teamsOf(scope, data?.metaTeams ?? [], vm.userTeam(mode, day.number)),
         };
       });
     });
@@ -114,14 +126,14 @@ export function useTeamsExportViewModel(vm: CycleViewModel) {
         },
         {
           title: nickname ? t("cycle:export.titleOf", { name: nickname }) : t("cycle:export.title"),
-          subtitle: t(scope === "mine" ? "cycle:export.subtitleMine" : "cycle:export.subtitle", { week: weekLabel }),
+          subtitle: t(SUBTITLE[scope], { week: weekLabel }),
           lang: locale ?? "pt-BR",
         },
       );
       const url = URL.createObjectURL(new Blob([html], { type: "text/html;charset=utf-8" }));
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${scope === "mine" ? "minhas-equipes" : "equipes"}-batalha-de-alianca-${now.toISOString().slice(0, 10)}.html`;
+      a.download = `${FILE_PREFIX[scope]}-batalha-de-alianca-${now.toISOString().slice(0, 10)}.html`;
       a.click();
       URL.revokeObjectURL(url);
     },

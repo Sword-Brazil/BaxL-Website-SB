@@ -70,6 +70,10 @@
     "notes": "Observações",
     "pickAgent": "Escolher agente…",
     "pickCtp": "CTP",
+    "ctps": "CTPs da Meta de {{name}}",
+    "ctp2Optional": "CTP 2 (opcional)",
+    "ctpsHelp": "O CTP 1 e o CTP 2 ficam no personagem e valem em todas as equipes dele. Em cada dia, escolha qual dos dois a equipe usa.",
+    "legacyCtp": "Esta equipe ainda usa {{ctp}} só neste dia. Escolha o CTP 1 ou 2 para unificar.",
     "searchAgent": "Buscar agente…",
     "noAgent": "Nenhum agente atende à restrição.",
     "deleteConfirm": "Excluir esta equipe? Esta ação não pode ser desfeita.",
@@ -134,7 +138,9 @@
     "uniformsHint": "Cada traje tem os próprios atributos (gênero, lado, espécie e ataque): as restrições dos dias são conferidas pelo traje usado. Um traje novo começa com os atributos do primeiro traje.",
     "variedUniforms_one": "{{count}} traje com atributos diferentes",
     "variedUniforms_other": "{{count}} trajes com atributos diferentes",
-    "effects": "Efeitos no chefe (atordoa na temporada do efeito)"
+    "effects": "Efeitos no chefe (atordoa na temporada do efeito)",
+    "metaStriker": "Striker meta",
+    "metaStrikerHelp": "Só os trajes marcados aparecem para escolher como Striker dos Causadores de Dano (Metas e equipes dos jogadores)."
   },
   "ctps": {
     "title": "Catálogo de CTPs",
@@ -202,8 +208,8 @@
     "titleLabel": "Título (opcional)",
     "titlePlaceholder": "Ex.: Abertura, Fase 2, Contra chefes",
     "sequence": "Rotação",
-    "sequencePlaceholder": "Ex.: 1 2c (3dc 4) 6 — ou escreva do seu jeito",
-    "sequenceHint": "Texto livre. Se usar a notação da comunidade (1–6, c, dc, qc, parênteses), aparece em blocos.",
+    "sequencePlaceholder": "Ex.: 1 2c (3dc 4) 6 | 5 4 * — ou escreva do seu jeito",
+    "sequenceHint": "Texto livre. Na notação da comunidade (1–6, c, dc, qc, parênteses) vira blocos; use | para o fim da rotação, / para começar a próxima e * para recomeçar do início.",
     "legendTitle": "Notação da comunidade",
     "legendFree": "A notação é opcional: escreva do jeito que explicar melhor.",
     "description": "Descrição",
