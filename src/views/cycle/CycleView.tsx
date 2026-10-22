@@ -1,10 +1,17 @@
 import { useTranslation } from "next-i18next/pages";
-import { CalendarClockIcon, FileDownIcon, InfinityIcon, PencilIcon, PlusIcon, SparklesIcon, SwordsIcon, TimerResetIcon, Trash2Icon } from "lucide-react";
+import { CalendarClockIcon, ChevronDownIcon, FileDownIcon, InfinityIcon, PencilIcon, PlusIcon, SparklesIcon, SwordsIcon, TimerResetIcon, Trash2Icon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitle, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -364,10 +371,27 @@ export function CycleView() {
             </ToggleGroupItem>
           ))}
         </ToggleGroup>
-        <Button variant="outline" size="sm" className="ml-auto" onClick={exporter.exportHtml} disabled={!exporter.canExport}>
-          <FileDownIcon data-icon="inline-start" />
-          {t("cycle:export.button")}
-        </Button>
+        {/* Exportar: só o ícone; o menu escolhe entre a tabela completa e só as minhas equipes. */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="ml-auto"
+              disabled={!exporter.canExport}
+              aria-label={t("cycle:export.button")}
+              title={t("cycle:export.button")}
+            >
+              <FileDownIcon />
+              <ChevronDownIcon className="opacity-60" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>{t("cycle:export.button")}</DropdownMenuLabel>
+            <DropdownMenuItem onSelect={() => exporter.exportHtml("all")}>{t("cycle:export.all")}</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => exporter.exportHtml("mine")}>{t("cycle:export.mine")}</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {resetNotice && (

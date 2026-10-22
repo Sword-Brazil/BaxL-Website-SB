@@ -8,9 +8,12 @@ import type { UserTeam } from "@/models/schemas/selections";
 import { useSelectionsStore } from "./stores/selectionsStore";
 import type { CycleViewModel } from "./useCycleViewModel";
 
+/** Tabela completa (Meta, Alternativas e a equipe do jogador) ou só as equipes do jogador. */
+export type ExportScope = "all" | "mine";
+
 /**
- * Exporta as equipes dos dias mostrados na tela (respeita o filtro de semana): Meta,
- * Alternativas e a equipe do jogador, num documento HTML com tabela.
+ * Exporta as equipes dos dias mostrados na tela (respeita o filtro de semana) num documento HTML
+ * com tabela.
  */
 export function useTeamsExportViewModel(vm: CycleViewModel) {
   const { t } = useTranslation(["cycle", "common"]);
@@ -64,7 +67,7 @@ export function useTeamsExportViewModel(vm: CycleViewModel) {
   const restriction = (criteria: Criterion[]) =>
     criteria.length ? criteria.map((c) => t(`common:values.${c.value}`)).join(" + ") : t("common:restriction.none");
 
-  const blocks = (): ExportBlock[] =>
+  const blocks = (scope: ExportScope): ExportBlock[] =>
     vm.days.flatMap((day) => {
       const weekday = t(`common:weekdays.${day.weekday}`);
       if (day.isBai) {
@@ -74,7 +77,7 @@ export function useTeamsExportViewModel(vm: CycleViewModel) {
             weekday,
             mode: "BAI" as Mode,
             restriction: t("cycle:export.allReleased"),
-            teams: [...metaTeams(vm.bai?.metaTeams ?? []), ...mine(vm.userTeam("BAI", day.number))],
+            teams: [...(scope === "all" ? metaTeams(vm.bai?.metaTeams ?? []) : []), ...mine(vm.userTeam("BAI", day.number))],
           },
         ];
       }
@@ -85,19 +88,19 @@ export function useTeamsExportViewModel(vm: CycleViewModel) {
           weekday,
           mode,
           restriction: restriction(data?.criteria ?? []),
-          teams: [...metaTeams(data?.metaTeams ?? []), ...mine(vm.userTeam(mode, day.number))],
+          teams: [...(scope === "all" ? metaTeams(data?.metaTeams ?? []) : []), ...mine(vm.userTeam(mode, day.number))],
         };
       });
     });
 
   return {
     canExport: !vm.isLoading && vm.days.length > 0,
-    exportHtml: () => {
+    exportHtml: (scope: ExportScope) => {
       const now = new Date();
       const date = new Intl.DateTimeFormat(locale, { dateStyle: "short", timeStyle: "short" }).format(now);
       const weekLabel = vm.week === "all" ? t("cycle:all") : t("cycle:week", { n: vm.week });
       const html = renderTeamsHtml(
-        blocks(),
+        blocks(scope),
         {
           day: t("cycle:export.day"),
           mode: t("cycle:export.mode"),
@@ -106,19 +109,19 @@ export function useTeamsExportViewModel(vm: CycleViewModel) {
           slots: { SOLO: t("common:team.slots.SOLO"), SUPPORT_1: t("common:team.slots.SUPPORT_1"), SUPPORT_2: t("common:team.slots.SUPPORT_2") },
           damageDealer: t("common:team.damageDealer"),
           empty: "—",
-          noTeams: t("cycle:noTeam"),
+          noTeams: scope === "mine" ? t("cycle:export.noMine") : t("cycle:noTeam"),
           generatedAt: t("cycle:export.generatedAt", { date }),
         },
         {
           title: nickname ? t("cycle:export.titleOf", { name: nickname }) : t("cycle:export.title"),
-          subtitle: t("cycle:export.subtitle", { week: weekLabel }),
+          subtitle: t(scope === "mine" ? "cycle:export.subtitleMine" : "cycle:export.subtitle", { week: weekLabel }),
           lang: locale ?? "pt-BR",
         },
       );
       const url = URL.createObjectURL(new Blob([html], { type: "text/html;charset=utf-8" }));
       const a = document.createElement("a");
       a.href = url;
-      a.download = `equipes-batalha-de-alianca-${now.toISOString().slice(0, 10)}.html`;
+      a.download = `${scope === "mine" ? "minhas-equipes" : "equipes"}-batalha-de-alianca-${now.toISOString().slice(0, 10)}.html`;
       a.click();
       URL.revokeObjectURL(url);
     },
