@@ -1,0 +1,62 @@
+{
+  "title": "Minhas pontuações",
+  "subtitle": "Anote sua pontuação de cada dia e modo e acompanhe seus ganhos e perdas por dia, semana e temporada.",
+  "help": {
+    "text1": "Preencha a pontuação de cada modo no dia de jogo (o dia vira às 12h). A soma do dia, da semana e da temporada (ciclo de 28 dias) é feita sozinha.",
+    "text2": "Fica salvo no aparelho e, se você entrar, também na sua conta. Só você vê as suas pontuações."
+  },
+  "locked": {
+    "title": "Libera hoje às 22h",
+    "text": "As pontuações começam a contar no reset semanal de hoje (22/10, 22h de Brasília), para cada dia, semana e temporada ficarem certinhos.",
+    "countdown": "para liberar"
+  },
+  "cards": {
+    "today": "Hoje",
+    "todayFooter": "Soma dos modos do dia · variação para o último dia preenchido",
+    "week": "Semana {{n}}",
+    "weekFooter": "Total da semana · variação para a semana anterior",
+    "season": "Temporada",
+    "seasonFooter_one": "{{count}} dia preenchido · desde {{date}}",
+    "seasonFooter_other": "{{count}} dias preenchidos · desde {{date}}",
+    "best": "Melhor dia",
+    "bestFooter": "Dia {{day}} · {{date}}",
+    "bestNone": "Nenhum dia preenchido ainda"
+  },
+  "entry": {
+    "title": "Preencher pontuação",
+    "subtitle": "Escolha o dia e anote quanto fez em cada modo. Salva ao sair do campo; apagar o número remove.",
+    "day": "Dia de jogo",
+    "today": "hoje",
+    "points": "Pontos",
+    "placeholder": "Ex.: 1.250.000",
+    "invalid": "Use só números (pode usar ponto para separar os milhares).",
+    "myTeam": "Minha equipe do dia",
+    "noTeam": "Você não montou equipe para este dia.",
+    "buildTeam": "Montar equipe"
+  },
+  "chart": {
+    "title": "Desempenho",
+    "subtitle": "Pontos por modo e quanto você ganhou ou perdeu em relação ao período anterior.",
+    "days": "Dias",
+    "weeks": "Semanas",
+    "range": "Período",
+    "ranges": {
+      "week": "Esta semana",
+      "season": "Esta temporada",
+      "all": "Tudo"
+    },
+    "dailyDelta": "Ganho ou perda para o dia anterior",
+    "weeklyDelta": "Ganho ou perda para a semana anterior",
+    "delta": "Variação",
+    "empty": "Preencha a pontuação de um dia para ver os gráficos."
+  },
+  "history": {
+    "title": "Histórico",
+    "subtitle": "Tudo o que você anotou. Toque numa linha para editar o dia.",
+    "day": "Dia",
+    "mode": "Modo",
+    "points": "Pontos",
+    "delta": "Variação",
+    "team": "Equipe"
+  }
+}

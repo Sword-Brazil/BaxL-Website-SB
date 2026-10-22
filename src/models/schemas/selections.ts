@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { BATTLE_DAY_NUMBERS, SLOTS } from "@/models/domain/enums";
+import { MAX_SCORE, SCORE_KEY_RE } from "@/models/rules/scores";
 import { idSchema } from "./common";
 import { VALIDATION } from "./messages";
 
@@ -55,6 +56,11 @@ export const UserSelectionsSchema = z.object({
   equipment: EquipmentSchema.default({ ctpByAgent: {} }),
   /** Montar equipes escolhendo entre todos os personagens (só a restrição do dia vale), sem elenco. */
   freePick: z.boolean().default(false),
+  /** Pontuação do jogador por dia de jogo e modo ("AAAA-MM-DD|BAX"), preenchida por ele mesmo. */
+  scores: z
+    .record(z.string().regex(SCORE_KEY_RE), z.number().int().min(0).max(MAX_SCORE))
+    .refine((s) => Object.keys(s).length <= 5000)
+    .optional(),
 });
 export type UserSelections = z.infer<typeof UserSelectionsSchema>;
 

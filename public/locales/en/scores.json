@@ -1,0 +1,62 @@
+{
+  "title": "My scores",
+  "subtitle": "Log your score for each day and mode and follow your gains and losses by day, week and season.",
+  "help": {
+    "text1": "Fill in each mode's score on the game day (the day turns at 12:00). Day, week and season (28-day cycle) totals are calculated for you.",
+    "text2": "Saved on this device and, if you sign in, in your account too. Only you can see your scores."
+  },
+  "locked": {
+    "title": "Unlocks today at 22:00",
+    "text": "Scores start counting at today's weekly reset (10/22, 22:00 Brasília time), so every day, week and season adds up correctly.",
+    "countdown": "until unlock"
+  },
+  "cards": {
+    "today": "Today",
+    "todayFooter": "Sum of the day's modes · change from the last filled day",
+    "week": "Week {{n}}",
+    "weekFooter": "Week total · change from the previous week",
+    "season": "Season",
+    "seasonFooter_one": "{{count}} day filled · since {{date}}",
+    "seasonFooter_other": "{{count}} days filled · since {{date}}",
+    "best": "Best day",
+    "bestFooter": "Day {{day}} · {{date}}",
+    "bestNone": "No day filled yet"
+  },
+  "entry": {
+    "title": "Log score",
+    "subtitle": "Pick the day and write how much you scored in each mode. Saves when you leave the field; clearing the number removes it.",
+    "day": "Game day",
+    "today": "today",
+    "points": "Points",
+    "placeholder": "E.g. 1,250,000",
+    "invalid": "Numbers only (you can use separators for thousands).",
+    "myTeam": "My team for the day",
+    "noTeam": "You haven't built a team for this day.",
+    "buildTeam": "Build team"
+  },
+  "chart": {
+    "title": "Performance",
+    "subtitle": "Points by mode and how much you gained or lost compared to the previous period.",
+    "days": "Days",
+    "weeks": "Weeks",
+    "range": "Period",
+    "ranges": {
+      "week": "This week",
+      "season": "This season",
+      "all": "All"
+    },
+    "dailyDelta": "Gain or loss vs. previous day",
+    "weeklyDelta": "Gain or loss vs. previous week",
+    "delta": "Change",
+    "empty": "Log a day's score to see the charts."
+  },
+  "history": {
+    "title": "History",
+    "subtitle": "Everything you logged. Tap a row to edit that day.",
+    "day": "Day",
+    "mode": "Mode",
+    "points": "Points",
+    "delta": "Change",
+    "team": "Team"
+  }
+}
