@@ -2,7 +2,7 @@
   "title": "Mis puntuaciones",
   "subtitle": "Anota tu puntuación de cada día y modo y sigue tus ganancias y pérdidas por día, semana y temporada.",
   "help": {
-    "text1": "Completa la puntuación de cada modo en el día de juego (el día cambia a las 12h). La suma del día, de la semana y de la temporada (ciclo de 28 días) se calcula sola.",
+    "text1": "Completa la puntuación de cada modo en el día de juego (el día cambia a las 12h). Como la BA se reinicia cada 28 días, cada día y semana se compara con el mismo día y semana del mes anterior: verde subió, rojo bajó.",
     "text2": "Se guarda en el dispositivo y, si inicias sesión, también en tu cuenta. Solo tú ves tus puntuaciones."
   },
   "locked": {
@@ -12,9 +12,9 @@
   },
   "cards": {
     "today": "Hoy",
-    "todayFooter": "Suma de los modos del día · variación con el último día del mismo tipo (BAI con BAI)",
+    "todayFooter": "Respecto al mismo día del ciclo del mes anterior",
     "week": "Semana {{n}}",
-    "weekFooter": "Total de la semana · variación con la semana anterior hasta el mismo día",
+    "weekFooter": "Hasta hoy, respecto a la misma semana del mes anterior hasta el mismo día",
     "season": "Temporada",
     "seasonFooter_one": "{{count}} día completado · desde {{date}}",
     "seasonFooter_other": "{{count}} días completados · desde {{date}}",
@@ -36,29 +36,32 @@
   },
   "chart": {
     "title": "Rendimiento",
-    "subtitle": "Puntos del día y por modo en la semana, y cuánto ganaste o perdiste respecto al período anterior.",
+    "subtitle": "La BA se reinicia cada 28 días: cada día y semana se compara con el mismo día y semana del mes anterior.",
     "days": "Días",
     "weeks": "Semanas",
-    "range": "Período",
-    "ranges": {
-      "week": "Esta semana",
-      "season": "Esta temporada",
-      "all": "Todo"
-    },
-    "dailyDelta": "Ganancia o pérdida respecto al último día del mismo tipo (BAI con BAI)",
-    "weeklyDelta": "Ganancia o pérdida respecto a la semana anterior",
-    "delta": "Variación",
     "empty": "Anota la puntuación de un día para ver los gráficos.",
-    "total": "Total del día",
-    "partial": "parcial"
+    "partial": "parcial",
+    "season": "Temporada",
+    "seasonOption": "Temporada {{range}}"
+  },
+  "compare": {
+    "current": "Esta temporada",
+    "previous": "Mes anterior",
+    "growth": "Crecimiento",
+    "growthTitle": "Crecimiento respecto al mismo día del mes anterior (verde subió, rojo bajó)",
+    "growthTitleWeek": "Crecimiento respecto a la misma semana del mes anterior (verde subió, rojo bajó)",
+    "week": "Semana {{n}}",
+    "weekColumn": "Semana",
+    "previousWas": "Mes anterior: {{value}}",
+    "noPrevious": "Sin puntuación en el mismo período del mes anterior"
   },
   "history": {
     "title": "Historial",
-    "subtitle": "Todo lo que anotaste. Toca una fila para editar ese día.",
+    "subtitle": "Todo lo que anotaste, cada uno respecto al mismo día y modo del mes anterior. Toca una fila para editar ese día.",
     "day": "Día",
     "mode": "Modo",
     "points": "Puntos",
-    "delta": "Variación",
+    "delta": "vs. mes anterior",
     "team": "Equipo"
   }
 }

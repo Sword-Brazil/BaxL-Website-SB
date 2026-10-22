@@ -139,9 +139,9 @@
   --ramp3-1: #86b6ef;
   --ramp3-2: #3987e5;
   --ramp3-3: #1c5cab;
-  /* Ganho e perda (par divergente azul ↔ vermelho; o zero fica neutro). */
-  --gain: #2a78d6;
-  --loss: #e34948;
+  /* Ganho e perda contra o mês anterior: verde cresceu, vermelho caiu (o zero fica neutro). */
+  --gain: #15803d;
+  --loss: #c62828;
 }
 
 /* ---------- Tema escuro (padrão) ---------- */
@@ -206,8 +206,8 @@
   --ramp3-1: #1c5cab;
   --ramp3-2: #2a78d6;
   --ramp3-3: #5598e7;
-  --gain: #3987e5;
-  --loss: #e66767;
+  --gain: #22c55e;
+  --loss: #f05252;
 }
 
 @theme inline {
@@ -271,6 +271,8 @@
   --color-series-2: var(--series-2);
   --color-series-3: var(--series-3);
   --color-series-4: var(--series-4);
+  --color-gain: var(--gain);
+  --color-loss: var(--loss);
 }
 
 /* Canto chanfrado no estilo dos painéis do MFF. */

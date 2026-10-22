@@ -9,34 +9,20 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
-  ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig,
-} from "@/components/ui/chart";
+import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, type ChartConfig } from "@/components/ui/chart";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { WEEKDAYS } from "@/models/domain/enums";
-import { parsePoints, type ScoreMode } from "@/models/rules/scores";
-import { useScoresViewModel, type ScoreRange, type ScoresViewModel } from "@/viewmodels/useScoresViewModel";
+import { WEEKDAYS, weekdayOf } from "@/models/domain/enums";
+import { addDays, parsePoints, type Comparison } from "@/models/rules/scores";
+import { useScoresViewModel, type ScoresViewModel } from "@/viewmodels/useScoresViewModel";
 import { HelpHint } from "@/views/layout/HelpHint";
 import { MODE_VISUALS } from "@/views/shared/modeVisuals";
 import { QueryState } from "@/views/shared/QueryState";
 import { TeamStrip } from "@/views/shared/TeamStrip";
 
-// Uma rampa de azul, do claro ao escuro (tokens --ramp3-*): sem cores vivas diferentes por modo.
-const MODE_COLORS: ChartConfig = {
-  BAX: { label: "BAX", color: "var(--ramp3-1)" },
-  BAL: { label: "BAL", color: "var(--ramp3-2)" },
-  BAI: { label: "BAI", color: "var(--ramp3-3)" },
-};
-const MODES = ["BAX", "BAL", "BAI"] as const satisfies readonly ScoreMode[];
+const COMPACT_TABLE = "text-xs sm:text-sm [&_td]:px-1.5 [&_th]:px-1.5 sm:[&_td]:px-2 sm:[&_th]:px-2";
 
 function useFormat() {
   const { locale } = useRouter();
@@ -45,6 +31,7 @@ function useFormat() {
     notation: "compact",
     maximumFractionDigits: 1,
   });
+  const percent = new Intl.NumberFormat(locale, { style: "percent", maximumFractionDigits: 1 });
   const date = new Intl.DateTimeFormat(locale, {
     day: "2-digit",
     month: "2-digit",
@@ -54,6 +41,7 @@ function useFormat() {
     n: (v: number) => number.format(v),
     compact: (v: number) => compact.format(v),
     signed: (v: number) => `${v > 0 ? "+" : ""}${number.format(v)}`,
+    pct: (v: number) => `${v > 0 ? "+" : ""}${percent.format(v)}`,
     date: (d: string) => date.format(new Date(`${d}T00:00:00Z`)),
   };
 }
@@ -82,25 +70,45 @@ function Locked({ vm }: { vm: ScoresViewModel }) {
   );
 }
 
-/** Cartão de número com tendência, no estilo dos "section cards" do dashboard do shadcn. */
-function StatCard({ label, value, delta, footer }: { label: string; value: string; delta?: number | null; footer: string }) {
+/** Crescimento contra o mês anterior: verde se cresceu, vermelho se caiu, com a porcentagem. */
+function GrowthBadge({ cmp, className }: { cmp: Comparison; className?: string }) {
   const f = useFormat();
-  const up = (delta ?? 0) >= 0;
+  if (cmp.delta === null) return null;
+  const up = cmp.delta >= 0;
+  return (
+    <Badge variant="outline" className={cn("tabular-nums", up ? "text-gain" : "text-loss", className)}>
+      {up ? <TrendingUpIcon /> : <TrendingDownIcon />}
+      {cmp.pct === null ? f.signed(cmp.delta) : f.pct(cmp.pct)}
+    </Badge>
+  );
+}
+
+/** Cartão de número com crescimento, no estilo dos "section cards" do dashboard do shadcn. */
+function StatCard({ label, cmp, footer }: { label: string; cmp: Comparison; footer?: string }) {
+  const { t } = useTranslation("scores");
+  const f = useFormat();
   return (
     <Card className="bg-linear-to-t from-energy/5 to-card">
       <CardHeader>
         <CardDescription>{label}</CardDescription>
-        <CardTitle className="font-heading text-2xl font-bold tabular-nums sm:text-3xl">{value}</CardTitle>
-        {delta !== undefined && delta !== null && (
-          <CardAction>
-            <Badge variant="outline" className={up ? "text-brazil-green" : "text-destructive"}>
-              {up ? <TrendingUpIcon /> : <TrendingDownIcon />}
-              {f.signed(delta)}
-            </Badge>
-          </CardAction>
-        )}
+        <CardTitle className="font-heading text-2xl font-bold tabular-nums sm:text-3xl">
+          {cmp.current === null ? "—" : f.n(cmp.current)}
+        </CardTitle>
+        <CardAction>
+          <GrowthBadge cmp={cmp} />
+        </CardAction>
       </CardHeader>
-      <CardFooter className="text-xs text-muted-foreground">{footer}</CardFooter>
+      <CardFooter className="flex-col items-start gap-0.5 text-xs text-muted-foreground">
+        {cmp.previous === null ? (
+          <span>{t("compare.noPrevious")}</span>
+        ) : (
+          <span>
+            {t("compare.previousWas", { value: f.n(cmp.previous) })}
+            {cmp.delta !== null && <span className={cmp.delta >= 0 ? "text-gain" : "text-loss"}> ({f.signed(cmp.delta)})</span>}
+          </span>
+        )}
+        {footer && <span>{footer}</span>}
+      </CardFooter>
     </Card>
   );
 }
@@ -112,33 +120,22 @@ function SummaryCards({ vm }: { vm: ScoresViewModel }) {
   if (!s || !vm.current) return null;
   return (
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-      <StatCard
-        label={t("cards.today")}
-        value={s.today === null ? "—" : f.n(s.today)}
-        delta={s.todayDelta}
-        footer={t("cards.todayFooter")}
-      />
-      <StatCard label={t("cards.week", { n: vm.current.week })} value={f.n(s.week)} delta={s.weekDelta} footer={t("cards.weekFooter")} />
+      <StatCard label={t("cards.today")} cmp={s.today} footer={t("cards.todayFooter")} />
+      <StatCard label={t("cards.week", { n: vm.current.week })} cmp={s.week} footer={t("cards.weekFooter")} />
       <StatCard
         label={t("cards.season")}
-        value={f.n(s.season)}
-        footer={t("cards.seasonFooter", {
-          count: s.seasonDays,
-          date: f.date(vm.current.seasonStart),
-        })}
+        cmp={s.season}
+        footer={t("cards.seasonFooter", { count: s.seasonDays, date: f.date(vm.current.seasonStart) })}
       />
-      <StatCard
-        label={t("cards.best")}
-        value={s.best ? f.n(s.best.total) : "—"}
-        footer={
-          s.best
-            ? t("cards.bestFooter", {
-                day: vm.dayOf(s.best.date)?.cycleDay,
-                date: f.date(s.best.date),
-              })
-            : t("cards.bestNone")
-        }
-      />
+      <Card className="bg-linear-to-t from-energy/5 to-card">
+        <CardHeader>
+          <CardDescription>{t("cards.best")}</CardDescription>
+          <CardTitle className="font-heading text-2xl font-bold tabular-nums sm:text-3xl">{s.best ? f.n(s.best.total) : "—"}</CardTitle>
+        </CardHeader>
+        <CardFooter className="text-xs text-muted-foreground">
+          {s.best ? t("cards.bestFooter", { day: vm.dayOf(s.best.date)?.cycleDay, date: f.date(s.best.date) }) : t("cards.bestNone")}
+        </CardFooter>
+      </Card>
     </div>
   );
 }
@@ -247,63 +244,95 @@ function EntryCard({ vm }: { vm: ScoresViewModel }) {
   );
 }
 
-/**
- * Áreas empilhadas no estilo do "Area Chart - Interactive" do shadcn: os modos (por semana) ou o
- * total do dia (por dia, já que BAX/BAL e BAI nunca acontecem no mesmo dia).
- */
-function ScoreArea({
-  id,
-  data,
-  keys,
-  config,
-}: {
-  id: string;
-  data: ({ label: string } & Record<string, unknown>)[];
-  keys: readonly string[];
-  config: ChartConfig;
-}) {
+type CompareRow = Comparison & { label: string; detail?: string };
+
+/** Dica do gráfico: esta temporada, o mês anterior, a diferença e a porcentagem. */
+function CompareTooltip({ active, payload }: { active?: boolean; payload?: { payload: CompareRow }[] }) {
+  const { t } = useTranslation("scores");
   const f = useFormat();
-  // Com um ponto só a área não aparece: marca os pontos.
-  const single = data.filter((d) => keys.some((k) => d[k] !== null && d[k] !== undefined)).length <= 1;
+  const row = payload?.[0]?.payload;
+  if (!active || !row) return null;
+  return (
+    <div className="grid min-w-44 gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl">
+      <span className="font-medium">
+        {row.label}
+        {row.detail && <span className="ml-1 font-normal text-muted-foreground">{row.detail}</span>}
+      </span>
+      <span className="flex justify-between gap-3">
+        <span className="text-muted-foreground">{t("compare.current")}</span>
+        <span className="font-mono font-medium tabular-nums">{row.current === null ? "—" : f.n(row.current)}</span>
+      </span>
+      <span className="flex justify-between gap-3">
+        <span className="text-muted-foreground">{t("compare.previous")}</span>
+        <span className="font-mono font-medium tabular-nums">{row.previous === null ? "—" : f.n(row.previous)}</span>
+      </span>
+      {row.delta !== null && (
+        <span className={cn("flex justify-between gap-3 font-medium", row.delta >= 0 ? "text-gain" : "text-loss")}>
+          <span>{t("compare.growth")}</span>
+          <span className="font-mono tabular-nums">
+            {f.signed(row.delta)}
+            {row.pct !== null && ` (${f.pct(row.pct)})`}
+          </span>
+        </span>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Esta temporada (área forte) contra o mês anterior (área clara e tracejada), no estilo do "Area
+ * Chart - Interactive" do shadcn.
+ */
+function CompareArea({ id, data }: { id: string; data: CompareRow[] }) {
+  const { t } = useTranslation("scores");
+  const f = useFormat();
+  const config = {
+    previous: { label: t("compare.previous"), color: "var(--ramp3-1)" },
+    current: { label: t("compare.current"), color: "var(--ramp3-3)" },
+  } satisfies ChartConfig;
+  const single = data.filter((d) => d.current !== null).length <= 1;
   return (
     <ChartContainer config={config} className="aspect-auto h-64 w-full">
       <AreaChart data={data} margin={{ top: 8, left: 4, right: 8 }}>
         <defs>
-          {keys.map((m) => (
-            <linearGradient key={m} id={`${id}-${m}`} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={`var(--color-${m})`} stopOpacity={0.7} />
-              <stop offset="95%" stopColor={`var(--color-${m})`} stopOpacity={0.05} />
+          {(["previous", "current"] as const).map((k) => (
+            <linearGradient key={k} id={`${id}-${k}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor={`var(--color-${k})`} stopOpacity={k === "current" ? 0.55 : 0.25} />
+              <stop offset="95%" stopColor={`var(--color-${k})`} stopOpacity={0.02} />
             </linearGradient>
           ))}
         </defs>
         <CartesianGrid vertical={false} strokeOpacity={0.5} />
-        <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={8} minTickGap={24} tick={{ fontSize: 11 }} />
+        <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={8} minTickGap={16} tick={{ fontSize: 11 }} />
         <YAxis tickLine={false} axisLine={false} width={48} tickFormatter={(v: number) => f.compact(v)} tick={{ fontSize: 11 }} />
-        <ChartTooltip
-          cursor={false}
-          content={<ChartTooltipContent indicator="dot" formatter={(v, name) => `${(name !== undefined && config[name]?.label) || name} ${f.n(Number(v))}`} />}
+        <ChartTooltip cursor={{ strokeOpacity: 0.4 }} content={<CompareTooltip />} />
+        <Area
+          dataKey="previous"
+          type="monotone"
+          fill={`url(#${id}-previous)`}
+          stroke="var(--color-previous)"
+          strokeWidth={2}
+          strokeDasharray="5 4"
+          connectNulls
+          isAnimationActive={false}
         />
-        {keys.map((m) => (
-          <Area
-            key={m}
-            dataKey={m}
-            type="monotone"
-            stackId="stack"
-            fill={`url(#${id}-${m})`}
-            stroke={`var(--color-${m})`}
-            strokeWidth={2}
-            dot={single ? { r: 4, fill: `var(--color-${m})`, strokeWidth: 0 } : false}
-            isAnimationActive={false}
-          />
-        ))}
-        {keys.length > 1 && <ChartLegend content={<ChartLegendContent />} />}
+        <Area
+          dataKey="current"
+          type="monotone"
+          fill={`url(#${id}-current)`}
+          stroke="var(--color-current)"
+          strokeWidth={2}
+          dot={single ? { r: 4, fill: "var(--color-current)", strokeWidth: 0 } : false}
+          isAnimationActive={false}
+        />
+        <ChartLegend content={<ChartLegendContent />} />
       </AreaChart>
     </ChartContainer>
   );
 }
 
-/** Ganho (azul, acima do zero) e perda (vermelho suave, abaixo) em relação ao período anterior. */
-function DeltaArea({ id, data }: { id: string; data: { label: string; delta: number | null }[] }) {
+/** Crescimento contra o mês anterior: verde acima do zero, vermelho abaixo. */
+function GrowthArea({ id, data }: { id: string; data: CompareRow[] }) {
   const { t } = useTranslation("scores");
   const f = useFormat();
   const values = data.flatMap((d) => (d.delta === null ? [] : [d.delta]));
@@ -311,16 +340,17 @@ function DeltaArea({ id, data }: { id: string; data: { label: string; delta: num
   const min = Math.min(0, ...values);
   // Ponto do degradê em que a área cruza o zero (a área vai do maior ao menor valor).
   const zero = max === min ? 1 : max / (max - min);
-  const config = { delta: { label: t("chart.delta"), color: "var(--gain)" } } satisfies ChartConfig;
+  const config = { delta: { label: t("compare.growth"), color: "var(--gain)" } } satisfies ChartConfig;
+  const single = values.length <= 1;
   return (
     <ChartContainer config={config} className="aspect-auto h-40 w-full">
       <AreaChart data={data} margin={{ top: 8, left: 4, right: 8 }}>
         <defs>
           <linearGradient id={`${id}-fill`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset={0} stopColor="var(--gain)" stopOpacity={0.45} />
+            <stop offset={0} stopColor="var(--gain)" stopOpacity={0.4} />
             <stop offset={zero} stopColor="var(--gain)" stopOpacity={0.04} />
             <stop offset={zero} stopColor="var(--loss)" stopOpacity={0.04} />
-            <stop offset={1} stopColor="var(--loss)" stopOpacity={0.45} />
+            <stop offset={1} stopColor="var(--loss)" stopOpacity={0.4} />
           </linearGradient>
           <linearGradient id={`${id}-line`} x1="0" y1="0" x2="0" y2="1">
             <stop offset={zero} stopColor="var(--gain)" />
@@ -328,10 +358,10 @@ function DeltaArea({ id, data }: { id: string; data: { label: string; delta: num
           </linearGradient>
         </defs>
         <CartesianGrid vertical={false} strokeOpacity={0.5} />
-        <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={8} minTickGap={24} tick={{ fontSize: 11 }} />
+        <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={8} minTickGap={16} tick={{ fontSize: 11 }} />
         <YAxis tickLine={false} axisLine={false} width={48} tickFormatter={(v: number) => f.compact(v)} tick={{ fontSize: 11 }} />
         <ReferenceLine y={0} stroke="var(--border)" />
-        <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" formatter={(v) => f.signed(Number(v))} />} />
+        <ChartTooltip cursor={{ strokeOpacity: 0.4 }} content={<CompareTooltip />} />
         <Area
           dataKey="delta"
           type="monotone"
@@ -341,6 +371,16 @@ function DeltaArea({ id, data }: { id: string; data: { label: string; delta: num
           // Degradê no traço só com ganho e perda juntos: numa linha reta (um sinal só) ele fica sem cor.
           stroke={max > 0 && min < 0 ? `url(#${id}-line)` : min < 0 ? "var(--loss)" : "var(--gain)"}
           strokeWidth={2}
+          dot={
+            single
+              ? (p: { cx?: number; cy?: number; payload?: CompareRow; index?: number }) =>
+                  p.payload?.delta === null || p.payload?.delta === undefined ? (
+                    <g key={p.index} />
+                  ) : (
+                    <circle key={p.index} cx={p.cx} cy={p.cy} r={4} fill={p.payload.delta >= 0 ? "var(--gain)" : "var(--loss)"} />
+                  )
+              : false
+          }
           isAnimationActive={false}
         />
       </AreaChart>
@@ -348,18 +388,74 @@ function DeltaArea({ id, data }: { id: string; data: { label: string; delta: num
   );
 }
 
-/** Desempenho: pontos por dia ou por semana (áreas empilhadas por modo) e o ganho/perda de cada período. */
+/** Tabela do comparativo: cada dia (ou semana) com o mês anterior, a diferença e a porcentagem. */
+function CompareTable({ rows, unit }: { rows: CompareRow[]; unit: string }) {
+  const { t } = useTranslation("scores");
+  const f = useFormat();
+  const shown = rows.filter((r) => r.current !== null || r.previous !== null);
+  if (!shown.length) return null;
+  return (
+    <div className="max-h-80 overflow-auto rounded-md ring-1 ring-foreground/10">
+      {/* No celular: células compactas, para a coluna de crescimento caber sem cortar. */}
+      <Table className={COMPACT_TABLE}>
+        <TableHeader>
+          <TableRow>
+            <TableHead>{unit}</TableHead>
+            <TableHead className="text-right">{t("compare.current")}</TableHead>
+            <TableHead className="hidden text-right sm:table-cell">{t("compare.previous")}</TableHead>
+            <TableHead className="text-right">{t("compare.growth")}</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {shown.map((r) => (
+            <TableRow key={r.label}>
+              <TableCell className="whitespace-nowrap">
+                <span className="font-medium">{r.label}</span>
+                {r.detail && <span className="ml-1.5 hidden text-xs text-muted-foreground sm:inline">{r.detail}</span>}
+              </TableCell>
+              <TableCell className="text-right font-semibold tabular-nums">{r.current === null ? "—" : f.n(r.current)}</TableCell>
+              <TableCell className="hidden text-right tabular-nums text-muted-foreground sm:table-cell">
+                {r.previous === null ? "—" : f.n(r.previous)}
+              </TableCell>
+              <TableCell className="text-right">
+                {r.delta === null ? (
+                  <span className="text-muted-foreground">—</span>
+                ) : (
+                  <span className="inline-flex flex-col items-end gap-0.5">
+                    <GrowthBadge cmp={r} />
+                    <span className={cn("hidden text-xs tabular-nums sm:inline", r.delta >= 0 ? "text-gain" : "text-loss")}>
+                      {f.signed(r.delta)}
+                    </span>
+                  </span>
+                )}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+}
+
+/**
+ * Desempenho: cada dia (D1–D28) ou semana (S1–S4) da temporada contra o mesmo dia ou semana do
+ * mês anterior — a BA reinicia a cada 28 dias.
+ */
 function PerformanceCard({ vm }: { vm: ScoresViewModel }) {
   const { t } = useTranslation(["scores", "common"]);
   const f = useFormat();
-  const daily = vm.daily.map((d) => ({ ...d, label: `D${d.cycleDay}` }));
-  const weekly = vm.weekly.map((w) => ({
-    ...w,
-    ...w.byMode,
-    label: `S${w.week} · ${f.date(w.start)}${w.partial ? ` (${t("scores:chart.partial")})` : ""}`,
+  const seasonLabel = (start: string) => `${f.date(start)} – ${f.date(addDays(start, 27))}`;
+  const days: CompareRow[] = vm.days.map((d) => ({
+    ...d,
+    label: `D${d.cycleDay}`,
+    detail: `${t(`common:weekdays.${weekdayOf(d.cycleDay)}`)} ${f.date(d.date)}${d.isBai ? " · BAI" : ""}`,
   }));
-  const totalConfig = { total: { label: t("scores:chart.total"), color: "var(--ramp3-2)" } } satisfies ChartConfig;
-  const empty = !vm.history.length;
+  const weeks: CompareRow[] = vm.weeks.map((w) => ({
+    ...w,
+    label: t("scores:compare.week", { n: w.week }),
+    detail: `${f.date(w.start)}${w.partial ? ` · ${t("scores:chart.partial")}` : ""}`,
+  }));
+  const empty = !days.some((d) => d.current !== null || d.previous !== null);
   return (
     <Card>
       <Tabs defaultValue="days">
@@ -373,42 +469,43 @@ function PerformanceCard({ vm }: { vm: ScoresViewModel }) {
             </TabsList>
           </CardAction>
         </CardHeader>
-        {/* Os gráficos ficam sempre montados (montar junto com o primeiro valor deixava o de dias em branco). */}
+        {/* Os gráficos ficam sempre montados (montar junto com o primeiro valor deixava o gráfico em branco). */}
         <CardContent className="relative flex flex-col gap-4">
+          {vm.season && (
+            <Select value={vm.season} onValueChange={vm.setSeason}>
+              <SelectTrigger className="w-full sm:w-72" aria-label={t("scores:chart.season")}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {vm.seasons.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {t("scores:chart.seasonOption", { range: seasonLabel(s) })}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
           {empty && (
             <p className="absolute inset-x-6 top-1/3 z-10 rounded-md border border-dashed bg-card/90 p-6 text-center text-sm text-muted-foreground">
               {t("scores:chart.empty")}
             </p>
           )}
           <div className={cn("flex flex-col gap-4", empty && "pointer-events-none opacity-30")}>
-            <TabsContent value="days" className="flex flex-col gap-4">
-              <ToggleGroup
-                type="single"
-                size="sm"
-                variant="outline"
-                value={vm.range}
-                onValueChange={(v) => v && vm.setRange(v as ScoreRange)}
-                aria-label={t("scores:chart.range")}
-              >
-                {(["week", "season", "all"] as const).map((r) => (
-                  <ToggleGroupItem key={r} value={r} className="px-3">
-                    {t(`scores:chart.ranges.${r}`)}
-                  </ToggleGroupItem>
-                ))}
-              </ToggleGroup>
-              <ScoreArea id="days" data={daily} keys={["total"]} config={totalConfig} />
-              <div className="flex flex-col gap-1">
-                <span className="text-xs font-medium text-muted-foreground">{t("scores:chart.dailyDelta")}</span>
-                <DeltaArea id="days-delta" data={daily} />
-              </div>
-            </TabsContent>
-            <TabsContent value="weeks" className="flex flex-col gap-4">
-              <ScoreArea id="weeks" data={weekly} keys={MODES} config={MODE_COLORS} />
-              <div className="flex flex-col gap-1">
-                <span className="text-xs font-medium text-muted-foreground">{t("scores:chart.weeklyDelta")}</span>
-                <DeltaArea id="weeks-delta" data={weekly} />
-              </div>
-            </TabsContent>
+            {(
+              [
+                ["days", days, t("scores:history.day"), t("scores:compare.growthTitle")],
+                ["weeks", weeks, t("scores:compare.weekColumn"), t("scores:compare.growthTitleWeek")],
+              ] as const
+            ).map(([tab, rows, unit, growthTitle]) => (
+              <TabsContent key={tab} value={tab} className="flex flex-col gap-4">
+                <CompareArea id={tab} data={rows} />
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-muted-foreground">{growthTitle}</span>
+                  <GrowthArea id={`${tab}-growth`} data={rows} />
+                </div>
+                <CompareTable rows={rows} unit={unit} />
+              </TabsContent>
+            ))}
           </div>
         </CardContent>
       </Tabs>
@@ -429,7 +526,8 @@ function HistoryCard({ vm }: { vm: ScoresViewModel }) {
       </CardHeader>
       <CardContent>
         <div className="max-h-[32rem] overflow-auto rounded-md ring-1 ring-foreground/10">
-          <Table>
+          {/* No celular: células compactas, para a coluna de crescimento caber sem cortar. */}
+          <Table className={COMPACT_TABLE}>
             <TableHeader>
               <TableRow>
                 <TableHead>{t("scores:history.day")}</TableHead>
@@ -445,7 +543,8 @@ function HistoryCard({ vm }: { vm: ScoresViewModel }) {
                 return (
                   <TableRow key={`${e.date}-${e.mode}`} className="cursor-pointer" onClick={() => vm.setDate(e.date)}>
                     <TableCell className="whitespace-nowrap">
-                      <span className="font-medium">{t("common:day", { number: e.cycleDay })}</span>
+                      <span className="font-medium sm:hidden">D{e.cycleDay}</span>
+                      <span className="hidden font-medium sm:inline">{t("common:day", { number: e.cycleDay })}</span>
                       <span className="ml-1.5 hidden text-xs text-muted-foreground sm:inline">
                         {f.date(e.date)} · S{e.week}
                       </span>
@@ -454,13 +553,18 @@ function HistoryCard({ vm }: { vm: ScoresViewModel }) {
                       <Badge variant={MODE_VISUALS[e.mode].badge}>{e.mode}</Badge>
                     </TableCell>
                     <TableCell className="text-right font-semibold tabular-nums">{f.n(e.points)}</TableCell>
-                    <TableCell
-                      className={cn(
-                        "text-right tabular-nums",
-                        e.delta === null ? "text-muted-foreground" : e.delta >= 0 ? "text-brazil-green" : "text-destructive",
+                    {/* Contra o mesmo dia e modo do mês anterior (28 dias antes). */}
+                    <TableCell className="text-right">
+                      {e.delta === null ? (
+                        <span className="text-muted-foreground">—</span>
+                      ) : (
+                        <span className="inline-flex flex-col items-end gap-0.5">
+                          <GrowthBadge cmp={e} />
+                          <span className={cn("hidden text-xs tabular-nums sm:inline", e.delta >= 0 ? "text-gain" : "text-loss")}>
+                            {f.signed(e.delta)}
+                          </span>
+                        </span>
                       )}
-                    >
-                      {e.delta === null ? "—" : f.signed(e.delta)}
                     </TableCell>
                     <TableCell className="hidden sm:table-cell">
                       <span className="flex -space-x-1.5">

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dailySeries, gameDayOf, modesOfDay, parsePoints, scoreSummary, weeklySeries } from "@/models/rules/scores";
+import { compare, gameDayOf, modesOfDay, parsePoints, scoreSummary, seasonDays, seasonWeeks, seasonsWithScores } from "@/models/rules/scores";
 
 const ANCHOR = "2026-10-01"; // Dia 1 de um ciclo
 
@@ -14,46 +14,50 @@ describe("gameDayOf", () => {
   });
 });
 
+// Temporada anterior (Dia 1 = 03/09) e atual (Dia 1 = 01/10): o Dia 22 é 24/09 e 22/10.
 const scores = {
-  "2026-10-22|BAX": 100,
-  "2026-10-22|BAL": 50,
-  "2026-10-23|BAX": 120,
-  "2026-10-24|BAI": 400,
-  "2026-10-29|BAX": 90, // nova temporada, semana 1
+  "2026-09-24|BAX": 100,
+  "2026-09-24|BAL": 100,
+  "2026-09-25|BAX": 200,
+  "2026-09-26|BAI": 1000,
+  "2026-10-22|BAX": 150,
+  "2026-10-22|BAL": 90,
+  "2026-10-23|BAX": 150,
+  "2026-10-24|BAI": 900,
 };
 
-describe("séries", () => {
-  it("soma por dia e variação para o último dia do mesmo tipo (BAI só com BAI)", () => {
-    const days = dailySeries({ ...scores, "2026-10-25|BAX": 200 }, ANCHOR, "2026-10-22", "2026-10-26");
-    expect(days.map((d) => d.total)).toEqual([150, 120, 400, 200, null]);
-    expect(days.map((d) => d.delta)).toEqual([null, -30, null, 80, null]);
+describe("comparação com a temporada anterior (mesmo dia do ciclo, 28 dias antes)", () => {
+  it("cada dia da temporada contra o mesmo dia da anterior, com diferença e %", () => {
+    const days = seasonDays(scores, ANCHOR, "2026-10-01", "2026-10-24");
+    expect(days).toHaveLength(28);
+    const d22 = days[21];
+    expect(d22).toMatchObject({ cycleDay: 22, current: 240, previous: 200, delta: 40 });
+    expect(d22.pct).toBeCloseTo(0.2);
+    expect(days[22]).toMatchObject({ cycleDay: 23, current: 150, previous: 200, delta: -50, pct: -0.25 });
+    expect(days[23]).toMatchObject({ cycleDay: 24, current: 900, previous: 1000, delta: -100 });
+    // Dia que ainda não chegou: só o valor da temporada anterior.
+    expect(days[24]).toMatchObject({ cycleDay: 25, future: true, current: null, delta: null });
+    expect(compare(10, 0).pct).toBeNull();
   });
 
-  it("soma por semana de cada temporada, com ganho ou perda", () => {
-    const weeks = weeklySeries(scores, ANCHOR);
-    expect(weeks.map((w) => [w.seasonStart, w.week, w.total, w.days])).toEqual([
-      ["2026-10-01", 4, 670, 3],
-      ["2026-10-29", 1, 90, 1],
-    ]);
-    expect(weeks[1].delta).toBe(-580);
-    expect(weeks[0].byMode).toEqual({ BAX: 220, BAL: 50, BAI: 400 });
+  it("semanas: a em andamento compara com a anterior só até o mesmo dia", () => {
+    const weeks = seasonWeeks(scores, "2026-10-01", "2026-10-23");
+    // Semana 4 até o Dia 23 (22–23) contra 24–25/09: 390 contra 400.
+    expect(weeks[3]).toMatchObject({ week: 4, partial: true, current: 390, previous: 400, delta: -10 });
+    expect(weeks[0]).toMatchObject({ week: 1, partial: false, current: null, previous: null });
   });
 
-  it("a semana atual compara com a anterior só até o mesmo dia da semana", () => {
-    // Semana 4 (Dias 22–28) contra a Semana 3 (Dias 15–21): no Dia 23, compara 22–23 com 15–16.
-    const s = { "2026-10-15|BAX": 100, "2026-10-16|BAX": 100, "2026-10-17|BAI": 900, "2026-10-22|BAX": 150, "2026-10-23|BAX": 120 };
-    expect(scoreSummary(s, ANCHOR, "2026-10-23")).toMatchObject({ week: 270, weekDelta: 70 });
+  it("cartões: hoje, semana e temporada contra o mês anterior, e o melhor dia", () => {
+    const s = scoreSummary(scores, ANCHOR, "2026-10-24");
+    expect(s.today).toMatchObject({ current: 900, previous: 1000, delta: -100, pct: -0.1 });
+    expect(s.week).toMatchObject({ current: 1290, previous: 1400, delta: -110 });
+    expect(s.season).toMatchObject({ current: 1290, previous: 1400 });
+    expect(s.seasonDays).toBe(3);
+    expect(s.best).toEqual({ date: "2026-09-26", total: 1000 });
   });
 
-  it("cartões: hoje, semana, temporada e melhor dia", () => {
-    expect(scoreSummary(scores, ANCHOR, "2026-10-24")).toMatchObject({
-      today: 400,
-      todayDelta: null, // primeira BAI registrada
-      week: 670,
-      season: 670,
-      seasonDays: 3,
-      best: { date: "2026-10-24", total: 400 },
-    });
+  it("temporadas com pontuação, da mais recente para a mais antiga", () => {
+    expect(seasonsWithScores(scores, ANCHOR, "2026-10-24")).toEqual(["2026-10-01", "2026-09-03"]);
   });
 });
 

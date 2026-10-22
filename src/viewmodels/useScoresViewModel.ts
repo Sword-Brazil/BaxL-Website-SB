@@ -5,36 +5,36 @@ import { dayCtpId } from "@/models/rules/ctpAssign";
 import {
   SCORES_FIRST_DATE,
   SCORES_UNLOCK_AT,
-  addDays,
-  dailySeries,
+  compare,
   dateRange,
   gameDayOf,
   modesOfDay,
+  previousSeasonDate,
   scoreEntries,
   scoreKey,
   scoreSummary,
-  weeklySeries,
+  seasonDays,
+  seasonWeeks,
+  seasonsWithScores,
   type ScoreMode,
 } from "@/models/rules/scores";
 import { useSelectionsStore } from "./stores/selectionsStore";
 import { useBattleClockViewModel } from "./useBattleClockViewModel";
 import { useCatalogViewModel } from "./useCatalogViewModel";
 
-/** Período dos gráficos por dia. */
-export type ScoreRange = "week" | "season" | "all";
-
 /**
- * Minhas pontuações: o jogador preenche a pontuação de cada dia e modo e acompanha ganhos e perdas
- * por dia, semana e temporada, ao lado da equipe que montou para o dia. Fica bloqueada até o reset
- * semanal de 22/10/2026 às 22h (horário do servidor), quando a contagem começa.
+ * Minhas pontuações: o jogador preenche a pontuação de cada dia e modo e compara cada dia e semana
+ * com o mesmo dia e semana da temporada anterior (a BA reinicia a cada 28 dias), ao lado da equipe
+ * que montou para o dia. Fica bloqueada até o reset semanal de 22/10/2026 às 22h (horário do
+ * servidor), quando a contagem começa.
  */
 export function useScoresViewModel() {
   const { clock, settings, isLoading: clockLoading, isError, refetch } = useBattleClockViewModel();
   const catalog = useCatalogViewModel();
   const { doc, hydrated, setScore } = useSelectionsStore();
   const [selected, setSelected] = useState<string | null>(null);
-  /** null = automático: "Esta semana" só quando a semana já tem 2 dias ou mais preenchidos. */
-  const [rangeChoice, setRange] = useState<ScoreRange | null>(null);
+  /** Temporada dos gráficos (data do Dia 1); null = a atual. */
+  const [seasonChoice, setSeason] = useState<string | null>(null);
 
 
   // Sem useMemo: o React Compiler memoriza os cálculos abaixo.
@@ -71,41 +71,17 @@ export function useScoresViewModel() {
   };
 
   const current = today && anchor ? gameDayOf(today, anchor) : null;
-  const weekStart = current ? addDays(current.seasonStart, (current.week - 1) * 7) : null;
-  const weekDaysFilled =
-    weekStart && today
-      ? dateRange(weekStart, today).filter((d) => modesOfDay(gameDayOf(d, anchor!)).some((m) => scores[scoreKey(d, m)] !== undefined))
-          .length
-      : 0;
-  // No começo da semana o gráfico teria um ponto só: abre na temporada.
-  const range: ScoreRange = rangeChoice ?? (weekDaysFilled >= 2 ? "week" : "season");
-  const rangeStart = !current
-    ? SCORES_FIRST_DATE
-    : range === "week"
-      ? weekStart!
-      : range === "season"
-        ? current.seasonStart
-        : SCORES_FIRST_DATE;
-  const from = rangeStart < SCORES_FIRST_DATE ? SCORES_FIRST_DATE : rangeStart;
-
-  // Série desde o primeiro dia contado e só depois o período: a variação do 1º dia do período compara com o dia de antes.
-  const daily = anchor && today ? dailySeries(scores, anchor, SCORES_FIRST_DATE, today).filter((d) => d.date >= from) : [];
-  // Semana em andamento: marcada como parcial e sem variação até acabar (comparar meia semana com uma inteira engana).
-  const weekly = (anchor ? weeklySeries(scores, anchor) : []).map((w) => {
-    const partial = !!today && w.start <= today && today <= addDays(w.start, 6);
-    return { ...w, partial, delta: partial ? null : w.delta };
-  });
+  const seasons = anchor && today ? seasonsWithScores(scores, anchor, today) : [];
+  const season = seasonChoice && seasons.includes(seasonChoice) ? seasonChoice : (current?.seasonStart ?? null);
+  // Cada dia e semana da temporada escolhida contra o mesmo dia e semana da anterior.
+  const days = anchor && today && season ? seasonDays(scores, anchor, season, today) : [];
+  const weeks = today && season ? seasonWeeks(scores, season, today) : [];
   const summary = anchor && today ? scoreSummary(scores, anchor, today) : null;
 
-  // Histórico: mais recente primeiro, com a variação para o registro anterior do mesmo modo.
-  const last: Partial<Record<ScoreMode, number>> = {};
+  // Histórico: mais recente primeiro, cada registro contra o mesmo dia e modo do mês anterior.
   const history = anchor
     ? scoreEntries(scores, anchor)
-        .map((e) => {
-          const previous = last[e.mode];
-          last[e.mode] = e.points;
-          return { ...e, delta: previous === undefined ? null : e.points - previous };
-        })
+        .map((e) => ({ ...e, ...compare(e.points, scores[scoreKey(previousSeasonDate(e.date), e.mode)] ?? null) }))
         .reverse()
     : [];
 
@@ -132,10 +108,11 @@ export function useScoresViewModel() {
       if (!locked && dates.includes(d)) setScore(d, mode, points);
     },
     teamOf,
-    range,
-    setRange,
-    daily,
-    weekly,
+    seasons,
+    season,
+    setSeason,
+    days,
+    weeks,
     summary,
     history,
     current,
