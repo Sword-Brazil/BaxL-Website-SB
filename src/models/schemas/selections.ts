@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { BATTLE_DAY_NUMBERS, SLOTS } from "@/models/domain/enums";
+import { MAX_SCORE, SCORE_KEY_RE } from "@/models/rules/scores";
 import { idSchema } from "./common";
 import { VALIDATION } from "./messages";
 
@@ -17,7 +18,10 @@ export type TeamKey = string;
 
 const SlotPickSchema = z.object({
   uniformId: idSchema,
+  /** CTP do dia em equipes antigas (antes dos slots); hoje vale `ctpSlot`. */
   ctpId: idSchema.optional().nullable(),
+  /** Slot de CTP do personagem usado neste dia (1 = padrão, 2 = alternativo). */
+  ctpSlot: z.union([z.literal(1), z.literal(2)]).optional().nullable(),
   /** Striker (apoio da Transcendência 4) que o jogador usa com este personagem. */
   strikerUniformId: idSchema.optional().nullable(),
 });
@@ -33,8 +37,14 @@ export const UserTeamSchema = z
   );
 export type UserTeam = z.infer<typeof UserTeamSchema>;
 
-/** CTP equipado em cada personagem do usuário (como no jogo: o CTP fica no personagem). */
-export const EquipmentSchema = z.object({ ctpByAgent: z.record(idSchema, idSchema) });
+/**
+ * CTPs de cada personagem do usuário (como no jogo: o CTP fica no personagem): o 1 (padrão) e o 2
+ * (opcional), alternados por dia nas equipes.
+ */
+export const EquipmentSchema = z.object({
+  ctpByAgent: z.record(idSchema, idSchema),
+  ctp2ByAgent: z.record(idSchema, idSchema).optional(),
+});
 
 export const UserSelectionsSchema = z.object({
   version: z.literal(1),
@@ -46,6 +56,11 @@ export const UserSelectionsSchema = z.object({
   equipment: EquipmentSchema.default({ ctpByAgent: {} }),
   /** Montar equipes escolhendo entre todos os personagens (só a restrição do dia vale), sem elenco. */
   freePick: z.boolean().default(false),
+  /** Pontuação do jogador por dia de jogo e modo ("AAAA-MM-DD|BAX"), preenchida por ele mesmo. */
+  scores: z
+    .record(z.string().regex(SCORE_KEY_RE), z.number().int().min(0).max(MAX_SCORE))
+    .refine((s) => Object.keys(s).length <= 5000)
+    .optional(),
 });
 export type UserSelections = z.infer<typeof UserSelectionsSchema>;
 

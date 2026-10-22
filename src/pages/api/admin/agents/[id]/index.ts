@@ -7,7 +7,7 @@ import { requireRole } from "@/server/session";
 
 export default handler({
   PUT: async (req, res) => {
-    await requireRole(req, res, "CURATOR");
+    await requireRole(req, res, "ADMIN");
     const { id } = parseQuery(z.object({ id: idSchema }), req);
     res.status(200).json(await updateAgent(id, parseBody(AgentSchema, req)));
   },

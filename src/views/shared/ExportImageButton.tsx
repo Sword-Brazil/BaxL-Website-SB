@@ -7,8 +7,8 @@ export function ExportImageButton({ onExport, disabled }: { onExport: () => void
   const { t } = useTranslation("common");
   return (
     <Hint label={t("actions.exportImage")}>
-      <Button size="icon-sm" variant="ghost" onClick={onExport} disabled={disabled} aria-label={t("actions.exportImage")}>
-        <ImageDownIcon />
+      <Button size="icon-sm" variant="ghost" onClick={onExport} loading={disabled} aria-label={t("actions.exportImage")}>
+        <ImageDownIcon data-icon="inline-start" />
       </Button>
     </Hint>
   );

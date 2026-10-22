@@ -33,6 +33,11 @@ function fromBrtWall(wall: number): number {
 
 const mod = (n: number, m: number) => ((n % m) + m) % m;
 
+const brtDate = new Intl.DateTimeFormat("en-CA", { timeZone: BRT_TIME_ZONE, year: "numeric", month: "2-digit", day: "2-digit" });
+
+/** Data (AAAA-MM-DD) no horário de Brasília de um instante. */
+export const brtDateKey = (instant: string | Date) => brtDate.format(new Date(instant));
+
 /**
  * Calcula o dia de batalha atual a partir do horário de Brasília.
  * - O dia vira em `dayTurnoverHour` (12:00): é a única hora em que `cycleDay` muda.

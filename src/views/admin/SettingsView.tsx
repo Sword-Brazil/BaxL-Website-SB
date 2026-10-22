@@ -46,7 +46,7 @@ export function SettingsView() {
             </FieldGroup>
           </CardContent>
           <CardFooter className="mt-4 justify-end">
-            <Button type="submit" variant="energy" disabled={vm.isSaving}>
+            <Button type="submit" variant="energy" loading={vm.isSaving}>
               <SaveIcon data-icon="inline-start" />
               {vm.isSaving ? t("admin:common.saving") : t("admin:common.save")}
             </Button>

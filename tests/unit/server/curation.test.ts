@@ -18,7 +18,7 @@ describe("curadoria", () => {
 
   beforeEach(async () => {
     await seedBase();
-    curatorId = (await createUser("CURATOR")).id;
+    curatorId = (await createUser("ADMIN", "editor")).id;
     ctp = await ctpId();
     fem = [];
     for (const s of ["f1", "f2", "f3"]) fem.push((await createAgent(s, { gender: "FEMALE", species: "MUTANT" })).uniform.id);
@@ -49,6 +49,28 @@ describe("curadoria", () => {
       SUPPORT_1: true,
       SUPPORT_2: true,
     });
+  });
+
+  it("CTPs 1/2 ficam no personagem: a equipe escolhe o slot e trocar o CTP do slot atualiza todos os dias", async () => {
+    const insight = await ctpId("INSIGHT", "NORMAL");
+    const base = team(fem);
+    const withSlots = (slotOfSolo: 1 | 2, agentCtps: object = {}) =>
+      base.members.map((m) => ({ ...m, ctpId: null, ctpSlot: m.slot === "SOLO" ? slotOfSolo : (1 as const), ...(m.slot === "SOLO" ? agentCtps : {}) }));
+
+    const day6 = await saveMetaTeam({ ...base, members: withSlots(2, { agentCtp1Id: ctp, agentCtp2Id: insight }) }, curatorId);
+    const solo = day6.members.find((m) => m.slot === "SOLO")!;
+    expect(solo).toMatchObject({ ctpSlot: 2, ctpId: insight });
+    // Sem CTPs no personagem, o slot 1 fica sem CTP.
+    expect(day6.members.find((m) => m.slot === "SUPPORT_1")).toMatchObject({ ctpSlot: 1, ctpId: null });
+
+    const agentId = (await prisma.uniform.findUniqueOrThrow({ where: { id: fem[0] } })).agentId;
+    expect(await prisma.agent.findUniqueOrThrow({ where: { id: agentId } })).toMatchObject({ metaCtp1Id: ctp, metaCtp2Id: insight });
+
+    // Outra equipe troca o CTP 2 do personagem: a do dia 6 (slot 2) acompanha.
+    const liberation = await ctpId("LIBERATION", "MIGHTY");
+    await saveMetaTeam({ ...base, isPrimary: false, members: withSlots(1, { agentCtp2Id: liberation }) }, curatorId);
+    const again = await prisma.metaTeamMember.findFirstOrThrow({ where: { metaTeamId: day6.id, slot: "SOLO" } });
+    expect(again.ctpId).toBe(liberation);
   });
 
   it("o Causador de Dano guarda o Striker meta; quem não é Causador de Dano não tem Striker", async () => {
@@ -135,7 +157,7 @@ describe("curadoria", () => {
 
   it("grava autor e data, e só uma principal por dia", async () => {
     const a = await saveMetaTeam(team(fem), curatorId);
-    expect(a.updatedBy).toBe("curator");
+    expect(a.updatedBy).toBe("admin");
     const b = await saveMetaTeam(team([fem[2], fem[1], fem[0]]), curatorId);
     const day = await dayId("BAX", 6);
     const rows = await prisma.metaTeam.findMany({ where: { battleDayId: day } });
@@ -195,16 +217,16 @@ describe("curadoria", () => {
 
     it("a busca acha por usuário ou apelido, sem diferenciar maiúsculas", async () => {
       await createAccount({ username: "tenmenezes", nickname: "Ten Menezes", password: "senha1234", role: "USER" });
-      await createAccount({ username: "curador", password: "senha1234", role: "CURATOR" });
+      await createAccount({ username: "lider", password: "senha1234", role: "ADMIN" });
       expect((await listUsers({ q: "MENEZES" })).users.map((u) => u.username)).toEqual(["tenmenezes"]);
-      expect((await listUsers({ q: "Curad" })).users.map((u) => u.username)).toEqual(["curador"]);
+      expect((await listUsers({ q: "LIDER" })).users.map((u) => u.username)).toEqual(["lider"]);
     });
 
     it("rebaixar o último ADMIN gera 409", async () => {
-      const admin = await createUser("ADMIN");
-      await expect(changeRole(admin.id, "USER")).rejects.toSatisfy(status(409));
+      // O "editor" do beforeEach é o único ADMIN.
+      await expect(changeRole(curatorId, "USER")).rejects.toSatisfy(status(409));
       await createUser("ADMIN", "outro");
-      await expect(changeRole(admin.id, "CURATOR")).resolves.toMatchObject({ role: "CURATOR" });
+      await expect(changeRole(curatorId, "USER")).resolves.toMatchObject({ role: "USER" });
     });
   });
 });

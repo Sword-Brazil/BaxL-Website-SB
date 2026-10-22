@@ -14,7 +14,8 @@
     "stats": "Estadísticas",
     "rotations": "Rotaciones",
     "login": "Entrar",
-    "synced": "Sincronizado con tu cuenta"
+    "synced": "Sincronizado con tu cuenta",
+    "scores": "Puntuaciones"
   },
   "modes": {
     "BAX": "Batalla de Alianza Extrema",
@@ -39,7 +40,7 @@
     "credit": "Calendario y equipos base: Guia BAX/BAL/BAI (guiabaxbal.web.app), con curaduría de Sword Brasil.",
     "support": {
       "dev": "Desarrollado y mantenido por un único dev.",
-      "text": "¿Quieres ayudar con el Pack Stark? Haz un Pix (Brasil):",
+      "text": "¿Le das una manito al Pack Stark? Manda un Pix (Brasil):",
       "copy": "Copiar clave",
       "copied": "Clave Pix copiada.",
       "copyFailed": "No se pudo copiar. Selecciona la clave y cópiala manualmente.",
@@ -82,10 +83,34 @@
       "c": "Cancel: cancela la animación justo después de usarla, soltando la siguiente habilidad.",
       "dc": "Delayed Cancel: espera una fracción de segundo (el efecto del golpe o el fin de la animación) antes de cancelar y pulsar la siguiente.",
       "qc": "Quick Cancel: cancelación rápida justo después del comando.",
-      "optional": "Tramo opcional o \"relleno\" del combo antes del bono principal."
+      "optional": "Tramo opcional o \"relleno\" del combo antes del bono principal.",
+      "start": "Inicio de la rotación (aparece solo al comienzo de cada rotación).",
+      "end": "Fin de la rotación actual.",
+      "next": "Empieza la siguiente rotación (otra línea).",
+      "restart": "Vuelve al inicio y repite la rotación."
+    },
+    "markers": {
+      "start": "Inicio de la rotación",
+      "end": "Fin de la rotación",
+      "next": "Siguiente rotación",
+      "restart": "Vuelve al inicio"
+    },
+    "errors": {
+      "empty": "Escribe la rotación.",
+      "token": "No entendí “{{token}}”: usa 1–6 (con c, dc o qc), paréntesis, |, / o *.",
+      "unclosedGroup": "Falta cerrar un paréntesis.",
+      "unopenedGroup": "Hay un “)” sin “(” antes.",
+      "nestedGroup": "No se puede abrir un paréntesis dentro de otro.",
+      "emptyGroup": "Hay un paréntesis vacío.",
+      "markerInGroup": "|, / y * no pueden ir dentro de paréntesis.",
+      "tooLong": "Rotación demasiado larga (máximo 30 pasos)."
     },
     "openVideo": "Abrir el vídeo",
     "playVideo": "Ver la rotación"
+  },
+  "ctpSlot": {
+    "label": "CTP {{n}}",
+    "use": "CTP usado en este día"
   },
   "restriction": {
     "none": "Sin restricción",
@@ -150,6 +175,7 @@
   },
   "states": {
     "loading": "Cargando…",
+    "slow": "Está tardando más de lo normal: el servidor puede estar despertando. Unos segundos más.",
     "error": "No se pudieron cargar los datos.",
     "notFound": "Página no encontrada.",
     "forbidden": "Acceso denegado."
@@ -211,8 +237,7 @@
     "dismiss": "Descartar aviso",
     "notMe": "¿No fuiste tú? Pide a un administrador que cambie tu contraseña.",
     "roles": {
-      "USER": "Usuario",
-      "CURATOR": "Curador",
+      "USER": "Miembro",
       "ADMIN": "Administrador"
     },
     "toast": {

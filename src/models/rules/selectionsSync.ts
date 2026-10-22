@@ -7,8 +7,11 @@ function contentKey(doc: UserSelections): string {
     .sort()
     .map((k) => [k, doc.teams[k]] as const)
     .filter(([, t]) => Object.values(t).some(Boolean));
-  const equipment = Object.entries(doc.equipment?.ctpByAgent ?? {}).sort(([a], [b]) => a.localeCompare(b));
-  return JSON.stringify([[...doc.roster.ownedUniformIds].sort(), teams, equipment, doc.nickname ?? ""]);
+  const equipment = [doc.equipment?.ctpByAgent, doc.equipment?.ctp2ByAgent].map((m) =>
+    Object.entries(m ?? {}).sort(([a], [b]) => a.localeCompare(b)),
+  );
+  const scores = Object.entries(doc.scores ?? {}).sort(([a], [b]) => a.localeCompare(b));
+  return JSON.stringify([[...doc.roster.ownedUniformIds].sort(), teams, equipment, doc.nickname ?? "", scores]);
 }
 
 export const isEmptySelections = (doc: UserSelections) => contentKey(doc) === contentKey(emptySelections());

@@ -45,6 +45,8 @@
     "allReleased": "Todos los agentes permitidos",
     "generatedAt": "Generado el {{date}}. ⚔ = Causante de daño.",
     "all": "Tabla completa (Metas y mis equipos)",
+    "meta": "Solo las Metas (Meta y Alternativas)",
+    "subtitleMeta": "Meta y Alternativas por día · {{week}} · Sword Brasil",
     "mine": "Solo mis equipos",
     "subtitleMine": "Mis equipos por día · {{week}} · Sword Brasil",
     "noMine": "Sin equipo armado"

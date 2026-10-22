@@ -1,0 +1,67 @@
+{
+  "title": "My scores",
+  "subtitle": "Log your score for each day and mode and follow your gains and losses by day, week and season.",
+  "help": {
+    "text1": "Fill in each mode's score on the game day (the day turns at 12:00). Since BA resets every 28 days, each day and week is compared with the same day and week last month: green is up, red is down.",
+    "text2": "Saved on this device and, if you sign in, in your account too. Only you can see your scores."
+  },
+  "locked": {
+    "title": "Unlocks today at 22:00",
+    "text": "Scores start counting at today's weekly reset (10/22, 22:00 Brasília time), so every day, week and season adds up correctly.",
+    "countdown": "until unlock"
+  },
+  "cards": {
+    "today": "Today",
+    "todayFooter": "Vs. the same cycle day last month",
+    "week": "Week {{n}}",
+    "weekFooter": "So far, vs. the same week last month up to the same day",
+    "season": "Season",
+    "seasonFooter_one": "{{count}} day filled · since {{date}}",
+    "seasonFooter_other": "{{count}} days filled · since {{date}}",
+    "best": "Best day",
+    "bestFooter": "Day {{day}} · {{date}}",
+    "bestNone": "No day filled yet"
+  },
+  "entry": {
+    "title": "Log score",
+    "subtitle": "Pick the day and write how much you scored in each mode. Saves when you leave the field; clearing the number removes it.",
+    "day": "Game day",
+    "today": "today",
+    "points": "Points",
+    "placeholder": "E.g. 1,250,000",
+    "invalid": "Numbers only (you can use separators for thousands).",
+    "myTeam": "My team for the day",
+    "noTeam": "You haven't built a team for this day.",
+    "buildTeam": "Build team"
+  },
+  "chart": {
+    "title": "Performance",
+    "subtitle": "BA resets every 28 days: each day and week is compared with the same day and week last month.",
+    "days": "Days",
+    "weeks": "Weeks",
+    "empty": "Log a day's score to see the charts.",
+    "partial": "partial",
+    "season": "Season",
+    "seasonOption": "Season {{range}}"
+  },
+  "compare": {
+    "current": "This season",
+    "previous": "Last month",
+    "growth": "Growth",
+    "growthTitle": "Growth vs. the same day last month (green up, red down)",
+    "growthTitleWeek": "Growth vs. the same week last month (green up, red down)",
+    "week": "Week {{n}}",
+    "weekColumn": "Week",
+    "previousWas": "Last month: {{value}}",
+    "noPrevious": "No score in the same period last month"
+  },
+  "history": {
+    "title": "History",
+    "subtitle": "Everything you logged, each vs. the same day and mode last month. Tap a row to edit that day.",
+    "day": "Day",
+    "mode": "Mode",
+    "points": "Points",
+    "delta": "vs. last month",
+    "team": "Team"
+  }
+}

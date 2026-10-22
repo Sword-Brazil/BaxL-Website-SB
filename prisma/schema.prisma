@@ -16,14 +16,19 @@ datasource db {
 // ---------- Catálogo ----------
 
 model Agent {
-  id        String     @id @default(cuid())
-  slug      String     @unique
-  name      String
-  active    Boolean    @default(true)
-  uniforms  Uniform[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  rotations Rotation[]
+  id         String     @id @default(cuid())
+  slug       String     @unique
+  name       String
+  active     Boolean    @default(true)
+  uniforms   Uniform[]
+  // CTPs da Meta para o personagem: o 1 (padrão) e o 2 (opcional), alternados por dia nas equipes.
+  metaCtp1Id String?
+  metaCtp1   Ctp?       @relation("AgentMetaCtp1", fields: [metaCtp1Id], references: [id], onDelete: SetNull)
+  metaCtp2Id String?
+  metaCtp2   Ctp?       @relation("AgentMetaCtp2", fields: [metaCtp2Id], references: [id], onDelete: SetNull)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  rotations  Rotation[]
 }
 
 model Uniform {
@@ -40,6 +45,8 @@ model Uniform {
   attackType      String           @default("UNKNOWN")
   // Efeitos que o traje causa no chefe da BA (SILENCE, PARALYSIS, BURN, FRACTURE, SHOCK, TRAP).
   effects         String[]         @default([])
+  // Striker meta: só os trajes marcados aparecem no seletor de Striker dos Causadores de Dano.
+  isMetaStriker   Boolean          @default(false)
   active          Boolean          @default(true)
   metaMembers     MetaTeamMember[] @relation("MemberUniform")
   priorityEntries PriorityEntry[]
@@ -59,6 +66,8 @@ model Ctp {
   active          Boolean          @default(true)
   metaMembers     MetaTeamMember[]
   priorityEntries PriorityEntry[]
+  metaCtp1Of      Agent[]          @relation("AgentMetaCtp1")
+  metaCtp2Of      Agent[]          @relation("AgentMetaCtp2")
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
@@ -131,8 +140,10 @@ model MetaTeamMember {
   slot             String
   uniformId        String
   uniform          Uniform  @relation("MemberUniform", fields: [uniformId], references: [id])
+  // CTP do membro, já resolvido pelo slot (Agent.metaCtp1/2); slot null = equipe antiga, CTP só dela.
   ctpId            String?
   ctp              Ctp?     @relation(fields: [ctpId], references: [id])
+  ctpSlot          Int?
   // Causador de Dano (qualquer posição): as rotações dele ficam em Rotation (por personagem/traje).
   isDamageDealer   Boolean  @default(false)
   // Striker meta (apoio da Transcendência 4) do Causador de Dano nesta equipe.
@@ -236,7 +247,7 @@ model SecurityNotice {
   userId          String
   user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   type            String
-  // JSON com parâmetros não sensíveis (ex.: {"role":"CURATOR"}).
+  // JSON com parâmetros não sensíveis (ex.: {"role":"ADMIN"}).
   params          String?
   // Sessão que causou o evento: o aviso de "novo login" não aparece nela mesma.
   originSessionId String?

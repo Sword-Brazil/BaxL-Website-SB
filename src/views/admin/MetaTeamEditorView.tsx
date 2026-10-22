@@ -17,32 +17,37 @@ import {
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Toggle } from "@/components/ui/toggle";
 import { Textarea } from "@/components/ui/textarea";
 import { DISPLAY_SLOTS } from "@/models/domain/enums";
 import type { Agent } from "@/models/domain/types";
+import { hasMetaStrikerTags, metaStrikerOptions } from "@/models/rules/striker";
 import type { CatalogViewModel, UniformRef } from "@/viewmodels/useCatalogViewModel";
 import type { MetaScopeViewModel } from "@/viewmodels/admin/useMetaScopeViewModel";
-import { useMetaTeamEditorViewModel } from "@/viewmodels/admin/useMetaTeamEditorViewModel";
+import { useMetaTeamEditorViewModel, type MemberDraft } from "@/viewmodels/admin/useMetaTeamEditorViewModel";
 import { useRotationsViewModel } from "@/viewmodels/useRotationsViewModel";
 import { MetaCycleBoard } from "./MetaCycleBoard";
 import { ReservesEditor } from "./ReservesEditor";
 import { TeamStrip } from "@/views/shared/TeamStrip";
 import { UpdatedAt } from "@/views/shared/UpdatedAt";
 import { CtpSelect } from "@/views/shared/CtpSelect";
+import { CtpSlotSwitch } from "@/views/shared/CtpSlotSwitch";
 import { EmptyTeam } from "@/views/shared/EmptyTeam";
 import { QueryState } from "@/views/shared/QueryState";
 import { RestrictionBadges } from "@/views/shared/RestrictionBadges";
 import { UniformPicker } from "@/views/shared/UniformPicker";
 
-/** Strikers possíveis para um Causador de Dano: trajes ativos dos outros personagens. */
+/** Strikers possíveis para um Causador de Dano: trajes ativos dos outros personagens marcados como Striker meta. */
 const strikerOptions = (catalog: CatalogViewModel, agentId: string | undefined): UniformRef[] =>
-  catalog.agents
-    .filter((a) => a.active && a.id !== agentId)
-    .flatMap((a) => a.uniforms.filter((u) => u.active).map((uniform) => ({ agent: a, uniform })));
+  metaStrikerOptions(
+    catalog.agents
+      .filter((a) => a.active && a.id !== agentId)
+      .flatMap((a) => a.uniforms.filter((u) => u.active).map((uniform) => ({ agent: a, uniform }))),
+    hasMetaStrikerTags(catalog.agents),
+  );
 
 /** Striker meta do Causador de Dano (apoio da Transcendência 4), com botão para tirar. */
 function StrikerPicker({
@@ -83,6 +88,63 @@ function StrikerPicker({
       </div>
       <p className="text-xs text-muted-foreground">{t("metas.strikerHelp")}</p>
     </div>
+  );
+}
+
+/**
+ * CTPs 1 e 2 da Meta do personagem (valem em todas as equipes dele) e qual dos dois esta equipe usa.
+ */
+function MemberCtps({
+  catalog,
+  member,
+  slotLabel,
+  onChange,
+}: {
+  catalog: CatalogViewModel;
+  member: MemberDraft;
+  slotLabel: string;
+  onChange: (patch: Partial<MemberDraft>) => void;
+}) {
+  const { t } = useTranslation(["admin", "common"]);
+  const agentName = member.uniformId ? catalog.uniformById(member.uniformId)?.agent.name : undefined;
+  const legacy = member.ctpSlot === null ? catalog.ctpById(member.ctpId) : null;
+  return (
+    <Field className="sm:col-span-2">
+      <FieldLabel>{t("admin:metas.ctps", { name: agentName ?? "" })}</FieldLabel>
+      <div className="grid grid-cols-2 gap-2">
+        {([1, 2] as const).map((n) => (
+          <CtpSelect
+            key={n}
+            ctps={catalog.ctps}
+            value={n === 1 ? member.agentCtp1Id : member.agentCtp2Id}
+            onChange={(ctpId) =>
+              onChange(
+                n === 1
+                  ? { agentCtp1Id: ctpId }
+                  : // Sem CTP 2, a equipe que usava o 2 volta para o 1.
+                    { agentCtp2Id: ctpId, ...(!ctpId && member.ctpSlot === 2 ? { ctpSlot: 1 as const } : {}) },
+              )
+            }
+            placeholder={n === 1 ? t("common:ctpSlot.label", { n }) : t("admin:metas.ctp2Optional")}
+            ariaLabel={`${t("common:ctpSlot.label", { n })} · ${slotLabel}`}
+            targetName={agentName}
+          />
+        ))}
+      </div>
+      <span className="text-xs text-muted-foreground">{t("common:ctpSlot.use")}</span>
+      <CtpSlotSwitch
+        ctp1={catalog.ctpById(member.agentCtp1Id)}
+        ctp2={catalog.ctpById(member.agentCtp2Id)}
+        value={member.ctpSlot}
+        onChange={(ctpSlot) => onChange({ ctpSlot })}
+      />
+      {legacy && (
+        <FieldDescription className="text-antihero">
+          {t("admin:metas.legacyCtp", { ctp: `${t(`common:ctp.${legacy.type}`)} · ${t(`common:quality.${legacy.quality}`)}` })}
+        </FieldDescription>
+      )}
+      <FieldDescription>{t("admin:metas.ctpsHelp")}</FieldDescription>
+    </Field>
   );
 }
 
@@ -254,18 +316,14 @@ export function MetaTeamEditorView({ scopeVm }: { scopeVm: MetaScopeViewModel })
                           ariaLabel={t(`common:team.slots.${slot}`)}
                         />
                       </Field>
-                      <Field>
-                        <FieldLabel>{t("admin:metas.pickCtp")}</FieldLabel>
-                        <CtpSelect
-                          ctps={catalog.ctps}
-                          value={member.ctpId}
-                          onChange={(ctpId) => vm.setMember(slot, { ctpId })}
-                          allowNone
-                          placeholder={t("admin:metas.pickCtp")}
-                          ariaLabel={`${t("admin:metas.pickCtp")} · ${t(`common:team.slots.${slot}`)}`}
-                          targetName={member.uniformId ? catalog.uniformById(member.uniformId)?.agent.name : undefined}
+                      {member.uniformId && (
+                        <MemberCtps
+                          catalog={catalog}
+                          member={member}
+                          slotLabel={t(`common:team.slots.${slot}`)}
+                          onChange={(patch) => vm.setMember(slot, patch)}
                         />
-                      </Field>
+                      )}
                       <DamageDealerToggle
                         pressed={member.isDamageDealer}
                         onChange={(isDamageDealer) => vm.setMember(slot, { isDamageDealer })}
@@ -310,7 +368,7 @@ export function MetaTeamEditorView({ scopeVm }: { scopeVm: MetaScopeViewModel })
             <Button variant="outline" onClick={vm.close}>
               {t("admin:common.cancel")}
             </Button>
-            <Button type="submit" form="meta-team-form" variant="energy" disabled={vm.isSaving}>
+            <Button type="submit" form="meta-team-form" variant="energy" loading={vm.isSaving}>
               {vm.isSaving ? t("admin:common.saving") : t("admin:common.save")}
             </Button>
           </DialogFooter>

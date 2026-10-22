@@ -18,6 +18,7 @@ const uniformData = (u: AgentInput["uniforms"][number]) => ({
   species: u.species,
   attackType: u.attackType,
   ...(u.effects ? { effects: u.effects } : {}),
+  ...(u.isMetaStriker !== undefined ? { isMetaStriker: u.isMetaStriker } : {}),
 });
 
 async function assertSlugFree(slug: string, exceptId?: string) {
@@ -99,6 +100,9 @@ export async function deleteCtp(id: string) {
   if (!(await prisma.ctp.findUnique({ where: { id } }))) throw new HttpError(404, "NOT_FOUND", "CTP não encontrado");
   await prisma.$transaction([
     prisma.metaTeamMember.updateMany({ where: { ctpId: id }, data: { ctpId: null } }),
+    // Os personagens que tinham o CTP no slot 1 ou 2 da Meta ficam sem ele.
+    prisma.agent.updateMany({ where: { metaCtp1Id: id }, data: { metaCtp1Id: null } }),
+    prisma.agent.updateMany({ where: { metaCtp2Id: id }, data: { metaCtp2Id: null } }),
     prisma.priorityEntry.updateMany({ where: { ctpId: id }, data: { ctpId: null } }),
     prisma.ctp.delete({ where: { id } }),
   ]);

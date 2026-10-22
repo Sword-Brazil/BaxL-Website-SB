@@ -7,7 +7,8 @@ export type Mode = (typeof MODES)[number];
 export const DAY_MODES = ["BAX", "BAL"] as const;
 export type DayMode = (typeof DAY_MODES)[number];
 
-export const ROLES = ["USER", "CURATOR", "ADMIN"] as const;
+/** Dois papéis: membro comum (USER) e Administrador (ADMIN), que cuida de todo o conteúdo e das contas. */
+export const ROLES = ["USER", "ADMIN"] as const;
 export type Role = (typeof ROLES)[number];
 
 export const GENDERS = ["MALE", "FEMALE", "NONE"] as const;

@@ -13,7 +13,7 @@
   },
   "guard": {
     "forbidden": "Acceso denegado",
-    "forbiddenText": "Esta área es exclusiva para curadores y administradores de Sword Brasil.",
+    "forbiddenText": "Esta área es exclusiva para los administradores de Sword Brasil.",
     "goHome": "Volver al inicio"
   },
   "overview": {
@@ -24,7 +24,7 @@
     "catalog": "Agentes, uniformes e imágenes.",
     "ctps": "Tipos, fotos y disponibilidad de los CTPs.",
     "bai": "Secuencia de jefes de la BAI.",
-    "users": "Jugadores, curadores y administradores: cuentas, roles y contraseñas.",
+    "users": "Miembros y administradores: cuentas, roles y contraseñas.",
     "settings": "Ancla del ciclo y horarios de cambio.",
     "rotations": "Rotaciones de los personajes (causantes de daño), por traje, con descripción y vídeo."
   },
@@ -70,6 +70,10 @@
     "notes": "Observaciones",
     "pickAgent": "Elegir agente…",
     "pickCtp": "CTP",
+    "ctps": "CTPs de la Meta de {{name}}",
+    "ctp2Optional": "CTP 2 (opcional)",
+    "ctpsHelp": "El CTP 1 y el CTP 2 quedan en el personaje y valen en todos sus equipos. En cada día, elige cuál de los dos usa el equipo.",
+    "legacyCtp": "Este equipo aún usa {{ctp}} solo en este día. Elige el CTP 1 o 2 para unificar.",
     "searchAgent": "Buscar agente…",
     "noAgent": "Ningún agente cumple la restricción.",
     "deleteConfirm": "¿Eliminar este equipo? No se puede deshacer.",
@@ -134,7 +138,9 @@
     "uniformsHint": "Cada traje tiene sus propios atributos (género, lado, especie y ataque): las restricciones de los días se verifican por el traje usado. Un traje nuevo empieza con los atributos del primer traje.",
     "variedUniforms_one": "{{count}} traje con atributos distintos",
     "variedUniforms_other": "{{count}} trajes con atributos distintos",
-    "effects": "Efectos en el jefe (aturde en la temporada del efecto)"
+    "effects": "Efectos en el jefe (aturde en la temporada del efecto)",
+    "metaStriker": "Striker meta",
+    "metaStrikerHelp": "Solo los trajes marcados aparecen para elegir como Striker de los Causantes de Daño (Metas y equipos de los jugadores)."
   },
   "ctps": {
     "title": "Catálogo de CTPs",
@@ -162,8 +168,7 @@
     "search": "Buscar por usuario o apodo…",
     "role": "Rol",
     "roles": {
-      "USER": "Jugador",
-      "CURATOR": "Curador",
+      "USER": "Miembro",
       "ADMIN": "Administrador"
     },
     "changeRoleConfirm": "¿Cambiar el rol de {{name}} a {{role}}?",
@@ -202,8 +207,8 @@
     "titleLabel": "Título (opcional)",
     "titlePlaceholder": "Ej.: Apertura, Fase 2, Contra jefes",
     "sequence": "Rotación",
-    "sequencePlaceholder": "Ej.: 1 2c (3dc 4) 6 — o escríbela a tu manera",
-    "sequenceHint": "Texto libre. Si usas la notación de la comunidad (1–6, c, dc, qc, paréntesis), aparece en bloques.",
+    "sequencePlaceholder": "Ej.: 1 2c (3dc 4) 6 | 5 4 * — o escríbela a tu manera",
+    "sequenceHint": "Texto libre. La notación de la comunidad (1–6, c, dc, qc, paréntesis) aparece en bloques; usa | para el fin de la rotación, / para empezar la siguiente y * para volver al inicio.",
     "legendTitle": "Notación de la comunidad",
     "legendFree": "La notación es opcional: escribe como mejor se explique.",
     "description": "Descripción",

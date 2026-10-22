@@ -41,7 +41,7 @@ function ModeDays({ mode, effect }: { mode: DayMode; effect: BossEffect | null }
                 <Button size="icon-sm" variant="ghost" disabled={!row.dirty} onClick={row.reset} aria-label={t("admin:common.cancel")}>
                   <RotateCcwIcon />
                 </Button>
-                <Button size="sm" disabled={!row.dirty || vm.savingDay === row.number} onClick={row.save}>
+                <Button size="sm" disabled={!row.dirty} loading={vm.savingDay === row.number} onClick={row.save}>
                   <SaveIcon data-icon="inline-start" />
                   {t("admin:common.save")}
                 </Button>
@@ -88,7 +88,7 @@ function SeasonCard({ vm }: { vm: SeasonVm }) {
           <Button size="icon-sm" variant="ghost" disabled={!vm.dirty} onClick={vm.reset} aria-label={t("admin:common.cancel")}>
             <RotateCcwIcon />
           </Button>
-          <Button size="sm" disabled={!vm.dirty || vm.isSaving} onClick={vm.save}>
+          <Button size="sm" disabled={!vm.dirty} loading={vm.isSaving} onClick={vm.save}>
             <SaveIcon data-icon="inline-start" />
             {t("admin:common.save")}
           </Button>

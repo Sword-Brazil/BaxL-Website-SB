@@ -1,0 +1,67 @@
+{
+  "title": "Minhas pontuações",
+  "subtitle": "Anote sua pontuação de cada dia e modo e acompanhe seus ganhos e perdas por dia, semana e temporada.",
+  "help": {
+    "text1": "Preencha a pontuação de cada modo no dia de jogo (o dia vira às 12h). Como a BA reinicia a cada 28 dias, cada dia e semana é comparado com o mesmo dia e semana do mês anterior: verde cresceu, vermelho caiu.",
+    "text2": "Fica salvo no aparelho e, se você entrar, também na sua conta. Só você vê as suas pontuações."
+  },
+  "locked": {
+    "title": "Libera hoje às 22h",
+    "text": "As pontuações começam a contar no reset semanal de hoje (22/10, 22h de Brasília), para cada dia, semana e temporada ficarem certinhos.",
+    "countdown": "para liberar"
+  },
+  "cards": {
+    "today": "Hoje",
+    "todayFooter": "Contra o mesmo dia do ciclo no mês anterior",
+    "week": "Semana {{n}}",
+    "weekFooter": "Até hoje, contra a mesma semana do mês anterior até o mesmo dia",
+    "season": "Temporada",
+    "seasonFooter_one": "{{count}} dia preenchido · desde {{date}}",
+    "seasonFooter_other": "{{count}} dias preenchidos · desde {{date}}",
+    "best": "Melhor dia",
+    "bestFooter": "Dia {{day}} · {{date}}",
+    "bestNone": "Nenhum dia preenchido ainda"
+  },
+  "entry": {
+    "title": "Preencher pontuação",
+    "subtitle": "Escolha o dia e anote quanto fez em cada modo. Salva ao sair do campo; apagar o número remove.",
+    "day": "Dia de jogo",
+    "today": "hoje",
+    "points": "Pontos",
+    "placeholder": "Ex.: 1.250.000",
+    "invalid": "Use só números (pode usar ponto para separar os milhares).",
+    "myTeam": "Minha equipe do dia",
+    "noTeam": "Você não montou equipe para este dia.",
+    "buildTeam": "Montar equipe"
+  },
+  "chart": {
+    "title": "Desempenho",
+    "subtitle": "A BA reinicia a cada 28 dias: cada dia e semana é comparado com o mesmo dia e semana do mês anterior.",
+    "days": "Dias",
+    "weeks": "Semanas",
+    "empty": "Preencha a pontuação de um dia para ver os gráficos.",
+    "partial": "parcial",
+    "season": "Temporada",
+    "seasonOption": "Temporada {{range}}"
+  },
+  "compare": {
+    "current": "Esta temporada",
+    "previous": "Mês anterior",
+    "growth": "Crescimento",
+    "growthTitle": "Crescimento contra o mesmo dia do mês anterior (verde subiu, vermelho caiu)",
+    "growthTitleWeek": "Crescimento contra a mesma semana do mês anterior (verde subiu, vermelho caiu)",
+    "week": "Semana {{n}}",
+    "weekColumn": "Semana",
+    "previousWas": "Mês anterior: {{value}}",
+    "noPrevious": "Sem pontuação no mesmo período do mês anterior"
+  },
+  "history": {
+    "title": "Histórico",
+    "subtitle": "Tudo o que você anotou, cada um contra o mesmo dia e modo do mês anterior. Toque numa linha para editar o dia.",
+    "day": "Dia",
+    "mode": "Modo",
+    "points": "Pontos",
+    "delta": "vs. mês anterior",
+    "team": "Equipe"
+  }
+}

@@ -38,6 +38,8 @@ export interface Uniform extends RestrictableAttributes {
   active: boolean;
   /** Efeitos que o traje causa no chefe da BA (para atordoá-lo na temporada certa). */
   effects: BossEffect[];
+  /** Striker meta: aparece no seletor de Striker dos Causadores de Dano. */
+  isMetaStriker: boolean;
 }
 
 export interface Agent {
@@ -46,6 +48,9 @@ export interface Agent {
   name: string;
   active: boolean;
   uniforms: Uniform[];
+  /** CTPs da Meta para o personagem: o 1 (padrão) e o 2 (opcional); cada equipe Meta escolhe um por dia. */
+  metaCtp1Id: string | null;
+  metaCtp2Id: string | null;
 }
 
 export interface Ctp {
@@ -64,8 +69,10 @@ export interface Criterion {
 export interface MetaTeamMember {
   slot: Slot;
   uniformId: string;
-  /** CTP recomendado. As equipes importadas trazem só o tipo; null = sem recomendação. */
+  /** CTP recomendado (o do slot escolhido, já resolvido). null = sem recomendação. */
   ctpId: string | null;
+  /** Slot de CTP do personagem usado neste dia; null = equipe antiga, com CTP escolhido só para ela. */
+  ctpSlot: 1 | 2 | null;
   /** Causador de Dano (qualquer posição): leva às rotações do personagem. */
   isDamageDealer: boolean;
   /** Striker meta (apoio da Transcendência 4) do Causador de Dano; null = não indicado. */
@@ -206,7 +213,7 @@ export interface CycleModeDay {
   metaTeams: MetaTeam[];
   /** Usada na sugestão: gerada das equipes, seguida das reservas. */
   priority: PriorityLists;
-  /** Reservas cadastradas pelos curadores (além das equipes). */
+  /** Reservas cadastradas pela administração (além das equipes). */
   reserves: PriorityLists;
 }
 

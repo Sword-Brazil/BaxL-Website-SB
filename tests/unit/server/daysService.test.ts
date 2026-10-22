@@ -57,12 +57,12 @@ describe("daysService", () => {
 
   it("a equipe principal vem primeiro e o autor aparece pelo apelido", async () => {
     const id = await dayId("BAL", 1);
-    const curator = await createUser("CURATOR");
+    const curator = await createUser("ADMIN", "editor");
     await createMetaTeam({ scope: "DAY", battleDayId: id, uniformIds: uniforms, label: "alt" });
     await createMetaTeam({ scope: "DAY", battleDayId: id, isPrimary: true, uniformIds: uniforms, updatedById: curator.id });
     const d = await getDay("BAL", 1);
     expect(d.metaTeams.map((t) => t.isPrimary)).toEqual([true, false]);
-    expect(d.metaTeams[0].updatedBy).toBe("curator");
+    expect(d.metaTeams[0].updatedBy).toBe("admin");
     expect(d.metaTeams[0].members.map((m) => m.slot)).toEqual(["SOLO", "SUPPORT_1", "SUPPORT_2"]);
   });
 

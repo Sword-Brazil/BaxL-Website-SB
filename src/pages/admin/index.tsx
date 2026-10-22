@@ -13,20 +13,20 @@ const SECTIONS = [
   { href: "/admin/metas", key: "metas" },
   { href: "/admin/catalogo", key: "catalog" },
   { href: "/admin/rotacoes", key: "rotations" },
-  { href: "/admin/ctps", key: "ctps", adminOnly: true },
+  { href: "/admin/ctps", key: "ctps" },
   { href: "/admin/bai", key: "bai" },
-  { href: "/admin/usuarios", key: "users", adminOnly: true },
-  { href: "/admin/config", key: "settings", adminOnly: true },
+  { href: "/admin/usuarios", key: "users" },
+  { href: "/admin/config", key: "settings" },
 ] as const;
 
 export default function AdminHome() {
   const { t } = useTranslation("admin");
-  const { user, isAdmin } = useAuthViewModel();
+  const { user } = useAuthViewModel();
   return (
     <AdminLayout title={t("nav.overview")} subtitle={t("overview.text")}>
       <p className="font-heading text-lg">{t("overview.welcome", { name: user ? displayName(user) : "" })}</p>
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {SECTIONS.filter((s) => !("adminOnly" in s) || isAdmin).map((s) => (
+        {SECTIONS.map((s) => (
           <li key={s.href}>
             <Link href={s.href} className="block h-full rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
               <Card variant="panel" className="h-full transition-colors hover:bg-accent/40">

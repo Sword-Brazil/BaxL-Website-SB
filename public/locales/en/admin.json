@@ -13,7 +13,7 @@
   },
   "guard": {
     "forbidden": "Access denied",
-    "forbiddenText": "This area is restricted to Sword Brazil curators and administrators.",
+    "forbiddenText": "This area is restricted to Sword Brazil administrators.",
     "goHome": "Back to home"
   },
   "overview": {
@@ -24,7 +24,7 @@
     "catalog": "Agents, uniforms and images.",
     "ctps": "CTP types, photos and availability.",
     "bai": "BAI boss sequence.",
-    "users": "Players, curators and administrators: accounts, roles and passwords.",
+    "users": "Members and administrators: accounts, roles and passwords.",
     "settings": "Cycle anchor and turnover times.",
     "rotations": "Character rotations (damage dealers), per uniform, with a description and video."
   },
@@ -70,6 +70,10 @@
     "notes": "Notes",
     "pickAgent": "Pick agent…",
     "pickCtp": "CTP",
+    "ctps": "{{name}}'s Meta CTPs",
+    "ctp2Optional": "CTP 2 (optional)",
+    "ctpsHelp": "CTP 1 and CTP 2 belong to the character and apply to all of their teams. For each day, pick which one the team uses.",
+    "legacyCtp": "This team still uses {{ctp}} for this day only. Pick CTP 1 or 2 to unify.",
     "searchAgent": "Search agent…",
     "noAgent": "No agent meets the restriction.",
     "deleteConfirm": "Delete this team? This cannot be undone.",
@@ -134,7 +138,9 @@
     "uniformsHint": "Each uniform has its own attributes (gender, side, species and attack): day restrictions are checked against the uniform used. A new uniform starts with the first uniform's attributes.",
     "variedUniforms_one": "{{count}} uniform with different attributes",
     "variedUniforms_other": "{{count}} uniforms with different attributes",
-    "effects": "Boss effects (stuns in that effect's season)"
+    "effects": "Boss effects (stuns in that effect's season)",
+    "metaStriker": "Meta Striker",
+    "metaStrikerHelp": "Only tagged uniforms can be picked as the Damage Dealers' Striker (Metas and players' teams)."
   },
   "ctps": {
     "title": "CTP catalog",
@@ -162,8 +168,7 @@
     "search": "Search by username or nickname…",
     "role": "Role",
     "roles": {
-      "USER": "Player",
-      "CURATOR": "Curator",
+      "USER": "Member",
       "ADMIN": "Administrator"
     },
     "changeRoleConfirm": "Change {{name}} role to {{role}}?",
@@ -202,8 +207,8 @@
     "titleLabel": "Title (optional)",
     "titlePlaceholder": "E.g. Opener, Phase 2, Against bosses",
     "sequence": "Rotation",
-    "sequencePlaceholder": "E.g. 1 2c (3dc 4) 6 — or write it your way",
-    "sequenceHint": "Free text. If you use the community notation (1–6, c, dc, qc, parentheses), it shows as blocks.",
+    "sequencePlaceholder": "E.g. 1 2c (3dc 4) 6 | 5 4 * — or write it your way",
+    "sequenceHint": "Free text. The community notation (1–6, c, dc, qc, parentheses) shows as blocks; use | for the end of the rotation, / to start the next one and * to restart from the beginning.",
     "legendTitle": "Community notation",
     "legendFree": "The notation is optional: write it however explains it best.",
     "description": "Description",

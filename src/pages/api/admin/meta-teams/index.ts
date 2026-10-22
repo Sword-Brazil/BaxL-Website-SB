@@ -14,13 +14,13 @@ const ListQuery = z.object({
 
 export default handler({
   GET: async (req, res) => {
-    await requireRole(req, res, "CURATOR");
+    await requireRole(req, res, "ADMIN");
     const q = parseQuery(ListQuery, req);
     const battleDayId = q.scope === "DAY" && q.mode && q.number ? (await findBattleDay(q.mode, q.number)).id : null;
     res.status(200).json(await listMetaTeams(q.scope, battleDayId));
   },
   POST: async (req, res) => {
-    const user = await requireRole(req, res, "CURATOR");
+    const user = await requireRole(req, res, "ADMIN");
     res.status(201).json(await saveMetaTeam(parseBody(MetaTeamSchema, req), user.id));
   },
 });

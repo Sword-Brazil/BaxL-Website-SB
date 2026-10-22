@@ -2,7 +2,9 @@ import { useMemo, useState } from "react";
 import { DISPLAY_SLOTS, type Slot } from "@/models/domain/enums";
 import type { Criterion, MetaTeam, PriorityLists } from "@/models/domain/types";
 import { compareWithMeta } from "@/models/rules/compare";
+import { dayCtpId, equippedCtps, type CtpSlot } from "@/models/rules/ctpAssign";
 import { matchesRestriction } from "@/models/rules/restriction";
+import { hasMetaStrikerTags, metaStrikerOptions } from "@/models/rules/striker";
 import { suggestTeam } from "@/models/rules/suggest";
 import type { TeamKey, UserTeam } from "@/models/schemas/selections";
 import { useSelectionsStore } from "./stores/selectionsStore";
@@ -11,8 +13,8 @@ import { useCatalogViewModel, type UniformRef } from "./useCatalogViewModel";
 /**
  * Equipe pessoal de um dia (ou da BAI): candidatos do elenco (ou, na escolha livre, de todo o
  * catálogo) que atendem à restrição,
- * comparação com a Meta, sugestão, cópia da Meta/Alternativa e o CTP de cada personagem neste dia
- * (arrastar e soltar, toque ou teclado). Sem CTP do dia, vale o CTP padrão do personagem (elenco).
+ * comparação com a Meta, sugestão, cópia da Meta/Alternativa e os CTPs de cada personagem: o 1 e o 2
+ * ficam no personagem (valem em todos os dias) e cada dia escolhe qual dos dois usa.
  */
 export function useTeamBuilderViewModel({
   teamKey,
@@ -27,7 +29,7 @@ export function useTeamBuilderViewModel({
   priority: PriorityLists;
 }) {
   const catalog = useCatalogViewModel();
-  const { doc, hydrated, setSlot, clearSlot, setStriker, setSlotCtp, applyTeam, setFreePick } = useSelectionsStore();
+  const { doc, hydrated, setSlot, clearSlot, setStriker, setCtpSlot, equipCtp, applyTeam, setFreePick } = useSelectionsStore();
   const [armedCtp, setArmedCtp] = useState<string | null>(null);
 
   const owned = useMemo(() => new Set(doc.roster.ownedUniformIds), [doc.roster.ownedUniformIds]);
@@ -40,13 +42,17 @@ export function useTeamBuilderViewModel({
         : owned,
     [freePick, owned, catalog.agents],
   );
-  const equipment = useMemo(() => doc.equipment?.ctpByAgent ?? {}, [doc.equipment]);
+  const equipment = doc.equipment;
   const agentIdOf = (uniformId: string) => catalog.uniformById(uniformId)?.agent.id;
   const team = useMemo(() => doc.teams[teamKey] ?? {}, [doc.teams, teamKey]);
   const meta = metaTeams.find((t) => t.isPrimary) ?? metaTeams[0] ?? null;
-  /** CTP usado pelo uniforme nesta equipe: o do dia ou, sem ele, o padrão do personagem. */
+  /** CTP usado pelo uniforme nesta equipe: o do slot (1 ou 2) escolhido para o dia. */
   const ctpIdOf = (uniformId: string) =>
-    Object.values(team).find((p) => p?.uniformId === uniformId)?.ctpId ?? equipment[agentIdOf(uniformId) ?? ""];
+    dayCtpId(
+      Object.values(team).find((p) => p?.uniformId === uniformId),
+      equipment,
+      agentIdOf(uniformId),
+    ) ?? undefined;
 
   const candidates = useMemo<UniformRef[]>(
     () =>
@@ -88,15 +94,29 @@ export function useTeamBuilderViewModel({
       if (!pool.has(m.uniformId)) continue;
       // O Striker meta do Causador de Dano vem junto, se o jogador também tiver o Striker.
       const striker = m.isDamageDealer && m.strikerUniformId && pool.has(m.strikerUniformId) ? m.strikerUniformId : null;
-      // O CTP da Meta neste dia vira o CTP do dia do jogador (sem CTP na Meta, vale o padrão).
-      next[m.slot] = { uniformId: m.uniformId, ctpId: m.ctpId ?? null, strikerUniformId: striker };
+      // O slot de CTP da Meta neste dia vira o do jogador (Metas antigas, sem slot, trazem o CTP do dia).
+      next[m.slot] = { uniformId: m.uniformId, ctpSlot: m.ctpSlot, ctpId: m.ctpSlot ? null : m.ctpId, strikerUniformId: striker };
+      // Personagem sem CTP no elenco do jogador recebe os CTPs da Meta para ele.
+      const agent = catalog.uniformById(m.uniformId)?.agent;
+      if (agent) {
+        const own = equippedCtps(equipment, agent.id);
+        if (!own.ctp1 && agent.metaCtp1Id) equipCtp(agent.id, agent.metaCtp1Id, 1);
+        if (!own.ctp2 && agent.metaCtp2Id) equipCtp(agent.id, agent.metaCtp2Id, 2);
+      }
     }
     applyTeam(teamKey, next);
     return Object.keys(next).length;
   };
 
+  /** Equipa o CTP no slot (1 ou 2) que o personagem usa neste dia: vale em todos os dias desse slot. */
   const equipOnSlot = (slot: Slot, ctpId: string | null) => {
-    if (team[slot]) setSlotCtp(teamKey, slot, ctpId);
+    const pick = team[slot];
+    const agentId = pick ? agentIdOf(pick.uniformId) : undefined;
+    if (!pick || !agentId) return;
+    const ctpSlot = pick.ctpSlot ?? 1;
+    equipCtp(agentId, ctpId, ctpSlot);
+    // Equipe antiga com CTP só deste dia: passa a usar o slot.
+    if (!pick.ctpSlot) setCtpSlot(teamKey, slot, ctpSlot);
   };
 
   return {
@@ -105,16 +125,20 @@ export function useTeamBuilderViewModel({
     metaTeams,
     /** Na ordem da tela: Esquerda · Líder · Direita. */
     slots: DISPLAY_SLOTS.map((slot) => {
-      const ref = team[slot] ? catalog.uniformById(team[slot]!.uniformId) : null;
+      const pick = team[slot];
+      const ref = pick ? catalog.uniformById(pick.uniformId) : null;
+      const own = ref ? equippedCtps(equipment, ref.agent.id) : { ctp1: null, ctp2: null };
+      /** Equipe antiga: CTP escolhido só para este dia, fora dos slots do personagem. */
+      const legacyCtp = !!pick?.ctpId && !pick.ctpSlot;
       return {
         slot,
-        pick: team[slot] ?? null,
+        pick: pick ?? null,
         ref,
-        ctp: ref ? catalog.ctpById(team[slot]?.ctpId ?? equipment[ref.agent.id]) : null,
-        /** O CTP mostrado é o padrão do personagem (não há CTP próprio deste dia). */
-        ctpIsDefault: !!ref && !team[slot]?.ctpId && !!equipment[ref.agent.id],
-        /** Há CTP padrão: "remover" o CTP do dia volta para ele. */
-        hasDefaultCtp: !!ref && !!equipment[ref.agent.id],
+        ctp: ref ? catalog.ctpById(dayCtpId(pick, equipment, ref.agent.id)) : null,
+        ctp1: catalog.ctpById(own.ctp1),
+        ctp2: catalog.ctpById(own.ctp2),
+        /** Slot usado neste dia (null = CTP antigo só deste dia). */
+        ctpSlot: legacyCtp ? null : ((pick?.ctpSlot ?? 1) as CtpSlot),
         striker: team[slot]?.strikerUniformId ? catalog.uniformById(team[slot]!.strikerUniformId!) : null,
         /** Striker da Meta para esta posição (quando ela é Causadora de Dano), como referência. */
         metaStriker: (() => {
@@ -136,17 +160,23 @@ export function useTeamBuilderViewModel({
     setSlot: (slot: Slot, uniformId: string) => setSlot(teamKey, slot, uniformId, agentIdOf),
     clearSlot: (slot: Slot) => clearSlot(teamKey, slot),
     setStriker: (slot: Slot, strikerUniformId: string | null) => setStriker(teamKey, slot, strikerUniformId),
-    /** Strikers possíveis para a posição: os mesmos personagens liberados para a equipe, menos o próprio. */
+    /**
+     * Strikers possíveis para a posição: os mesmos personagens liberados para a equipe, menos o
+     * próprio, só entre os marcados como Striker meta no catálogo.
+     */
     strikerOptions: (slot: Slot): UniformRef[] => {
       const own = team[slot] ? agentIdOf(team[slot]!.uniformId) : undefined;
-      return catalog.agents
-        .filter((a) => a.active && a.id !== own)
-        .flatMap((agent) => agent.uniforms.filter((u) => u.active && pool.has(u.id)).map((uniform) => ({ agent, uniform })));
+      return metaStrikerOptions(
+        catalog.agents
+          .filter((a) => a.active && a.id !== own)
+          .flatMap((agent) => agent.uniforms.filter((u) => u.active && pool.has(u.id)).map((uniform) => ({ agent, uniform }))),
+        hasMetaStrikerTags(catalog.agents),
+      );
     },
     applySuggestion: () => suggestion && applyTeam(teamKey, suggestion),
     copyTeam,
 
-    // CTPs: um único comando para arrastar e soltar, toque e teclado; o CTP vale só neste dia.
+    // CTPs: um único comando para arrastar e soltar, toque e teclado; vai para o slot usado no dia.
     armedCtp,
     armCtp: (ctpId: string | null) => setArmedCtp((cur) => (cur === ctpId ? null : ctpId)),
     dropCtp: (slot: Slot, ctpId: string) => equipOnSlot(slot, ctpId),
@@ -157,6 +187,7 @@ export function useTeamBuilderViewModel({
       }
     },
     removeCtp: (slot: Slot) => equipOnSlot(slot, null),
+    chooseCtpSlot: (slot: Slot, ctpSlot: CtpSlot) => team[slot] && setCtpSlot(teamKey, slot, ctpSlot),
   };
 }
 

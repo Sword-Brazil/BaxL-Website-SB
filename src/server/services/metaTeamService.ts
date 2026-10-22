@@ -1,4 +1,6 @@
+import type { Prisma } from "@prisma/client";
 import type { MetaTeam } from "@/models/domain/types";
+import { slotCtpId } from "@/models/rules/ctpAssign";
 import type { MetaTeamInput } from "@/models/schemas/admin";
 import { prisma } from "@/server/db";
 import { HttpError } from "@/server/http";
@@ -23,6 +25,16 @@ async function assertStrikers(members: MetaTeamInput["members"], uniforms: { id:
   }
 }
 
+/**
+ * Troca os CTPs 1 e 2 da Meta do personagem e atualiza o CTP de todos os membros que usam cada slot,
+ * em qualquer dia: o CTP fica no personagem, cada equipe só escolhe o slot.
+ */
+async function syncAgentMetaCtps(tx: Prisma.TransactionClient, agentId: string, ctp1: string | null, ctp2: string | null) {
+  await tx.agent.update({ where: { id: agentId }, data: { metaCtp1Id: ctp1, metaCtp2Id: ctp2 } });
+  await tx.metaTeamMember.updateMany({ where: { ctpSlot: 1, uniform: { agentId } }, data: { ctpId: slotCtpId(ctp1, ctp2, 1) } });
+  await tx.metaTeamMember.updateMany({ where: { ctpSlot: 2, uniform: { agentId } }, data: { ctpId: slotCtpId(ctp1, ctp2, 2) } });
+}
+
 /** Cria (sem `id`) ou edita uma equipe Meta, validando catálogo e restrição do dia. */
 export async function saveMetaTeam(input: MetaTeamInput, userId: string, id?: string): Promise<MetaTeam> {
   const day = input.scope === "DAY" ? await findBattleDay(input.mode!, input.number!) : null;
@@ -32,7 +44,7 @@ export async function saveMetaTeam(input: MetaTeamInput, userId: string, id?: st
   if (new Set(uniforms.map((u) => u.agentId)).size !== uniforms.length) {
     throw new HttpError(400, "VALIDATION_ERROR", "O mesmo agente não pode ocupar dois slots");
   }
-  await assertCtpsExist(input.members.flatMap((m) => (m.ctpId ? [m.ctpId] : [])));
+  await assertCtpsExist(input.members.flatMap((m) => [m.ctpId, m.agentCtp1Id, m.agentCtp2Id].filter((c): c is string => !!c)));
   await assertStrikers(input.members, uniforms);
   if (day) assertRestriction(uniforms, day.criteria);
 
@@ -48,16 +60,29 @@ export async function saveMetaTeam(input: MetaTeamInput, userId: string, id?: st
     notes: input.notes || null,
     updatedById: userId,
   };
-  const members = input.members.map((m) => ({
-    slot: m.slot,
-    uniformId: m.uniformId,
-    ctpId: m.ctpId ?? null,
-    isDamageDealer: !!m.isDamageDealer,
-    // Só o Causador de Dano tem Striker.
-    strikerUniformId: m.isDamageDealer ? (m.strikerUniformId ?? null) : null,
-  }));
+  const agentIdOf = (uniformId: string) => uniforms.find((u) => u.id === uniformId)!.agentId;
 
   const saved = await prisma.$transaction(async (tx) => {
+    // CTPs 1/2 de cada personagem (novos ou os do catálogo) e o CTP do slot que a equipe usa.
+    const ctpOfSlot = new Map<string, string | null>();
+    for (const m of input.members) {
+      const agentId = agentIdOf(m.uniformId);
+      const agent = await tx.agent.findUniqueOrThrow({ where: { id: agentId }, select: { metaCtp1Id: true, metaCtp2Id: true } });
+      const ctp1 = m.agentCtp1Id === undefined ? agent.metaCtp1Id : m.agentCtp1Id;
+      const ctp2 = m.agentCtp2Id === undefined ? agent.metaCtp2Id : m.agentCtp2Id;
+      if (ctp1 !== agent.metaCtp1Id || ctp2 !== agent.metaCtp2Id) await syncAgentMetaCtps(tx, agentId, ctp1, ctp2);
+      ctpOfSlot.set(m.slot, m.ctpSlot ? slotCtpId(ctp1, ctp2, m.ctpSlot) : (m.ctpId ?? null));
+    }
+    const members = input.members.map((m) => ({
+      slot: m.slot,
+      uniformId: m.uniformId,
+      ctpId: ctpOfSlot.get(m.slot) ?? null,
+      ctpSlot: m.ctpSlot ?? null,
+      isDamageDealer: !!m.isDamageDealer,
+      // Só o Causador de Dano tem Striker.
+      strikerUniformId: m.isDamageDealer ? (m.strikerUniformId ?? null) : null,
+    }));
+
     if (input.isPrimary) {
       await tx.metaTeam.updateMany({
         where: { scope: input.scope, battleDayId, isPrimary: true, ...(id ? { NOT: { id } } : {}) },

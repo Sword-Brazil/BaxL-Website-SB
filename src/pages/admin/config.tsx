@@ -8,7 +8,7 @@ export const getStaticProps = withTranslations(["admin", "days"]);
 export default function AdminSettingsPage() {
   const { t } = useTranslation("admin");
   return (
-    <AdminLayout title={t("settings.title")} help={t("settings.help")} adminOnly>
+    <AdminLayout title={t("settings.title")} help={t("settings.help")}>
       <SettingsView />
     </AdminLayout>
   );

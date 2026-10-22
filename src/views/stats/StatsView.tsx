@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { useTranslation } from "next-i18next/pages";
+import { ChevronDownIcon, DownloadIcon } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { MODE_VISUALS } from "@/views/shared/modeVisuals";
 import { Button } from "@/components/ui/button";
@@ -14,15 +16,17 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { Field, FieldLabel } from "@/components/ui/field";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { CTP_QUALITIES } from "@/models/domain/enums";
-import type { StatsMode } from "@/models/rules/stats";
+import { ctpsOfUses, type AgentUse, type CtpUsage, type StatsMode } from "@/models/rules/stats";
 import { useStatsViewModel, type RepetitionSource } from "@/viewmodels/useStatsViewModel";
 import { HelpHint } from "@/views/layout/HelpHint";
+import { CtpBadge } from "@/views/shared/CtpBadge";
 import { QueryState } from "@/views/shared/QueryState";
 import { TeamStrip } from "@/views/shared/TeamStrip";
 
@@ -31,10 +35,82 @@ const BAR_ROW_PX = 28;
 /** 2px de superfície entre segmentos empilhados (via CSS: o `stroke` do Recharts vira a cor da legenda). */
 const SEGMENT_GAP = "[&_.recharts-bar-rectangle_path]:stroke-card [&_.recharts-bar-rectangle_path]:[stroke-width:2px]";
 
-function RepetitionChart({ vm }: { vm: ReturnType<typeof useStatsViewModel> }) {
+type StatsVm = ReturnType<typeof useStatsViewModel>;
+
+/** Foto pequena do personagem (iniciais sem foto). */
+function AgentFace({ vm, agentId, name, className }: { vm: StatsVm; agentId: string; name: string; className?: string }) {
+  return (
+    <Avatar className={`chamfer-sm size-8 shrink-0 rounded-none after:hidden ${className ?? ""}`}>
+      <AvatarImage src={vm.portraitOf(agentId) ?? undefined} alt="" loading="lazy" decoding="async" className="rounded-none object-cover" />
+      <AvatarFallback className="rounded-none bg-secondary font-heading text-[0.6rem]">{name.slice(0, 2).toUpperCase()}</AvatarFallback>
+    </Avatar>
+  );
+}
+
+/** Dias em que o personagem aparece, num menu: modo, dia e o CTP usado em cada um. */
+function DaysMenu({ vm, uses }: { vm: StatsVm; uses: AgentUse[] }) {
+  const { t } = useTranslation(["stats", "common"]);
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button size="xs" variant="outline" className="gap-1">
+          {t("stats:repetition.days", { count: uses.length })}
+          <ChevronDownIcon data-icon="inline-end" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent align="end" className="max-h-80 w-72 overflow-y-auto p-2">
+        <ul className="flex flex-col gap-1">
+          {uses.map((u, i) => (
+            <li key={i} className="flex items-center justify-between gap-2 text-xs">
+              <Badge variant={MODE_VISUALS[u.mode].badge}>
+                {u.mode} · {t("common:day", { number: u.day })}
+              </Badge>
+              {u.ctpId ? <CtpBadge ctp={vm.catalog.ctpById(u.ctpId)} size="xs" /> : <span className="text-muted-foreground">—</span>}
+            </li>
+          ))}
+        </ul>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+/** Personagens com um tipo de CTP: fotos empilhadas e, no menu, foto + nome + o CTP (e o slot). */
+function CtpAgentsMenu({ vm, row }: { vm: StatsVm; row: CtpUsage }) {
+  const { t } = useTranslation(["stats", "common"]);
+  if (!row.agents.length) return <span className="text-muted-foreground">—</span>;
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button type="button" className="flex items-center gap-2 rounded-md px-1 py-0.5 text-xs hover:bg-accent/40">
+          <span className="flex -space-x-2">
+            {row.agents.slice(0, 4).map((a) => (
+              <AgentFace key={`${a.agentId}-${a.slot}`} vm={vm} agentId={a.agentId} name={a.name} className="size-7 ring-2 ring-card" />
+            ))}
+          </span>
+          <span className="whitespace-nowrap text-muted-foreground">{t("stats:ctp.agentsCount", { count: row.agents.length })}</span>
+          <ChevronDownIcon className="size-3.5 text-muted-foreground" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="end" className="max-h-80 w-72 overflow-y-auto p-2">
+        <ul className="flex flex-col gap-1.5">
+          {row.agents.map((a) => (
+            <li key={`${a.agentId}-${a.slot}`} className="flex items-center gap-2 text-sm">
+              <AgentFace vm={vm} agentId={a.agentId} name={a.name} />
+              <span className="min-w-0 flex-1 truncate font-medium">{a.name}</span>
+              <span className="text-[0.65rem] text-muted-foreground">{t("common:ctpSlot.label", { n: a.slot })}</span>
+              <CtpBadge ctp={vm.catalog.ctpById(a.ctpId)} size="sm" />
+            </li>
+          ))}
+        </ul>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function RepetitionChart({ vm }: { vm: StatsVm }) {
   const { t } = useTranslation(["stats", "cycle"]);
   const config = Object.fromEntries(
-    WEEK_KEYS.map((k, i) => [k, { label: t("cycle:week", { n: i + 1 }), color: `var(--series-${i + 1})` }]),
+    WEEK_KEYS.map((k, i) => [k, { label: t("cycle:week", { n: i + 1 }), color: `var(--ramp-${i + 1})` }]),
   ) satisfies ChartConfig;
   const data = vm.repetition.map((r) => ({ name: r.name, total: r.total, w1: r.weeks[0], w2: r.weeks[1], w3: r.weeks[2], w4: r.weeks[3] }));
 
@@ -54,12 +130,14 @@ function RepetitionChart({ vm }: { vm: ReturnType<typeof useStatsViewModel> }) {
           value={vm.source}
           onValueChange={(v) => v && vm.setSource(v as RepetitionSource)}
           aria-label={t("stats:repetition.source")}
-          className="w-full sm:w-fit"
+          // Grade de 2 colunas iguais: cada uma do tamanho do texto mais longo (com flex-1 num grupo
+          // w-fit, "Minhas equipes" ficava com metade da soma dos textos e estourava no PC).
+          className="grid w-full grid-cols-2 sm:w-fit"
         >
-          <ToggleGroupItem value="META" className="flex-1 font-heading tracking-wider uppercase data-[state=on]:text-energy">
+          <ToggleGroupItem value="META" className="px-4 font-heading tracking-wider uppercase data-[state=on]:text-energy">
             {t("stats:repetition.sourceMeta")}
           </ToggleGroupItem>
-          <ToggleGroupItem value="MINE" className="flex-1 font-heading tracking-wider uppercase data-[state=on]:text-brazil-green">
+          <ToggleGroupItem value="MINE" className="px-4 font-heading tracking-wider uppercase data-[state=on]:text-brazil-green">
             {t("stats:repetition.sourceMine")}
           </ToggleGroupItem>
         </ToggleGroup>
@@ -84,6 +162,11 @@ function RepetitionChart({ vm }: { vm: ReturnType<typeof useStatsViewModel> }) {
               <FieldLabel htmlFor="with-alt">{t("stats:repetition.withAlt")}</FieldLabel>
             </Field>
           )}
+          {/* Exporta todos os personagens da origem e do modo escolhidos, com CTPs e dias. */}
+          <Button size="sm" variant="outline" className="ml-auto" disabled={!vm.canExport} onClick={vm.exportHtml}>
+            <DownloadIcon data-icon="inline-start" />
+            {t("stats:repetition.export")}
+          </Button>
         </div>
         {data.length === 0 ? (
           <EmptyMine text={t("stats:repetition.emptyMine")} />
@@ -101,7 +184,7 @@ function RepetitionChart({ vm }: { vm: ReturnType<typeof useStatsViewModel> }) {
                   <YAxis type="category" dataKey="name" width={112} tickLine={false} axisLine={false} interval={0} tick={{ fontSize: 11 }} />
                   <ChartTooltip cursor={{ fillOpacity: 0.3 }} content={<ChartTooltipContent indicator="dot" />} />
                   <ChartLegend content={<ChartLegendContent />} />
-                  {WEEK_KEYS.map((k, i) => (
+                  {WEEK_KEYS.map((k) => (
                     <Bar
                       key={k}
                       dataKey={k}
@@ -109,7 +192,7 @@ function RepetitionChart({ vm }: { vm: ReturnType<typeof useStatsViewModel> }) {
                       fill={`var(--color-${k})`}
                       isAnimationActive={false}
                       maxBarSize={20}
-                      radius={i === WEEK_KEYS.length - 1 ? [0, 4, 4, 0] : 0}
+                      radius={4}
                     />
                   ))}
                 </BarChart>
@@ -121,24 +204,42 @@ function RepetitionChart({ vm }: { vm: ReturnType<typeof useStatsViewModel> }) {
                   <TableHeader>
                     <TableRow>
                       <TableHead>{t("stats:repetition.agent")}</TableHead>
+                      <TableHead>{t("stats:repetition.ctps")}</TableHead>
                       {WEEK_KEYS.map((k, i) => (
                         <TableHead key={k} className="text-right">
                           S{i + 1}
                         </TableHead>
                       ))}
                       <TableHead className="text-right">{t("stats:total")}</TableHead>
+                      <TableHead className="text-right">{t("stats:repetition.days")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {vm.repetition.map((r) => (
                       <TableRow key={r.agentId}>
-                        <TableCell className="font-medium">{r.name}</TableCell>
+                        <TableCell>
+                          <span className="flex items-center gap-2 font-medium">
+                            <AgentFace vm={vm} agentId={r.agentId} name={r.name} />
+                            {r.name}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          {/* CTPs que o personagem usa, do mais usado para o menos. */}
+                          <span className="flex items-center gap-1">
+                            {ctpsOfUses(r.uses).map(({ ctpId }) => (
+                              <CtpBadge key={ctpId} ctp={vm.catalog.ctpById(ctpId)} size="xs" />
+                            ))}
+                          </span>
+                        </TableCell>
                         {r.weeks.map((w, i) => (
                           <TableCell key={i} className="text-right tabular-nums">
                             {w}
                           </TableCell>
                         ))}
                         <TableCell className="text-right font-semibold tabular-nums">{r.total}</TableCell>
+                        <TableCell className="text-right">
+                          <DaysMenu vm={vm} uses={r.uses} />
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -212,7 +313,7 @@ function MyTeamsCard({ vm }: { vm: ReturnType<typeof useStatsViewModel> }) {
 function CtpChart({ vm }: { vm: ReturnType<typeof useStatsViewModel> }) {
   const { t } = useTranslation(["stats", "common", "roster"]);
   const config = Object.fromEntries(
-    CTP_QUALITIES.map((q, i) => [q, { label: t(`common:quality.${q}`), color: `var(--series-${i + 1})` }]),
+    CTP_QUALITIES.map((q, i) => [q, { label: t(`common:quality.${q}`), color: `var(--ramp3-${i + 1})` }]),
   ) satisfies ChartConfig;
   const data = vm.usage.map((r) => ({ name: t(`common:ctp.${r.type}`), ...r.counts, total: r.total }));
 
@@ -220,7 +321,7 @@ function CtpChart({ vm }: { vm: ReturnType<typeof useStatsViewModel> }) {
     <Card>
       <CardHeader>
         <CardTitle>{t("stats:ctp.title")}</CardTitle>
-        <CardDescription>{t("stats:ctp.subtitle", { equipped: vm.equipped, owned: vm.ownedAgents })}</CardDescription>
+        <CardDescription>{t("stats:ctp.subtitle", { equipped: vm.equipped, withCtp: vm.withCtp, owned: vm.ownedAgents })}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         {!vm.hydrated ? (
@@ -246,7 +347,7 @@ function CtpChart({ vm }: { vm: ReturnType<typeof useStatsViewModel> }) {
                   <YAxis allowDecimals={false} tickLine={false} axisLine={false} />
                   <ChartTooltip cursor={{ fillOpacity: 0.3 }} content={<ChartTooltipContent indicator="dot" />} />
                   <ChartLegend content={<ChartLegendContent />} />
-                  {CTP_QUALITIES.map((q, i) => (
+                  {CTP_QUALITIES.map((q) => (
                     <Bar
                       key={q}
                       dataKey={q}
@@ -254,7 +355,7 @@ function CtpChart({ vm }: { vm: ReturnType<typeof useStatsViewModel> }) {
                       fill={`var(--color-${q})`}
                       isAnimationActive={false}
                       maxBarSize={24}
-                      radius={i === CTP_QUALITIES.length - 1 ? [4, 4, 0, 0] : 0}
+                      radius={4}
                     />
                   ))}
                 </BarChart>
@@ -283,8 +384,8 @@ function CtpChart({ vm }: { vm: ReturnType<typeof useStatsViewModel> }) {
                             {r.counts[q]}
                           </TableCell>
                         ))}
-                        <TableCell className="min-w-48 text-xs whitespace-normal text-muted-foreground">
-                          {r.agents.map((a) => `${a.name} (${t(`common:quality.${a.quality}`)})`).join(", ") || "—"}
+                        <TableCell>
+                          <CtpAgentsMenu vm={vm} row={r} />
                         </TableCell>
                       </TableRow>
                     ))}

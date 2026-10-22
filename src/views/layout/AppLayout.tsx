@@ -7,6 +7,7 @@ import { useTheme } from "next-themes";
 import { CloudCheckIcon, LanguagesIcon, LogInIcon, LogOutIcon, MenuIcon, MoonIcon, ShieldIcon, SunIcon, UserRoundIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,13 +36,14 @@ const NAV = [
   { href: "/meu-elenco", key: "roster" },
   { href: "/rotacoes", key: "rotations" },
   { href: "/estatisticas", key: "stats" },
+  { href: "/minhas-pontuacoes", key: "scores" },
 ] as const;
 
-/** Menu ☰ do celular: inclui a Administração para curadores (no PC ela fica no menu da conta). */
+/** Menu ☰ do celular: inclui a Administração para administradores (no PC ela fica no menu da conta). */
 function MobileNav({ pathname }: { pathname: string }) {
   const { t } = useTranslation("common");
-  const { isCurator } = useAuthViewModel();
-  const items = [...NAV, ...(isCurator ? [{ href: "/admin", key: "admin" } as const] : [])];
+  const { isAdmin } = useAuthViewModel();
+  const items = [...NAV, ...(isAdmin ? [{ href: "/admin", key: "admin" } as const] : [])];
   return (
     <nav className="flex flex-col gap-1 px-4">
       {items.map((item) => (
@@ -114,9 +116,16 @@ function ThemeToggle({ className }: { className?: string }) {
 /** Conta: "Entrar" para visitantes; para quem entrou, o nome, a administração (curadoria) e "Sair". */
 function AccountMenu() {
   const { t } = useTranslation("common");
-  const { user, isCurator, isLoading, logout } = useAuthViewModel();
+  const { user, isAdmin, isLoading, logout } = useAuthViewModel();
   const router = useRouter();
-  if (isLoading) return null;
+  // Enquanto confere a sessão: um spinner no lugar do botão (sem pular o layout).
+  if (isLoading) {
+    return (
+      <span className="flex size-11 items-center justify-center" role="status" aria-label={t("states.loading")}>
+        <Spinner className="text-muted-foreground" />
+      </span>
+    );
+  }
   if (!user) {
     return (
       <Button asChild variant="ghost" size="icon-touch" className="sm:w-auto sm:px-3" aria-label={t("nav.login")}>
@@ -131,7 +140,7 @@ function AccountMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon-touch" aria-label={t("nav.account")}>
-          {isCurator ? <ShieldIcon /> : <UserRoundIcon />}
+          {isAdmin ? <ShieldIcon /> : <UserRoundIcon />}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-52">
@@ -143,7 +152,7 @@ function AccountMenu() {
           </span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {isCurator && (
+        {isAdmin && (
           <DropdownMenuItem asChild>
             <Link href="/admin">
               <ShieldIcon />

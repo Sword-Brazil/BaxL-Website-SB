@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { CycleOverview, MetaTeam } from "@/models/domain/types";
 
-const NO_ROTATION = { isDamageDealer: false, strikerUniformId: null, rotation: null, rotationNotes: null, rotationVideoUrl: null };
-import { agentRepetition, ctpUsage, myAgentRepetition, myTeamCompositions } from "@/models/rules/stats";
+const NO_ROTATION = { isDamageDealer: false, strikerUniformId: null, ctpSlot: null, rotation: null, rotationNotes: null, rotationVideoUrl: null };
+import { agentRepetition, ctpsOfUses, ctpUsage, myAgentRepetition, myTeamCompositions } from "@/models/rules/stats";
 
 const team = (isPrimary: boolean, uniforms: [string, string, string]): MetaTeam => ({
   id: uniforms.join(),
@@ -33,7 +33,8 @@ const agentOf = (u: string) => ({ id: u, name: u.toUpperCase() });
 describe("agentRepetition", () => {
   it("conta aparições por semana nas equipes Meta (BAX, BAL e BAI)", () => {
     const rows = agentRepetition(cycle, agentOf, { mode: "ALL", includeAlternatives: false });
-    expect(rows[0]).toEqual({ agentId: "a", name: "A", weeks: [2, 1, 0, 0], total: 3 });
+    expect(rows[0]).toMatchObject({ agentId: "a", name: "A", weeks: [2, 1, 0, 0], total: 3 });
+    expect(rows[0].uses.map((u) => `${u.mode}-${u.day}`)).toEqual(["BAX-1", "BAL-1", "BAX-8"]);
     expect(rows.find((r) => r.agentId === "b")?.weeks).toEqual([2, 1, 0, 0]); // BAX D1 + BAI D3 + BAX D8
     expect(rows.some((r) => r.agentId === "d")).toBe(false);
   });
@@ -52,7 +53,8 @@ describe("ctpUsage", () => {
       rn: { type: "RAGE", quality: "NORMAL" },
       ib: { type: "INSIGHT", quality: "BRILLIANT" },
     };
-    const rows = ctpUsage({ wanda: "rb", storm: "rn", luna: "ib", ghost: "rb" }, (id) => ctps[id] ?? null, (id) => (id === "ghost" ? undefined : id));
+    const equipped = Object.entries({ wanda: "rb", storm: "rn", luna: "ib", ghost: "rb" }).map(([agentId, ctpId]) => ({ agentId, ctpId, slot: 1 as const }));
+    const rows = ctpUsage(equipped, (id) => ctps[id] ?? null, (id) => (id === "ghost" ? undefined : id));
     const rage = rows.find((r) => r.type === "RAGE")!;
     expect(rage.counts).toEqual({ NORMAL: 1, MIGHTY: 0, BRILLIANT: 1 });
     expect(rage.agents.map((a) => a.name)).toEqual(["wanda", "storm"]);
@@ -73,7 +75,8 @@ describe("minhas equipes", () => {
 
   it("conta os personagens por semana; a equipe da BAI vale para as 4 semanas", () => {
     const rows = myAgentRepetition(teams, agentOf, "ALL");
-    expect(rows[0]).toEqual({ agentId: "a", name: "A", weeks: [2, 2, 1, 1], total: 6 });
+    expect(rows[0]).toMatchObject({ agentId: "a", name: "A", weeks: [2, 2, 1, 1], total: 6 });
+    expect(rows[0].uses.map((u) => `${u.mode}-${u.day}`)).toEqual(["BAX-1", "BAI-3", "BAL-8", "BAI-10", "BAI-17", "BAI-24"]);
     expect(myAgentRepetition(teams, agentOf, "BAL").map((r) => r.agentId)).toEqual(["a", "b", "c"]);
   });
 
@@ -84,5 +87,20 @@ describe("minhas equipes", () => {
       { mode: "BAL", day: 8 },
     ]);
     expect(groups).toHaveLength(3); // a+b+c, d sozinho e a da BAI; a vazia é ignorada
+  });
+});
+
+describe("ctpsOfUses", () => {
+  it("CTPs do personagem do mais usado para o menos, sem contar aparições sem CTP", () => {
+    const uses = [
+      { mode: "BAX" as const, day: 1, ctpId: "rage" },
+      { mode: "BAL" as const, day: 2, ctpId: "insight" },
+      { mode: "BAX" as const, day: 5, ctpId: "insight" },
+      { mode: "BAL" as const, day: 6, ctpId: null },
+    ];
+    expect(ctpsOfUses(uses)).toEqual([
+      { ctpId: "insight", count: 2 },
+      { ctpId: "rage", count: 1 },
+    ]);
   });
 });

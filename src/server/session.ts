@@ -51,14 +51,14 @@ export async function requireUser(req: NextApiRequest, res: NextApiResponse): Pr
   return user;
 }
 
-const RANK: Record<Role, number> = { USER: 0, CURATOR: 1, ADMIN: 2 };
+const RANK: Record<Role, number> = { USER: 0, ADMIN: 1 };
 
 export function hasRole(user: SessionUser | null, role: Role): boolean {
   return !!user && RANK[user.role] >= RANK[role];
 }
 
-/** Exige o papel informado. ADMIN satisfaz CURATOR. */
-export async function requireRole(req: NextApiRequest, res: NextApiResponse, role: "CURATOR" | "ADMIN") {
+/** Exige o papel informado (hoje só ADMIN tem rotas próprias). */
+export async function requireRole(req: NextApiRequest, res: NextApiResponse, role: "ADMIN") {
   const user = await requireUser(req, res);
   if (!hasRole(user, role)) throw new HttpError(403, "FORBIDDEN", "Acesso negado");
   return user;

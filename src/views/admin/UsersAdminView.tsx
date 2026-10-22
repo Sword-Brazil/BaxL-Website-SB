@@ -185,7 +185,7 @@ export function UsersAdminView() {
             <Button variant="outline" onClick={() => vm.setCreateOpen(false)}>
               {t("admin:common.cancel")}
             </Button>
-            <Button type="submit" form="user-form" variant="energy" disabled={vm.isCreating}>
+            <Button type="submit" form="user-form" variant="energy" loading={vm.isCreating}>
               {t("admin:common.save")}
             </Button>
           </DialogFooter>
@@ -213,7 +213,7 @@ export function UsersAdminView() {
             <Button variant="outline" onClick={() => vm.setResetUserId(null)}>
               {t("admin:common.cancel")}
             </Button>
-            <Button type="submit" form="reset-form" variant="energy">
+            <Button type="submit" form="reset-form" variant="energy" loading={vm.isResetting}>
               {t("admin:common.save")}
             </Button>
           </DialogFooter>

@@ -3,7 +3,7 @@ import type { UserTeam } from "@/models/schemas/selections";
 import { matchesRestriction } from "./restriction";
 
 /**
- * Melhor equipe possível com o elenco do usuário, seguindo as listas de prioridade dos curadores:
+ * Melhor equipe possível com o elenco do usuário, seguindo as listas de prioridade da administração:
  * Solador possuído de menor rank cujo traje tem as tags da restrição (UNKNOWN não entra); depois 2 Suportes de agentes distintos.
  * Retorna `null` se nenhum slot puder ser preenchido.
  */

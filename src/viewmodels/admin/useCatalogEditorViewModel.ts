@@ -26,7 +26,7 @@ const blank: AgentInput = {
   slug: "",
   name: "",
   active: true,
-  uniforms: [{ slug: "padrao", name: "Padrão", imagePath: "", active: true, effects: [], ...UNKNOWN_ATTRIBUTES }],
+  uniforms: [{ slug: "padrao", name: "Padrão", imagePath: "", active: true, effects: [], isMetaStriker: false, ...UNKNOWN_ATTRIBUTES }],
 };
 
 /** Traje novo começa com os atributos de um traje já cadastrado (ajuste o que for diferente). */
@@ -36,6 +36,7 @@ const newUniform = (from?: RestrictableAttributes): UniformInput => ({
   imagePath: "",
   active: true,
   effects: [],
+  isMetaStriker: false,
   ...(from ? attributesOf(from) : UNKNOWN_ATTRIBUTES),
 });
 
@@ -50,6 +51,7 @@ const toInput = (a: Agent): AgentInput => ({
     imagePath: u.imagePath,
     active: u.active,
     effects: u.effects,
+    isMetaStriker: u.isMetaStriker,
     ...attributesOf(u),
   })),
 });
@@ -65,7 +67,7 @@ const fileToBase64 = (file: File) =>
   });
 
 /**
- * Catálogo de personagens e trajes (admin/curador): busca, novo personagem, novo traje,
+ * Catálogo de personagens e trajes (admin): busca, novo personagem, novo traje,
  * troca/remoção de foto de cada traje e desativação. O identificador (slug) é gerado do nome.
  */
 export function useCatalogEditorViewModel(messages: { saved: string; uploaded: string; tooBig: string; badType: string }) {

@@ -2,7 +2,7 @@ import type { MetaTeam, PriorityItem, PriorityLists } from "@/models/domain/type
 
 /**
  * Listas usadas na sugestão de equipe: geradas na hora das equipes do dia (Líderes da Meta e
- * das Alternativas; depois as demais posições), seguidas das reservas cadastradas pelos curadores.
+ * das Alternativas; depois as demais posições), seguidas das reservas cadastradas pela administração.
  * Um uniforme aparece uma vez por lista; a sugestão ainda evita repetir o agente.
  */
 export function effectivePriority(metaTeams: readonly MetaTeam[], reserves: PriorityLists): PriorityLists {

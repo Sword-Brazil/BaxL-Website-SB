@@ -3,6 +3,8 @@ import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { getCycle } from "@/models/api/cycle";
 import type { DayMode } from "@/models/domain/enums";
+import { dayCtpId } from "@/models/rules/ctpAssign";
+import type { UserTeam } from "@/models/schemas/selections";
 import { useSelectionsStore } from "./stores/selectionsStore";
 import { useBattleClockViewModel } from "./useBattleClockViewModel";
 import { useCatalogViewModel } from "./useCatalogViewModel";
@@ -78,7 +80,9 @@ export function useCycleViewModel() {
     hasRoster: hydrated && owned.size > 0,
     isOwned: (uniformId: string) => owned.has(uniformId),
     userTeam: (mode: DayMode | "BAI", day: number) => doc.teams[teamKeyOf(mode, day)] ?? null,
-    equippedCtpOf: (agentId: string) => catalog.ctpById(doc.equipment?.ctpByAgent?.[agentId]),
+    /** CTP do personagem numa equipe do jogador: o do slot (1 ou 2) escolhido para o dia. */
+    dayCtpIdOf: (pick: NonNullable<UserTeam[keyof UserTeam]>) =>
+      dayCtpId(pick, doc.equipment, catalog.uniformById(pick.uniformId)?.agent.id),
     builder: activeBuilder,
     openBuilder: (mode: DayMode | "BAI", day: number) => setBuilder({ mode, day }),
     closeBuilder: () => {
