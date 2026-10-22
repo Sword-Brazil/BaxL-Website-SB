@@ -219,12 +219,30 @@ function EntryCard({ vm }: { vm: ScoresViewModel }) {
                   <Badge variant={MODE_VISUALS[mode].badge}>{mode}</Badge>
                   <span className="text-xs text-muted-foreground">{t("scores:entry.points")}</span>
                 </div>
-                <ScoreInput
-                  key={`${vm.date}-${mode}`}
-                  value={vm.scoreOf(vm.date!, mode)}
-                  onSave={(v) => vm.setScore(vm.date!, mode, v)}
-                  label={`${mode} · ${dayLabel(vm.date!)}`}
-                />
+                {/* Dia do reset: antes das 22h conta na semana que acaba; depois, na semana nova. */}
+                {vm.phases.map((phase) => (
+                  <div key={phase} className="flex flex-col gap-1">
+                    {vm.phases.length > 1 && (
+                      <span className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs">
+                        <span className="font-medium">{t(`scores:entry.phase.${phase}`)}</span>
+                        <span className="text-muted-foreground">
+                          {t("scores:entry.countsFor", { n: phase === "pre" ? (vm.day!.week === 1 ? 4 : vm.day!.week - 1) : vm.day!.week })}
+                        </span>
+                        {vm.date === vm.today && phase === vm.currentPhase && (
+                          <Badge variant="outline" className="h-4 px-1.5 text-[0.6rem] text-energy">
+                            {t("scores:entry.now")}
+                          </Badge>
+                        )}
+                      </span>
+                    )}
+                    <ScoreInput
+                      key={`${vm.date}-${mode}-${phase}`}
+                      value={vm.scoreOf(vm.date!, mode, phase)}
+                      onSave={(v) => vm.setScore(vm.date!, mode, v, phase)}
+                      label={`${mode} · ${dayLabel(vm.date!)}${vm.phases.length > 1 ? ` · ${t(`scores:entry.phase.${phase}`)}` : ""}`}
+                    />
+                  </div>
+                ))}
                 {team.length ? (
                   <TeamStrip label={t("scores:entry.myTeam")} tone="mine" members={team} catalog={vm.catalog} />
                 ) : (
@@ -548,6 +566,8 @@ function HistoryCard({ vm }: { vm: ScoresViewModel }) {
                       <span className="ml-1.5 hidden text-xs text-muted-foreground sm:inline">
                         {f.date(e.date)} · S{e.week}
                       </span>
+                      {/* Parte antes do reset das 22h (conta na semana anterior). */}
+                      {e.phase === "pre" && <span className="ml-1.5 text-[0.65rem] text-muted-foreground">{t("scores:history.preReset")}</span>}
                     </TableCell>
                     <TableCell>
                       <Badge variant={MODE_VISUALS[e.mode].badge}>{e.mode}</Badge>
@@ -612,6 +632,7 @@ export function ScoresView() {
         <HelpHint title={t("title")}>
           <p>{t("help.text1")}</p>
           <p>{t("help.text2")}</p>
+          <p>{t("help.text3")}</p>
         </HelpHint>
       </div>
       <QueryState isLoading={vm.isLoading} isError={vm.isError} retry={vm.retry}>

@@ -3,7 +3,8 @@
   "subtitle": "Log your score for each day and mode and follow your gains and losses by day, week and season.",
   "help": {
     "text1": "Fill in each mode's score on the game day (the day turns at 12:00). Since BA resets every 28 days, each day and week is compared with the same day and week last month: green is up, red is down.",
-    "text2": "Saved on this device and, if you sign in, in your account too. Only you can see your scores."
+    "text2": "Saved on this device and, if you sign in, in your account too. Only you can see your scores.",
+    "text3": "On reset day (Thursday, Days 1, 8, 15 and 22), log twice: what you scored before 22:00 counts for the week that ends; after 22:00 the score restarts and counts for the new week."
   },
   "locked": {
     "title": "Unlocks today at 22:00",
@@ -32,7 +33,13 @@
     "invalid": "Numbers only (you can use separators for thousands).",
     "myTeam": "My team for the day",
     "noTeam": "You haven't built a team for this day.",
-    "buildTeam": "Build team"
+    "buildTeam": "Build team",
+    "phase": {
+      "pre": "Before the reset (12:00–22:00)",
+      "post": "After the reset (22:00–12:00)"
+    },
+    "countsFor": "counts for Week {{n}}",
+    "now": "now"
   },
   "chart": {
     "title": "Performance",
@@ -62,6 +69,7 @@
     "mode": "Mode",
     "points": "Points",
     "delta": "vs. last month",
-    "team": "Team"
+    "team": "Team",
+    "preReset": "before reset"
   }
 }
