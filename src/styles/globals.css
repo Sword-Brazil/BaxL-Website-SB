@@ -128,6 +128,20 @@
   --series-2: #eb6834;
   --series-3: #1baf7a;
   --series-4: #eda100;
+
+  /* Rampa de um só tom (azul), do claro ao escuro: séries ordenadas (semanas, qualidades, modos).
+     Validada como ordinal contra a superfície clara (passo mais claro >= 2:1). */
+  --ramp-1: #86b6ef;
+  --ramp-2: #5598e7;
+  --ramp-3: #2a78d6;
+  --ramp-4: #1c5cab;
+  /* Versão de 3 passos (qualidades de CTP, modos BAX/BAL/BAI). */
+  --ramp3-1: #86b6ef;
+  --ramp3-2: #3987e5;
+  --ramp3-3: #1c5cab;
+  /* Ganho e perda contra o mês anterior: verde cresceu, vermelho caiu (o zero fica neutro). */
+  --gain: #15803d;
+  --loss: #c62828;
 }
 
 /* ---------- Tema escuro (padrão) ---------- */
@@ -183,6 +197,17 @@
   --series-2: #d95926;
   --series-3: #199e70;
   --series-4: #c98500;
+
+  /* No escuro a âncora inverte: o passo menos destacado é o mais escuro (>= 2:1 na superfície). */
+  --ramp-1: #184f95;
+  --ramp-2: #256abf;
+  --ramp-3: #3987e5;
+  --ramp-4: #6da7ec;
+  --ramp3-1: #1c5cab;
+  --ramp3-2: #2a78d6;
+  --ramp3-3: #5598e7;
+  --gain: #22c55e;
+  --loss: #f05252;
 }
 
 @theme inline {
@@ -246,6 +271,8 @@
   --color-series-2: var(--series-2);
   --color-series-3: var(--series-3);
   --color-series-4: var(--series-4);
+  --color-gain: var(--gain);
+  --color-loss: var(--loss);
 }
 
 /* Canto chanfrado no estilo dos painéis do MFF. */

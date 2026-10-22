@@ -36,6 +36,7 @@ const NAV = [
   { href: "/meu-elenco", key: "roster" },
   { href: "/rotacoes", key: "rotations" },
   { href: "/estatisticas", key: "stats" },
+  { href: "/minhas-pontuacoes", key: "scores" },
 ] as const;
 
 /** Menu ☰ do celular: inclui a Administração para curadores (no PC ela fica no menu da conta). */

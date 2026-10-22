@@ -1,6 +1,6 @@
 import { Fragment, type ComponentType } from "react";
 import { useTranslation } from "next-i18next/pages";
-import { ChevronRightIcon, PlayIcon, RotateCcwIcon, SkipForwardIcon, SquareIcon, TriangleAlertIcon } from "lucide-react";
+import { ChevronRightIcon, CornerDownRightIcon, PlayIcon, RefreshCwIcon, SquareIcon, TriangleAlertIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   CANCELS,
@@ -23,18 +23,19 @@ const CANCEL_CLASS: Record<Cancel, string> = {
   qc: "text-hero",
 };
 
+// Ícones pequenos e de traço fino: início ▷, fim ◻, próxima rotação ↳ e recomeço ⟳ (círculo de setas).
 const MARKER_ICON: Record<Marker | "start", ComponentType<{ className?: string }>> = {
   start: PlayIcon,
   end: SquareIcon,
-  next: SkipForwardIcon,
-  restart: RotateCcwIcon,
+  next: CornerDownRightIcon,
+  restart: RefreshCwIcon,
 };
 
 const MARKER_CLASS: Record<Marker | "start", string> = {
-  start: "border-brazil-green/60 bg-brazil-green/10 text-brazil-green",
-  end: "border-villain/60 bg-villain/10 text-villain",
-  next: "border-spark/60 bg-spark/10 text-spark",
-  restart: "border-hero/60 bg-hero/10 text-hero",
+  start: "text-brazil-green",
+  end: "text-villain",
+  next: "text-spark",
+  restart: "text-hero",
 };
 
 type Part = RotationPart | RotationUnknown;
@@ -74,9 +75,9 @@ function MarkerChip({ marker, n }: { marker: Marker | "start"; n?: number }) {
       <span
         aria-label={label}
         role="img"
-        className={cn("inline-flex h-7 min-w-7 items-center justify-center gap-0.5 rounded-full border px-1.5 text-xs font-bold", MARKER_CLASS[marker])}
+        className={cn("inline-flex h-7 items-center justify-center gap-0.5 px-0.5 text-[0.65rem] font-semibold", MARKER_CLASS[marker])}
       >
-        <Icon className="size-3.5 fill-current" />
+        <Icon className={cn("size-3", marker === "end" && "size-2.5")} />
         {n && <span className="font-heading tabular-nums">{n}</span>}
       </span>
     </Hint>
