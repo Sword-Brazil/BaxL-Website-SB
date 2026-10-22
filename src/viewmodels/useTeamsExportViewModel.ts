@@ -26,7 +26,8 @@ export function useTeamsExportViewModel(vm: CycleViewModel) {
   const member = (uniformId: string, opts: { ctpId?: string | null; damageDealer?: boolean; mine?: boolean }): ExportMember | undefined => {
     const ref = vm.catalog.uniformById(uniformId);
     if (!ref) return undefined;
-    const ctpId = opts.mine ? (vm.equippedCtpOf(ref.agent.id)?.id ?? null) : opts.ctpId;
+    // Minha equipe: o CTP do dia ou, sem ele, o padrão do personagem.
+    const ctpId = opts.mine ? (opts.ctpId ?? vm.equippedCtpOf(ref.agent.id)?.id ?? null) : opts.ctpId;
     return {
       name: ref.agent.name,
       uniform: ref.uniform.slug === "padrao" ? null : ref.uniform.name,
@@ -53,7 +54,7 @@ export function useTeamsExportViewModel(vm: CycleViewModel) {
     const members = Object.fromEntries(
       SLOTS.flatMap((slot) => {
         const pick = team[slot];
-        const em = pick ? member(pick.uniformId, { mine: true }) : undefined;
+        const em = pick ? member(pick.uniformId, { ctpId: pick.ctpId, mine: true }) : undefined;
         return em ? [[slot, em]] : [];
       }),
     ) as Partial<Record<Slot, ExportMember>>;

@@ -55,7 +55,9 @@ function teamMembers(team: MetaTeam) {
 function userMembers(team: UserTeam | null) {
   return team
     ? SLOTS.flatMap((slot) =>
-        team[slot] ? [{ slot, uniformId: team[slot]!.uniformId, strikerUniformId: team[slot]!.strikerUniformId ?? null }] : [],
+        team[slot]
+          ? [{ slot, uniformId: team[slot]!.uniformId, ctpId: team[slot]!.ctpId ?? null, strikerUniformId: team[slot]!.strikerUniformId ?? null }]
+          : [],
       )
     : [];
 }
