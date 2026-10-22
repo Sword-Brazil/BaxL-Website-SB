@@ -33,7 +33,8 @@ export function useScoresViewModel() {
   const catalog = useCatalogViewModel();
   const { doc, hydrated, setScore } = useSelectionsStore();
   const [selected, setSelected] = useState<string | null>(null);
-  const [range, setRange] = useState<ScoreRange>("week");
+  /** null = automático: "Esta semana" só quando a semana já tem 2 dias ou mais preenchidos. */
+  const [rangeChoice, setRange] = useState<ScoreRange | null>(null);
 
 
   // Sem useMemo: o React Compiler memoriza os cálculos abaixo.
@@ -70,16 +71,25 @@ export function useScoresViewModel() {
   };
 
   const current = today && anchor ? gameDayOf(today, anchor) : null;
+  const weekStart = current ? addDays(current.seasonStart, (current.week - 1) * 7) : null;
+  const weekDaysFilled =
+    weekStart && today
+      ? dateRange(weekStart, today).filter((d) => modesOfDay(gameDayOf(d, anchor!)).some((m) => scores[scoreKey(d, m)] !== undefined))
+          .length
+      : 0;
+  // No começo da semana o gráfico teria um ponto só: abre na temporada.
+  const range: ScoreRange = rangeChoice ?? (weekDaysFilled >= 2 ? "week" : "season");
   const rangeStart = !current
     ? SCORES_FIRST_DATE
     : range === "week"
-      ? addDays(current.seasonStart, (current.week - 1) * 7)
+      ? weekStart!
       : range === "season"
         ? current.seasonStart
         : SCORES_FIRST_DATE;
   const from = rangeStart < SCORES_FIRST_DATE ? SCORES_FIRST_DATE : rangeStart;
 
-  const daily = anchor && today ? dailySeries(scores, anchor, from, today) : [];
+  // Série desde o primeiro dia contado e só depois o período: a variação do 1º dia do período compara com o dia de antes.
+  const daily = anchor && today ? dailySeries(scores, anchor, SCORES_FIRST_DATE, today).filter((d) => d.date >= from) : [];
   // Semana em andamento: marcada como parcial e sem variação até acabar (comparar meia semana com uma inteira engana).
   const weekly = (anchor ? weeklySeries(scores, anchor) : []).map((w) => {
     const partial = !!today && w.start <= today && today <= addDays(w.start, 6);

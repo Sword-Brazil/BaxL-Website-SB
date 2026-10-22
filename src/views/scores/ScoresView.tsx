@@ -263,6 +263,8 @@ function ScoreArea({
   config: ChartConfig;
 }) {
   const f = useFormat();
+  // Com um ponto só a área não aparece: marca os pontos.
+  const single = data.filter((d) => keys.some((k) => d[k] !== null && d[k] !== undefined)).length <= 1;
   return (
     <ChartContainer config={config} className="aspect-auto h-64 w-full">
       <AreaChart data={data} margin={{ top: 8, left: 4, right: 8 }}>
@@ -290,6 +292,7 @@ function ScoreArea({
             fill={`url(#${id}-${m})`}
             stroke={`var(--color-${m})`}
             strokeWidth={2}
+            dot={single ? { r: 4, fill: `var(--color-${m})`, strokeWidth: 0 } : false}
             isAnimationActive={false}
           />
         ))}
