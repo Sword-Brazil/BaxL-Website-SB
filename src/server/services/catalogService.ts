@@ -20,6 +20,8 @@ export async function getCatalog(): Promise<Catalog> {
         slug: a.slug,
         name: a.name,
         active: a.active,
+        metaCtp1Id: a.metaCtp1Id,
+        metaCtp2Id: a.metaCtp2Id,
         uniforms: a.uniforms.map((u) => ({
           id: u.id,
           agentId: u.agentId,
@@ -33,6 +35,7 @@ export async function getCatalog(): Promise<Catalog> {
           species: u.species as Species,
           attackType: u.attackType as AttackType,
           effects: u.effects as BossEffect[],
+          isMetaStriker: u.isMetaStriker,
         })),
       };
     }),

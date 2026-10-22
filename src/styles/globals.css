@@ -4,6 +4,16 @@
  * Neon do cartão com CTP no elenco: o brilho fica fixo no cartão e uma camada (::after) com o
  * brilho mais forte só varia a opacidade. Animar box-shadow repintava cada cartão a cada quadro.
  */
+/* Barra de carregamento do topo (GlobalProgress). */
+@keyframes progress-slide {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(300%);
+  }
+}
+
 @keyframes roster-ctp-glow {
   0%, 100% { opacity: 0; }
   50% { opacity: 1; }

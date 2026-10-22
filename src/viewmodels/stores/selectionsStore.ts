@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { SLOTS, type Mode, type Slot } from "@/models/domain/enums";
-import { equipCtp } from "@/models/rules/ctpAssign";
+import { equipCtp, type CtpSlot } from "@/models/rules/ctpAssign";
 import { emptySelections } from "@/models/rules/selections";
 import type { TeamKey, UserSelections, UserTeam } from "@/models/schemas/selections";
 
@@ -29,10 +29,10 @@ interface SelectionsState {
   clearSlot: (teamKey: TeamKey, slot: Slot) => void;
   /** Striker do personagem nesta posição (null tira). */
   setStriker: (teamKey: TeamKey, slot: Slot, strikerUniformId: string | null) => void;
-  /** CTP do personagem só nesta equipe/dia (null volta ao CTP padrão dele, do elenco). */
-  setSlotCtp: (teamKey: TeamKey, slot: Slot, ctpId: string | null) => void;
-  /** Equipa (ou remove) o CTP padrão de um personagem do usuário (vale nos dias sem CTP próprio). */
-  equipCtp: (agentId: string, ctpId: string | null) => void;
+  /** Slot de CTP (1 ou 2) do personagem nesta equipe/dia; troca também o CTP antigo "do dia". */
+  setCtpSlot: (teamKey: TeamKey, slot: Slot, ctpSlot: CtpSlot) => void;
+  /** Equipa (ou remove) o CTP 1 ou 2 de um personagem do usuário (vale em todos os dias desse slot). */
+  equipCtp: (agentId: string, ctpId: string | null, slot?: CtpSlot) => void;
   applyTeam: (teamKey: TeamKey, team: UserTeam) => void;
   resetMode: (mode: Mode) => void;
   /** Apaga todas as equipes montadas (BAX, BAL e BAI); elenco, CTPs e nome ficam. */
@@ -94,6 +94,7 @@ export const useSelectionsStore = create<SelectionsState>()(
             team[slot] = {
               uniformId,
               ctpId: (same ? team[slot]?.ctpId : undefined) ?? null,
+              ctpSlot: (same ? team[slot]?.ctpSlot : undefined) ?? null,
               strikerUniformId: (same ? team[slot]?.strikerUniformId : undefined) ?? null,
             };
             return team;
@@ -108,10 +109,10 @@ export const useSelectionsStore = create<SelectionsState>()(
           }),
         })),
 
-      setSlotCtp: (teamKey, slot, ctpId) =>
+      setCtpSlot: (teamKey, slot, ctpSlot) =>
         set(({ doc }) => ({
           doc: withTeam(doc, teamKey, (team) => {
-            if (team[slot]) team[slot] = { ...team[slot]!, ctpId };
+            if (team[slot]) team[slot] = { ...team[slot]!, ctpSlot, ctpId: null };
             return team;
           }),
         })),
@@ -124,9 +125,9 @@ export const useSelectionsStore = create<SelectionsState>()(
           }),
         })),
 
-      equipCtp: (agentId, ctpId) =>
+      equipCtp: (agentId, ctpId, slot = 1) =>
         set(({ doc }) => ({
-          doc: touch(doc, { equipment: equipCtp(doc.equipment ?? { ctpByAgent: {} }, agentId, ctpId) }),
+          doc: touch(doc, { equipment: equipCtp(doc.equipment ?? { ctpByAgent: {} }, agentId, ctpId, slot) }),
         })),
 
       applyTeam: (teamKey, team) => set(({ doc }) => ({ doc: withTeam(doc, teamKey, () => ({ ...team })) })),

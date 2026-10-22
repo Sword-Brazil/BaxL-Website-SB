@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthViewModel } from "@/viewmodels/useAuthViewModel";
 import { AppLayout } from "@/views/layout/AppLayout";
 import { HelpHint } from "@/views/layout/HelpHint";
+import { LoadingState } from "@/views/shared/LoadingState";
 
 const NAV = [
   { href: "/admin", key: "overview" },
@@ -33,7 +34,13 @@ export function AdminGuard({ adminOnly = false, children }: { adminOnly?: boolea
     if (!isLoading && !user) router.replace({ pathname: "/entrar", query: { next: router.asPath } });
   }, [isLoading, user, router]);
 
-  if (isLoading || !user) return <Skeleton className="h-64 w-full" />;
+  if (isLoading || !user) {
+    return (
+      <LoadingState>
+        <Skeleton className="h-64 w-full" />
+      </LoadingState>
+    );
+  }
   if (!isCurator || (adminOnly && !isAdmin)) {
     return (
       <Card variant="panel" className="mx-auto max-w-lg">

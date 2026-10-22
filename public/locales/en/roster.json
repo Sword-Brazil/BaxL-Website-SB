@@ -23,5 +23,6 @@
   },
   "ctpTitle": "Equip CTPs",
   "ctpDrop": "Drag or tap a CTP to equip",
+  "ctp2Optional": "CTP 2 (optional, to switch per day)",
   "ctpArmed": "CTP selected: tap one of your characters to equip it."
 }

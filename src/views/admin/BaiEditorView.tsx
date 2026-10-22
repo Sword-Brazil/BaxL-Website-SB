@@ -66,7 +66,7 @@ export function BaiEditorView() {
             <PlusIcon data-icon="inline-start" />
             {t("bai.add")}
           </Button>
-          <Button variant="energy" disabled={!vm.dirty || vm.isSaving} onClick={vm.save}>
+          <Button variant="energy" disabled={!vm.dirty} loading={vm.isSaving} onClick={vm.save}>
             <SaveIcon data-icon="inline-start" />
             {vm.isSaving ? t("common.saving") : t("common.save")}
           </Button>

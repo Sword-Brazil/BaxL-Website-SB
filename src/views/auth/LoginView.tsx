@@ -78,8 +78,9 @@ export function LoginView() {
                   </Field>
                 )}
               />
-              <Button type="submit" variant="energy" size="touch" disabled={form.formState.isSubmitting}>
-                {t("login.submit")}
+              {/* Continua carregando depois do login, enquanto abre a próxima página. */}
+              <Button type="submit" variant="energy" size="touch" loading={form.formState.isSubmitting || form.formState.isSubmitSuccessful}>
+                {form.formState.isSubmitting || form.formState.isSubmitSuccessful ? t("login.submitting") : t("login.submit")}
               </Button>
             </FieldGroup>
           </form>

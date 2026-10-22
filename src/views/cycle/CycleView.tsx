@@ -49,7 +49,6 @@ function TeamStrip(props: {
       members={props.team}
       catalog={vm.catalog}
       isOwned={vm.hasRoster ? vm.isOwned : undefined}
-      equippedCtpOf={vm.equippedCtpOf}
       effect={props.effect}
     />
   );
@@ -59,13 +58,15 @@ function teamMembers(team: MetaTeam) {
   return team.members;
 }
 
-function userMembers(team: UserTeam | null) {
+/** Equipe do jogador na faixa, com o CTP do slot (1 ou 2) que cada personagem usa no dia. */
+function userMembers(team: UserTeam | null, vm: Vm) {
   return team
-    ? SLOTS.flatMap((slot) =>
-        team[slot]
-          ? [{ slot, uniformId: team[slot]!.uniformId, ctpId: team[slot]!.ctpId ?? null, strikerUniformId: team[slot]!.strikerUniformId ?? null }]
-          : [],
-      )
+    ? SLOTS.flatMap((slot) => {
+        const pick = team[slot];
+        return pick
+          ? [{ slot, uniformId: pick.uniformId, ctpId: vm.dayCtpIdOf(pick), strikerUniformId: pick.strikerUniformId ?? null }]
+          : [];
+      })
     : [];
 }
 
@@ -96,7 +97,7 @@ function ModePanel({
 }) {
   const { t } = useTranslation(["cycle", "common"]);
   const [meta, ...alts] = data?.metaTeams ?? [];
-  const mine = userMembers(vm.userTeam(mode, day));
+  const mine = userMembers(vm.userTeam(mode, day), vm);
   const look = MODE_VISUALS[mode];
   const effect = vm.cycle?.season[mode];
   return (
@@ -135,7 +136,7 @@ function ModePanel({
 function BaiPanel({ day, vm }: { day: number; vm: Vm }) {
   const { t } = useTranslation(["cycle", "common"]);
   const [meta, ...alts] = vm.bai?.metaTeams ?? [];
-  const mine = userMembers(vm.userTeam("BAI", day));
+  const mine = userMembers(vm.userTeam("BAI", day), vm);
   return (
     <div className={cn("flex flex-col gap-3 border-t-2 p-3", MODE_VISUALS.BAI.accentBar, MODE_VISUALS.BAI.tint)}>
       <div className="flex flex-wrap items-start justify-between gap-2">
@@ -389,6 +390,7 @@ export function CycleView() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>{t("cycle:export.button")}</DropdownMenuLabel>
             <DropdownMenuItem onSelect={() => exporter.exportHtml("all")}>{t("cycle:export.all")}</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => exporter.exportHtml("meta")}>{t("cycle:export.meta")}</DropdownMenuItem>
             <DropdownMenuItem onSelect={() => exporter.exportHtml("mine")}>{t("cycle:export.mine")}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -23,5 +23,6 @@
   },
   "ctpTitle": "Equipar CTPs",
   "ctpDrop": "Arraste ou toque um CTP para equipar",
+  "ctp2Optional": "CTP 2 (opcional, para alternar por dia)",
   "ctpArmed": "CTP selecionado: toque em um personagem seu para equipar."
 }

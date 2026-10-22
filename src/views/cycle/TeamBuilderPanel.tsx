@@ -34,7 +34,9 @@ import { CtpPalette } from "@/views/day/CtpPalette";
 import { CtpBadge } from "@/views/shared/CtpBadge";
 import { CtpDragOverlay } from "@/views/shared/CtpDragOverlay";
 import { CtpPicker } from "@/views/shared/CtpPicker";
+import { CtpSlotSwitch } from "@/views/shared/CtpSlotSwitch";
 import { ExportImageButton } from "@/views/shared/ExportImageButton";
+import { LoadingState } from "@/views/shared/LoadingState";
 import { MemberChip } from "@/views/shared/MemberChip";
 import { UniformPicker } from "@/views/shared/UniformPicker";
 
@@ -131,7 +133,9 @@ function SlotRow({
           />
         </div>
         {slot.pick && ref && (
-          <div onClick={(e) => e.stopPropagation()}>
+          // CTP 1 ou 2 do personagem neste dia; trocar o CTP muda o do slot (vale em todos os dias dele).
+          <div className="flex flex-col gap-1.5" onClick={(e) => e.stopPropagation()}>
+            <CtpSlotSwitch ctp1={slot.ctp1} ctp2={slot.ctp2} value={slot.ctpSlot} onChange={(s) => vm.chooseCtpSlot(slot.slot, s)} />
             <CtpPicker
               ctps={vm.catalog.ctps.filter((c) => c.active)}
               value={slot.ctp?.id ?? null}
@@ -149,9 +153,9 @@ function SlotRow({
                       <span className="truncate">
                         {t(`common:ctp.${slot.ctp.type}`)} · {t(`common:quality.${slot.ctp.quality}`)}
                       </span>
-                      {/* Padrão do personagem (elenco) ou escolhido só para este dia. */}
+                      {/* CTP do slot do personagem ou, em equipe antiga, escolhido só para este dia. */}
                       <span className="truncate text-[0.65rem] text-muted-foreground">
-                        {slot.ctpIsDefault ? t("days:myTeam.dayCtp.default") : t("days:myTeam.dayCtp.thisDay")}
+                        {slot.ctpSlot ? t("days:myTeam.dayCtp.slot", { n: slot.ctpSlot }) : t("days:myTeam.dayCtp.legacy")}
                       </span>
                     </span>
                     <span className="shrink-0 text-energy">{t("common:ctpPicker.change")}</span>
@@ -215,7 +219,7 @@ function SlotRow({
             )}
             {slot.pick && (
               <span className="ml-auto flex gap-1">
-                {slot.ctp && !slot.ctpIsDefault && (
+                {slot.ctp && (slot.ctpSlot === 1 || (slot.ctpSlot === 2 && slot.ctp2)) && (
                   <Button
                     size="xs"
                     variant="ghost"
@@ -225,7 +229,7 @@ function SlotRow({
                     }}
                   >
                     <XIcon data-icon="inline-start" />
-                    {slot.hasDefaultCtp ? t("days:myTeam.dayCtp.useDefault") : t("days:myTeam.palette.remove")}
+                    {t("days:myTeam.palette.remove")}
                   </Button>
                 )}
                 <Button
@@ -281,7 +285,13 @@ export function TeamBuilderPanel(props: { teamKey: TeamKey; criteria: Criterion[
     vm.dropCtp(String(over.id).replace("slot:", "") as Slot, String(active.data.current?.ctpId ?? ""));
   };
 
-  if (!vm.hydrated || vm.catalog.isLoading) return <Skeleton className="h-64 w-full" />;
+  if (!vm.hydrated || vm.catalog.isLoading) {
+    return (
+      <LoadingState>
+        <Skeleton className="h-64 w-full" />
+      </LoadingState>
+    );
+  }
 
   const copy = (index: number) => {
     const n = vm.copyTeam(vm.metaTeams[index]);

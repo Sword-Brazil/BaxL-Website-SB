@@ -11,6 +11,7 @@ import { ApiError } from "@/models/api/client";
 import { APP_ERRORS, classifyError } from "@/models/domain/appErrors";
 import { useSelectionsStore } from "@/viewmodels/stores/selectionsStore";
 import { notifyErrorClient } from "@/viewmodels/useNotify";
+import { GlobalProgress } from "@/views/layout/GlobalProgress";
 import { bodyFont, displayFont } from "@/styles/fonts";
 import { setZodLocale } from "@/lib/zodLocale";
 
@@ -78,6 +79,7 @@ function App({ Component, pageProps }: AppProps) {
       `}</style>
       <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
         <TooltipProvider>
+          <GlobalProgress />
           <Component {...pageProps} />
           <Toaster richColors position="top-center" />
         </TooltipProvider>

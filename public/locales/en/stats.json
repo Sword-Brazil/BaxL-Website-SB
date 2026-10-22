@@ -16,13 +16,29 @@
     "sourceMeta": "Metas",
     "sourceMine": "My teams",
     "subtitleMine": "How many times each character appears in the teams you built, by week.",
-    "emptyMine": "You haven't built any teams yet."
+    "emptyMine": "You haven't built any teams yet.",
+    "ctps": "CTPs",
+    "days": "Days",
+    "days_one": "{{count}} day",
+    "days_other": "{{count}} days",
+    "export": "Export (HTML)",
+    "noCtp": "No CTP"
   },
   "ctp": {
     "title": "My equipped CTPs",
-    "subtitle": "{{equipped}} of {{owned}} character(s) with a default CTP (My roster), by type and quality.",
+    "subtitle": "{{equipped}} CTP(s) equipped (CTP 1 and 2) on {{withCtp}} of {{owned}} character(s) in My roster, by type and quality.",
     "empty": "You haven't equipped any CTP yet. Equip them in My roster.",
-    "agents": "Characters"
+    "agents": "Characters",
+    "agentsCount_one": "{{count}} character",
+    "agentsCount_other": "{{count}} characters"
+  },
+  "export": {
+    "title": "Character statistics",
+    "titleOf": "Character statistics · {{name}}",
+    "subtitleMeta": "Metas · {{mode}} · most used first · Sword Brazil",
+    "subtitleMine": "My teams · {{mode}} · most used first · Sword Brazil",
+    "rank": "#",
+    "generatedAt": "Generated on {{date}}. Hover a day to see the CTP used."
   },
   "help": {
     "text1": "Repetition counts one appearance per team. Characters that repeat a lot are good investments.",

@@ -20,6 +20,7 @@ import { ASSET_MAX_BYTES } from "@/models/schemas/admin";
 import { useCatalogViewModel } from "@/viewmodels/useCatalogViewModel";
 import { CtpQualityFx } from "@/views/shared/CtpQualityFx";
 import { Hint } from "@/views/shared/Hint";
+import { LoadingState } from "@/views/shared/LoadingState";
 
 type Draft = { id?: string; type: CtpType; quality: CtpQuality; imagePath: string; active: boolean };
 const TYPES: Record<string, "image/png" | "image/webp" | "image/jpeg"> = { "image/png": "image/png", "image/webp": "image/webp", "image/jpeg": "image/jpeg" };
@@ -102,7 +103,7 @@ export function CtpAdminView() {
   };
 
   return <>
-    {catalog.isLoading ? <p className="text-sm text-muted-foreground">{t("common:loading")}</p> : catalog.isError ? <Button variant="outline" onClick={() => catalog.refetch()}>{t("common:retry")}</Button> :
+    {catalog.isLoading ? <LoadingState /> : catalog.isError ? <Button variant="outline" onClick={() => catalog.refetch()}>{t("common:actions.retry")}</Button> :
       <div className="flex flex-col gap-6">{CTP_TYPES.map((type) => <section key={type} className="flex flex-col gap-3">
         <div className="flex items-center justify-between gap-2">
           <h2 className="font-heading text-lg tracking-wider text-energy uppercase">{t(`common:ctp.${type}`)}</h2>
@@ -138,7 +139,7 @@ export function CtpAdminView() {
             <div><Input id="ctp-image" type="file" accept="image/png,image/webp,image/jpeg" className="hidden" onChange={(event) => { void upload(event.target.files?.[0]); event.target.value = ""; }} /><Button type="button" variant="outline" asChild disabled={uploading}><label htmlFor="ctp-image" className="cursor-pointer">{uploading ? <LoaderIcon data-icon="inline-start" className="animate-spin" /> : <ImageUpIcon data-icon="inline-start" />}{draft.imagePath ? t("admin:catalog.changePhoto") : t("admin:catalog.addPhoto")}</label></Button><p className="mt-1 text-xs text-muted-foreground">{t("admin:catalog.uploadHint")}</p></div>
           </div>
         </div>
-        <DialogFooter><Button variant="outline" onClick={() => setDraft(null)}>{t("admin:common.cancel")}</Button><Button variant="energy" disabled={save.isPending || uploading} onClick={() => save.mutate(draft)}>{t("admin:common.save")}</Button></DialogFooter>
+        <DialogFooter><Button variant="outline" onClick={() => setDraft(null)}>{t("admin:common.cancel")}</Button><Button variant="energy" disabled={uploading} loading={save.isPending} onClick={() => save.mutate(draft)}>{t("admin:common.save")}</Button></DialogFooter>
       </DialogContent>}
     </Dialog>
   </>;

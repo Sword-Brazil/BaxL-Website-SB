@@ -4,8 +4,9 @@ import { TriangleAlertIcon } from "lucide-react";
 import { Alert, AlertAction, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { LoadingState } from "./LoadingState";
 
-/** Estados de carregamento (Skeleton) e erro (Alert com "tentar novamente"). */
+/** Estados de carregamento (aviso + Skeleton) e erro (Alert com "tentar novamente"). */
 export function QueryState({
   isLoading,
   isError,
@@ -33,6 +34,6 @@ export function QueryState({
       </Alert>
     );
   }
-  if (isLoading) return <>{skeleton ?? <Skeleton className="h-48 w-full" />}</>;
+  if (isLoading) return <LoadingState>{skeleton ?? <Skeleton className="h-48 w-full" />}</LoadingState>;
   return <>{children}</>;
 }
