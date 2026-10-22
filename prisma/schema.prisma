@@ -247,7 +247,7 @@ model SecurityNotice {
   userId          String
   user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   type            String
-  // JSON com parâmetros não sensíveis (ex.: {"role":"CURATOR"}).
+  // JSON com parâmetros não sensíveis (ex.: {"role":"ADMIN"}).
   params          String?
   // Sessão que causou o evento: o aviso de "novo login" não aparece nela mesma.
   originSessionId String?

@@ -13,7 +13,7 @@
   },
   "guard": {
     "forbidden": "Access denied",
-    "forbiddenText": "This area is restricted to Sword Brazil curators and administrators.",
+    "forbiddenText": "This area is restricted to Sword Brazil administrators.",
     "goHome": "Back to home"
   },
   "overview": {
@@ -24,7 +24,7 @@
     "catalog": "Agents, uniforms and images.",
     "ctps": "CTP types, photos and availability.",
     "bai": "BAI boss sequence.",
-    "users": "Players, curators and administrators: accounts, roles and passwords.",
+    "users": "Members and administrators: accounts, roles and passwords.",
     "settings": "Cycle anchor and turnover times.",
     "rotations": "Character rotations (damage dealers), per uniform, with a description and video."
   },
@@ -168,8 +168,7 @@
     "search": "Search by username or nickname…",
     "role": "Role",
     "roles": {
-      "USER": "Player",
-      "CURATOR": "Curator",
+      "USER": "Member",
       "ADMIN": "Administrator"
     },
     "changeRoleConfirm": "Change {{name}} role to {{role}}?",

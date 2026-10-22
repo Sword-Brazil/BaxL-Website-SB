@@ -39,7 +39,6 @@ export function useAuthViewModel() {
     user,
     isLoading: me.isLoading,
     isLoggedIn: !!user,
-    isCurator: user?.role === "CURATOR" || user?.role === "ADMIN",
     isAdmin: user?.role === "ADMIN",
     login: loginMutation.mutateAsync,
     loginState: loginMutation,

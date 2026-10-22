@@ -105,7 +105,7 @@ export function MemberChip({
   slotLabel: string;
   /** Líder: fica no meio da equipe, um pouco maior e com brilho. */
   leader?: boolean;
-  /** Causador de Dano marcado pelos curadores (selo de espada). */
+  /** Causador de Dano marcado pelos administradores (selo de espada). */
   damageDealer?: boolean;
   /** O traje causa o efeito da temporada: atordoa o chefe (selo com o ícone do efeito). */
   stunEffect?: BossEffect;

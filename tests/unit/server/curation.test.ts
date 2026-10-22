@@ -18,7 +18,7 @@ describe("curadoria", () => {
 
   beforeEach(async () => {
     await seedBase();
-    curatorId = (await createUser("CURATOR")).id;
+    curatorId = (await createUser("ADMIN", "editor")).id;
     ctp = await ctpId();
     fem = [];
     for (const s of ["f1", "f2", "f3"]) fem.push((await createAgent(s, { gender: "FEMALE", species: "MUTANT" })).uniform.id);
@@ -157,7 +157,7 @@ describe("curadoria", () => {
 
   it("grava autor e data, e só uma principal por dia", async () => {
     const a = await saveMetaTeam(team(fem), curatorId);
-    expect(a.updatedBy).toBe("curator");
+    expect(a.updatedBy).toBe("admin");
     const b = await saveMetaTeam(team([fem[2], fem[1], fem[0]]), curatorId);
     const day = await dayId("BAX", 6);
     const rows = await prisma.metaTeam.findMany({ where: { battleDayId: day } });
@@ -217,16 +217,16 @@ describe("curadoria", () => {
 
     it("a busca acha por usuário ou apelido, sem diferenciar maiúsculas", async () => {
       await createAccount({ username: "tenmenezes", nickname: "Ten Menezes", password: "senha1234", role: "USER" });
-      await createAccount({ username: "curador", password: "senha1234", role: "CURATOR" });
+      await createAccount({ username: "lider", password: "senha1234", role: "ADMIN" });
       expect((await listUsers({ q: "MENEZES" })).users.map((u) => u.username)).toEqual(["tenmenezes"]);
-      expect((await listUsers({ q: "Curad" })).users.map((u) => u.username)).toEqual(["curador"]);
+      expect((await listUsers({ q: "LIDER" })).users.map((u) => u.username)).toEqual(["lider"]);
     });
 
     it("rebaixar o último ADMIN gera 409", async () => {
-      const admin = await createUser("ADMIN");
-      await expect(changeRole(admin.id, "USER")).rejects.toSatisfy(status(409));
+      // O "editor" do beforeEach é o único ADMIN.
+      await expect(changeRole(curatorId, "USER")).rejects.toSatisfy(status(409));
       await createUser("ADMIN", "outro");
-      await expect(changeRole(admin.id, "CURATOR")).resolves.toMatchObject({ role: "CURATOR" });
+      await expect(changeRole(curatorId, "USER")).resolves.toMatchObject({ role: "USER" });
     });
   });
 });

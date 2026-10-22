@@ -6,7 +6,7 @@ import { dismissNotice, flushNotifications, listNotices, notify } from "@/server
 import { adminResetPassword, changeRole } from "@/server/services/usersService";
 
 const IP = "10.0.0.9";
-async function createUser(username = "alvo", role = "CURATOR") {
+async function createUser(username = "alvo", role = "USER") {
   return prisma.user.create({ data: { username, passwordHash: await hashPassword("senha1234"), role } });
 }
 
@@ -23,14 +23,14 @@ describe("notify: canal pela gravidade", () => {
 
   it("crítico grava o aviso com a gravidade e os parâmetros", async () => {
     const u = await createUser();
-    await notify({ type: "ROLE_CHANGED", userId: u.id, params: { role: "CURATOR" } });
+    await notify({ type: "ROLE_CHANGED", userId: u.id, params: { role: "ADMIN" } });
     const [notice] = await listNotices(u.id, session());
-    expect(notice).toMatchObject({ type: "ROLE_CHANGED", severity: "CRITICAL", params: { role: "CURATOR" } });
+    expect(notice).toMatchObject({ type: "ROLE_CHANGED", severity: "CRITICAL", params: { role: "ADMIN" } });
   });
 
   it("evento repetido atualiza o mesmo aviso em vez de empilhar", async () => {
     const u = await createUser();
-    await notify({ type: "ROLE_CHANGED", userId: u.id, params: { role: "CURATOR" } });
+    await notify({ type: "ROLE_CHANGED", userId: u.id, params: { role: "ADMIN" } });
     await notify({ type: "ROLE_CHANGED", userId: u.id, params: { role: "ADMIN" } });
     expect(await prisma.securityNotice.count({ where: { userId: u.id } })).toBe(1);
     expect((await listNotices(u.id, session()))[0].params).toEqual({ role: "ADMIN" });
@@ -92,7 +92,7 @@ describe("eventos ligados ao notify", () => {
   it("troca de papel avisa; manter o mesmo papel não", async () => {
     await createUser("chefe@sword.br", "ADMIN");
     const u = await createUser();
-    await changeRole(u.id, "CURATOR");
+    await changeRole(u.id, "USER");
     expect(await types(u.id)).toEqual([]);
     await changeRole(u.id, "ADMIN");
     expect(await types(u.id)).toEqual(["ROLE_CHANGED"]);

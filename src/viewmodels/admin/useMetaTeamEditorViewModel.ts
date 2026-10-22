@@ -53,7 +53,7 @@ const agentCtps = (catalog: CatalogViewModel, uniformId: string | null) => {
 /**
  * Membro salvo → rascunho. Equipe antiga (CTP só dela, sem slot): o CTP ocupa o slot vazio do
  * personagem ou o slot com o mesmo CTP; se os dois slots já têm outros CTPs, fica como está até o
- * curador escolher um slot.
+ * administrador escolher um slot.
  */
 function memberDraft(catalog: CatalogViewModel, m: MetaTeam["members"][number]): MemberDraft {
   const base = { uniformId: m.uniformId, isDamageDealer: m.isDamageDealer, strikerUniformId: m.strikerUniformId, ...agentCtps(catalog, m.uniformId) };

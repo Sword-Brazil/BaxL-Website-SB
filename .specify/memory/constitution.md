@@ -1,11 +1,12 @@
 <!--
 Sync Impact Report
 ==================
-Version change: 1.3.0 → 1.4.0 (MINOR: domain restriction on personal data revised)
-Modified principles: none
-Modified sections:
-  - Restrições de Domínio e Conteúdo: contas sem e-mail (nome de usuário, hash de senha e
-    apelido opcional), criadas só por Administradores; site privado da aliança
+Version change: 1.4.0 → 1.5.0 (MINOR: papel de Curador removido)
+Modified principles:
+  - IV. Conteúdo Curado, Datado e Separado do Código: só dois papéis, membro comum e
+    Administrador; o Administrador publica e altera o conteúdo (o papel de Curador deixa
+    de existir)
+Modified sections: none
 Added/removed sections: none
 Templates: not modified.
 Follow-up TODOs: none
@@ -68,10 +69,11 @@ elite para seus membros; generalizar dilui esse propósito.
 - Toda equipe publicada DEVE registrar a **data da última atualização** e, quando
   aplicável, a temporada/versão do jogo a que se refere, e essa data DEVE ser visível
   ao jogador.
-- Somente **Curadores** podem publicar ou alterar conteúdo. **Administradores**
-  (liderança da Sword Brazil) promovem e removem Curadores e DEVE existir sempre ao menos
-  um Administrador. O conteúdo DEVE ser validado (agente existente, CTP existente, dia
-  válido de BAX/BAL, restrição respeitada) antes de ser publicado.
+- Há só dois papéis: **membro** comum e **Administrador** (liderança da Sword Brazil).
+  Somente Administradores publicam ou alteram conteúdo e gerenciam as contas, e DEVE
+  existir sempre ao menos um Administrador. O conteúdo DEVE ser validado (agente
+  existente, CTP existente, dia válido de BAX/BAL, restrição respeitada) antes de ser
+  publicado.
 
 **Racional**: o Meta muda a cada atualização do jogo; dados desatualizados ou inválidos
 custam pontos à aliança. Atualização fácil e datada mantém a confiança.
@@ -145,4 +147,4 @@ significa tempo e pontuação perdidos.
 - Revisões de código e de spec DEVEM apontar violações; exceções exigem justificativa
   escrita no plano da feature.
 
-**Version**: 1.4.0 | **Ratified**: 2026-10-17 | **Last Amended**: 2026-10-21
+**Version**: 1.5.0 | **Ratified**: 2026-10-17 | **Last Amended**: 2026-10-22

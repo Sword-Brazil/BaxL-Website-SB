@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { BAL_EFFECTS, BAX_EFFECTS, BOSS_EFFECTS, CRITERION_VALUES, CTP_QUALITIES, CTP_TYPES, SLOTS, UNKNOWN } from "@/models/domain/enums";
+import { BAL_EFFECTS, BAX_EFFECTS, BOSS_EFFECTS, CRITERION_VALUES, CTP_QUALITIES, CTP_TYPES, ROLES, SLOTS, UNKNOWN } from "@/models/domain/enums";
 import {
   attackTypeSchema,
   criterionAttributeSchema,
@@ -155,11 +155,11 @@ export const CreateUserSchema = z.object({
   username: usernameSchema,
   password: passwordSchema,
   nickname: z.string().trim().max(30).optional(),
-  role: z.enum(["USER", "CURATOR", "ADMIN"]),
+  role: z.enum(ROLES),
 });
 export type CreateUserInput = z.infer<typeof CreateUserSchema>;
 
-export const ChangeRoleSchema = z.object({ role: z.enum(["USER", "CURATOR", "ADMIN"]) });
+export const ChangeRoleSchema = z.object({ role: z.enum(ROLES) });
 export const AdminResetPasswordSchema = z.object({ password: passwordSchema });
 
 export const ASSET_MAX_BYTES = 2 * 1024 * 1024;

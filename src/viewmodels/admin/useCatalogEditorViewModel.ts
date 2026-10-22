@@ -67,7 +67,7 @@ const fileToBase64 = (file: File) =>
   });
 
 /**
- * Catálogo de personagens e trajes (admin/curador): busca, novo personagem, novo traje,
+ * Catálogo de personagens e trajes (admin): busca, novo personagem, novo traje,
  * troca/remoção de foto de cada traje e desativação. O identificador (slug) é gerado do nome.
  */
 export function useCatalogEditorViewModel(messages: { saved: string; uploaded: string; tooBig: string; badType: string }) {

@@ -84,10 +84,14 @@ describe("PrioritySchema", () => {
 });
 
 describe("CreateUserSchema", () => {
-  it("aceita os três papéis com nome de usuário e senha forte", () => {
-    for (const role of ["USER", "CURATOR", "ADMIN"]) {
+  it("aceita os dois papéis (membro e administrador) com nome de usuário e senha forte", () => {
+    for (const role of ["USER", "ADMIN"]) {
       expect(CreateUserSchema.safeParse({ username: "tenmenezes", password: "Senha.1234", role }).success).toBe(true);
     }
+  });
+
+  it("não existe mais o papel de curador", () => {
+    expect(CreateUserSchema.safeParse({ username: "tenmenezes", password: "Senha.1234", role: "CURATOR" }).success).toBe(false);
   });
 
   it("exige nome de usuário válido e não aceita e-mail", () => {

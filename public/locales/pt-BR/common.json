@@ -237,8 +237,7 @@
     "dismiss": "Dispensar aviso",
     "notMe": "Não foi você? Peça a um administrador para trocar sua senha.",
     "roles": {
-      "USER": "Usuário",
-      "CURATOR": "Curador",
+      "USER": "Membro",
       "ADMIN": "Administrador"
     },
     "toast": {
