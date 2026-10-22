@@ -25,9 +25,15 @@ export function NicknameMenu() {
       }}
     >
       <PopoverTrigger asChild>
-        <Button variant="ghost" className="h-11 max-w-44 gap-1.5 px-2.5" aria-label={t("nickname.label")}>
+        <Button
+          variant="ghost"
+          className="h-11 max-w-44 gap-1.5 px-2.5"
+          aria-label={t("nickname.label")}
+          title={hydrated && nickname ? nickname : t("nickname.label")}
+        >
           <UserRoundPenIcon data-icon="inline-start" />
-          <span className="hidden truncate sm:inline">{hydrated && nickname ? nickname : t("nickname.placeholder")}</span>
+          {/* Com o menu completo no cabeçalho (xl), só o ícone: o nome não cabe ao lado do menu. */}
+          <span className="hidden truncate sm:inline xl:hidden">{hydrated && nickname ? nickname : t("nickname.placeholder")}</span>
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-72">
