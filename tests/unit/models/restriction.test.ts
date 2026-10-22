@@ -50,3 +50,15 @@ describe("atributos por traje", () => {
     expect(matchesRestriction(fenixNegra, [...villain])).toBe(true);
   });
 });
+
+describe("matchesRestriction estrito (montagem do jogador)", () => {
+  it("UNKNOWN não entra: só quem tem exatamente as tags do dia", () => {
+    const criteria = [
+      { attribute: "GENDER", value: "FEMALE" },
+      { attribute: "SPECIES", value: "MUTANT" },
+    ] as const;
+    expect(matchesRestriction(agent("FEMALE", "MUTANT"), [...criteria], { strict: true })).toBe(true);
+    expect(matchesRestriction(agent("UNKNOWN", "MUTANT"), [...criteria], { strict: true })).toBe(false);
+    expect(matchesRestriction(agent("UNKNOWN", "UNKNOWN"), [], { strict: true })).toBe(true);
+  });
+});

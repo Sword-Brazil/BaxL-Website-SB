@@ -29,7 +29,9 @@ interface SelectionsState {
   clearSlot: (teamKey: TeamKey, slot: Slot) => void;
   /** Striker do personagem nesta posição (null tira). */
   setStriker: (teamKey: TeamKey, slot: Slot, strikerUniformId: string | null) => void;
-  /** Equipa (ou remove) o CTP de um personagem do usuário. */
+  /** CTP do personagem só nesta equipe/dia (null volta ao CTP padrão dele, do elenco). */
+  setSlotCtp: (teamKey: TeamKey, slot: Slot, ctpId: string | null) => void;
+  /** Equipa (ou remove) o CTP padrão de um personagem do usuário (vale nos dias sem CTP próprio). */
   equipCtp: (agentId: string, ctpId: string | null) => void;
   applyTeam: (teamKey: TeamKey, team: UserTeam) => void;
   resetMode: (mode: Mode) => void;
@@ -102,6 +104,14 @@ export const useSelectionsStore = create<SelectionsState>()(
         set(({ doc }) => ({
           doc: withTeam(doc, teamKey, (team) => {
             if (team[slot]) team[slot] = { ...team[slot]!, strikerUniformId };
+            return team;
+          }),
+        })),
+
+      setSlotCtp: (teamKey, slot, ctpId) =>
+        set(({ doc }) => ({
+          doc: withTeam(doc, teamKey, (team) => {
+            if (team[slot]) team[slot] = { ...team[slot]!, ctpId };
             return team;
           }),
         })),

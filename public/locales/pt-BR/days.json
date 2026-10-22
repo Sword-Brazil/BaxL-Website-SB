@@ -115,6 +115,11 @@
       "remove": "Tirar Striker",
       "none": "Nenhum personagem disponível",
       "metaWas": "Meta: {{name}}"
+    },
+    "dayCtp": {
+      "default": "Padrão do personagem",
+      "thisDay": "Só neste dia",
+      "useDefault": "Usar padrão"
     }
   }
 }

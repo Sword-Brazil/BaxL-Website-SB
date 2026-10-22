@@ -43,6 +43,10 @@
     "restriction": "Restrição",
     "team": "Equipe",
     "allReleased": "Todos os agentes liberados",
-    "generatedAt": "Gerado em {{date}}. ⚔ = Causador de Dano."
+    "generatedAt": "Gerado em {{date}}. ⚔ = Causador de Dano.",
+    "all": "Tabela completa (Metas e minhas equipes)",
+    "mine": "Só minhas equipes",
+    "subtitleMine": "Minhas equipes por dia · {{week}} · Sword Brasil",
+    "noMine": "Sem equipe montada"
   }
 }
