@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { searchByName } from "@/models/rules/search";
 import type { UniformRef } from "@/viewmodels/useCatalogViewModel";
 import { AgentPortrait } from "./AgentPortrait";
 
@@ -38,11 +39,19 @@ export function UniformPicker({
   ariaLabel?: string;
 }) {
   const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  // Busca própria só pelo nome do personagem e do traje (sem acento nem maiúscula): o filtro
+  // aproximado do cmdk casava letras soltas, inclusive do id do traje, e embaralhava a lista.
+  const found = searchByName(options, search, (o) => [o.agent.name, o.uniform.name]);
   const byAgent = new Map<string, UniformRef[]>();
-  for (const o of options) byAgent.set(o.agent.name, [...(byAgent.get(o.agent.name) ?? []), o]);
+  for (const o of found) byAgent.set(o.agent.id, [...(byAgent.get(o.agent.id) ?? []), o]);
+  const close = (next: boolean) => {
+    setOpen(next);
+    if (!next) setSearch("");
+  };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={close}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -57,19 +66,19 @@ export function UniformPicker({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-(--radix-popover-trigger-width) min-w-72 p-0" align="start">
-        <Command>
-          <CommandInput placeholder={searchPlaceholder} />
+        <Command shouldFilter={false}>
+          <CommandInput placeholder={searchPlaceholder} value={search} onValueChange={setSearch} />
           <CommandList>
             <CommandEmpty>{emptyText}</CommandEmpty>
-            {[...byAgent.entries()].map(([agentName, refs]) => (
-              <CommandGroup key={agentName}>
+            {[...byAgent.entries()].map(([agentId, refs]) => (
+              <CommandGroup key={agentId}>
                 {refs.map((r) => (
                   <CommandItem
                     key={r.uniform.id}
-                    value={`${r.agent.name} ${r.uniform.name} ${r.uniform.id}`}
+                    value={r.uniform.id}
                     onSelect={() => {
                       onChange(r.uniform.id);
-                      setOpen(false);
+                      close(false);
                     }}
                   >
                     <Avatar
