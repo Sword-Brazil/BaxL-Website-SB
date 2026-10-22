@@ -20,7 +20,7 @@
   },
   "ctp": {
     "title": "My equipped CTPs",
-    "subtitle": "{{equipped}} CTP(s) equipped across {{owned}} owned character(s), by type and quality.",
+    "subtitle": "{{equipped}} of {{owned}} character(s) with a default CTP (My roster), by type and quality.",
     "empty": "You haven't equipped any CTP yet. Equip them in My roster.",
     "agents": "Characters"
   },

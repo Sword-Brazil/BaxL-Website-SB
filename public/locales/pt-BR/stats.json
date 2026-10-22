@@ -20,7 +20,7 @@
   },
   "ctp": {
     "title": "Meus CTPs equipados",
-    "subtitle": "{{equipped}} CTP(s) equipado(s) em {{owned}} personagem(ns) possuído(s), por tipo e qualidade.",
+    "subtitle": "{{equipped}} de {{owned}} personagem(ns) com CTP padrão (Meu elenco), por tipo e qualidade.",
     "empty": "Você ainda não equipou CTPs. Equipe em Meu elenco.",
     "agents": "Personagens"
   },

@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getCycle } from "@/models/api/cycle";
+import { ownedAgentIds, rosterAgents, uniformsInTeams } from "@/models/rules/roster";
 import { agentRepetition, ctpUsage, myAgentRepetition, myTeamCompositions, type StatsMode } from "@/models/rules/stats";
 import { useSelectionsStore } from "./stores/selectionsStore";
 import { useCatalogViewModel } from "./useCatalogViewModel";
@@ -42,20 +43,27 @@ export function useStatsViewModel() {
     [doc.teams, catalog.agents, mode],
   );
 
+  // Personagens do jogador, contados como em Meu elenco. Na escolha livre (sem elenco), todos.
+  const available = useMemo(() => {
+    const used = uniformsInTeams(cycle.data);
+    return doc.freePick
+      ? new Set(rosterAgents(catalog.agents, used).map((a) => a.id))
+      : ownedAgentIds(catalog.agents, new Set(doc.roster.ownedUniformIds), used);
+  }, [cycle.data, catalog.agents, doc.freePick, doc.roster.ownedUniformIds]);
+
+  // Só CTPs de personagens disponíveis: um CTP que ficou num personagem desmarcado não conta.
   const usage = useMemo(
     () =>
       ctpUsage(
-        doc.equipment?.ctpByAgent ?? {},
+        Object.fromEntries(Object.entries(doc.equipment?.ctpByAgent ?? {}).filter(([agentId]) => available.has(agentId))),
         (id) => catalog.ctpById(id),
         (agentId) => catalog.agents.find((a) => a.id === agentId)?.name,
       ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [doc.equipment, catalog.agents, catalog.ctps],
+    [doc.equipment, available, catalog.agents, catalog.ctps],
   );
 
-  const ownedAgents = new Set(
-    doc.roster.ownedUniformIds.map((u) => catalog.uniformById(u)?.agent.id).filter(Boolean),
-  ).size;
+  const ownedAgents = available.size;
   const equipped = usage.reduce((n, r) => n + r.total, 0);
 
   return {

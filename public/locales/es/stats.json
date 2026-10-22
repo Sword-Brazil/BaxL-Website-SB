@@ -20,7 +20,7 @@
   },
   "ctp": {
     "title": "Mis CTPs equipados",
-    "subtitle": "{{equipped}} CTP(s) equipado(s) en {{owned}} personaje(s), por tipo y calidad.",
+    "subtitle": "{{equipped}} de {{owned}} personaje(s) con CTP predeterminado (Mi plantilla), por tipo y calidad.",
     "empty": "Aún no equipaste CTPs. Equípalos en Mi plantilla.",
     "agents": "Personajes"
   },
