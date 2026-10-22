@@ -130,12 +130,14 @@ function RepetitionChart({ vm }: { vm: StatsVm }) {
           value={vm.source}
           onValueChange={(v) => v && vm.setSource(v as RepetitionSource)}
           aria-label={t("stats:repetition.source")}
-          className="w-full sm:w-fit"
+          // Grade de 2 colunas iguais: cada uma do tamanho do texto mais longo (com flex-1 num grupo
+          // w-fit, "Minhas equipes" ficava com metade da soma dos textos e estourava no PC).
+          className="grid w-full grid-cols-2 sm:w-fit"
         >
-          <ToggleGroupItem value="META" className="flex-1 font-heading tracking-wider uppercase data-[state=on]:text-energy">
+          <ToggleGroupItem value="META" className="px-4 font-heading tracking-wider uppercase data-[state=on]:text-energy">
             {t("stats:repetition.sourceMeta")}
           </ToggleGroupItem>
-          <ToggleGroupItem value="MINE" className="flex-1 font-heading tracking-wider uppercase data-[state=on]:text-brazil-green">
+          <ToggleGroupItem value="MINE" className="px-4 font-heading tracking-wider uppercase data-[state=on]:text-brazil-green">
             {t("stats:repetition.sourceMine")}
           </ToggleGroupItem>
         </ToggleGroup>
