@@ -3,7 +3,8 @@
   "subtitle": "Anote sua pontuação de cada dia e modo e acompanhe seus ganhos e perdas por dia, semana e temporada.",
   "help": {
     "text1": "Preencha a pontuação de cada modo no dia de jogo (o dia vira às 12h). Como a BA reinicia a cada 28 dias, cada dia e semana é comparado com o mesmo dia e semana do mês anterior: verde cresceu, vermelho caiu.",
-    "text2": "Fica salvo no aparelho e, se você entrar, também na sua conta. Só você vê as suas pontuações."
+    "text2": "Fica salvo no aparelho e, se você entrar, também na sua conta. Só você vê as suas pontuações.",
+    "text3": "No dia do reset (quinta, Dias 1, 8, 15 e 22), anote duas vezes: o que fez antes das 22h conta na semana que acaba; depois das 22h a pontuação recomeça e conta na semana nova."
   },
   "locked": {
     "title": "Libera hoje às 22h",
@@ -32,7 +33,13 @@
     "invalid": "Use só números (pode usar ponto para separar os milhares).",
     "myTeam": "Minha equipe do dia",
     "noTeam": "Você não montou equipe para este dia.",
-    "buildTeam": "Montar equipe"
+    "buildTeam": "Montar equipe",
+    "phase": {
+      "pre": "Antes do reset (12h–22h)",
+      "post": "Depois do reset (22h–12h)"
+    },
+    "countsFor": "conta na Semana {{n}}",
+    "now": "agora"
   },
   "chart": {
     "title": "Desempenho",
@@ -62,6 +69,7 @@
     "mode": "Modo",
     "points": "Pontos",
     "delta": "vs. mês anterior",
-    "team": "Equipe"
+    "team": "Equipe",
+    "preReset": "antes do reset"
   }
 }

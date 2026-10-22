@@ -9,6 +9,7 @@ import {
   dateRange,
   gameDayOf,
   modesOfDay,
+  phasesOfDay,
   previousSeasonDate,
   scoreEntries,
   scoreKey,
@@ -17,6 +18,7 @@ import {
   seasonWeeks,
   seasonsWithScores,
   type ScoreMode,
+  type ScorePhase,
 } from "@/models/rules/scores";
 import { useSelectionsStore } from "./stores/selectionsStore";
 import { useBattleClockViewModel } from "./useBattleClockViewModel";
@@ -81,7 +83,7 @@ export function useScoresViewModel() {
   // Histórico: mais recente primeiro, cada registro contra o mesmo dia e modo do mês anterior.
   const history = anchor
     ? scoreEntries(scores, anchor)
-        .map((e) => ({ ...e, ...compare(e.points, scores[scoreKey(previousSeasonDate(e.date), e.mode)] ?? null) }))
+        .map((e) => ({ ...e, ...compare(e.points, scores[scoreKey(previousSeasonDate(e.date), e.mode, e.phase)] ?? null) }))
         .reverse()
     : [];
 
@@ -102,10 +104,14 @@ export function useScoresViewModel() {
     setDate: setSelected,
     day,
     modes: day ? modesOfDay(day) : [],
+    /** No dia do reset: antes e depois das 22h; nos outros dias, uma parte só. */
+    phases: day ? phasesOfDay(day) : [],
+    /** Parte do dia de hoje que está valendo agora (antes ou depois do reset das 22h). */
+    currentPhase: (clock?.beforeWeeklyReset ? "pre" : "post") as ScorePhase,
     dayOf: (d: string) => (anchor ? gameDayOf(d, anchor) : null),
-    scoreOf: (d: string, mode: ScoreMode) => scores[scoreKey(d, mode)] ?? null,
-    setScore: (d: string, mode: ScoreMode, points: number | null) => {
-      if (!locked && dates.includes(d)) setScore(d, mode, points);
+    scoreOf: (d: string, mode: ScoreMode, phase: ScorePhase = "post") => scores[scoreKey(d, mode, phase)] ?? null,
+    setScore: (d: string, mode: ScoreMode, points: number | null, phase: ScorePhase = "post") => {
+      if (!locked && dates.includes(d) && (anchor ? phasesOfDay(gameDayOf(d, anchor)).includes(phase) : false)) setScore(d, mode, points, phase);
     },
     teamOf,
     seasons,

@@ -2,6 +2,10 @@
 // de seleções (aparelho e conta). A chave é a data em Brasília em que o dia de jogo começa (12h) e
 // o modo: "2026-10-22|BAX". Dia do ciclo, semana e temporada (ciclo de 28 dias) saem da âncora do
 // ciclo nas configurações, então a contagem continua certa ciclo após ciclo.
+//
+// Dia do reset (Dias 1, 8, 15 e 22, quinta): o dia de jogo vai das 12h às 12h, mas o reset semanal
+// é às 22h. O que se joga antes das 22h conta para a semana que acaba ("|pre" na chave); depois, a
+// pontuação recomeça e conta para a semana nova (chave sem sufixo, como nos outros dias).
 import { CYCLE_LENGTH, WEEK_LENGTH, isBaiDay } from "@/models/domain/enums";
 
 export type ScoreMode = "BAX" | "BAL" | "BAI";
@@ -13,13 +17,17 @@ export const SCORES_UNLOCK_AT = "2026-10-23T01:00:00.000Z";
 export const SCORES_FIRST_DATE = "2026-10-22";
 
 export const MAX_SCORE = 2_000_000_000;
-export const SCORE_KEY_RE = /^(\d{4}-\d{2}-\d{2})\|(BAX|BAL|BAI)$/;
+export const SCORE_KEY_RE = /^(\d{4}-\d{2}-\d{2})\|(BAX|BAL|BAI)(\|pre)?$/;
 
-export const scoreKey = (date: string, mode: ScoreMode) => `${date}|${mode}`;
+/** Parte do dia: "pre" = antes do reset das 22h no dia do reset (conta na semana anterior); "post" = o resto. */
+export type ScorePhase = "pre" | "post";
 
-export function parseScoreKey(key: string): { date: string; mode: ScoreMode } | null {
+export const scoreKey = (date: string, mode: ScoreMode, phase: ScorePhase = "post") =>
+  `${date}|${mode}${phase === "pre" ? "|pre" : ""}`;
+
+export function parseScoreKey(key: string): { date: string; mode: ScoreMode; phase: ScorePhase } | null {
   const m = SCORE_KEY_RE.exec(key);
-  return m ? { date: m[1], mode: m[2] as ScoreMode } : null;
+  return m ? { date: m[1], mode: m[2] as ScoreMode, phase: m[3] ? "pre" : "post" } : null;
 }
 
 const DAY_MS = 86_400_000;
@@ -62,19 +70,38 @@ export function gameDayOf(date: string, anchorDate: string): GameDay {
 /** Modos jogados no dia: BAX e BAL, ou só a BAI no 3º dia de cada semana. */
 export const modesOfDay = (day: GameDay): ScoreMode[] => (day.isBai ? ["BAI"] : ["BAX", "BAL"]);
 
+/** Dia do reset semanal (1º dia de cada semana do ciclo): tem a parte antes e a depois das 22h. */
+export const isResetDay = (day: GameDay) => (day.cycleDay - 1) % WEEK_LENGTH === 0;
+
+/** Partes do dia que dá para preencher: no dia do reset, antes e depois das 22h (a de antes não existe no 1º dia contado). */
+export const phasesOfDay = (day: GameDay, firstDate = SCORES_FIRST_DATE): ScorePhase[] =>
+  isResetDay(day) && day.date > firstDate ? ["pre", "post"] : ["post"];
+
 export interface ScoreEntry extends GameDay {
   mode: ScoreMode;
+  phase: ScorePhase;
   points: number;
 }
 
-/** Pontuações registradas, em ordem (data e modo). */
+/**
+ * Pontuações registradas, em ordem (data, fase e modo). A parte antes do reset fica com a semana e
+ * a temporada do dia anterior, para onde ela conta.
+ */
 export function scoreEntries(scores: Record<string, number>, anchorDate: string): ScoreEntry[] {
   return Object.entries(scores)
     .flatMap(([key, points]) => {
       const k = parseScoreKey(key);
-      return k ? [{ ...gameDayOf(k.date, anchorDate), mode: k.mode, points }] : [];
+      if (!k) return [];
+      const counted = gameDayOf(k.phase === "pre" ? addDays(k.date, -1) : k.date, anchorDate);
+      const day = gameDayOf(k.date, anchorDate);
+      return [{ ...day, week: counted.week, seasonStart: counted.seasonStart, mode: k.mode, phase: k.phase, points }];
     })
-    .sort((a, b) => a.date.localeCompare(b.date) || SCORE_MODES.indexOf(a.mode) - SCORE_MODES.indexOf(b.mode));
+    .sort(
+      (a, b) =>
+        a.date.localeCompare(b.date) ||
+        (a.phase === b.phase ? 0 : a.phase === "pre" ? -1 : 1) ||
+        SCORE_MODES.indexOf(a.mode) - SCORE_MODES.indexOf(b.mode),
+    );
 }
 
 /**
@@ -96,22 +123,32 @@ export function compare(current: number | null, previous: number | null): Compar
   return { current, previous, delta, pct: delta === null || !previous ? null : delta / previous };
 }
 
-/** Soma dos modos preenchidos no dia (null sem nenhum). */
-export function dayTotal(scores: Record<string, number>, date: string): number | null {
-  const filled = SCORE_MODES.flatMap((m) => {
-    const v = scores[scoreKey(date, m)];
-    return v === undefined ? [] : [v];
-  });
+const sumOf = (values: (number | undefined)[]) => {
+  const filled = values.filter((v): v is number => v !== undefined);
   return filled.length ? filled.reduce((a, b) => a + b, 0) : null;
+};
+
+/** Pontos de uma parte do dia (soma dos modos; null sem nenhum). */
+const phaseTotal = (scores: Record<string, number>, date: string, phase: ScorePhase) =>
+  sumOf(SCORE_MODES.map((m) => scores[scoreKey(date, m, phase)]));
+
+/** Soma do dia de jogo inteiro (no dia do reset, antes e depois das 22h); null sem nenhum valor. */
+export function dayTotal(scores: Record<string, number>, date: string): number | null {
+  return sumOf([phaseTotal(scores, date, "pre") ?? undefined, phaseTotal(scores, date, "post") ?? undefined]);
 }
 
-/** Soma dos dias preenchidos de `from` a `to` (null se nenhum dia tiver pontuação). */
-export function sumRange(scores: Record<string, number>, from: string, to: string): number | null {
-  const totals = dateRange(from, to).flatMap((d) => {
-    const t = dayTotal(scores, d);
-    return t === null ? [] : [t];
-  });
-  return totals.length ? totals.reduce((a, b) => a + b, 0) : null;
+/**
+ * Soma de um período que começa num dia de reset (semana ou temporada), de `from` a `to`: a parte
+ * antes do reset de `from` é do período anterior e fica de fora; a do reset seguinte (`to` + 1)
+ * entra quando `withNextReset` (período já fechado). null se nada estiver preenchido.
+ */
+export function sumPeriod(scores: Record<string, number>, from: string, to: string, withNextReset = false): number | null {
+  const parts = dateRange(from, to).flatMap((d) => [
+    phaseTotal(scores, d, "post"),
+    d === from ? null : phaseTotal(scores, d, "pre"),
+  ]);
+  if (withNextReset) parts.push(phaseTotal(scores, addDays(to, 1), "pre"));
+  return sumOf(parts.map((v) => v ?? undefined));
 }
 
 /** Mesma data na temporada anterior. */
@@ -159,14 +196,16 @@ export function seasonWeeks(scores: Record<string, number>, seasonStart: string,
     const future = start > today;
     const partial = !future && today < end;
     const to = partial ? today : end;
+    // A parte antes do próximo reset (até 22h da quinta seguinte) fecha a semana.
+    const closed = addDays(end, 1) <= today;
     return {
       week: i + 1,
       start,
       partial,
       future,
       ...compare(
-        future ? null : sumRange(scores, start, to),
-        sumRange(scores, previousSeasonDate(start), previousSeasonDate(future ? end : to)),
+        future ? null : sumPeriod(scores, start, to, closed),
+        sumPeriod(scores, previousSeasonDate(start), previousSeasonDate(future ? end : to), future || closed),
       ),
     };
   });
@@ -195,7 +234,7 @@ export function scoreSummary(scores: Record<string, number>, anchorDate: string,
   const current = gameDayOf(today, anchorDate);
   const weekStart = addDays(current.seasonStart, (current.week - 1) * WEEK_LENGTH);
   const period = (from: string) =>
-    compare(sumRange(scores, from, today), sumRange(scores, previousSeasonDate(from), previousSeasonDate(today)));
+    compare(sumPeriod(scores, from, today), sumPeriod(scores, previousSeasonDate(from), previousSeasonDate(today)));
   const dates = [...new Set(scoreEntries(scores, anchorDate).map((e) => e.date))];
   const best = dates.reduce<{ date: string; total: number } | null>((b, d) => {
     const t = dayTotal(scores, d) ?? 0;

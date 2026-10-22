@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { SLOTS, type Mode, type Slot } from "@/models/domain/enums";
 import { equipCtp, type CtpSlot } from "@/models/rules/ctpAssign";
-import { scoreKey, type ScoreMode } from "@/models/rules/scores";
+import { scoreKey, type ScoreMode, type ScorePhase } from "@/models/rules/scores";
 import { emptySelections } from "@/models/rules/selections";
 import type { TeamKey, UserSelections, UserTeam } from "@/models/schemas/selections";
 
@@ -35,8 +35,8 @@ interface SelectionsState {
   /** Equipa (ou remove) o CTP 1 ou 2 de um personagem do usuário (vale em todos os dias desse slot). */
   equipCtp: (agentId: string, ctpId: string | null, slot?: CtpSlot) => void;
   applyTeam: (teamKey: TeamKey, team: UserTeam) => void;
-  /** Pontuação do jogador num dia de jogo e modo (null apaga). */
-  setScore: (date: string, mode: ScoreMode, points: number | null) => void;
+  /** Pontuação do jogador num dia de jogo, modo e parte do dia (null apaga). */
+  setScore: (date: string, mode: ScoreMode, points: number | null, phase?: ScorePhase) => void;
   resetMode: (mode: Mode) => void;
   /** Apaga todas as equipes montadas (BAX, BAL e BAI); elenco, CTPs e nome ficam. */
   resetAllTeams: () => void;
@@ -135,11 +135,11 @@ export const useSelectionsStore = create<SelectionsState>()(
 
       applyTeam: (teamKey, team) => set(({ doc }) => ({ doc: withTeam(doc, teamKey, () => ({ ...team })) })),
 
-      setScore: (date, mode, points) =>
+      setScore: (date, mode, points, phase = "post") =>
         set(({ doc }) => {
           const scores = { ...(doc.scores ?? {}) };
-          if (points === null) delete scores[scoreKey(date, mode)];
-          else scores[scoreKey(date, mode)] = points;
+          if (points === null) delete scores[scoreKey(date, mode, phase)];
+          else scores[scoreKey(date, mode, phase)] = points;
           return { doc: touch(doc, { scores }) };
         }),
 

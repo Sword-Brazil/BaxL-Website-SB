@@ -1,5 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { compare, gameDayOf, modesOfDay, parsePoints, scoreSummary, seasonDays, seasonWeeks, seasonsWithScores } from "@/models/rules/scores";
+import {
+  compare,
+  dayTotal,
+  gameDayOf,
+  modesOfDay,
+  parsePoints,
+  phasesOfDay,
+  scoreEntries,
+  scoreKey,
+  scoreSummary,
+  seasonDays,
+  seasonWeeks,
+  seasonsWithScores,
+} from "@/models/rules/scores";
 
 const ANCHOR = "2026-10-01"; // Dia 1 de um ciclo
 
@@ -58,6 +71,41 @@ describe("comparação com a temporada anterior (mesmo dia do ciclo, 28 dias ant
 
   it("temporadas com pontuação, da mais recente para a mais antiga", () => {
     expect(seasonsWithScores(scores, ANCHOR, "2026-10-24")).toEqual(["2026-10-01", "2026-09-03"]);
+  });
+});
+
+describe("dia do reset (antes e depois das 22h)", () => {
+  // Dia 15 (15/10) é dia de reset: antes das 22h conta na Semana 2; depois, na Semana 3.
+  const r = {
+    [scoreKey("2026-10-14", "BAX")]: 100, // Dia 14, Semana 2
+    [scoreKey("2026-10-15", "BAX", "pre")]: 30, // Dia 15 antes do reset → Semana 2
+    [scoreKey("2026-10-15", "BAX")]: 50, // Dia 15 depois do reset → Semana 3
+    [scoreKey("2026-10-16", "BAX")]: 70,
+  };
+
+  it("só o dia do reset tem as duas partes (e não no 1º dia contado)", () => {
+    const first = "2026-10-22";
+    expect(phasesOfDay(gameDayOf("2026-10-29", ANCHOR), first)).toEqual(["pre", "post"]);
+    expect(phasesOfDay(gameDayOf("2026-10-23", ANCHOR), first)).toEqual(["post"]);
+    expect(phasesOfDay(gameDayOf("2026-10-22", ANCHOR), first)).toEqual(["post"]); // Dia 22: a contagem começa às 22h
+  });
+
+  it("a parte antes do reset conta na semana anterior; o dia soma as duas partes", () => {
+    const weeks = seasonWeeks(r, "2026-10-01", "2026-10-21");
+    expect(weeks[1]).toMatchObject({ week: 2, current: 130 }); // 100 + 30 (fechada: o reset seguinte já passou)
+    expect(weeks[2]).toMatchObject({ week: 3, current: 120 }); // 50 + 70
+    expect(dayTotal(r, "2026-10-15")).toBe(80);
+    const pre = scoreEntries(r, ANCHOR).find((e) => e.phase === "pre")!;
+    expect(pre).toMatchObject({ cycleDay: 15, week: 2 });
+  });
+
+  it("a semana atual, no dia do reset, começa só com o que veio depois das 22h", () => {
+    expect(scoreSummary(r, ANCHOR, "2026-10-15").week.current).toBe(50);
+  });
+
+  it("a parte antes do reset do Dia 1 é da temporada anterior", () => {
+    const e = scoreEntries({ [scoreKey("2026-10-29", "BAL", "pre")]: 10 }, ANCHOR)[0];
+    expect(e).toMatchObject({ cycleDay: 1, week: 4, seasonStart: "2026-10-01" });
   });
 });
 
