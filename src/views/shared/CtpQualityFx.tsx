@@ -1,5 +1,4 @@
-import { useId, useRef, useState } from "react";
-import { motion, useInView, useReducedMotion } from "motion/react";
+import { useEffect, useId, useRef, useState, useSyncExternalStore, type RefObject } from "react";
 import { cn } from "@/lib/utils";
 import type { CtpQuality } from "@/models/domain/enums";
 
@@ -7,35 +6,63 @@ import type { CtpQuality } from "@/models/domain/enums";
  * Brilho da qualidade do CTP, desenhado na área da própria imagem do CTP (dentro do Avatar,
  * que precisa de `isolate`): qualquer imagem cadastrada ganha o efeito.
  * Poderoso: estrelinhas de raios finos piscando devagar em volta da peça.
- * Brilhante: as mesmas estrelas + uma galáxia roxa por trás da peça, que surge aos poucos,
- * fica e gira bem devagar.
+ * Brilhante: menos estrelas + uma galáxia roxa por trás da peça, que surge aos poucos e cuja
+ * espiral gira bem devagar.
  * Fora da tela não anima; com "reduzir movimento" fica estático.
+ * Desempenho (dezenas de CTPs na tela do PC): animações CSS só de opacidade e transform, e poucas
+ * camadas animadas por CTP — as estrelas piscam em grupos e, na galáxia, só a espiral gira (com
+ * will-change: desenhada uma vez e girada pela GPU). Nada de mix-blend nem blur animados.
  */
+
+const REDUCED_QUERY = "(prefers-reduced-motion: reduce)";
+const subscribeReduced = (onChange: () => void) => {
+  const mq = window.matchMedia(REDUCED_QUERY);
+  mq.addEventListener("change", onChange);
+  return () => mq.removeEventListener("change", onChange);
+};
+const useReducedMotion = () =>
+  useSyncExternalStore(subscribeReduced, () => window.matchMedia(REDUCED_QUERY).matches, () => false);
+
+/** Só monta o efeito perto da área visível (um IntersectionObserver por CTP). */
+function useNearViewport(ref: RefObject<HTMLElement | null>) {
+  const [near, setNear] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([entry]) => setNear(entry.isIntersecting), { rootMargin: "64px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [ref]);
+  return near;
+}
 
 /** Estrelas em % da área da imagem, em volta da peça (que ocupa o centro). */
 const SPARKLES = [
-  { x: 20, y: 22, size: 22, delay: 0, duration: 2.4 },
-  { x: 82, y: 30, size: 17, delay: 1.4, duration: 2.8 },
-  { x: 78, y: 74, size: 19, delay: 2.6, duration: 2.5 },
-  { x: 22, y: 70, size: 14, delay: 0.8, duration: 2.9 },
-  { x: 56, y: 12, size: 16, delay: 2, duration: 2.6 },
-  { x: 12, y: 46, size: 12, delay: 3.1, duration: 2.3 },
-  { x: 88, y: 52, size: 13, delay: 0.4, duration: 2.7 },
-  { x: 40, y: 86, size: 14, delay: 1.7, duration: 2.8 },
-  { x: 66, y: 88, size: 11, delay: 3.4, duration: 2.4 },
-  { x: 34, y: 10, size: 11, delay: 2.9, duration: 2.7 },
-  { x: 70, y: 16, size: 10, delay: 0.2, duration: 2.5 },
+  { x: 20, y: 22, size: 22 },
+  { x: 82, y: 30, size: 17 },
+  { x: 78, y: 74, size: 19 },
+  { x: 22, y: 70, size: 14 },
+  { x: 56, y: 12, size: 16 },
+  { x: 12, y: 46, size: 12 },
+  { x: 88, y: 52, size: 13 },
+  { x: 40, y: 86, size: 14 },
+  { x: 66, y: 88, size: 11 },
+  { x: 34, y: 10, size: 11 },
+  { x: 70, y: 16, size: 10 },
 ] as const;
 
 /** Estrela de quatro pontas com raios bem finos (o centro redondo é um círculo à parte). */
 const STAR_PATH = "M12 0C12.12 9.8 14.2 11.88 24 12C14.2 12.12 12.12 14.2 12 24C11.88 14.2 9.8 12.12 0 12C9.8 11.88 11.88 9.8 12 0Z";
 
-const PURPLE = "#b026ff";
+/** Paleta única da galáxia do Brilhante: do núcleo claro ao roxo profundo da borda. */
+const GALAXY = { core: "#fdf2ff", glow: "#e2a6ff", bright: "#c45cff", main: "#9a2cf5", deep: "#6514c9" } as const;
 const PURPLE_SOFT = "#d58bff";
 
-function Sparkle({ spec, color, still, phase }: { spec: (typeof SPARKLES)[number]; color: string; still: boolean; phase: number }) {
+/** Estrelas que piscam juntas: cada grupo é uma única camada animada (só opacidade). */
+const TWINKLE_SECONDS = 3.2;
+
+function Sparkle({ spec, color }: { spec: (typeof SPARKLES)[number]; color: string }) {
   const id = useId();
-  // Centraliza pela margem (não por transform), para a animação só mexer em escala e opacidade.
   const style = {
     left: `${spec.x}%`,
     top: `${spec.y}%`,
@@ -58,24 +85,33 @@ function Sparkle({ spec, color, still, phase }: { spec: (typeof SPARKLES)[number
     </svg>
   );
 
+  return (
+    <span className="absolute aspect-square" style={style}>
+      {svg}
+    </span>
+  );
+}
+
+/** Estrelas em grupos que piscam defasados (ctp-twinkle); paradas, ficam acesas. */
+function Sparkles({ specs, groups, color, still, phase }: { specs: readonly (typeof SPARKLES)[number][]; groups: number; color: string; still: boolean; phase: number }) {
   if (still) {
     return (
-      <span className="absolute aspect-square opacity-80" style={style}>
-        {svg}
+      <span className="absolute inset-0 opacity-80">
+        {specs.map((spec, i) => (
+          <Sparkle key={i} spec={spec} color={color} />
+        ))}
       </span>
     );
   }
-  return (
-    <motion.span
-      className="absolute aspect-square will-change-transform"
-      style={style}
-      initial={{ opacity: 0, scale: 0.5 }}
-      animate={{ opacity: [0, 1, 1, 0], scale: [0.5, 1, 1, 0.5] }}
-      transition={{ duration: spec.duration, delay: spec.delay + phase, times: [0, 0.2, 0.75, 1], repeat: Infinity, repeatDelay: 0.6, ease: "easeInOut" }}
+  return Array.from({ length: groups }, (_, g) => (
+    <span
+      key={g}
+      className="ctp-twinkle absolute inset-0"
+      style={{ animationDuration: `${TWINKLE_SECONDS}s`, animationDelay: `${(g * TWINKLE_SECONDS) / groups + phase}s` }}
     >
-      {svg}
-    </motion.span>
-  );
+      {specs.map((spec, i) => (i % groups === g ? <Sparkle key={i} spec={spec} color={color} /> : null))}
+    </span>
+  ));
 }
 
 /** Braço da galáxia: espiral logarítmica em volta do centro (viewBox 100×100). */
@@ -98,29 +134,30 @@ const DUST = Array.from({ length: 22 }, (_, i) => {
 });
 
 /**
- * Galáxia roxa por trás da peça: núcleo de luz, braços em espiral e poeira de estrelas girando
- * devagar; a luz se espalha até sumir, sem borda. Surge aos poucos e fica.
+ * Galáxia roxa por trás da peça: nebulosa, véu e núcleo de luz parados; só os braços em espiral
+ * e a poeira de estrelas giram devagar. A luz se espalha até sumir, sem borda. Surge aos poucos.
  */
 function Galaxy({ still }: { still: boolean }) {
   const id = useId();
-  const spin = (duration: number, reverse = false) =>
-    still ? {} : { animate: { rotate: reverse ? -360 : 360 }, transition: { duration, repeat: Infinity, ease: "linear" as const } };
   return (
-    <motion.span
-      className="absolute inset-0 -z-10"
-      initial={{ opacity: still ? 1 : 0, scale: still ? 1 : 0.6 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 2.4, delay: 0.8, ease: "easeOut" }}
-    >
-      {/* Fundo: nebulosa roxa viva que se dissolve só perto da borda. */}
+    <span className={cn("absolute inset-0 -z-10", !still && "ctp-galaxy-in")}>
+      {/* Nebulosa: roxo vivo no centro que se dissolve só perto da borda. */}
       <span
         className="absolute inset-0"
         style={{
-          background: `radial-gradient(closest-side, #c13cff 0%, #8f1fff 32%, color-mix(in srgb, #7a12f0 85%, transparent) 55%, color-mix(in srgb, #7a12f0 45%, transparent) 76%, color-mix(in srgb, #7a12f0 12%, transparent) 90%, transparent 100%)`,
+          background: `radial-gradient(closest-side, ${GALAXY.bright} 0%, ${GALAXY.main} 34%, color-mix(in srgb, ${GALAXY.deep} 85%, transparent) 58%, color-mix(in srgb, ${GALAXY.deep} 40%, transparent) 78%, color-mix(in srgb, ${GALAXY.deep} 10%, transparent) 91%, transparent 100%)`,
         }}
       />
-      {/* Braços em espiral + poeira, girando devagar. */}
-      <motion.span className="absolute inset-0 will-change-transform" {...spin(30)}>
+      {/* Véu de nebulosa (parado): faixas mais claras que dão profundidade ao disco. */}
+      <span
+        className="absolute inset-0 opacity-60"
+        style={{
+          background: `conic-gradient(from 90deg, transparent 0deg, color-mix(in srgb, ${GALAXY.bright} 80%, transparent) 60deg, transparent 140deg, color-mix(in srgb, ${GALAXY.glow} 65%, transparent) 210deg, transparent 290deg)`,
+          maskImage: "radial-gradient(closest-side, transparent 25%, black 55%, transparent 100%)",
+        }}
+      />
+      {/* Braços em espiral + poeira: a única camada que gira. */}
+      <span className={cn("absolute inset-0", !still && "ctp-spin")}>
         <svg viewBox="0 0 100 100" className="size-full">
           <defs>
             <filter id={`${id}-blur`} x="-20%" y="-20%" width="140%" height="140%">
@@ -138,35 +175,24 @@ function Galaxy({ still }: { still: boolean }) {
           <g mask={`url(#${id}-mask)`}>
             <g filter={`url(#${id}-blur)`} fill="none" strokeLinecap="round">
               {ARMS.map((d, i) => (
-                <path key={i} d={d} stroke={i === 1 ? "#e040fb" : "#c94dff"} strokeWidth={i === 1 ? 5 : 6.5} strokeOpacity={0.95} />
+                <path key={i} d={d} stroke={i === 1 ? GALAXY.glow : GALAXY.bright} strokeWidth={i === 1 ? 5 : 6.5} strokeOpacity={0.95} />
               ))}
             </g>
             {ARMS.map((d, i) => (
-              <path key={i} d={d} fill="none" stroke="#f7d6ff" strokeWidth="1.1" strokeOpacity="0.85" strokeLinecap="round" />
+              <path key={i} d={d} fill="none" stroke={GALAXY.core} strokeWidth="1.1" strokeOpacity="0.85" strokeLinecap="round" />
             ))}
             {DUST.map((p, i) => (
               <circle key={i} cx={p.cx} cy={p.cy} r={p.r} fill="white" opacity={0.7 + (i % 3) * 0.15} />
             ))}
           </g>
         </svg>
-      </motion.span>
-      {/* Véu de nebulosa girando ao contrário, para dar profundidade. */}
-      <motion.span
-        className="absolute inset-0 mix-blend-screen blur-[1px]"
-        style={{
-          background: `conic-gradient(from 90deg, transparent 0deg, #9d2bffdd 60deg, transparent 140deg, #f472ffaa 210deg, transparent 290deg)`,
-          maskImage: "radial-gradient(closest-side, transparent 25%, black 55%, transparent 100%)",
-        }}
-        {...spin(48, true)}
+      </span>
+      {/* Núcleo: a luz que vem de trás da peça. */}
+      <span
+        className="absolute inset-0 rounded-full"
+        style={{ background: `radial-gradient(circle, ${GALAXY.core} 0%, ${GALAXY.glow} 13%, color-mix(in srgb, ${GALAXY.bright} 70%, transparent) 27%, transparent 44%)` }}
       />
-      {/* Núcleo: a luz que vem de trás da peça, respirando devagar. */}
-      <motion.span
-        className="absolute inset-0 rounded-full mix-blend-screen"
-        style={{ background: `radial-gradient(circle, #fdf4ff 0%, #e48bff 12%, color-mix(in srgb, ${PURPLE} 75%, transparent) 26%, transparent 42%)` }}
-        animate={still ? undefined : { opacity: [0.75, 1, 0.75], scale: [0.92, 1.05, 0.92] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-      />
-    </motion.span>
+    </span>
   );
 }
 
@@ -182,21 +208,27 @@ export function CtpQualityFx({
   className?: string;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { margin: "64px" });
-  const reduced = useReducedMotion() ?? false;
+  const inView = useNearViewport(ref);
+  const reduced = useReducedMotion();
   // Fase aleatória por CTP, para que vários lado a lado não pisquem em sincronia.
   const [phase] = useState(() => Math.random() * 3);
   if (quality !== "MIGHTY" && quality !== "BRILLIANT") return null;
   const brilliant = quality === "BRILLIANT";
-  const sparkles = reduced ? SPARKLES.slice(0, 3) : SPARKLES;
+  // No Brilhante a galáxia é o destaque: menos estrelas, na cor dela.
+  const sparkles = reduced ? SPARKLES.slice(0, 3) : brilliant ? SPARKLES.slice(0, 6) : SPARKLES;
 
   return (
     <span ref={ref} aria-hidden className={cn("pointer-events-none absolute inset-0", className)}>
       {inView && brilliant && <Galaxy still={reduced} />}
-      {inView &&
-        sparkles.map((spec, i) => (
-          <Sparkle key={i} spec={spec} color={brilliant ? PURPLE_SOFT : (color ?? PURPLE_SOFT)} still={reduced} phase={phase} />
-        ))}
+      {inView && (
+        <Sparkles
+          specs={sparkles}
+          groups={brilliant ? 2 : 3}
+          color={brilliant ? GALAXY.glow : (color ?? PURPLE_SOFT)}
+          still={reduced}
+          phase={phase}
+        />
+      )}
     </span>
   );
 }

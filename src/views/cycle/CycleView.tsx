@@ -346,7 +346,7 @@ export function CycleView() {
 
       <DayStrip vm={vm} />
 
-      <div className="z-30 -mx-4 flex md:sticky md:top-16 flex-wrap items-center gap-2 border-b border-energy/10 bg-background/85 px-4 py-2 backdrop-blur-md">
+      <div className="z-30 -mx-4 flex md:sticky md:top-16 flex-wrap items-center gap-2 border-b border-energy/10 bg-background/95 px-4 py-2">
         {vm.clock ? (
           <Button variant="energy" size="sm" onClick={vm.goToday}>
             <CalendarClockIcon data-icon="inline-start" />

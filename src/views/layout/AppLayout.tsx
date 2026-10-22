@@ -181,7 +181,7 @@ export function AppLayout({ title, children, wide = false }: { title?: string; c
         <meta property="og:image" content="/brand/og.jpg" />
       </Head>
       <div className="flex min-h-dvh flex-col">
-        <header className="sticky top-0 z-40 border-b border-energy/15 bg-background/80 backdrop-blur-md">
+        <header className="sticky top-0 z-40 border-b border-energy/15 bg-background/95">
           <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4">
             {isLoggedIn && (
               <Sheet>
