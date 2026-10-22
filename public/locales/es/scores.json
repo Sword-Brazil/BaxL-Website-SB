@@ -12,9 +12,9 @@
   },
   "cards": {
     "today": "Hoy",
-    "todayFooter": "Suma de los modos del día · variación con el último día completado",
+    "todayFooter": "Suma de los modos del día · variación con el último día del mismo tipo (BAI con BAI)",
     "week": "Semana {{n}}",
-    "weekFooter": "Total de la semana · variación con la semana anterior",
+    "weekFooter": "Total de la semana · variación con la semana anterior hasta el mismo día",
     "season": "Temporada",
     "seasonFooter_one": "{{count}} día completado · desde {{date}}",
     "seasonFooter_other": "{{count}} días completados · desde {{date}}",
@@ -36,7 +36,7 @@
   },
   "chart": {
     "title": "Rendimiento",
-    "subtitle": "Puntos por modo y cuánto ganaste o perdiste respecto al período anterior.",
+    "subtitle": "Puntos del día y por modo en la semana, y cuánto ganaste o perdiste respecto al período anterior.",
     "days": "Días",
     "weeks": "Semanas",
     "range": "Período",
@@ -45,10 +45,12 @@
       "season": "Esta temporada",
       "all": "Todo"
     },
-    "dailyDelta": "Ganancia o pérdida respecto al día anterior",
+    "dailyDelta": "Ganancia o pérdida respecto al último día del mismo tipo (BAI con BAI)",
     "weeklyDelta": "Ganancia o pérdida respecto a la semana anterior",
     "delta": "Variación",
-    "empty": "Anota la puntuación de un día para ver los gráficos."
+    "empty": "Anota la puntuación de un día para ver los gráficos.",
+    "total": "Total del día",
+    "partial": "parcial"
   },
   "history": {
     "title": "Historial",

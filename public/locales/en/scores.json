@@ -12,9 +12,9 @@
   },
   "cards": {
     "today": "Today",
-    "todayFooter": "Sum of the day's modes · change from the last filled day",
+    "todayFooter": "Sum of the day's modes · change from the last day of the same kind (BAI vs. BAI)",
     "week": "Week {{n}}",
-    "weekFooter": "Week total · change from the previous week",
+    "weekFooter": "Week total · change from the previous week up to the same day",
     "season": "Season",
     "seasonFooter_one": "{{count}} day filled · since {{date}}",
     "seasonFooter_other": "{{count}} days filled · since {{date}}",
@@ -36,7 +36,7 @@
   },
   "chart": {
     "title": "Performance",
-    "subtitle": "Points by mode and how much you gained or lost compared to the previous period.",
+    "subtitle": "Points per day and per mode each week, and how much you gained or lost compared to the previous period.",
     "days": "Days",
     "weeks": "Weeks",
     "range": "Period",
@@ -45,10 +45,12 @@
       "season": "This season",
       "all": "All"
     },
-    "dailyDelta": "Gain or loss vs. previous day",
+    "dailyDelta": "Gain or loss vs. the last day of the same kind (BAI vs. BAI)",
     "weeklyDelta": "Gain or loss vs. previous week",
     "delta": "Change",
-    "empty": "Log a day's score to see the charts."
+    "empty": "Log a day's score to see the charts.",
+    "total": "Day total",
+    "partial": "partial"
   },
   "history": {
     "title": "History",

@@ -35,6 +35,7 @@ export function useScoresViewModel() {
   const [selected, setSelected] = useState<string | null>(null);
   const [range, setRange] = useState<ScoreRange>("week");
 
+
   // Sem useMemo: o React Compiler memoriza os cálculos abaixo.
   const scores = doc.scores ?? {};
   const anchor = settings ? brtDateKey(settings.cycleAnchor) : null;
@@ -79,7 +80,11 @@ export function useScoresViewModel() {
   const from = rangeStart < SCORES_FIRST_DATE ? SCORES_FIRST_DATE : rangeStart;
 
   const daily = anchor && today ? dailySeries(scores, anchor, from, today) : [];
-  const weekly = anchor ? weeklySeries(scores, anchor) : [];
+  // Semana em andamento: marcada como parcial e sem variação até acabar (comparar meia semana com uma inteira engana).
+  const weekly = (anchor ? weeklySeries(scores, anchor) : []).map((w) => {
+    const partial = !!today && w.start <= today && today <= addDays(w.start, 6);
+    return { ...w, partial, delta: partial ? null : w.delta };
+  });
   const summary = anchor && today ? scoreSummary(scores, anchor, today) : null;
 
   // Histórico: mais recente primeiro, com a variação para o registro anterior do mesmo modo.

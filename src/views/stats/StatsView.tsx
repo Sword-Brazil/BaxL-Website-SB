@@ -110,7 +110,7 @@ function CtpAgentsMenu({ vm, row }: { vm: StatsVm; row: CtpUsage }) {
 function RepetitionChart({ vm }: { vm: StatsVm }) {
   const { t } = useTranslation(["stats", "cycle"]);
   const config = Object.fromEntries(
-    WEEK_KEYS.map((k, i) => [k, { label: t("cycle:week", { n: i + 1 }), color: `var(--series-${i + 1})` }]),
+    WEEK_KEYS.map((k, i) => [k, { label: t("cycle:week", { n: i + 1 }), color: `var(--ramp-${i + 1})` }]),
   ) satisfies ChartConfig;
   const data = vm.repetition.map((r) => ({ name: r.name, total: r.total, w1: r.weeks[0], w2: r.weeks[1], w3: r.weeks[2], w4: r.weeks[3] }));
 
@@ -184,7 +184,7 @@ function RepetitionChart({ vm }: { vm: StatsVm }) {
                   <YAxis type="category" dataKey="name" width={112} tickLine={false} axisLine={false} interval={0} tick={{ fontSize: 11 }} />
                   <ChartTooltip cursor={{ fillOpacity: 0.3 }} content={<ChartTooltipContent indicator="dot" />} />
                   <ChartLegend content={<ChartLegendContent />} />
-                  {WEEK_KEYS.map((k, i) => (
+                  {WEEK_KEYS.map((k) => (
                     <Bar
                       key={k}
                       dataKey={k}
@@ -192,7 +192,7 @@ function RepetitionChart({ vm }: { vm: StatsVm }) {
                       fill={`var(--color-${k})`}
                       isAnimationActive={false}
                       maxBarSize={20}
-                      radius={i === WEEK_KEYS.length - 1 ? [0, 4, 4, 0] : 0}
+                      radius={4}
                     />
                   ))}
                 </BarChart>
@@ -313,7 +313,7 @@ function MyTeamsCard({ vm }: { vm: ReturnType<typeof useStatsViewModel> }) {
 function CtpChart({ vm }: { vm: ReturnType<typeof useStatsViewModel> }) {
   const { t } = useTranslation(["stats", "common", "roster"]);
   const config = Object.fromEntries(
-    CTP_QUALITIES.map((q, i) => [q, { label: t(`common:quality.${q}`), color: `var(--series-${i + 1})` }]),
+    CTP_QUALITIES.map((q, i) => [q, { label: t(`common:quality.${q}`), color: `var(--ramp3-${i + 1})` }]),
   ) satisfies ChartConfig;
   const data = vm.usage.map((r) => ({ name: t(`common:ctp.${r.type}`), ...r.counts, total: r.total }));
 
@@ -347,7 +347,7 @@ function CtpChart({ vm }: { vm: ReturnType<typeof useStatsViewModel> }) {
                   <YAxis allowDecimals={false} tickLine={false} axisLine={false} />
                   <ChartTooltip cursor={{ fillOpacity: 0.3 }} content={<ChartTooltipContent indicator="dot" />} />
                   <ChartLegend content={<ChartLegendContent />} />
-                  {CTP_QUALITIES.map((q, i) => (
+                  {CTP_QUALITIES.map((q) => (
                     <Bar
                       key={q}
                       dataKey={q}
@@ -355,7 +355,7 @@ function CtpChart({ vm }: { vm: ReturnType<typeof useStatsViewModel> }) {
                       fill={`var(--color-${q})`}
                       isAnimationActive={false}
                       maxBarSize={24}
-                      radius={i === CTP_QUALITIES.length - 1 ? [4, 4, 0, 0] : 0}
+                      radius={4}
                     />
                   ))}
                 </BarChart>

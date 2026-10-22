@@ -86,20 +86,24 @@ export interface DailyPoint extends GameDay {
   BAI: number | null;
   /** Soma dos modos preenchidos no dia (null sem nenhum). */
   total: number | null;
-  /** Ganho ou perda em relação ao último dia preenchido. */
+  /** Ganho ou perda em relação ao último dia preenchido do mesmo tipo (BAI com BAI, BAX/BAL com BAX/BAL). */
   delta: number | null;
 }
 
-/** Um ponto por dia de `from` até `to`, com a soma do dia e a variação para o último dia preenchido. */
+/**
+ * Um ponto por dia de `from` até `to`, com a soma do dia e a variação para o último dia preenchido
+ * do mesmo tipo: a BAI pontua numa escala própria, então comparar com um dia de BAX/BAL não diz nada.
+ */
 export function dailySeries(scores: Record<string, number>, anchorDate: string, from: string, to: string): DailyPoint[] {
-  let previous: number | null = null;
+  const previous = { bai: null as number | null, regular: null as number | null };
   return dateRange(from, to).map((date) => {
     const day = gameDayOf(date, anchorDate);
     const value = (mode: ScoreMode) => scores[scoreKey(date, mode)] ?? null;
     const filled = SCORE_MODES.map(value).filter((v): v is number => v !== null);
     const total = filled.length ? filled.reduce((a, b) => a + b, 0) : null;
-    const point = { ...day, BAX: value("BAX"), BAL: value("BAL"), BAI: value("BAI"), total, delta: delta(total, previous) };
-    if (total !== null) previous = total;
+    const kind = day.isBai ? "bai" : "regular";
+    const point = { ...day, BAX: value("BAX"), BAL: value("BAL"), BAI: value("BAI"), total, delta: delta(total, previous[kind]) };
+    if (total !== null) previous[kind] = total;
     return point;
   });
 }
@@ -153,6 +157,7 @@ export interface ScoreSummary {
   today: number | null;
   todayDelta: number | null;
   week: number;
+  /** Semana atual contra a anterior até o mesmo dia da semana (a atual ainda está em andamento). */
   weekDelta: number | null;
   season: number;
   seasonDays: number;
@@ -162,10 +167,19 @@ export interface ScoreSummary {
 /** Números dos cartões: hoje, semana e temporada atuais e o melhor dia. */
 export function scoreSummary(scores: Record<string, number>, anchorDate: string, today: string): ScoreSummary {
   const current = gameDayOf(today, anchorDate);
-  const days = dailySeries(scores, anchorDate, SCORES_FIRST_DATE, today);
+  // Desde o primeiro registro (a semana anterior precisa entrar na comparação).
+  const first = Object.keys(scores).reduce((min, key) => {
+    const d = parseScoreKey(key)?.date;
+    return d && d < min ? d : min;
+  }, SCORES_FIRST_DATE);
+  const days = dailySeries(scores, anchorDate, first < today ? first : today, today);
   const todayPoint = days.find((d) => d.date === today);
-  const weeks = weeklySeries(scores, anchorDate);
-  const week = weeks.find((w) => w.seasonStart === current.seasonStart && w.week === current.week);
+  const weekStart = addDays(current.seasonStart, (current.week - 1) * WEEK_LENGTH);
+  const sum = (from: string, to: string) =>
+    days.filter((d) => d.date >= from && d.date <= to).reduce((n, d) => n + (d.total ?? 0), 0);
+  const filled = (from: string, to: string) => days.some((d) => d.date >= from && d.date <= to && d.total !== null);
+  const week = sum(weekStart, today);
+  const lastWeek = [addDays(weekStart, -WEEK_LENGTH), addDays(today, -WEEK_LENGTH)] as const;
   const seasonDays = days.filter((d) => d.seasonStart === current.seasonStart && d.total !== null);
   const best = days.reduce<{ date: string; total: number } | null>(
     (b, d) => (d.total !== null && (!b || d.total > b.total) ? { date: d.date, total: d.total } : b),
@@ -174,8 +188,8 @@ export function scoreSummary(scores: Record<string, number>, anchorDate: string,
   return {
     today: todayPoint?.total ?? null,
     todayDelta: todayPoint?.delta ?? null,
-    week: week?.total ?? 0,
-    weekDelta: week?.delta ?? null,
+    week,
+    weekDelta: filled(weekStart, today) && filled(...lastWeek) ? week - sum(...lastWeek) : null,
     season: seasonDays.reduce((n, d) => n + (d.total ?? 0), 0),
     seasonDays: seasonDays.length,
     best,

@@ -2,7 +2,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next/pages";
-import { Bar, BarChart, CartesianGrid, Cell, ReferenceLine, XAxis, YAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts";
 import { LockIcon, TrendingDownIcon, TrendingUpIcon, TrophyIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -30,15 +30,13 @@ import { MODE_VISUALS } from "@/views/shared/modeVisuals";
 import { QueryState } from "@/views/shared/QueryState";
 import { TeamStrip } from "@/views/shared/TeamStrip";
 
+// Uma rampa de azul, do claro ao escuro (tokens --ramp3-*): sem cores vivas diferentes por modo.
 const MODE_COLORS: ChartConfig = {
-  BAX: { label: "BAX", color: "var(--color-bax)" },
-  BAL: { label: "BAL", color: "var(--color-bal)" },
-  BAI: { label: "BAI", color: "var(--color-bai)" },
+  BAX: { label: "BAX", color: "var(--ramp3-1)" },
+  BAL: { label: "BAL", color: "var(--ramp3-2)" },
+  BAI: { label: "BAI", color: "var(--ramp3-3)" },
 };
-const GAIN = "var(--color-brazil-green)";
-const LOSS = "var(--color-destructive)";
-/** 2px de superfície entre segmentos empilhados (o `stroke` do Recharts vira a cor da legenda). */
-const SEGMENT_GAP = "[&_.recharts-bar-rectangle_path]:stroke-card [&_.recharts-bar-rectangle_path]:[stroke-width:2px]";
+const MODES = ["BAX", "BAL", "BAI"] as const satisfies readonly ScoreMode[];
 
 function useFormat() {
   const { locale } = useRouter();
@@ -249,35 +247,105 @@ function EntryCard({ vm }: { vm: ScoresViewModel }) {
   );
 }
 
-/** Barras de ganho (verde) e perda (vermelho) em relação ao período anterior. */
-function DeltaChart({ data, height = 160 }: { data: { label: string; delta: number | null }[]; height?: number }) {
-  const { t } = useTranslation("scores");
+/**
+ * Áreas empilhadas no estilo do "Area Chart - Interactive" do shadcn: os modos (por semana) ou o
+ * total do dia (por dia, já que BAX/BAL e BAI nunca acontecem no mesmo dia).
+ */
+function ScoreArea({
+  id,
+  data,
+  keys,
+  config,
+}: {
+  id: string;
+  data: ({ label: string } & Record<string, unknown>)[];
+  keys: readonly string[];
+  config: ChartConfig;
+}) {
   const f = useFormat();
-  const config = {
-    delta: { label: t("chart.delta"), color: GAIN },
-  } satisfies ChartConfig;
   return (
-    <ChartContainer config={config} className="aspect-auto w-full" style={{ height }}>
-      <BarChart data={data} margin={{ left: 4, right: 8 }}>
-        <CartesianGrid vertical={false} strokeWidth={1} />
-        <XAxis dataKey="label" tickLine={false} axisLine={false} interval="preserveStartEnd" tick={{ fontSize: 11 }} />
-        <YAxis tickLine={false} axisLine={false} width={48} tickFormatter={(v: number) => f.compact(v)} />
-        <ReferenceLine y={0} stroke="var(--border)" />
-        <ChartTooltip
-          cursor={{ fillOpacity: 0.3 }}
-          content={<ChartTooltipContent indicator="dot" formatter={(v) => f.signed(Number(v))} />}
-        />
-        <Bar dataKey="delta" radius={3} maxBarSize={28} isAnimationActive={false}>
-          {data.map((d, i) => (
-            <Cell key={i} fill={(d.delta ?? 0) >= 0 ? GAIN : LOSS} />
+    <ChartContainer config={config} className="aspect-auto h-64 w-full">
+      <AreaChart data={data} margin={{ top: 8, left: 4, right: 8 }}>
+        <defs>
+          {keys.map((m) => (
+            <linearGradient key={m} id={`${id}-${m}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor={`var(--color-${m})`} stopOpacity={0.7} />
+              <stop offset="95%" stopColor={`var(--color-${m})`} stopOpacity={0.05} />
+            </linearGradient>
           ))}
-        </Bar>
-      </BarChart>
+        </defs>
+        <CartesianGrid vertical={false} strokeOpacity={0.5} />
+        <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={8} minTickGap={24} tick={{ fontSize: 11 }} />
+        <YAxis tickLine={false} axisLine={false} width={48} tickFormatter={(v: number) => f.compact(v)} tick={{ fontSize: 11 }} />
+        <ChartTooltip
+          cursor={false}
+          content={<ChartTooltipContent indicator="dot" formatter={(v, name) => `${(name !== undefined && config[name]?.label) || name} ${f.n(Number(v))}`} />}
+        />
+        {keys.map((m) => (
+          <Area
+            key={m}
+            dataKey={m}
+            type="monotone"
+            stackId="stack"
+            fill={`url(#${id}-${m})`}
+            stroke={`var(--color-${m})`}
+            strokeWidth={2}
+            isAnimationActive={false}
+          />
+        ))}
+        {keys.length > 1 && <ChartLegend content={<ChartLegendContent />} />}
+      </AreaChart>
     </ChartContainer>
   );
 }
 
-/** Desempenho: pontos por dia (empilhados por modo) ou por semana, e o ganho/perda de cada período. */
+/** Ganho (azul, acima do zero) e perda (vermelho suave, abaixo) em relação ao período anterior. */
+function DeltaArea({ id, data }: { id: string; data: { label: string; delta: number | null }[] }) {
+  const { t } = useTranslation("scores");
+  const f = useFormat();
+  const values = data.flatMap((d) => (d.delta === null ? [] : [d.delta]));
+  const max = Math.max(0, ...values);
+  const min = Math.min(0, ...values);
+  // Ponto do degradê em que a área cruza o zero (a área vai do maior ao menor valor).
+  const zero = max === min ? 1 : max / (max - min);
+  const config = { delta: { label: t("chart.delta"), color: "var(--gain)" } } satisfies ChartConfig;
+  return (
+    <ChartContainer config={config} className="aspect-auto h-40 w-full">
+      <AreaChart data={data} margin={{ top: 8, left: 4, right: 8 }}>
+        <defs>
+          <linearGradient id={`${id}-fill`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset={0} stopColor="var(--gain)" stopOpacity={0.45} />
+            <stop offset={zero} stopColor="var(--gain)" stopOpacity={0.04} />
+            <stop offset={zero} stopColor="var(--loss)" stopOpacity={0.04} />
+            <stop offset={1} stopColor="var(--loss)" stopOpacity={0.45} />
+          </linearGradient>
+          <linearGradient id={`${id}-line`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset={zero} stopColor="var(--gain)" />
+            <stop offset={zero} stopColor="var(--loss)" />
+          </linearGradient>
+        </defs>
+        <CartesianGrid vertical={false} strokeOpacity={0.5} />
+        <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={8} minTickGap={24} tick={{ fontSize: 11 }} />
+        <YAxis tickLine={false} axisLine={false} width={48} tickFormatter={(v: number) => f.compact(v)} tick={{ fontSize: 11 }} />
+        <ReferenceLine y={0} stroke="var(--border)" />
+        <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" formatter={(v) => f.signed(Number(v))} />} />
+        <Area
+          dataKey="delta"
+          type="monotone"
+          baseValue={0}
+          connectNulls
+          fill={`url(#${id}-fill)`}
+          // Degradê no traço só com ganho e perda juntos: numa linha reta (um sinal só) ele fica sem cor.
+          stroke={max > 0 && min < 0 ? `url(#${id}-line)` : min < 0 ? "var(--loss)" : "var(--gain)"}
+          strokeWidth={2}
+          isAnimationActive={false}
+        />
+      </AreaChart>
+    </ChartContainer>
+  );
+}
+
+/** Desempenho: pontos por dia ou por semana (áreas empilhadas por modo) e o ganho/perda de cada período. */
 function PerformanceCard({ vm }: { vm: ScoresViewModel }) {
   const { t } = useTranslation(["scores", "common"]);
   const f = useFormat();
@@ -285,8 +353,9 @@ function PerformanceCard({ vm }: { vm: ScoresViewModel }) {
   const weekly = vm.weekly.map((w) => ({
     ...w,
     ...w.byMode,
-    label: `S${w.week} · ${f.date(w.start)}`,
+    label: `S${w.week} · ${f.date(w.start)}${w.partial ? ` (${t("scores:chart.partial")})` : ""}`,
   }));
+  const totalConfig = { total: { label: t("scores:chart.total"), color: "var(--ramp3-2)" } } satisfies ChartConfig;
   const empty = !vm.history.length;
   return (
     <Card>
@@ -309,64 +378,34 @@ function PerformanceCard({ vm }: { vm: ScoresViewModel }) {
             </p>
           )}
           <div className={cn("flex flex-col gap-4", empty && "pointer-events-none opacity-30")}>
-            <>
-              <TabsContent value="days" className="flex flex-col gap-4">
-                <ToggleGroup
-                  type="single"
-                  size="sm"
-                  variant="outline"
-                  value={vm.range}
-                  onValueChange={(v) => v && vm.setRange(v as ScoreRange)}
-                  aria-label={t("scores:chart.range")}
-                >
-                  {(["week", "season", "all"] as const).map((r) => (
-                    <ToggleGroupItem key={r} value={r} className="px-3">
-                      {t(`scores:chart.ranges.${r}`)}
-                    </ToggleGroupItem>
-                  ))}
-                </ToggleGroup>
-                <ChartContainer config={MODE_COLORS} className={`aspect-auto h-64 w-full ${SEGMENT_GAP}`}>
-                  <BarChart data={daily} margin={{ left: 4, right: 8 }}>
-                    <CartesianGrid vertical={false} strokeWidth={1} />
-                    <XAxis dataKey="label" tickLine={false} axisLine={false} interval="preserveStartEnd" tick={{ fontSize: 11 }} />
-                    <YAxis tickLine={false} axisLine={false} width={48} tickFormatter={(v: number) => f.compact(v)} />
-                    <ChartTooltip
-                      cursor={{ fillOpacity: 0.3 }}
-                      content={<ChartTooltipContent indicator="dot" formatter={(v, name) => `${name} ${f.n(Number(v))}`} />}
-                    />
-                    <ChartLegend content={<ChartLegendContent />} />
-                    {(["BAX", "BAL", "BAI"] as ScoreMode[]).map((m) => (
-                      <Bar key={m} dataKey={m} stackId="day" fill={`var(--color-${m})`} maxBarSize={28} isAnimationActive={false} />
-                    ))}
-                  </BarChart>
-                </ChartContainer>
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs font-medium text-muted-foreground">{t("scores:chart.dailyDelta")}</span>
-                  <DeltaChart data={daily} />
-                </div>
-              </TabsContent>
-              <TabsContent value="weeks" className="flex flex-col gap-4">
-                <ChartContainer config={MODE_COLORS} className={`aspect-auto h-64 w-full ${SEGMENT_GAP}`}>
-                  <BarChart data={weekly} margin={{ left: 4, right: 8 }}>
-                    <CartesianGrid vertical={false} strokeWidth={1} />
-                    <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
-                    <YAxis tickLine={false} axisLine={false} width={48} tickFormatter={(v: number) => f.compact(v)} />
-                    <ChartTooltip
-                      cursor={{ fillOpacity: 0.3 }}
-                      content={<ChartTooltipContent indicator="dot" formatter={(v, name) => `${name} ${f.n(Number(v))}`} />}
-                    />
-                    <ChartLegend content={<ChartLegendContent />} />
-                    {(["BAX", "BAL", "BAI"] as ScoreMode[]).map((m) => (
-                      <Bar key={m} dataKey={m} stackId="week" fill={`var(--color-${m})`} maxBarSize={48} isAnimationActive={false} />
-                    ))}
-                  </BarChart>
-                </ChartContainer>
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs font-medium text-muted-foreground">{t("scores:chart.weeklyDelta")}</span>
-                  <DeltaChart data={weekly} />
-                </div>
-              </TabsContent>
-            </>
+            <TabsContent value="days" className="flex flex-col gap-4">
+              <ToggleGroup
+                type="single"
+                size="sm"
+                variant="outline"
+                value={vm.range}
+                onValueChange={(v) => v && vm.setRange(v as ScoreRange)}
+                aria-label={t("scores:chart.range")}
+              >
+                {(["week", "season", "all"] as const).map((r) => (
+                  <ToggleGroupItem key={r} value={r} className="px-3">
+                    {t(`scores:chart.ranges.${r}`)}
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
+              <ScoreArea id="days" data={daily} keys={["total"]} config={totalConfig} />
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-medium text-muted-foreground">{t("scores:chart.dailyDelta")}</span>
+                <DeltaArea id="days-delta" data={daily} />
+              </div>
+            </TabsContent>
+            <TabsContent value="weeks" className="flex flex-col gap-4">
+              <ScoreArea id="weeks" data={weekly} keys={MODES} config={MODE_COLORS} />
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-medium text-muted-foreground">{t("scores:chart.weeklyDelta")}</span>
+                <DeltaArea id="weeks-delta" data={weekly} />
+              </div>
+            </TabsContent>
           </div>
         </CardContent>
       </Tabs>
