@@ -187,10 +187,14 @@ export function AppLayout({ title, children, wide = false }: { title?: string; c
               <Sheet>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon-touch" className="xl:hidden" aria-label={t("nav.menu")}>
-                    <MenuIcon />
+                    <MenuIcon className="size-6" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-72">
+                {/* Desliza inteiro da esquerda ao abrir e volta para a esquerda ao fechar. */}
+                <SheetContent
+                  side="left"
+                  className="w-72 ease-out data-closed:duration-200 data-closed:slide-out-to-left! data-open:duration-300 data-open:slide-in-from-left!"
+                >
                   <SheetHeader>
                     <SheetTitle className="sr-only">{t("nav.menu")}</SheetTitle>
                     <BrandMark />
