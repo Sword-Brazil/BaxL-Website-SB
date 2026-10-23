@@ -22,7 +22,8 @@
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
     "@hookform/resolvers": "^5.9.2",
-    "@prisma/client": "^6.19.3",
+    "@prisma/adapter-pg": "^7.10.1",
+    "@prisma/client": "^7.10.1",
     "@tanstack/react-query": "^5.104.4",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
@@ -55,8 +56,8 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.4.2",
-    "pglite-prisma-adapter": "^0.6.1",
-    "prisma": "^6.19.3",
+    "pglite-prisma-adapter": "^0.7.2",
+    "prisma": "^7.10.1",
     "tailwindcss": "^4",
     "tsx": "^4.23.15",
     "typescript": "^5",
@@ -66,8 +67,5 @@
     "@typeschema/zod": {
       "zod": "$zod"
     }
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
   }
 }

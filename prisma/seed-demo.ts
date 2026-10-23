@@ -1,12 +1,12 @@
 // Dados de DEMONSTRAÇÃO para desenvolvimento e validação da US1 (não é conteúdo real da aliança).
 // Uso: npm run seed:demo   (rodar depois de `npx prisma db seed`)
 import { existsSync } from "node:fs";
-import { PrismaClient } from "@prisma/client";
+import { createPrismaClient } from "../src/server/prismaClient";
 import type { AttackType, CtpQuality, CtpType, Gender, Side, Slot, Species } from "../src/models/domain/enums";
 
 if (existsSync(".env.local")) process.loadEnvFile(".env.local");
 
-const prisma = new PrismaClient();
+const prisma = createPrismaClient();
 
 type DemoAgent = [slug: string, name: string, gender: Gender, side: Side, species: Species, attack: AttackType];
 

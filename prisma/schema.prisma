@@ -5,12 +5,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// Postgres do Supabase: DATABASE_URL é o pooler (app/serverless) e DIRECT_URL a conexão
-// direta, usada pelo `prisma migrate`.
+// Postgres do Supabase. As URLs ficam fora do schema (Prisma 7): DATABASE_URL (pooler) no app,
+// em src/server/db.ts, e DIRECT_URL (conexão de sessão) nas migrações, em prisma.config.ts.
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
 }
 
 // ---------- Catálogo ----------
