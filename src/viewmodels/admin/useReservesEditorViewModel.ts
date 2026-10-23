@@ -30,6 +30,8 @@ export function useReservesEditorViewModel(target: PriorityTarget, saved: Priori
     mutationFn: () => adminApi.savePriority(target, { solo: lists.SOLO, support: lists.SUPPORT }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["cycle"] });
+      // Num dia livre, o servidor recria as equipes dos outros dias livres e da BAI.
+      qc.invalidateQueries({ queryKey: ["admin-meta-teams"] });
       qc.invalidateQueries({ queryKey: ["day"] });
       qc.invalidateQueries({ queryKey: ["bai"] });
       setDraft(null);

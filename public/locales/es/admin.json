@@ -110,7 +110,14 @@
       "down": "Bajar la {{n}}ª"
     },
     "labelEn": "Etiqueta en inglés (opcional)",
-    "labelEnPlaceholder": "Vacío: \"Alternativa N\" pasa a \"Alternative N\""
+    "labelEnPlaceholder": "Vacío: \"Alternativa N\" pasa a \"Alternative N\"",
+    "freeSync": {
+      "label": "Días sin restricción y BAI siempre iguales",
+      "on": "Activado: cambiar los equipos o las reservas de uno de estos días copia todo a los demás (reemplaza lo que tienen).",
+      "off": "Apagado: cada día sin restricción y la BAI tienen sus propios equipos.",
+      "badge": "Sincronizado",
+      "dialog": "Día libre sincronizado: al guardar, los otros días sin restricción y la BAI quedan iguales a este."
+    }
   },
   "priority": {
     "solo": "Solistas",

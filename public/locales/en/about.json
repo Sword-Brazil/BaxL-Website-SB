@@ -97,7 +97,7 @@
       },
       "tips": {
         "1": "Everything red? You haven't marked your roster yet. Mark it in My roster or turn on Pick from every character.",
-        "2": "Days without restrictions can share a team: the site offers to copy it to the other free days.",
+        "2": "Unrestricted days and BAI share the same team: change one and the others follow (you can turn this off in the builder).",
         "3": "Everything saves on its own. Just close the window."
       }
     },

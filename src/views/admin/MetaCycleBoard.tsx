@@ -25,6 +25,7 @@ import { TeamStrip } from "@/views/shared/TeamStrip";
 import { Badge } from "@/components/ui/badge";
 import { MODE_VISUALS } from "@/views/shared/modeVisuals";
 import { AlternativesOrder } from "./AlternativesOrder";
+import { FreeDaySyncedBadge } from "./FreeDaysSync";
 import { ReservesEditor } from "./ReservesEditor";
 
 type EditorVm = ReturnType<typeof useMetaTeamEditorViewModel>;
@@ -67,12 +68,14 @@ function ModeCell({
   data,
   scopeVm,
   vm,
+  freeSync,
 }: {
   mode: DayMode;
   day: number;
   data: CycleModeDay | null;
   scopeVm: MetaScopeViewModel;
   vm: EditorVm;
+  freeSync: boolean;
 }) {
   const { t } = useTranslation(["admin", "common"]);
   const teams = data?.metaTeams ?? [];
@@ -90,6 +93,7 @@ function ModeCell({
           {mode}
         </Badge>
         <RestrictionBadges criteria={data?.criteria ?? []} />
+        {freeSync && data && data.criteria.length === 0 && <FreeDaySyncedBadge />}
       </div>
       {teams.map((team) => (
         <TeamStrip
@@ -132,7 +136,7 @@ function ModeCell({
  * Quadro do ciclo: todos os dias de BAX/BAL com as equipes lado a lado, para editar sem trocar
  * de dia e de modo a cada passo. Filtros por semana e por modo encurtam a lista no celular.
  */
-export function MetaCycleBoard({ scopeVm, vm }: { scopeVm: MetaScopeViewModel; vm: EditorVm }) {
+export function MetaCycleBoard({ scopeVm, vm, freeSync = false }: { scopeVm: MetaScopeViewModel; vm: EditorVm; freeSync?: boolean }) {
   const { t } = useTranslation(["admin", "common"]);
   const [week, setWeek] = useState("all");
   const [modeFilter, setModeFilter] = useState<ModeFilter>("BOTH");
@@ -185,6 +189,7 @@ export function MetaCycleBoard({ scopeVm, vm }: { scopeVm: MetaScopeViewModel; v
                       data={m === "BAX" ? d.bax : d.bal}
                       scopeVm={scopeVm}
                       vm={vm}
+                      freeSync={freeSync}
                     />
                   </div>
                 ))}

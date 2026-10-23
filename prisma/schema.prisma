@@ -86,6 +86,8 @@ model Settings {
   // Temporada atual: efeito que atordoa o chefe em todos os dias de BAX e de BAL.
   baxEffect       String   @default("PARALYSIS")
   balEffect       String   @default("SHOCK")
+  // Dias de BAX/BAL sem restrição e a BAI com as mesmas equipes e reservas: editar um copia para os outros.
+  syncFreeDays    Boolean  @default(true)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }

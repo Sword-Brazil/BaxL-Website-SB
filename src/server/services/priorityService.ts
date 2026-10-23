@@ -2,6 +2,7 @@ import type { PriorityLists } from "@/models/domain/types";
 import type { PriorityInput, PriorityTarget } from "@/models/schemas/admin";
 import { prisma } from "@/server/db";
 import { assertCtpsExist, assertRestriction, findBattleDay, loadActiveUniforms } from "./curationGuards";
+import { mirrorFreePlace } from "./freeDaysService";
 import { toPriority } from "./mappers";
 
 async function resolve(target: PriorityTarget) {
@@ -42,5 +43,6 @@ export async function savePriority(target: PriorityTarget, input: PriorityInput)
     prisma.priorityEntry.deleteMany({ where: { scope: target.scope, battleDayId } }),
     prisma.priorityEntry.createMany({ data: rows }),
   ]);
+  await mirrorFreePlace({ scope: target.scope, battleDayId });
   return getPriority(target);
 }
