@@ -216,8 +216,12 @@ model User {
   id           String             @id @default(cuid())
   // Guardado em minúsculas, com espaços simples (ex.: "sword menezes").
   username     String             @unique
+  // Chaves de identidade (src/models/rules/userIdentity.ts): bloqueiam a mesma pessoa em duas
+  // contas, com o nome escrito de outro jeito. Preenchidas pelo usersService.
+  usernameKey  String?            @unique
   passwordHash String
   nickname     String?
+  nicknameKey  String?            @unique
   role         String             @default("USER")
   selections   UserSelectionsDoc?
   metaTeams    MetaTeam[]

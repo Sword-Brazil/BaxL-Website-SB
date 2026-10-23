@@ -24,7 +24,7 @@
     "catalog": "Agents, uniforms and images.",
     "ctps": "CTP types, photos and availability.",
     "bai": "BAI boss sequence.",
-    "users": "Members and administrators: accounts, roles and passwords.",
+    "users": "Members and administrators: accounts, roles, passwords and removing who left the alliance.",
     "settings": "Cycle anchor and turnover times.",
     "rotations": "Character rotations (damage dealers), per uniform, with a description and video."
   },
@@ -189,7 +189,13 @@
     "newUser": "New account",
     "username": "Username",
     "usernameHint": "Used to sign in. E.g. the in-game nick (3 to 30 letters, digits, space, dot, hyphen or underscore). Case doesn't matter.",
-    "resetHelp": "Set a new password and hand it to the person. The old password stops working right away."
+    "resetHelp": "Set a new password and hand it to the person. The old password stops working right away.",
+    "deleted": "Account deleted",
+    "deleteTitle": "Delete account",
+    "deleteConfirm": "Delete {{name}}'s account? Their roster, teams and scores go with it, and their open session ends. This can't be undone.",
+    "duplicate": "Duplicate",
+    "duplicateHint": "Repeats another account's username or nickname (spelled differently). Delete the one that isn't used.",
+    "nicknameHint": "In-game name. Can't repeat another account's (case, accents and punctuation don't count)."
   },
   "settings": {
     "title": "Calendar settings",

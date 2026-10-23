@@ -4,8 +4,8 @@ import { HttpError } from "@/server/http";
 import { deleteMetaTeam, listMetaTeams, reorderMetaTeams, saveMetaTeam } from "@/server/services/metaTeamService";
 import { setRestriction } from "@/server/services/restrictionService";
 import { savePriority } from "@/server/services/priorityService";
-import { changeRole, createUser as createAccount, listUsers } from "@/server/services/usersService";
-import { createAgent, createUser, ctpId, dayId, seedBase } from "./fixtures";
+import { changeRole, createUser as createAccount, deleteUser, listUsers } from "@/server/services/usersService";
+import { createAgent, createMetaTeam, createUser, ctpId, dayId, seedBase } from "./fixtures";
 import { deleteCtp, saveCtp } from "@/server/services/catalogAdminService";
 
 const status = (s: number) => (e: unknown) => e instanceof HttpError && e.status === s;
@@ -237,6 +237,50 @@ describe("curadoria", () => {
       await createAccount({ username: "lider", password: "senha1234", role: "ADMIN" });
       expect((await listUsers({ q: "MENEZES" })).users.map((u) => u.username)).toEqual(["tenmenezes"]);
       expect((await listUsers({ q: "LIDER" })).users.map((u) => u.username)).toEqual(["lider"]);
+    });
+
+    it("a mesma pessoa não ganha duas contas: usuário ou apelido escritos de outro jeito geram 409", async () => {
+      await createAccount({ username: "sword menezes", nickname: "Sword Menezes", password: "Desenho.2020!", role: "USER" });
+      for (const username of ["sword.menezes", "sword_menezes", "swordmenezes", "Sword-Menezes"]) {
+        await expect(createAccount({ username, password: "Desenho.2020!", role: "USER" })).rejects.toSatisfy(
+          (e) => e instanceof HttpError && e.status === 409 && !!e.fields?.username,
+        );
+      }
+      await expect(createAccount({ username: "outra", nickname: "  swórd.MENEZES ", password: "Desenho.2020!", role: "USER" })).rejects.toSatisfy(
+        (e) => e instanceof HttpError && e.status === 409 && !!e.fields?.nickname,
+      );
+      // Contas sem apelido não colidem entre si.
+      await createAccount({ username: "sem apelido 1", password: "Desenho.2020!", role: "USER" });
+      await createAccount({ username: "sem apelido 2", password: "Desenho.2020!", role: "USER" });
+    });
+
+    it("a lista marca contas antigas que repetem outra (sem a chave de identidade)", async () => {
+      await createAccount({ username: "tenmenezes", nickname: "Ten", password: "senha1234", role: "USER" });
+      await prisma.user.create({ data: { username: "ten.menezes", passwordHash: "x", role: "USER" } });
+      const byName = Object.fromEntries((await listUsers({})).users.map((u) => [u.username, u.duplicate]));
+      expect(byName).toMatchObject({ tenmenezes: false, "ten.menezes": true });
+    });
+
+    it("excluir a conta (saiu da aliança) apaga os dados dela, mantém as equipes Meta e libera o nome", async () => {
+      const u = await createAccount({ username: "saiu", nickname: "Saiu", password: "senha1234", role: "USER" });
+      await prisma.userSelectionsDoc.create({ data: { userId: u.id, json: "{}" } });
+      await prisma.securityNotice.create({ data: { userId: u.id, type: "NEW_LOGIN" } });
+      await prisma.loginAttempt.create({ data: { key: "saiu|10.0.0.1", failedCount: 2 } });
+      const team = await createMetaTeam({ scope: "BAI", uniformIds: [fem[0], fem[1], fem[2]], updatedById: u.id });
+
+      await deleteUser(u.id, curatorId);
+
+      expect(await prisma.user.findUnique({ where: { id: u.id } })).toBeNull();
+      expect(await prisma.userSelectionsDoc.count({ where: { userId: u.id } })).toBe(0);
+      expect(await prisma.securityNotice.count({ where: { userId: u.id } })).toBe(0);
+      expect(await prisma.loginAttempt.count()).toBe(0);
+      expect(await prisma.metaTeam.findUniqueOrThrow({ where: { id: team.id } })).toMatchObject({ updatedById: null });
+      await expect(createAccount({ username: "saiu", nickname: "Saiu", password: "senha1234", role: "USER" })).resolves.toBeTruthy();
+    });
+
+    it("ninguém exclui a própria conta; conta inexistente gera 404", async () => {
+      await expect(deleteUser(curatorId, curatorId)).rejects.toSatisfy(status(409));
+      await expect(deleteUser("nao-existe", curatorId)).rejects.toSatisfy(status(404));
     });
 
     it("rebaixar o último ADMIN gera 409", async () => {
