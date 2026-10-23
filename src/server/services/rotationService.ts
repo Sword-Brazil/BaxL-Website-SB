@@ -18,6 +18,9 @@ const toRotation = (r: DbRotation): Rotation => ({
   description: r.description,
   descriptionEn: r.descriptionEn,
   videoUrl: r.videoUrl,
+  videoBax: r.videoBax,
+  videoBal: r.videoBal,
+  videoBai: r.videoBai,
   updatedAt: r.updatedAt.toISOString(),
 });
 
@@ -40,6 +43,10 @@ export async function saveAgentRotations(agentId: string, input: AgentRotationsI
   }
 
   const rows = await prisma.$transaction(async (tx) => {
+    // Modos em que pontua: automático ou os escolhidos (ausente = mantém).
+    if (input.scoring) {
+      await tx.agent.update({ where: { id: agentId }, data: { scoringAuto: input.scoring.auto, scoringModes: input.scoring.modes } });
+    }
     await tx.rotation.deleteMany({ where: { agentId } });
     for (const [position, r] of input.rotations.entries()) {
       await tx.rotation.create({
@@ -54,6 +61,9 @@ export async function saveAgentRotations(agentId: string, input: AgentRotationsI
           description: r.description || null,
           descriptionEn: r.descriptionEn || null,
           videoUrl: r.videoUrl || null,
+          videoBax: r.videoBax || null,
+          videoBal: r.videoBal || null,
+          videoBai: r.videoBai || null,
         },
       });
     }

@@ -15,5 +15,9 @@
   "uniforms": "Trajes com rotação",
   "usedInTeam": "Traje usado na equipe que você abriu",
   "untitled": "Rotação {{n}}",
-  "season": "Temporada"
+  "season": "Temporada",
+  "videoGeneral": "Geral",
+  "videoOf": "Demonstração na {{mode}}",
+  "videos": "Vídeos da rotação",
+  "scoresIn": "Pontua em"
 }

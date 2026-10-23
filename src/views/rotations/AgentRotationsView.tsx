@@ -7,9 +7,12 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BOSS_EFFECTS, UNKNOWN, type BossEffect } from "@/models/domain/enums";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BOSS_EFFECTS, DAY_MODES, EFFECTS_BY_MODE, MODES, UNKNOWN, type BossEffect, type Mode } from "@/models/domain/enums";
 import type { Rotation, Uniform } from "@/models/domain/types";
 import { pick } from "@/models/rules/localize";
+import { effectiveScoringModes, rotationVideos } from "@/models/rules/scoringModes";
+import { MODE_VISUALS } from "@/views/shared/modeVisuals";
 import { useContentLang } from "@/viewmodels/useContentLang";
 import { useRotationsViewModel, type RotationGroup } from "@/viewmodels/useRotationsViewModel";
 import { HelpHint } from "@/views/layout/HelpHint";
@@ -41,14 +44,51 @@ function UniformBadges({ uniform }: { uniform: Uniform }) {
   );
 }
 
+/** Vídeos da rotação: o geral e a demonstração em cada modo, em abas quando há mais de um. */
+function RotationVideos({ rotation, title, preferredMode }: { rotation: Rotation; title: string; preferredMode: Mode | null }) {
+  const { t } = useTranslation("rotations");
+  const videos = rotationVideos(rotation);
+  if (!videos.length) return null;
+  const key = (mode: Mode | null) => mode ?? "ALL";
+  const tabLabel = (mode: Mode | null) => mode ?? t("videoGeneral");
+  if (videos.length === 1) {
+    const [v] = videos;
+    return (
+      <div className="flex w-full flex-col gap-1.5 md:max-w-[26rem]">
+        {v.mode && <Badge variant={MODE_VISUALS[v.mode].badge} className="self-start">{t("videoOf", { mode: v.mode })}</Badge>}
+        <RotationVideoPlayer url={v.url} title={`${title} · ${tabLabel(v.mode)}`} />
+      </div>
+    );
+  }
+  const initial = videos.find((v) => v.mode === preferredMode) ?? videos[0];
+  return (
+    <Tabs defaultValue={key(initial.mode)} className="w-full gap-2 md:max-w-[26rem]">
+      <TabsList aria-label={t("videos")} className="flex-wrap">
+        {videos.map((v) => (
+          <TabsTrigger key={key(v.mode)} value={key(v.mode)} className={cn(v.mode && MODE_VISUALS[v.mode].active)}>
+            {tabLabel(v.mode)}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+      {videos.map((v) => (
+        <TabsContent key={key(v.mode)} value={key(v.mode)}>
+          <RotationVideoPlayer url={v.url} title={`${title} · ${tabLabel(v.mode)}`} />
+        </TabsContent>
+      ))}
+    </Tabs>
+  );
+}
+
 function RotationCard({
   rotation,
   index,
   agentName,
+  preferredMode,
 }: {
   rotation: Rotation;
   index: number;
   agentName: string;
+  preferredMode: Mode | null;
 }) {
   const { t } = useTranslation("rotations");
   const lang = useContentLang();
@@ -67,11 +107,7 @@ function RotationCard({
       <RotationText text={rotation.sequence} />
       {description && <p className="text-sm whitespace-pre-line text-muted-foreground">{description}</p>}
       {/* No PC o vídeo não ocupa mais a largura toda. */}
-      {rotation.videoUrl && (
-        <div className="w-full md:max-w-[26rem]">
-          <RotationVideoPlayer url={rotation.videoUrl} title={`${agentName} · ${title}`} />
-        </div>
-      )}
+      <RotationVideos rotation={rotation} title={`${agentName} · ${title}`} preferredMode={preferredMode} />
     </article>
   );
 }
@@ -108,11 +144,13 @@ function GroupSection({
   agentName,
   fallbackSrc,
   highlighted,
+  preferredMode,
 }: {
   group: RotationGroup;
   agentName: string;
   fallbackSrc?: string;
   highlighted: boolean;
+  preferredMode: Mode | null;
 }) {
   const { t } = useTranslation("rotations");
   return (
@@ -136,7 +174,7 @@ function GroupSection({
       </header>
       <div className="flex flex-col gap-3">
         {group.rotations.map((r, i) => (
-          <RotationCard key={r.id} rotation={r} index={i} agentName={agentName} />
+          <RotationCard key={r.id} rotation={r} index={i} agentName={agentName} preferredMode={preferredMode} />
         ))}
       </div>
     </section>
@@ -156,6 +194,11 @@ export function AgentRotationsView() {
   const fromLink = typeof router.query.efeito === "string" && (BOSS_EFFECTS as readonly string[]).includes(router.query.efeito) ? (router.query.efeito as BossEffect) : null;
   const [picked, setPicked] = useState<BossEffect | null | undefined>(undefined);
   const effectFilter = picked === undefined ? fromLink : picked;
+  // Vindo de um dia de BAX/BAL (efeito da temporada): abre o vídeo daquele modo, se houver.
+  const linkModes = fromLink ? DAY_MODES.filter((m) => (EFFECTS_BY_MODE[m] as readonly string[]).includes(fromLink)) : [];
+  const fromMode = typeof router.query.modo === "string" ? MODES.find((m) => m === router.query.modo) : undefined;
+  const preferredMode = fromMode ?? (linkModes.length === 1 ? linkModes[0] : null);
+  const scoring = agent ? effectiveScoringModes(agent) : [];
   const effects = BOSS_EFFECTS.filter((e) => allGroups.some((g) => g.rotations.some((r) => r.effect === e)));
   const groups = allGroups
     .map((g) => ({ ...g, rotations: g.rotations.filter((r) => !effectFilter || !r.effect || r.effect === effectFilter) }))
@@ -191,6 +234,16 @@ export function AgentRotationsView() {
                   {t("common:team.damageDealer")}
                 </p>
                 <h1 className="font-heading text-3xl font-bold">{t("rotations:titleOf", { name: agent.name })}</h1>
+                {scoring.length > 0 && (
+                  <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                    {t("rotations:scoresIn")}
+                    {scoring.map((m) => (
+                      <Badge key={m} variant={MODE_VISUALS[m].badge}>
+                        {m}
+                      </Badge>
+                    ))}
+                  </p>
+                )}
               </div>
               <HelpHint title={t("rotations:legendTitle")} guide="rotations">
                 <RotationLegend />
@@ -227,6 +280,7 @@ export function AgentRotationsView() {
                   agentName={agent.name}
                   fallbackSrc={fallbackSrc}
                   highlighted={g === target}
+                  preferredMode={preferredMode}
                 />
               ))
             )}

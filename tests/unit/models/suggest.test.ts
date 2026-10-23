@@ -13,6 +13,9 @@ const agent = (id: string, side: "HERO" | "VILLAIN" = "HERO"): Agent => {
     active: true,
     metaCtp1Id: null,
     metaCtp2Id: null,
+    scoringAuto: true,
+    scoringModes: [],
+    detectedScoringModes: [],
     uniforms: [
       {
         id: `${id}-u`,
