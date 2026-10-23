@@ -8,12 +8,12 @@
 // - --attributes-only: só agentes, trajes e atributos; não mexe em restrições nem equipes.
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { PrismaClient } from "@prisma/client";
+import { createPrismaClient } from "../src/server/prismaClient";
 import { CRITERION_ATTRIBUTES, UNKNOWN } from "../src/models/domain/enums";
 import { convertSnapshot, DEFAULT_UNIFORM, slugify, type ImportedTeam } from "../src/models/import/guiabaxbal";
 
 if (existsSync(".env.local")) process.loadEnvFile(".env.local");
-const prisma = new PrismaClient();
+const prisma = createPrismaClient();
 const FIELD = { GENDER: "gender", SIDE: "side", SPECIES: "species", ATTACK_TYPE: "attackType" } as const;
 
 async function main() {

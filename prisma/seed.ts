@@ -4,7 +4,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { loadEnvConfig } from "@next/env";
-import { PrismaClient } from "@prisma/client";
+import { createPrismaClient } from "../src/server/prismaClient";
 import bcrypt from "bcryptjs";
 import { BATTLE_DAY_NUMBERS, CTP_QUALITIES, CTP_TYPES, DAY_MODES, type Role } from "../src/models/domain/enums";
 import { identityKey } from "../src/models/rules/userIdentity";
@@ -12,7 +12,7 @@ import { identityKey } from "../src/models/rules/userIdentity";
 // .env.local com expansão de ${VAR} (ex.: a senha do banco dentro das URLs), como no Next.
 loadEnvConfig(process.cwd(), true, { info: () => {}, error: console.error });
 
-const prisma = new PrismaClient();
+const prisma = createPrismaClient();
 
 /** Quinta-feira 12:00 BRT mais recente (início do Dia 1). */
 /**

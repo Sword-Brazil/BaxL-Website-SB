@@ -13,7 +13,8 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { loadEnvConfig } from "@next/env";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { createPrismaClient } from "../src/server/prismaClient";
 import { ensureBucket, publicUrl, storageConfig } from "../src/server/storage";
 
 // .env.local com expansão de ${VAR} (ex.: a senha do banco dentro das URLs), como no Next.
@@ -107,7 +108,7 @@ async function main() {
   const tables = new Set(
     (sqlite.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").all() as { name: string }[]).map((t) => t.name),
   );
-  const prisma = new PrismaClient();
+  const prisma = createPrismaClient();
   try {
     const models = new Map(Prisma.dmmf.datamodel.models.map((m) => [m.name, m]));
     const delegateOf = (name: string) =>
