@@ -130,6 +130,24 @@ function RotationEditor({ draft, index, total, agent, vm }: { draft: RotationDra
           onChange={(e) => vm.update(draft.key, { description: e.target.value })}
         />
       </Field>
+      {/* Versão em inglês (o espanhol usa a mesma); vazia = mostra o português. */}
+      <div className="grid gap-3 rounded-lg border border-dashed p-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+        <p className="text-xs font-semibold tracking-wider text-muted-foreground uppercase sm:col-span-2">{t("admin:rotations.english")}</p>
+        <Field>
+          <FieldLabel htmlFor={id("titleEn")}>{t("admin:rotations.titleLabel")}</FieldLabel>
+          <Input id={id("titleEn")} maxLength={80} value={draft.titleEn} onChange={(e) => vm.update(draft.key, { titleEn: e.target.value })} />
+        </Field>
+        <Field>
+          <FieldLabel htmlFor={id("descriptionEn")}>{t("admin:rotations.description")}</FieldLabel>
+          <Textarea
+            id={id("descriptionEn")}
+            maxLength={3000}
+            rows={2}
+            value={draft.descriptionEn}
+            onChange={(e) => vm.update(draft.key, { descriptionEn: e.target.value })}
+          />
+        </Field>
+      </div>
       <Field data-invalid={videoInvalid || undefined}>
         <FieldLabel htmlFor={id("video")}>{t("admin:rotations.video")}</FieldLabel>
         <Input

@@ -8,10 +8,11 @@ import { effectivePriority } from "@/models/rules/priority";
 import { getPriority } from "./priorityService";
 import { getSettings } from "./settingsService";
 
-const toBoss = (b: { id: string; position: number; name: string; imagePath: string | null; tips: string | null }): BaiBoss => ({
+const toBoss = (b: { id: string; position: number; name: string; nameEn: string | null; imagePath: string | null; tips: string | null }): BaiBoss => ({
   id: b.id,
   position: b.position,
   name: b.name,
+  nameEn: b.nameEn,
   imagePath: b.imagePath,
   tips: b.tips,
 });
@@ -25,7 +26,7 @@ export async function saveBosses(input: BaiBossesInput): Promise<BaiBoss[]> {
   await prisma.$transaction([
     prisma.baiBoss.deleteMany(),
     prisma.baiBoss.createMany({
-      data: input.map((b) => ({ position: b.position, name: b.name, imagePath: b.imagePath ?? null, tips: b.tips ?? null })),
+      data: input.map((b) => ({ position: b.position, name: b.name, nameEn: b.nameEn || null, imagePath: b.imagePath ?? null, tips: b.tips ?? null })),
     }),
   ]);
   return listBosses();

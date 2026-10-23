@@ -17,6 +17,8 @@ model Agent {
   id         String     @id @default(cuid())
   slug       String     @unique
   name       String
+  // Nome em inglês (o espanhol usa o mesmo); vazio = mostra o nome em português.
+  nameEn     String?
   active     Boolean    @default(true)
   uniforms   Uniform[]
   // CTPs da Meta para o personagem: o 1 (padrão) e o 2 (opcional), alternados por dia nas equipes.
@@ -35,6 +37,7 @@ model Uniform {
   agent           Agent            @relation(fields: [agentId], references: [id])
   slug            String
   name            String
+  nameEn          String?
   imagePath       String
   // Atributos são do traje (ex.: Fênix Negra é vilã), não do personagem. UNKNOWN = não informado.
   gender          String           @default("UNKNOWN")
@@ -124,6 +127,8 @@ model MetaTeam {
   position    Int              @default(0)
   label       String?
   notes       String?
+  // Rótulo em inglês (vazio = mostra o português; "Alternativa N" é traduzido sozinho).
+  labelEn     String?
   members     MetaTeamMember[]
   updatedById String?
   updatedBy   User?            @relation(fields: [updatedById], references: [id])
@@ -158,21 +163,23 @@ model MetaTeamMember {
 // Rotação de um personagem (Causador de Dano), em texto livre, com descrição e vídeo opcional.
 // uniformId null = vale para todos os trajes do personagem.
 model Rotation {
-  id          String   @id @default(cuid())
-  agentId     String
-  agent       Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  uniformId   String?
-  uniform     Uniform? @relation("RotationUniform", fields: [uniformId], references: [id], onDelete: Cascade)
+  id            String   @id @default(cuid())
+  agentId       String
+  agent         Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  uniformId     String?
+  uniform       Uniform? @relation("RotationUniform", fields: [uniformId], references: [id], onDelete: Cascade)
   // Temporada (efeito do chefe) da rotação; null = vale para todas.
-  effect      String?
-  position    Int
-  title       String?
-  sequence    String
-  description String?
+  effect        String?
+  position      Int
+  title         String?
+  titleEn       String?
+  sequence      String
+  description   String?
+  descriptionEn String?
   // Link do YouTube ou de um .mp4/.webm externo: o sistema não hospeda vídeo.
-  videoUrl    String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  videoUrl      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@index([agentId, position])
 }
@@ -199,6 +206,7 @@ model BaiBoss {
   id        String   @id @default(cuid())
   position  Int      @unique
   name      String
+  nameEn    String?
   imagePath String?
   tips      String?
   createdAt DateTime @default(now())

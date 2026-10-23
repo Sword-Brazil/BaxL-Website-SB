@@ -7,6 +7,7 @@ import { ApiError } from "@/models/api/client";
 import type { BossEffect } from "@/models/domain/enums";
 import type { Agent, Rotation } from "@/models/domain/types";
 import { AgentRotationsSchema } from "@/models/schemas/admin";
+import { searchNames } from "@/viewmodels/useCatalogViewModel";
 import { ROTATIONS_KEY, useRotationsViewModel } from "@/viewmodels/useRotationsViewModel";
 
 export interface RotationDraft {
@@ -16,8 +17,10 @@ export interface RotationDraft {
   /** Temporada (efeito do chefe); null = todas. */
   effect: BossEffect | null;
   title: string;
+  titleEn: string;
   sequence: string;
   description: string;
+  descriptionEn: string;
   videoUrl: string;
 }
 
@@ -29,8 +32,10 @@ const fromRotation = (r: Rotation): RotationDraft => ({
   uniformId: r.uniformId,
   effect: r.effect,
   title: r.title ?? "",
+  titleEn: r.titleEn ?? "",
   sequence: r.sequence,
   description: r.description ?? "",
+  descriptionEn: r.descriptionEn ?? "",
   videoUrl: r.videoUrl ?? "",
 });
 
@@ -40,8 +45,10 @@ const blankDraft = (from?: RotationDraft): RotationDraft => ({
   uniformId: from?.uniformId ?? null,
   effect: from?.effect ?? null,
   title: "",
+  titleEn: "",
   sequence: "",
   description: "",
+  descriptionEn: "",
   videoUrl: "",
 });
 
@@ -79,7 +86,7 @@ export function useRotationsEditorViewModel(messages: { saved: string }) {
   const agents = useMemo(() => {
     const q = search.trim().toLowerCase();
     return catalog.agents
-      .filter((a) => !q || a.name.toLowerCase().includes(q) || a.slug.includes(q))
+      .filter((a) => !q || searchNames(a).some((n) => n.toLowerCase().includes(q)))
       .filter((a) => !onlyWithRotations || rotations.rotationsOf(a.id).length > 0);
   }, [catalog.agents, search, onlyWithRotations, rotations]);
 
@@ -92,8 +99,10 @@ export function useRotationsEditorViewModel(messages: { saved: string }) {
             uniformId: d.uniformId,
             effect: d.effect,
             title: d.title || null,
+            titleEn: d.titleEn || null,
             sequence: d.sequence,
             description: d.description || null,
+            descriptionEn: d.descriptionEn || null,
             videoUrl: d.videoUrl || null,
           })),
       });

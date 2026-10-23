@@ -108,7 +108,9 @@
       "oldest": "Más antigua primero",
       "up": "Subir la {{n}}ª",
       "down": "Bajar la {{n}}ª"
-    }
+    },
+    "labelEn": "Etiqueta en inglés (opcional)",
+    "labelEnPlaceholder": "Vacío: \"Alternativa N\" pasa a \"Alternative N\""
   },
   "priority": {
     "solo": "Solistas",
@@ -149,7 +151,10 @@
     "variedUniforms_other": "{{count}} trajes con atributos distintos",
     "effects": "Efectos en el jefe (aturde en la temporada del efecto)",
     "metaStriker": "Striker meta",
-    "metaStrikerHelp": "Solo los trajes marcados aparecen para elegir como Striker de los Causantes de Daño (Metas y equipos de los jugadores)."
+    "metaStrikerHelp": "Solo los trajes marcados aparecen para elegir como Striker de los Causantes de Daño (Metas y equipos de los jugadores).",
+    "nameEn": "Nombre en inglés",
+    "nameEnHint": "Se muestra a quien usa el sitio en inglés o español. Vacío = muestra el nombre en portugués.",
+    "nameEnPlaceholder": "Ej.: Marvel Zombies"
   },
   "ctps": {
     "title": "Catálogo de CTPs",
@@ -170,7 +175,8 @@
     "name": "Nombre",
     "image": "Imagen (ruta)",
     "tips": "Consejos",
-    "help": "Los jefes aparecen en este orden en la página de la BAI."
+    "help": "Los jefes aparecen en este orden en la página de la BAI.",
+    "nameEn": "Nombre en inglés (opcional)"
   },
   "users": {
     "title": "Usuarios y roles",
@@ -231,6 +237,7 @@
     "video": "Vídeo de referencia (opcional)",
     "videoHint": "Enlace de YouTube (vídeo o Shorts; usa ?t= para empezar en el momento justo) o de un archivo .mp4/.webm. Se reproduce sin sonido y en bucle; el vídeo no se guarda en el sistema.",
     "add": "Añadir rotación",
-    "effect": "Temporada"
+    "effect": "Temporada",
+    "english": "En inglés (opcional; el español usa el mismo)"
   }
 }

@@ -3,7 +3,9 @@ import { useTranslation } from "next-i18next/pages";
 import type { DayMode, Mode, Slot } from "@/models/domain/enums";
 import { SLOTS } from "@/models/domain/enums";
 import type { Criterion, MetaTeam } from "@/models/domain/types";
+import { teamLabel } from "@/models/rules/localize";
 import { renderTeamsHtml, type ExportBlock, type ExportMember, type ExportTeam } from "@/models/rules/teamsExport";
+import { useContentLang } from "./useContentLang";
 import type { UserTeam } from "@/models/schemas/selections";
 import { useSelectionsStore } from "./stores/selectionsStore";
 import type { CycleViewModel } from "./useCycleViewModel";
@@ -24,6 +26,7 @@ const FILE_PREFIX: Record<ExportScope, string> = { all: "equipes", meta: "metas"
  */
 export function useTeamsExportViewModel(vm: CycleViewModel) {
   const { t } = useTranslation(["cycle", "common"]);
+  const lang = useContentLang();
   const { locale } = useRouter();
   const nickname = useSelectionsStore((s) => s.doc.nickname);
 
@@ -49,7 +52,7 @@ export function useTeamsExportViewModel(vm: CycleViewModel) {
   const metaTeams = (teams: MetaTeam[]): ExportTeam[] =>
     teams.map((team) => ({
       kind: team.isPrimary ? "META" : "ALT",
-      label: team.isPrimary ? t("cycle:meta") : (team.label ?? t("cycle:alternative")),
+      label: team.isPrimary ? t("cycle:meta") : (teamLabel(team.label, team.labelEn, lang) ?? t("cycle:alternative")),
       members: Object.fromEntries(
         team.members.flatMap((m) => {
           const em = member(m.uniformId, { ctpId: m.ctpId, damageDealer: m.isDamageDealer });

@@ -108,7 +108,9 @@
       "oldest": "Oldest first",
       "up": "Move #{{n}} up",
       "down": "Move #{{n}} down"
-    }
+    },
+    "labelEn": "English label (optional)",
+    "labelEnPlaceholder": "Empty: \"Alternativa N\" becomes \"Alternative N\""
   },
   "priority": {
     "solo": "Solos",
@@ -149,7 +151,10 @@
     "variedUniforms_other": "{{count}} uniforms with different attributes",
     "effects": "Boss effects (stuns in that effect's season)",
     "metaStriker": "Meta Striker",
-    "metaStrikerHelp": "Only tagged uniforms can be picked as the Damage Dealers' Striker (Metas and players' teams)."
+    "metaStrikerHelp": "Only tagged uniforms can be picked as the Damage Dealers' Striker (Metas and players' teams).",
+    "nameEn": "English name",
+    "nameEnHint": "Shown to people using the site in English or Spanish. Empty = shows the Portuguese name.",
+    "nameEnPlaceholder": "E.g. Marvel Zombies"
   },
   "ctps": {
     "title": "CTP catalog",
@@ -170,7 +175,8 @@
     "name": "Name",
     "image": "Image (path)",
     "tips": "Tips",
-    "help": "Bosses appear in this order on the BAI page."
+    "help": "Bosses appear in this order on the BAI page.",
+    "nameEn": "English name (optional)"
   },
   "users": {
     "title": "Users and roles",
@@ -231,6 +237,7 @@
     "video": "Reference video (optional)",
     "videoHint": "YouTube link (video or Shorts; add ?t= to start at the right moment) or a .mp4/.webm file. It plays muted and looped; the video is not stored in the system.",
     "add": "Add rotation",
-    "effect": "Season"
+    "effect": "Season",
+    "english": "In English (optional; Spanish uses the same)"
   }
 }
