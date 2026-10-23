@@ -335,7 +335,7 @@ export function CycleView() {
               <ResetTeamsOptions />
             </PopoverContent>
           </Popover>
-          <HelpHint title={t("cycle:legend.title")}>
+          <HelpHint title={t("cycle:legend.title")} guide="cycle">
             <p>{t("cycle:legend.owned")}</p>
             <p>{t("cycle:legend.dim")}</p>
             <p>{t("cycle:legend.ctp")}</p>

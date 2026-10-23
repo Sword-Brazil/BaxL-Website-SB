@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next/pages";
 import { useTheme } from "next-themes";
-import { CloudCheckIcon, LanguagesIcon, LogInIcon, LogOutIcon, MenuIcon, MoonIcon, ShieldIcon, SunIcon, UserRoundIcon } from "lucide-react";
+import { CircleHelpIcon, CloudCheckIcon, LanguagesIcon, LogInIcon, LogOutIcon, MenuIcon, MoonIcon, ShieldIcon, SunIcon, UserRoundIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
@@ -43,7 +43,7 @@ const NAV = [
 function MobileNav({ pathname }: { pathname: string }) {
   const { t } = useTranslation("common");
   const { isAdmin } = useAuthViewModel();
-  const items = [...NAV, ...(isAdmin ? [{ href: "/admin", key: "admin" } as const] : [])];
+  const items = [...NAV, { href: "/sobre", key: "about" } as const, ...(isAdmin ? [{ href: "/admin", key: "admin" } as const] : [])];
   return (
     <nav className="flex flex-col gap-1 px-4">
       {items.map((item) => (
@@ -56,6 +56,7 @@ function MobileNav({ pathname }: { pathname: string }) {
           >
             <Link href={item.href}>
               {item.key === "admin" && <ShieldIcon data-icon="inline-start" />}
+              {item.key === "about" && <CircleHelpIcon data-icon="inline-start" />}
               {t(`nav.${item.key}`)}
             </Link>
           </Button>
@@ -152,6 +153,12 @@ function AccountMenu() {
           </span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/sobre">
+            <CircleHelpIcon />
+            {t("nav.about")}
+          </Link>
+        </DropdownMenuItem>
         {isAdmin && (
           <DropdownMenuItem asChild>
             <Link href="/admin">
@@ -267,6 +274,13 @@ export function AppLayout({ title, children, wide = false }: { title?: string; c
             <p className="font-heading tracking-wider text-energy/80 uppercase">{t("footer.alliance")}</p>
             <p>{t("footer.disclaimer")}</p>
             <p>{t("footer.credit")}</p>
+            {isLoggedIn && (
+              <p>
+                <Link href="/sobre" className="text-energy/90 underline-offset-4 hover:underline">
+                  {t("nav.about")}
+                </Link>
+              </p>
+            )}
             <SupportFooter />
           </div>
         </footer>

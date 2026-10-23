@@ -188,7 +188,7 @@ export function AgentRotationsView() {
                 </p>
                 <h1 className="font-heading text-3xl font-bold">{t("rotations:titleOf", { name: agent.name })}</h1>
               </div>
-              <HelpHint title={t("rotations:legendTitle")}>
+              <HelpHint title={t("rotations:legendTitle")} guide="rotations">
                 <RotationLegend />
               </HelpHint>
             </div>

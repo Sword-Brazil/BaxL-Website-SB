@@ -27,7 +27,7 @@ export function BalFreeView() {
           </h1>
           <p className="text-sm text-muted-foreground">{t("days:free.subtitle")}</p>
         </div>
-        <HelpHint title={t("days:free.help.title")}>
+        <HelpHint title={t("days:free.help.title")} guide="day">
           <p>{t("days:free.help.text1")}</p>
         </HelpHint>
       </div>

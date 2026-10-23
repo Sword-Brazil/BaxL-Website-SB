@@ -15,7 +15,8 @@
     "rotations": "Rotaciones",
     "login": "Entrar",
     "synced": "Sincronizado con tu cuenta",
-    "scores": "Puntuaciones"
+    "scores": "Puntuaciones",
+    "about": "Acerca del sitio"
   },
   "modes": {
     "BAX": "Batalla de Alianza Extrema",
@@ -171,7 +172,8 @@
     "close": "Cerrar",
     "back": "Volver",
     "help": "Ayuda",
-    "exportImage": "Exportar imagen"
+    "exportImage": "Exportar imagen",
+    "fullGuide": "Ver la guía completa del sitio"
   },
   "states": {
     "loading": "Cargando…",

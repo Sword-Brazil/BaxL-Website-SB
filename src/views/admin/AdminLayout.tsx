@@ -105,7 +105,7 @@ export function AdminLayout({
               {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
             </div>
             {help && (
-              <HelpHint title={title}>
+              <HelpHint title={title} guide="admin">
                 <p>{help}</p>
               </HelpHint>
             )}

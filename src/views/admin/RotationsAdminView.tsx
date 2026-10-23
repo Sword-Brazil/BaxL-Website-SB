@@ -104,7 +104,7 @@ function RotationEditor({ draft, index, total, agent, vm }: { draft: RotationDra
       <Field>
         <div className="flex items-center gap-1">
           <FieldLabel htmlFor={id("sequence")}>{t("admin:rotations.sequence")}</FieldLabel>
-          <HelpHint title={t("admin:rotations.legendTitle")}>
+          <HelpHint title={t("admin:rotations.legendTitle")} guide="admin">
             <RotationLegend />
             <p>{t("admin:rotations.legendFree")}</p>
           </HelpHint>

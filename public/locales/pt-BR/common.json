@@ -15,7 +15,8 @@
     "rotations": "Rotações",
     "login": "Entrar",
     "synced": "Sincronizado com a sua conta",
-    "scores": "Pontuações"
+    "scores": "Pontuações",
+    "about": "Sobre o site"
   },
   "modes": {
     "BAX": "Batalha de Aliança Extrema",
@@ -171,7 +172,8 @@
     "close": "Fechar",
     "back": "Voltar",
     "help": "Ajuda",
-    "exportImage": "Exportar imagem"
+    "exportImage": "Exportar imagem",
+    "fullGuide": "Ver o guia completo do site"
   },
   "states": {
     "loading": "Carregando…",

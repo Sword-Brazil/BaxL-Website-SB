@@ -1,0 +1,185 @@
+{
+  "title": "Sobre o site",
+  "subtitle": "Um guia rápido de cada tela: para que serve, onde fica cada coisa e o que procurar quando você travar.",
+  "toc": "Ir para",
+  "openPage": "Abrir {{name}}",
+  "zoom": "Abrir o print em tamanho real",
+  "shotAlt": "Print da tela {{name}} com as marcações numeradas",
+  "stuck": "Não sabe o que fazer?",
+  "start": {
+    "title": "Por onde começar",
+    "subtitle": "Quatro passos e o site já monta as equipes com o que você tem.",
+    "steps": {
+      "1": "Toque no ícone de lápis no topo e escreva o seu nome no jogo.",
+      "2": "Em Meu elenco, marque os agentes e uniformes que você tem e equipe os CTPs deles.",
+      "3": "Na Batalha de Aliança, abra o dia de hoje e veja a Meta. Toque em Montar minha equipe para montar a sua.",
+      "4": "Depois de jogar, anote quanto fez em Pontuações e acompanhe sua evolução."
+    }
+  },
+  "general": {
+    "title": "Dúvidas gerais",
+    "items": {
+      "saved": "Tudo o que você marca (elenco, equipes, CTPs, nome e pontuações) fica salvo no aparelho e na sua conta: entre em outro aparelho e está tudo lá.",
+      "sync": "Se aparecer a pergunta sobre qual versão manter, é porque este aparelho e a sua conta estão diferentes. Escolha a que tem as suas marcações mais recentes.",
+      "help": "Cada tela tem um botão de ajuda (?) no canto, com um resumo do que fazer ali.",
+      "password": "Esqueceu a senha ou não tem acesso? Fale com um administrador da aliança: só eles criam contas e trocam senhas.",
+      "error": "Apareceu um aviso de erro? Tente de novo em instantes. Se continuar, avise um administrador."
+    }
+  },
+  "sections": {
+    "header": {
+      "title": "Barra do topo",
+      "intro": "Fica em todas as telas. É por aqui que você troca de tela e ajusta o site do seu jeito.",
+      "markers": {
+        "1": "Menu (celular): abre as telas do site e também o idioma, o tamanho da letra e o tema.",
+        "2": "Telas do site (PC): Batalha de Aliança, Meu elenco, Rotações, Estatísticas e Pontuações.",
+        "3": "Apoiar: a chave Pix para ajudar quem mantém o site.",
+        "4": "Idioma: português, inglês ou espanhol.",
+        "5": "Tamanho da letra: aumente se estiver difícil de ler.",
+        "6": "Tema claro ou escuro.",
+        "7": "Seu nome no jogo: aparece nas imagens que você exporta.",
+        "8": "Minha conta: este guia, a Administração (só administradores) e Sair."
+      },
+      "tips": {
+        "1": "No celular, o idioma, a letra e o tema ficam dentro do menu (☰).",
+        "2": "Perdido? Toque em Batalha de Aliança: ela sempre abre no dia de hoje.",
+        "3": "Para voltar a este guia, abra Minha conta e toque em Sobre o site."
+      }
+    },
+    "cycle": {
+      "title": "Batalha de Aliança: o ciclo",
+      "intro": "A tela inicial. Mostra os 28 dias do ciclo com a BAX e a BAL lado a lado; nos dias de BAI, só ela acontece.",
+      "markers": {
+        "1": "Os 28 dias do ciclo: toque num dia para ir até ele. O de hoje fica aceso e os de BAI ficam em vermelho.",
+        "2": "Hoje: volta para o dia atual da BA de qualquer ponto da página.",
+        "3": "Semanas: mostra só uma semana (S1 a S4) ou todas.",
+        "4": "Exportar: baixa a tabela do ciclo (completa, só a Meta ou só as suas equipes) para mandar no grupo.",
+        "5": "Limpar equipes: apaga as equipes que você montou (todas ou de um modo). O elenco e os CTPs ficam.",
+        "6": "Ajuda: o que significam as cores, a marca verde e o ícone de CTP nos retratos."
+      },
+      "tips": {
+        "1": "O dia da BA vira às 12h e a pontuação semanal reseta às 22h do dia do reset (horário de Brasília).",
+        "2": "Retrato apagado = você ainda não tem o agente. Marque em Meu elenco.",
+        "3": "Moldura azul é herói, vermelha é vilão."
+      }
+    },
+    "day": {
+      "title": "O dia: Meta e minha equipe",
+      "intro": "Cada dia tem a BAX e a BAL, com a restrição, a equipe Meta, as alternativas e a equipe que você montou.",
+      "markers": {
+        "1": "Você está aqui: o dia atual da BA e quanto falta para virar.",
+        "2": "Efeito da temporada: atordoe o chefe com esse efeito em todos os dias do modo.",
+        "3": "Restrição do dia: quem pode lutar (ex.: só vilões, só femininos). Com vários, todos valem juntos.",
+        "4": "Meta: a equipe recomendada pela Sword Brasil, com o uniforme e o CTP de cada agente.",
+        "5": "Alternativa: outra opção boa, se faltar alguém da Meta.",
+        "6": "Minha equipe: a equipe que você montou para o dia.",
+        "7": "Montar ou editar minha equipe: abre o montador (próxima seção)."
+      },
+      "tips": {
+        "1": "O líder com Ver rotação é o Causador de Dano: toque para ver como usar as habilidades dele.",
+        "2": "Marca verde no nome = você tem o agente. Sem ela (e com o retrato apagado), marque o agente em Meu elenco.",
+        "3": "Não tem ninguém da Meta? Use a Alternativa ou Aplicar sugestão no montador."
+      }
+    },
+    "team": {
+      "title": "Montar minha equipe",
+      "intro": "Escolha os três agentes do dia (líder e dois apoios), o CTP e o Striker de cada um. Só aparecem os que atendem à restrição.",
+      "markers": {
+        "1": "Escolher entre todos os personagens: monta sem precisar preencher o elenco (a restrição continua valendo).",
+        "2": "Copiar Meta ou Copiar Alternativa: copia a equipe recomendada de uma vez.",
+        "3": "Aplicar sugestão: a melhor equipe possível com o que você tem.",
+        "4": "Trocar agente: escolha outro agente para esta posição.",
+        "5": "CTP 1 e CTP 2: qual dos dois CTPs do personagem usar neste dia.",
+        "6": "Striker: o apoio da Transcendência 4 do personagem (opcional).",
+        "7": "Selos: verde = igual à Meta, âmbar = diferente, vermelho = você não tem o agente ou o uniforme.",
+        "8": "CTPs: arraste um CTP até um agente, ou toque no CTP e depois no agente.",
+        "9": "Sugestão para seu elenco: a equipe que o Aplicar sugestão vai usar."
+      },
+      "tips": {
+        "1": "Ficou tudo vermelho? Você ainda não marcou o elenco. Marque em Meu elenco ou ligue Escolher entre todos os personagens.",
+        "2": "Dias sem restrição podem usar a mesma equipe: o site oferece copiar para os outros dias livres.",
+        "3": "Tudo salva sozinho. É só fechar a janela."
+      }
+    },
+    "roster": {
+      "title": "Meu elenco",
+      "intro": "Marque os agentes e uniformes que você tem e os CTPs de cada um. É isso que monta as suas equipes e as sugestões.",
+      "markers": {
+        "1": "Buscar agente pelo nome.",
+        "2": "Filtros por gênero, lado, espécie e tipo de ataque (no celular, no botão Filtros).",
+        "3": "Quantos agentes você marcou.",
+        "4": "Uniforme: toque para marcar ou desmarcar. Ter um uniforme já conta o agente como seu.",
+        "5": "Marcar todos os uniformes do agente de uma vez (ou Desmarcar).",
+        "6": "CTP 1 e CTP 2 do personagem: valem em todos os dias. O 2 é opcional, para alternar por dia.",
+        "7": "Equipar CTPs: arraste um CTP até o personagem (no PC, fica ao lado da lista).",
+        "8": "Ajuda da tela."
+      },
+      "tips": {
+        "1": "Não achou um agente? Limpe a busca e os filtros.",
+        "2": "Marque o elenco uma vez só: o resto do site passa a usar essas marcações."
+      }
+    },
+    "rotations": {
+      "title": "Rotações",
+      "intro": "A ordem das habilidades de cada Causador de Dano das Metas, por traje, com explicação e vídeo quando houver.",
+      "markers": {
+        "1": "Todos os personagens: volta para a lista de quem tem rotação.",
+        "2": "O personagem e para qual traje vale a rotação.",
+        "3": "A rotação: as habilidades na ordem, da esquerda para a direita, com a descrição embaixo.",
+        "4": "Como ler a notação: o que significam c, dc, qc, os parênteses e os símbolos."
+      },
+      "tips": {
+        "1": "Os números são as habilidades na ordem da tela do jogo. 6 é a Ultimate, Despertada ou Tier-4.",
+        "2": "Também dá para chegar aqui pelo botão Ver rotação no líder de cada dia."
+      }
+    },
+    "stats": {
+      "title": "Estatísticas",
+      "intro": "Quem mais aparece nas equipes do ciclo (bons investimentos) e os CTPs que você equipou.",
+      "markers": {
+        "1": "Metas: conta as equipes recomendadas pela Sword Brasil.",
+        "2": "Minhas equipes: conta as equipes que você montou.",
+        "3": "Modo: todos, só BAX, só BAL ou só BAI.",
+        "4": "Incluir alternativas na contagem.",
+        "5": "Exportar a lista.",
+        "6": "Ver como gráfico ou como tabela.",
+        "7": "Meus CTPs equipados, por tipo e qualidade.",
+        "8": "Ajuda da tela."
+      },
+      "tips": {
+        "1": "Não sabe em quem investir? Veja quem está no topo de Metas: aparece mais vezes no ciclo.",
+        "2": "Gráfico de CTPs vazio? Equipe os CTPs em Meu elenco."
+      }
+    },
+    "scores": {
+      "title": "Pontuações",
+      "intro": "Anote quanto fez em cada modo e acompanhe se você melhorou contra o mesmo dia do mês anterior. Só você vê as suas pontuações.",
+      "markers": {
+        "1": "Resumo: hoje, a semana, a temporada e o seu melhor dia.",
+        "2": "Escolha o dia que vai anotar (abre no dia de hoje).",
+        "3": "Pontos de cada modo: salva ao sair do campo. Apagar o número remove.",
+        "4": "A equipe que você montou para aquele dia, para lembrar com quem jogou.",
+        "5": "Ajuda: como funcionam o reset, a BA normal e as comparações."
+      },
+      "tips": {
+        "1": "No dia do reset (quinta) anote duas vezes: antes e depois das 22h.",
+        "2": "Não precisa anotar a BA normal: ela entra sozinha no total.",
+        "3": "Verde cresceu, vermelho caiu, sempre contra o mesmo dia e semana do mês anterior."
+      }
+    },
+    "admin": {
+      "title": "Administração",
+      "intro": "Só para administradores. Aqui fica tudo o que os membros veem: restrições, equipes Meta, catálogo, rotações e contas.",
+      "markers": {
+        "1": "Abas: Visão geral, Dias, Metas, Catálogo, Rotações, CTPs, BAI, Usuários e Configurações.",
+        "2": "Dias: a restrição de cada dia de BAX e BAL.",
+        "3": "Metas: as equipes Meta e Alternativas de cada dia, a BAL livre e a BAI.",
+        "4": "Usuários: criar contas, trocar papel e senha e excluir quem saiu da aliança."
+      },
+      "tips": {
+        "1": "Tudo o que você publica aparece na hora para os membros, com data e autor.",
+        "2": "Conta marcada como Duplicada: a pessoa tem duas contas. Exclua a que não é usada."
+      }
+    }
+  }
+}

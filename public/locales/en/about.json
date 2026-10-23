@@ -1,0 +1,185 @@
+{
+  "title": "About the site",
+  "subtitle": "A quick guide to every screen: what it's for, where everything is and what to look for when you get stuck.",
+  "toc": "Go to",
+  "openPage": "Open {{name}}",
+  "zoom": "Open the screenshot at full size",
+  "shotAlt": "Screenshot of {{name}} with numbered markers",
+  "stuck": "Not sure what to do?",
+  "start": {
+    "title": "Where to start",
+    "subtitle": "Four steps and the site builds teams with what you own.",
+    "steps": {
+      "1": "Tap the pencil icon at the top and type your in-game name.",
+      "2": "In My roster, mark the agents and uniforms you own and equip their CTPs.",
+      "3": "In Alliance Battle, open today and check the Meta. Tap Build my team to build yours.",
+      "4": "After playing, log your points in Scores and follow your progress."
+    }
+  },
+  "general": {
+    "title": "General questions",
+    "items": {
+      "saved": "Everything you mark (roster, teams, CTPs, name and scores) is saved on the device and in your account: sign in on another device and it's all there.",
+      "sync": "If you're asked which version to keep, this device and your account differ. Pick the one with your latest changes.",
+      "help": "Every screen has a help button (?) in the corner with a summary of what to do there.",
+      "password": "Forgot your password or have no access? Talk to an alliance administrator: only they create accounts and change passwords.",
+      "error": "Seeing an error? Try again in a moment. If it keeps happening, tell an administrator."
+    }
+  },
+  "sections": {
+    "header": {
+      "title": "Top bar",
+      "intro": "It's on every screen. Use it to switch screens and adjust the site to your liking.",
+      "markers": {
+        "1": "Menu (phone): opens the site's screens plus language, text size and theme.",
+        "2": "Site screens (PC): Alliance Battle, My roster, Rotations, Statistics and Scores.",
+        "3": "Support: the Pix key to help whoever maintains the site.",
+        "4": "Language: Portuguese, English or Spanish.",
+        "5": "Text size: make it bigger if it's hard to read.",
+        "6": "Light or dark theme.",
+        "7": "Your in-game name: shown on the images you export.",
+        "8": "My account: this guide, Administration (admins only) and Sign out."
+      },
+      "tips": {
+        "1": "On the phone, language, text size and theme are inside the menu (☰).",
+        "2": "Lost? Tap Alliance Battle: it always opens on today.",
+        "3": "To come back to this guide, open My account and tap About the site."
+      }
+    },
+    "cycle": {
+      "title": "Alliance Battle: the cycle",
+      "intro": "The home screen. It shows the 28 days of the cycle with BAX and BAL side by side; on BAI days, only BAI happens.",
+      "markers": {
+        "1": "The 28 days of the cycle: tap a day to jump to it. Today is lit and BAI days are red.",
+        "2": "Today: back to the current battle day from anywhere on the page.",
+        "3": "Weeks: show only one week (S1 to S4) or all of them.",
+        "4": "Export: download the cycle table (full, Meta only or only your teams) to share with the group.",
+        "5": "Clear teams: deletes the teams you built (all or one mode). Roster and CTPs stay.",
+        "6": "Help: what the colors, the green check and the CTP icon on portraits mean."
+      },
+      "tips": {
+        "1": "The battle day turns at 12:00 and weekly points reset at 22:00 on reset day (Brasília time).",
+        "2": "Faded portrait = you don't own the agent yet. Mark it in My roster.",
+        "3": "Blue frame is a hero, red is a villain."
+      }
+    },
+    "day": {
+      "title": "The day: Meta and my team",
+      "intro": "Each day has BAX and BAL, with the restriction, the Meta team, the alternatives and the team you built.",
+      "markers": {
+        "1": "You are here: the current battle day and how long until it turns.",
+        "2": "Season effect: stun the boss with this effect on every day of the mode.",
+        "3": "Day restriction: who can fight (e.g. villains only, female only). With several, all apply together.",
+        "4": "Meta: the team recommended by Sword Brasil, with each agent's uniform and CTP.",
+        "5": "Alternative: another good option if you're missing someone from the Meta.",
+        "6": "My team: the team you built for the day.",
+        "7": "Build or edit my team: opens the team builder (next section)."
+      },
+      "tips": {
+        "1": "The leader with See rotation is the Damage Dealer: tap it to see how to use their skills.",
+        "2": "Green check on the name = you own the agent. Without it (and with a faded portrait), mark the agent in My roster.",
+        "3": "Missing the whole Meta? Use the Alternative or Apply suggestion in the builder."
+      }
+    },
+    "team": {
+      "title": "Build my team",
+      "intro": "Pick the day's three agents (leader and two supports), plus each one's CTP and Striker. Only agents that meet the restriction show up.",
+      "markers": {
+        "1": "Pick from every character: build without filling your roster (the restriction still applies).",
+        "2": "Copy Meta or Copy Alternative: copies the recommended team at once.",
+        "3": "Apply suggestion: the best possible team with what you own.",
+        "4": "Change agent: pick another agent for this position.",
+        "5": "CTP 1 and CTP 2: which of the character's two CTPs to use on this day.",
+        "6": "Striker: the character's Transcendence 4 support (optional).",
+        "7": "Tags: green = same as Meta, amber = different, red = you don't own the agent or the uniform.",
+        "8": "CTPs: drag a CTP onto an agent, or tap the CTP and then the agent.",
+        "9": "Suggestion for your roster: the team Apply suggestion will use."
+      },
+      "tips": {
+        "1": "Everything red? You haven't marked your roster yet. Mark it in My roster or turn on Pick from every character.",
+        "2": "Days without restrictions can share a team: the site offers to copy it to the other free days.",
+        "3": "Everything saves on its own. Just close the window."
+      }
+    },
+    "roster": {
+      "title": "My roster",
+      "intro": "Mark the agents and uniforms you own and each one's CTPs. That's what builds your teams and the suggestions.",
+      "markers": {
+        "1": "Search an agent by name.",
+        "2": "Filters by gender, side, species and attack type (on the phone, under the Filters button).",
+        "3": "How many agents you marked.",
+        "4": "Uniform: tap to mark or unmark. Owning one uniform already counts the agent as yours.",
+        "5": "Mark all of the agent's uniforms at once (or Unmark).",
+        "6": "The character's CTP 1 and CTP 2: they apply on every day. CTP 2 is optional, to alternate by day.",
+        "7": "Equip CTPs: drag a CTP onto the character (on PC it sits next to the list).",
+        "8": "Screen help."
+      },
+      "tips": {
+        "1": "Can't find an agent? Clear the search and the filters.",
+        "2": "Mark your roster once: the rest of the site uses it from then on."
+      }
+    },
+    "rotations": {
+      "title": "Rotations",
+      "intro": "The skill order of each Meta Damage Dealer, by uniform, with an explanation and a video when available.",
+      "markers": {
+        "1": "All characters: back to the list of who has rotations.",
+        "2": "The character and which uniform the rotation is for.",
+        "3": "The rotation: skills in order, left to right, with the description below.",
+        "4": "How to read the notation: what c, dc, qc, the parentheses and symbols mean."
+      },
+      "tips": {
+        "1": "Numbers are the skills in the order of the game screen. 6 is the Ultimate, Awakened or Tier-4.",
+        "2": "You can also get here from the See rotation button on each day's leader."
+      }
+    },
+    "stats": {
+      "title": "Statistics",
+      "intro": "Who shows up the most in the cycle's teams (good investments) and the CTPs you equipped.",
+      "markers": {
+        "1": "Metas: counts the teams recommended by Sword Brasil.",
+        "2": "My teams: counts the teams you built.",
+        "3": "Mode: all, BAX only, BAL only or BAI only.",
+        "4": "Include alternatives in the count.",
+        "5": "Export the list.",
+        "6": "View as chart or table.",
+        "7": "My equipped CTPs, by type and quality.",
+        "8": "Screen help."
+      },
+      "tips": {
+        "1": "Not sure who to invest in? Check the top of Metas: they show up most often in the cycle.",
+        "2": "CTP chart empty? Equip CTPs in My roster."
+      }
+    },
+    "scores": {
+      "title": "Scores",
+      "intro": "Log your points for each mode and see whether you improved against the same day last month. Only you see your scores.",
+      "markers": {
+        "1": "Summary: today, the week, the season and your best day.",
+        "2": "Choose the day to log (it opens on today).",
+        "3": "Points for each mode: saved when you leave the field. Deleting the number removes it.",
+        "4": "The team you built for that day, to remember who you played with.",
+        "5": "Help: how the reset, normal BA and comparisons work."
+      },
+      "tips": {
+        "1": "On reset day (Thursday) log twice: before and after 22:00.",
+        "2": "No need to log normal BA: it's added to the total on its own.",
+        "3": "Green went up, red went down, always against the same day and week last month."
+      }
+    },
+    "admin": {
+      "title": "Administration",
+      "intro": "Admins only. Everything members see lives here: restrictions, Meta teams, catalog, rotations and accounts.",
+      "markers": {
+        "1": "Tabs: Overview, Days, Metas, Catalog, Rotations, CTPs, BAI, Users and Settings.",
+        "2": "Days: each BAX and BAL day's restriction.",
+        "3": "Metas: each day's Meta and Alternative teams, free BAL and BAI.",
+        "4": "Users: create accounts, change role and password and delete who left the alliance."
+      },
+      "tips": {
+        "1": "Everything you publish shows up for members right away, with date and author.",
+        "2": "Account marked Duplicate: the person has two accounts. Delete the unused one."
+      }
+    }
+  }
+}
