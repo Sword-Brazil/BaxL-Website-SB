@@ -34,6 +34,15 @@ export const RestrictionSchema = z.object({
 });
 export type RestrictionInput = z.infer<typeof RestrictionSchema>;
 
+/** Nova ordem das equipes de um dia (ids na ordem desejada, sem repetir). */
+export const ReorderMetaTeamsSchema = z.object({
+  ids: z
+    .array(idSchema)
+    .min(1)
+    .max(50)
+    .refine((ids) => new Set(ids).size === ids.length),
+});
+
 export const MetaTeamMemberSchema = z.object({
   slot: slotSchema,
   uniformId: idSchema,

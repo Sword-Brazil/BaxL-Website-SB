@@ -145,6 +145,15 @@ export function useMetaTeamEditorViewModel(scopeVm: MetaScopeViewModel, messages
     onError: (e: Error) => notifyError(e),
   });
 
+  const reorder = useMutation({
+    mutationFn: (ids: string[]) => adminApi.reorderMetaTeams(ids),
+    onSuccess: () => {
+      invalidate();
+      toast.success(messages.saved);
+    },
+    onError: (e: Error) => notifyError(e),
+  });
+
   const teams = list.data ?? [];
   return {
     teams,
@@ -177,5 +186,8 @@ export function useMetaTeamEditorViewModel(scopeVm: MetaScopeViewModel, messages
       }),
     submit: () => draft && save.mutate(draft),
     remove: (id: string) => remove.mutate(id),
+    /** Nova ordem das alternativas de um dia (ids na ordem desejada). */
+    reorder: (ids: string[]) => reorder.mutateAsync(ids),
+    isReordering: reorder.isPending,
   };
 }

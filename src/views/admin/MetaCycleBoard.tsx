@@ -24,6 +24,7 @@ import { RestrictionBadges } from "@/views/shared/RestrictionBadges";
 import { TeamStrip } from "@/views/shared/TeamStrip";
 import { Badge } from "@/components/ui/badge";
 import { MODE_VISUALS } from "@/views/shared/modeVisuals";
+import { AlternativesOrder } from "./AlternativesOrder";
 import { ReservesEditor } from "./ReservesEditor";
 
 type EditorVm = ReturnType<typeof useMetaTeamEditorViewModel>;
@@ -113,6 +114,7 @@ function ModeCell({
           <PlusIcon data-icon="inline-start" />
           {t("admin:metas.addAlt")}
         </Button>
+        <AlternativesOrder teams={teams} catalog={scopeVm.catalog} onSave={vm.reorder} isSaving={vm.isReordering} />
       </div>
       {data && (
         <ReservesEditor

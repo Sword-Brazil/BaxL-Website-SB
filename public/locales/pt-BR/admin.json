@@ -99,7 +99,16 @@
     "striker": "Striker meta de {{name}}",
     "pickStriker": "Escolher Striker",
     "removeStriker": "Tirar Striker",
-    "strikerHelp": "Apoio liberado na Transcendência 4: entra na partida e usa uma única skill para dar dano extra."
+    "strikerHelp": "Apoio liberado na Transcendência 4: entra na partida e usa uma única skill para dar dano extra.",
+    "order": {
+      "button": "Ordenar alternativas",
+      "title": "Ordem das alternativas",
+      "help": "A Meta principal fica sempre primeiro. Mova as alternativas ou use uma ordem pronta, e salve.",
+      "newest": "Mais recente primeiro",
+      "oldest": "Mais antiga primeiro",
+      "up": "Subir a {{n}}ª",
+      "down": "Descer a {{n}}ª"
+    }
   },
   "priority": {
     "solo": "Soladores",
