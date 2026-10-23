@@ -10,9 +10,12 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/in
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { DAY_MODES, EFFECTS_BY_MODE, type BossEffect } from "@/models/domain/enums";
+import { DAY_MODES, EFFECTS_BY_MODE, MODES, type BossEffect, type Mode } from "@/models/domain/enums";
 import type { Agent } from "@/models/domain/types";
 import { parseRotationVideo } from "@/models/rules/rotationVideo";
+import { videoSearchUrl } from "@/models/rules/scoringModes";
+import { cn } from "@/lib/utils";
+import { MODE_VISUALS } from "@/views/shared/modeVisuals";
 import { useRotationsEditorViewModel, type RotationDraft } from "@/viewmodels/admin/useRotationsEditorViewModel";
 import { HelpHint } from "@/views/layout/HelpHint";
 import { QueryState } from "@/views/shared/QueryState";
@@ -26,10 +29,109 @@ type Vm = ReturnType<typeof useRotationsEditorViewModel>;
 const ALL = "__all";
 
 /** Uma rotação: traje, temporada, título, sequência livre (com prévia), descrição e vídeo. */
+const VIDEO_FIELD = { BAX: "videoBax", BAL: "videoBal", BAI: "videoBai" } as const satisfies Record<Mode, keyof RotationDraft>;
+
+/** Link de vídeo (geral ou de um modo), com a validação, a prévia e a sugestão de busca no YouTube. */
+function VideoField({
+  id,
+  label,
+  hint,
+  value,
+  agent,
+  mode,
+  onChange,
+}: {
+  id: string;
+  label: string;
+  hint?: string;
+  value: string;
+  agent: Agent;
+  mode: Mode | null;
+  onChange: (value: string) => void;
+}) {
+  const { t } = useTranslation(["admin", "common"]);
+  const invalid = !!value.trim() && !parseRotationVideo(value);
+  return (
+    <Field data-invalid={invalid || undefined}>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <FieldLabel htmlFor={id} className="flex items-center gap-1.5">
+          {mode && <Badge variant={MODE_VISUALS[mode].badge}>{mode}</Badge>}
+          {label}
+        </FieldLabel>
+        <Button asChild size="sm" variant="ghost" className="h-7 text-xs">
+          <a href={videoSearchUrl(agent.nameEn || agent.name, mode)} target="_blank" rel="noreferrer">
+            <SearchIcon data-icon="inline-start" />
+            {t("admin:rotations.suggestVideo")}
+          </a>
+        </Button>
+      </div>
+      <Input
+        id={id}
+        type="url"
+        inputMode="url"
+        maxLength={300}
+        placeholder="https://youtu.be/…?t=42"
+        value={value}
+        aria-invalid={invalid || undefined}
+        onChange={(e) => onChange(e.target.value)}
+      />
+      {(invalid || hint) && (
+        <FieldDescription className={invalid ? "text-destructive" : undefined}>
+          {invalid ? t("common:validation.rotationVideo") : hint}
+        </FieldDescription>
+      )}
+      {!invalid && value.trim() && (
+        <div className="w-full max-w-md">
+          <RotationVideoPlayer url={value} title={mode ? `${agent.name} · ${mode}` : agent.name} />
+        </div>
+      )}
+    </Field>
+  );
+}
+
+/** Modos em que o personagem pontua: automático (pelas equipes Meta) ou escolhidos pelo admin. */
+function ScoringModes({ agent, vm }: { agent: Agent; vm: Vm }) {
+  const { t } = useTranslation("admin");
+  return (
+    <div className="flex flex-col gap-2 rounded-lg bg-spark/5 p-3 ring-1 ring-spark/25">
+      <p className="text-sm font-medium">{t("rotations.scoring.title")}</p>
+      <Field orientation="horizontal">
+        <Switch id="scoring-auto" checked={vm.scoring.auto} onCheckedChange={vm.setScoringAuto} />
+        <FieldLabel htmlFor="scoring-auto">{t("rotations.scoring.auto")}</FieldLabel>
+      </Field>
+      <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label={t("rotations.scoring.title")}>
+        {MODES.map((mode) => {
+          const on = vm.scoringModes.includes(mode);
+          return (
+            <Button
+              key={mode}
+              type="button"
+              size="sm"
+              variant={on ? "secondary" : "outline"}
+              aria-pressed={on}
+              disabled={vm.scoring.auto}
+              onClick={() => vm.toggleScoringMode(mode)}
+              className={cn(on && MODE_VISUALS[mode].text)}
+            >
+              {mode}
+            </Button>
+          );
+        })}
+      </div>
+      <p className="text-xs text-muted-foreground">
+        {vm.scoring.auto
+          ? agent.detectedScoringModes.length
+            ? t("rotations.scoring.detected", { modes: agent.detectedScoringModes.join(", ") })
+            : t("rotations.scoring.none")
+          : t("rotations.scoring.manual")}
+      </p>
+    </div>
+  );
+}
+
 function RotationEditor({ draft, index, total, agent, vm }: { draft: RotationDraft; index: number; total: number; agent: Agent; vm: Vm }) {
   const { t } = useTranslation(["admin", "common"]);
   const id = (name: string) => `${name}-${draft.key}`;
-  const videoInvalid = !!draft.videoUrl.trim() && !parseRotationVideo(draft.videoUrl);
   const uniform = agent.uniforms.find((u) => u.id === draft.uniformId) ?? null;
   return (
     <li className="flex flex-col gap-3 rounded-lg border border-spark/25 bg-background/40 p-3">
@@ -148,27 +250,19 @@ function RotationEditor({ draft, index, total, agent, vm }: { draft: RotationDra
           />
         </Field>
       </div>
-      <Field data-invalid={videoInvalid || undefined}>
-        <FieldLabel htmlFor={id("video")}>{t("admin:rotations.video")}</FieldLabel>
-        <Input
-          id={id("video")}
-          type="url"
-          inputMode="url"
-          maxLength={300}
-          placeholder="https://youtu.be/…?t=42"
-          value={draft.videoUrl}
-          aria-invalid={videoInvalid || undefined}
-          onChange={(e) => vm.update(draft.key, { videoUrl: e.target.value })}
+      <VideoField id={id("video")} label={t("admin:rotations.video")} hint={t("admin:rotations.videoHint")} value={draft.videoUrl} agent={agent} mode={null} onChange={(videoUrl) => vm.update(draft.key, { videoUrl })} />
+      {/* Demonstração em cada modo em que o personagem pontua (e nos que já têm vídeo). */}
+      {MODES.filter((m) => vm.scoringModes.includes(m) || draft[VIDEO_FIELD[m]].trim()).map((mode) => (
+        <VideoField
+          key={mode}
+          id={id(`video-${mode}`)}
+          label={t("admin:rotations.videoOf", { mode })}
+          value={draft[VIDEO_FIELD[mode]]}
+          agent={agent}
+          mode={mode}
+          onChange={(v) => vm.update(draft.key, { [VIDEO_FIELD[mode]]: v })}
         />
-        <FieldDescription className={videoInvalid ? "text-destructive" : undefined}>
-          {videoInvalid ? t("common:validation.rotationVideo") : t("admin:rotations.videoHint")}
-        </FieldDescription>
-        {!videoInvalid && draft.videoUrl.trim() && (
-          <div className="w-full max-w-md">
-            <RotationVideoPlayer url={draft.videoUrl} title={agent.name} />
-          </div>
-        )}
-      </Field>
+      ))}
     </li>
   );
 }
@@ -244,6 +338,7 @@ export function RotationsAdminView() {
                     <AlertTitle>{vm.error}</AlertTitle>
                   </Alert>
                 )}
+                <ScoringModes agent={agent} vm={vm} />
                 <ul className="flex flex-col gap-3">
                   {vm.drafts.map((d, i) => (
                     <RotationEditor key={d.key} draft={d} index={i} total={vm.drafts.length} agent={agent} vm={vm} />

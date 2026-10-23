@@ -14,21 +14,25 @@ datasource db {
 // ---------- Catálogo ----------
 
 model Agent {
-  id         String     @id @default(cuid())
-  slug       String     @unique
-  name       String
+  id           String     @id @default(cuid())
+  slug         String     @unique
+  name         String
   // Nome em inglês (o espanhol usa o mesmo); vazio = mostra o nome em português.
-  nameEn     String?
-  active     Boolean    @default(true)
-  uniforms   Uniform[]
+  nameEn       String?
+  active       Boolean    @default(true)
+  uniforms     Uniform[]
   // CTPs da Meta para o personagem: o 1 (padrão) e o 2 (opcional), alternados por dia nas equipes.
-  metaCtp1Id String?
-  metaCtp1   Ctp?       @relation("AgentMetaCtp1", fields: [metaCtp1Id], references: [id], onDelete: SetNull)
-  metaCtp2Id String?
-  metaCtp2   Ctp?       @relation("AgentMetaCtp2", fields: [metaCtp2Id], references: [id], onDelete: SetNull)
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  rotations  Rotation[]
+  metaCtp1Id   String?
+  metaCtp1     Ctp?       @relation("AgentMetaCtp1", fields: [metaCtp1Id], references: [id], onDelete: SetNull)
+  metaCtp2Id   String?
+  metaCtp2     Ctp?       @relation("AgentMetaCtp2", fields: [metaCtp2Id], references: [id], onDelete: SetNull)
+  // Modos em que o personagem pontua (Causador de Dano): automático pelas equipes Meta ou os
+  // escolhidos pelo admin em scoringModes (BAX, BAL, BAI).
+  scoringAuto  Boolean    @default(true)
+  scoringModes String[]   @default([])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  rotations    Rotation[]
 }
 
 model Uniform {
@@ -178,7 +182,11 @@ model Rotation {
   sequence      String
   description   String?
   descriptionEn String?
-  // Link do YouTube ou de um .mp4/.webm externo: o sistema não hospeda vídeo.
+  // Link do YouTube ou de um .mp4/.webm externo: o sistema não hospeda vídeo. videoUrl vale para
+  // qualquer modo; os outros são a demonstração em cada modo.
+  videoBax      String?
+  videoBal      String?
+  videoBai      String?
   videoUrl      String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

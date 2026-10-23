@@ -1,5 +1,6 @@
 import { CTP_QUALITIES, CTP_TYPES, type AttackType, type BossEffect, type CtpQuality, type CtpType, type Gender, type Side, type Species } from "@/models/domain/enums";
 import type { Agent, Catalog, Ctp } from "@/models/domain/types";
+import { modeOfTeam, sortModes } from "@/models/rules/scoringModes";
 import { catalogRepository } from "@/server/repositories/catalogRepository";
 
 /**
@@ -8,7 +9,17 @@ import { catalogRepository } from "@/server/repositories/catalogRepository";
  * Telas de escolha filtram `active: true`.
  */
 export async function getCatalog(): Promise<Catalog> {
-  const [agents, ctps] = await Promise.all([catalogRepository.listAgents(), catalogRepository.listCtps()]);
+  const [agents, ctps, dealers] = await Promise.all([
+    catalogRepository.listAgents(),
+    catalogRepository.listCtps(),
+    catalogRepository.listDamageDealers(),
+  ]);
+  // Modos em que cada personagem é Causador de Dano nas equipes Meta.
+  const detected = new Map<string, Set<string>>();
+  for (const d of dealers) {
+    const mode = modeOfTeam(d.metaTeam.scope, d.metaTeam.battleDay?.mode);
+    if (mode) detected.set(d.uniform.agentId, (detected.get(d.uniform.agentId) ?? new Set()).add(mode));
+  }
   return {
     agents: agents.map((a): Agent => {
       const fallback =
@@ -23,6 +34,9 @@ export async function getCatalog(): Promise<Catalog> {
         active: a.active,
         metaCtp1Id: a.metaCtp1Id,
         metaCtp2Id: a.metaCtp2Id,
+        scoringAuto: a.scoringAuto,
+        scoringModes: sortModes(a.scoringModes),
+        detectedScoringModes: sortModes(detected.get(a.id) ?? []),
         uniforms: a.uniforms.map((u) => ({
           id: u.id,
           agentId: u.agentId,

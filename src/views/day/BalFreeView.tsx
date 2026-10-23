@@ -52,6 +52,7 @@ export function BalFreeView() {
                 key={team.id}
                 label={team.isPrimary ? t("cycle:meta") : (teamLabel(team.label, team.labelEn, lang) ?? t("cycle:alternative"))}
                 tone={team.isPrimary ? "meta" : "alt"}
+                mode="BAL"
                 members={team.members}
                 catalog={catalog}
                 isOwned={owned.size ? (u) => owned.has(u) : undefined}

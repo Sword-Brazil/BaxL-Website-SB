@@ -4,7 +4,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { adminApi } from "@/models/api/admin";
 import { ApiError } from "@/models/api/client";
-import type { BossEffect } from "@/models/domain/enums";
+import type { BossEffect, Mode } from "@/models/domain/enums";
+import { effectiveScoringModes, sortModes } from "@/models/rules/scoringModes";
 import type { Agent, Rotation } from "@/models/domain/types";
 import { AgentRotationsSchema } from "@/models/schemas/admin";
 import { searchNames } from "@/viewmodels/useCatalogViewModel";
@@ -22,6 +23,9 @@ export interface RotationDraft {
   description: string;
   descriptionEn: string;
   videoUrl: string;
+  videoBax: string;
+  videoBal: string;
+  videoBai: string;
 }
 
 let nextKey = 0;
@@ -37,6 +41,9 @@ const fromRotation = (r: Rotation): RotationDraft => ({
   description: r.description ?? "",
   descriptionEn: r.descriptionEn ?? "",
   videoUrl: r.videoUrl ?? "",
+  videoBax: r.videoBax ?? "",
+  videoBal: r.videoBal ?? "",
+  videoBai: r.videoBai ?? "",
 });
 
 /** Rotação nova; `from` copia traje e temporada da anterior (o mais comum é variar só um deles). */
@@ -50,6 +57,9 @@ const blankDraft = (from?: RotationDraft): RotationDraft => ({
   description: "",
   descriptionEn: "",
   videoUrl: "",
+  videoBax: "",
+  videoBal: "",
+  videoBai: "",
 });
 
 /**
@@ -65,11 +75,14 @@ export function useRotationsEditorViewModel(messages: { saved: string }) {
   const [onlyWithRotations, setOnlyWithRotations] = useState(false);
   const [agent, setAgent] = useState<Agent | null>(null);
   const [drafts, setDrafts] = useState<RotationDraft[]>([]);
+  /** Modos em que pontua: automático (pelas equipes Meta) ou os escolhidos aqui. */
+  const [scoring, setScoring] = useState<{ auto: boolean; modes: Mode[] }>({ auto: true, modes: [] });
   const [error, setError] = useState<string | null>(null);
 
   const open = (a: Agent) => {
     setError(null);
     setAgent(a);
+    setScoring({ auto: a.scoringAuto, modes: a.scoringModes });
     const current = rotations.rotationsOf(a.id).map(fromRotation);
     setDrafts(current.length ? current : [blankDraft()]);
   };
@@ -94,7 +107,7 @@ export function useRotationsEditorViewModel(messages: { saved: string }) {
     mutationFn: async () => {
       const parsed = AgentRotationsSchema.safeParse({
         rotations: drafts
-          .filter((d) => d.sequence.trim() || d.title.trim() || d.description.trim() || d.videoUrl.trim())
+          .filter((d) => [d.sequence, d.title, d.description, d.videoUrl, d.videoBax, d.videoBal, d.videoBai].some((v) => v.trim()))
           .map((d) => ({
             uniformId: d.uniformId,
             effect: d.effect,
@@ -104,13 +117,19 @@ export function useRotationsEditorViewModel(messages: { saved: string }) {
             description: d.description || null,
             descriptionEn: d.descriptionEn || null,
             videoUrl: d.videoUrl || null,
+            videoBax: d.videoBax || null,
+            videoBal: d.videoBal || null,
+            videoBai: d.videoBai || null,
           })),
+        scoring,
       });
       if (!parsed.success) throw new ApiError(400, "VALIDATION_ERROR", parsed.error.issues[0]?.message ?? "Dados inválidos");
       return adminApi.saveRotations(agent!.id, parsed.data);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ROTATIONS_KEY });
+      // Os modos em que pontua ficam no personagem (catálogo).
+      qc.invalidateQueries({ queryKey: ["catalog"] });
       setAgent(null);
       toast.success(messages.saved);
     },
@@ -133,6 +152,12 @@ export function useRotationsEditorViewModel(messages: { saved: string }) {
     agents,
     agent,
     drafts,
+    scoring,
+    setScoringAuto: (auto: boolean) => setScoring((s) => ({ ...s, auto })),
+    toggleScoringMode: (mode: Mode) =>
+      setScoring((s) => ({ ...s, modes: sortModes(s.modes.includes(mode) ? s.modes.filter((m) => m !== mode) : [...s.modes, mode]) })),
+    /** Modos em que pontua com a escolha atual (os detectados, no automático). */
+    scoringModes: agent ? effectiveScoringModes({ ...agent, scoringAuto: scoring.auto, scoringModes: scoring.modes }) : [],
     error,
     isSaving: save.isPending,
     open,

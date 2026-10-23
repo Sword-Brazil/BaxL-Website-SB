@@ -2,7 +2,8 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/server/db";
 import { HttpError } from "@/server/http";
 import { listRotations, saveAgentRotations } from "@/server/services/rotationService";
-import { createAgent, seedBase } from "./fixtures";
+import { getCatalog } from "@/server/services/catalogService";
+import { createAgent, createMetaTeam, dayId, seedBase } from "./fixtures";
 
 describe("rotações por personagem", () => {
   let agentId: string;
@@ -32,6 +33,24 @@ describe("rotações por personagem", () => {
     ]);
     expect(saved[1]).toMatchObject({ title: "Fase 2", videoUrl: "https://youtu.be/dQw4w9WgXcQ?t=42", description: null });
     expect(await listRotations()).toHaveLength(3);
+  });
+
+  it("guarda um vídeo de demonstração por modo e os modos escolhidos pelo admin", async () => {
+    const [r] = await saveAgentRotations(agentId, {
+      rotations: [{ uniformId: null, sequence: "1 2", videoBax: "https://youtu.be/dQw4w9WgXcQ", videoBai: "https://cdn.example.com/bai.mp4" }],
+      scoring: { auto: false, modes: ["BAI", "BAX"] },
+    });
+    expect(r).toMatchObject({ videoUrl: null, videoBax: "https://youtu.be/dQw4w9WgXcQ", videoBal: null, videoBai: "https://cdn.example.com/bai.mp4" });
+    const agent = (await getCatalog()).agents.find((a) => a.id === agentId)!;
+    expect(agent).toMatchObject({ scoringAuto: false, scoringModes: ["BAX", "BAI"] });
+  });
+
+  it("detecta os modos em que pontua pelas equipes Meta em que é Causador de Dano", async () => {
+    const others = [(await createAgent("a1")).uniform.id, (await createAgent("a2")).uniform.id];
+    const team = await createMetaTeam({ scope: "DAY", battleDayId: await dayId("BAL", 1), isPrimary: true, uniformIds: [padrao, ...others] as [string, string, string] });
+    await prisma.metaTeamMember.updateMany({ where: { metaTeamId: team.id, uniformId: padrao }, data: { isDamageDealer: true } });
+    const agent = (await getCatalog()).agents.find((a) => a.id === agentId)!;
+    expect(agent).toMatchObject({ scoringAuto: true, detectedScoringModes: ["BAL"] });
   });
 
   it("salvar de novo substitui a lista do personagem", async () => {

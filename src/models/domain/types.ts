@@ -8,6 +8,7 @@ import type {
   CtpQuality,
   CtpType,
   DayMode,
+  Mode,
   Gender,
   PriorityRole,
   Role,
@@ -54,6 +55,11 @@ export interface Agent {
   /** CTPs da Meta para o personagem: o 1 (padrão) e o 2 (opcional); cada equipe Meta escolhe um por dia. */
   metaCtp1Id: string | null;
   metaCtp2Id: string | null;
+  /** Modos em que pontua: automático (pelas equipes Meta em que é Causador de Dano) ou escolhidos pelo admin. */
+  scoringAuto: boolean;
+  scoringModes: Mode[];
+  /** Modos das equipes Meta em que é Causador de Dano (a detecção automática). */
+  detectedScoringModes: Mode[];
 }
 
 export interface Ctp {
@@ -97,8 +103,12 @@ export interface Rotation {
   /** Quando usar, os delays, o que observar. */
   description: string | null;
   descriptionEn: string | null;
-  /** Vídeo de referência (YouTube ou .mp4/.webm externo). */
+  /** Vídeo de referência (YouTube ou .mp4/.webm externo), para qualquer modo. */
   videoUrl: string | null;
+  /** Demonstração da rotação em cada modo. */
+  videoBax: string | null;
+  videoBal: string | null;
+  videoBai: string | null;
   updatedAt: string;
 }
 

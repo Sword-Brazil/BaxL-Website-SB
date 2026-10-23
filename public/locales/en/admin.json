@@ -241,10 +241,19 @@
     "legendFree": "The notation is optional: write it however explains it best.",
     "description": "Description",
     "descriptionPlaceholder": "When to use it, how long each delay is, what to watch for…",
-    "video": "Reference video (optional)",
+    "video": "General video (any mode, optional)",
     "videoHint": "YouTube link (video or Shorts; add ?t= to start at the right moment) or a .mp4/.webm file. It plays muted and looped; the video is not stored in the system.",
     "add": "Add rotation",
     "effect": "Season",
-    "english": "In English (optional; Spanish uses the same)"
+    "english": "In English (optional; Spanish uses the same)",
+    "videoOf": "Demo video in {{mode}}",
+    "suggestVideo": "Suggest a video",
+    "scoring": {
+      "title": "Modes where they score (Damage Dealer)",
+      "auto": "Automatic, from the Meta teams",
+      "detected": "Found in the Meta teams: {{modes}}. A video field shows up for each mode.",
+      "none": "Not a Damage Dealer in any Meta team yet. Turn automatic off to pick the modes.",
+      "manual": "Pick the modes: a demo video field shows up for each one."
+    }
   }
 }

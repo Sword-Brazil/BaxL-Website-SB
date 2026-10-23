@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { useTranslation } from "next-i18next/pages";
 import { ChevronRightIcon, SwordIcon } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { effectiveScoringModes } from "@/models/rules/scoringModes";
 import { useRotationsViewModel } from "@/viewmodels/useRotationsViewModel";
 import { HelpHint } from "@/views/layout/HelpHint";
+import { MODE_VISUALS } from "@/views/shared/modeVisuals";
 import { QueryState } from "@/views/shared/QueryState";
 import { RotationLegend } from "@/views/shared/RotationSequence";
 import { UniformPreview } from "./UniformPreview";
@@ -46,9 +49,14 @@ export function RotationsIndexView() {
                     <UniformPreview uniform={main} name={agent.name} className="size-14" />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-heading font-semibold">{agent.name}</span>
-                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <span className="flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
                         <SwordIcon className="size-3 text-spark" />
                         {t("count", { count })}
+                        {effectiveScoringModes(agent).map((m) => (
+                          <Badge key={m} variant={MODE_VISUALS[m].badge} className="h-4 px-1.5 text-[0.6rem]">
+                            {m}
+                          </Badge>
+                        ))}
                       </span>
                     </span>
                     <ChevronRightIcon className="size-4 shrink-0 text-muted-foreground" />

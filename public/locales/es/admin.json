@@ -241,10 +241,19 @@
     "legendFree": "La notación es opcional: escribe como mejor se explique.",
     "description": "Descripción",
     "descriptionPlaceholder": "Cuándo usarla, cuánto esperar en cada delay, qué observar…",
-    "video": "Vídeo de referencia (opcional)",
+    "video": "Video general (cualquier modo, opcional)",
     "videoHint": "Enlace de YouTube (vídeo o Shorts; usa ?t= para empezar en el momento justo) o de un archivo .mp4/.webm. Se reproduce sin sonido y en bucle; el vídeo no se guarda en el sistema.",
     "add": "Añadir rotación",
     "effect": "Temporada",
-    "english": "En inglés (opcional; el español usa el mismo)"
+    "english": "En inglés (opcional; el español usa el mismo)",
+    "videoOf": "Video de demostración en {{mode}}",
+    "suggestVideo": "Sugerir video",
+    "scoring": {
+      "title": "Modos en los que puntúa (Causante de Daño)",
+      "auto": "Automático, por los equipos Meta",
+      "detected": "Detectado en los equipos Meta: {{modes}}. Aparece un campo de video para cada modo.",
+      "none": "Aún no es Causante de Daño en ningún equipo Meta. Apaga el automático para elegir los modos.",
+      "manual": "Elige los modos: aparece un campo de video de demostración para cada uno."
+    }
   }
 }

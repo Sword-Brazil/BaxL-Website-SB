@@ -15,7 +15,7 @@ import {
 import { Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitle, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { SLOTS, type BossEffect, type DayMode } from "@/models/domain/enums";
+import { SLOTS, type BossEffect, type DayMode, type Mode } from "@/models/domain/enums";
 import type { CycleDay, CycleModeDay, MetaTeam } from "@/models/domain/types";
 import type { UserTeam } from "@/models/schemas/selections";
 import { pick, teamLabel } from "@/models/rules/localize";
@@ -42,6 +42,7 @@ function TeamStrip(props: {
   team: StripMember[];
   vm: Vm;
   effect?: BossEffect;
+  mode?: Mode;
 }) {
   const { vm } = props;
   return (
@@ -52,6 +53,7 @@ function TeamStrip(props: {
       catalog={vm.catalog}
       isOwned={vm.hasRoster ? vm.isOwned : undefined}
       effect={props.effect}
+      mode={props.mode}
     />
   );
 }
@@ -119,12 +121,12 @@ function ModePanel({
         </span>
       </div>
       {meta ? (
-        <TeamStrip label={t("cycle:meta")} tone="meta" team={teamMembers(meta)} vm={vm} effect={effect} />
+        <TeamStrip label={t("cycle:meta")} tone="meta" team={teamMembers(meta)} vm={vm} effect={effect} mode={mode} />
       ) : (
         <p className="rounded-md border border-dashed p-3 text-center text-xs text-muted-foreground">{t("cycle:noTeam")}</p>
       )}
       {alts.map((alt) => (
-        <TeamStrip key={alt.id} label={teamLabel(alt.label, alt.labelEn, lang) ?? t("cycle:alternative")} tone="alt" team={teamMembers(alt)} vm={vm} effect={effect} />
+        <TeamStrip key={alt.id} label={teamLabel(alt.label, alt.labelEn, lang) ?? t("cycle:alternative")} tone="alt" team={teamMembers(alt)} vm={vm} effect={effect} mode={mode} />
       ))}
       {mine.length > 0 && <TeamStrip label={t("cycle:mine")} tone="mine" team={mine} vm={vm} effect={effect} />}
       <Button variant={mine.length ? "ghost" : "outline"} size="sm" className="self-start" onClick={() => vm.openBuilder(mode, day)}>
@@ -164,12 +166,12 @@ function BaiPanel({ day, vm }: { day: number; vm: Vm }) {
       </div>
       <div className="grid gap-2 md:grid-cols-2">
         {meta ? (
-          <TeamStrip label={t("cycle:meta")} tone="meta" team={teamMembers(meta)} vm={vm} />
+          <TeamStrip label={t("cycle:meta")} tone="meta" team={teamMembers(meta)} vm={vm} mode="BAI" />
         ) : (
           <p className="rounded-md border border-dashed p-3 text-center text-xs text-muted-foreground">{t("cycle:noTeam")}</p>
         )}
         {alts.map((alt) => (
-          <TeamStrip key={alt.id} label={teamLabel(alt.label, alt.labelEn, lang) ?? t("cycle:alternative")} tone="alt" team={teamMembers(alt)} vm={vm} />
+          <TeamStrip key={alt.id} label={teamLabel(alt.label, alt.labelEn, lang) ?? t("cycle:alternative")} tone="alt" team={teamMembers(alt)} vm={vm} mode="BAI" />
         ))}
         {mine.length > 0 && <TeamStrip label={t("cycle:mine")} tone="mine" team={mine} vm={vm} />}
       </div>
