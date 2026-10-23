@@ -23,8 +23,10 @@ describe("parseRotation", () => {
     expect(normalizeRotation("(5 4c)6")).toBe("(5 4c) 6");
   });
 
-  it("recusa habilidades fora de 1–6 e sufixos desconhecidos", () => {
-    expect(parseRotation("1 7")).toMatchObject({ ok: false, error: "token", token: "7" });
+  it("aceita as habilidades 1–7 e recusa as de fora e sufixos desconhecidos", () => {
+    expect(parseRotation("1 6 7qc")).toMatchObject({ ok: true });
+    expect(parseRotation("1 8")).toMatchObject({ ok: false, error: "token", token: "8" });
+    expect(parseRotation("0")).toMatchObject({ ok: false, error: "token", token: "0" });
     expect(parseRotation("1x")).toMatchObject({ ok: false, error: "token", token: "1x" });
   });
 

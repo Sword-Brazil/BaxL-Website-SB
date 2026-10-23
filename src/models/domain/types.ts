@@ -98,7 +98,7 @@ export interface Rotation {
   position: number;
   title: string | null;
   titleEn: string | null;
-  /** Sequência em texto livre (a notação 1–6 / c / dc / qc vira "chips" quando reconhecida). */
+  /** Sequência em texto livre (a notação 1–7 / c / dc / qc vira "chips" quando reconhecida). */
   sequence: string;
   /** Quando usar, os delays, o que observar. */
   description: string | null;

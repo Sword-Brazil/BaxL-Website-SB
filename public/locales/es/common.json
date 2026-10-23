@@ -72,7 +72,7 @@
   "rotation": {
     "title": "Rotación",
     "skill": "Habilidad {{n}}",
-    "ultimate": "Habilidad 6 (Ultimate / Despertada / Tier-4)",
+    "ultimate": "Habilidad 7 (Ultimate / Despertada / Tier-4)",
     "optional": "Opcional",
     "cancels": {
       "c": "cancelar justo después de usar",
@@ -80,7 +80,7 @@
       "qc": "cancelación rápida"
     },
     "legend": {
-      "numbers": "Habilidades en el orden de la pantalla. 6 = Ultimate, Despertada o Tier-4.",
+      "numbers": "Habilidades en el orden de la pantalla. 7 = Ultimate, Despertada o Tier-4.",
       "c": "Cancel: cancela la animación justo después de usarla, soltando la siguiente habilidad.",
       "dc": "Delayed Cancel: espera una fracción de segundo (el efecto del golpe o el fin de la animación) antes de cancelar y pulsar la siguiente.",
       "qc": "Quick Cancel: cancelación rápida justo después del comando.",
@@ -98,7 +98,7 @@
     },
     "errors": {
       "empty": "Escribe la rotación.",
-      "token": "No entendí “{{token}}”: usa 1–6 (con c, dc o qc), paréntesis, |, / o *.",
+      "token": "No entendí “{{token}}”: usa 1–7 (con c, dc o qc), paréntesis, |, / o *.",
       "unclosedGroup": "Falta cerrar un paréntesis.",
       "unopenedGroup": "Hay un “)” sin “(” antes.",
       "nestedGroup": "No se puede abrir un paréntesis dentro de otro.",
