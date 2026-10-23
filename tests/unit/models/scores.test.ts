@@ -4,6 +4,8 @@ import {
   dayTotal,
   gameDayOf,
   modesOfDay,
+  normalBaOf,
+  normalBaPointsOf,
   parsePoints,
   phasesOfDay,
   scoreEntries,
@@ -15,6 +17,9 @@ import {
 } from "@/models/rules/scores";
 
 const ANCHOR = "2026-10-01"; // Dia 1 de um ciclo
+// BA normal somada com a BAX: 166.750 e 210.500 alternando nos dias de BAX/BAL da semana.
+const N1 = 166_750;
+const N2 = 210_500;
 
 describe("gameDayOf", () => {
   it("dia do ciclo, semana e temporada a partir da âncora", () => {
@@ -44,29 +49,30 @@ describe("comparação com a temporada anterior (mesmo dia do ciclo, 28 dias ant
     const days = seasonDays(scores, ANCHOR, "2026-10-01", "2026-10-24");
     expect(days).toHaveLength(28);
     const d22 = days[21];
-    expect(d22).toMatchObject({ cycleDay: 22, current: 240, previous: 200, delta: 40 });
-    expect(d22.pct).toBeCloseTo(0.2);
-    expect(days[22]).toMatchObject({ cycleDay: 23, current: 150, previous: 200, delta: -50, pct: -0.25 });
-    expect(days[23]).toMatchObject({ cycleDay: 24, current: 900, previous: 1000, delta: -100 });
+    expect(d22).toMatchObject({ cycleDay: 22, current: 240 + N1, previous: 200 + N1, delta: 40, normal: N1 });
+    expect(days[22].normal).toBe(N2);
+    expect(d22.pct).toBeCloseTo(40 / (200 + N1));
+    expect(days[22]).toMatchObject({ cycleDay: 23, current: 150 + N2, previous: 200 + N2, delta: -50 });
+    expect(days[23]).toMatchObject({ cycleDay: 24, current: 900, previous: 1000, delta: -100, normal: null });
     // Dia que ainda não chegou: só o valor da temporada anterior.
     expect(days[24]).toMatchObject({ cycleDay: 25, future: true, current: null, delta: null });
     expect(compare(10, 0).pct).toBeNull();
   });
 
   it("semanas: a em andamento compara com a anterior só até o mesmo dia", () => {
-    const weeks = seasonWeeks(scores, "2026-10-01", "2026-10-23");
-    // Semana 4 até o Dia 23 (22–23) contra 24–25/09: 390 contra 400.
-    expect(weeks[3]).toMatchObject({ week: 4, partial: true, current: 390, previous: 400, delta: -10 });
+    const weeks = seasonWeeks(scores, ANCHOR, "2026-10-01", "2026-10-23");
+    // Semana 4 até o Dia 23 (22–23) contra 24–25/09: 390 contra 400, mais a BA normal dos dois dias.
+    expect(weeks[3]).toMatchObject({ week: 4, partial: true, current: 390 + N1 + N2, previous: 400 + N1 + N2, delta: -10 });
     expect(weeks[0]).toMatchObject({ week: 1, partial: false, current: null, previous: null });
   });
 
   it("cartões: hoje, semana e temporada contra o mês anterior, e o melhor dia", () => {
     const s = scoreSummary(scores, ANCHOR, "2026-10-24");
     expect(s.today).toMatchObject({ current: 900, previous: 1000, delta: -100, pct: -0.1 });
-    expect(s.week).toMatchObject({ current: 1290, previous: 1400, delta: -110 });
-    expect(s.season).toMatchObject({ current: 1290, previous: 1400 });
+    expect(s.week).toMatchObject({ current: 1290 + N1 + N2, previous: 1400 + N1 + N2, delta: -110 });
+    expect(s.season).toMatchObject({ current: 1290 + N1 + N2, previous: 1400 + N1 + N2 });
     expect(s.seasonDays).toBe(3);
-    expect(s.best).toEqual({ date: "2026-09-26", total: 1000 });
+    expect(s.best).toEqual({ date: "2026-09-25", total: 200 + N2 });
   });
 
   it("temporadas com pontuação, da mais recente para a mais antiga", () => {
@@ -91,21 +97,47 @@ describe("dia do reset (antes e depois das 22h)", () => {
   });
 
   it("a parte antes do reset conta na semana anterior; o dia soma as duas partes", () => {
-    const weeks = seasonWeeks(r, "2026-10-01", "2026-10-21");
-    expect(weeks[1]).toMatchObject({ week: 2, current: 130 }); // 100 + 30 (fechada: o reset seguinte já passou)
-    expect(weeks[2]).toMatchObject({ week: 3, current: 120 }); // 50 + 70
-    expect(dayTotal(r, "2026-10-15")).toBe(80);
+    const weeks = seasonWeeks(r, ANCHOR, "2026-10-01", "2026-10-21");
+    // Fechada (o reset seguinte já passou): Dia 14 e Dia 15 antes do reset, cada um com a BA normal.
+    expect(weeks[1]).toMatchObject({ week: 2, current: 100 + N2 + 30 + N1 });
+    // A BA normal é refeita depois do reset: Dia 15 depois das 22h + Dia 16, cada um com a dele.
+    expect(weeks[2]).toMatchObject({ week: 3, current: 50 + N1 + 70 + N2 });
+    expect(dayTotal(r, "2026-10-15", ANCHOR)).toBe(80 + 2 * N1);
     const pre = scoreEntries(r, ANCHOR).find((e) => e.phase === "pre")!;
     expect(pre).toMatchObject({ cycleDay: 15, week: 2 });
   });
 
   it("a semana atual, no dia do reset, começa só com o que veio depois das 22h", () => {
-    expect(scoreSummary(r, ANCHOR, "2026-10-15").week.current).toBe(50);
+    expect(scoreSummary(r, ANCHOR, "2026-10-15").week.current).toBe(50 + N1);
   });
 
   it("a parte antes do reset do Dia 1 é da temporada anterior", () => {
     const e = scoreEntries({ [scoreKey("2026-10-29", "BAL", "pre")]: 10 }, ANCHOR)[0];
     expect(e).toMatchObject({ cycleDay: 1, week: 4, seasonStart: "2026-10-01" });
+  });
+});
+
+describe("BA normal", () => {
+  it("alterna 166.750 e 210.500 nos dias de BAX/BAL de cada semana, sem a BAI", () => {
+    expect([1, 2, 3, 4, 5, 6, 7].map(normalBaPointsOf)).toEqual([N1, N2, null, N1, N2, N1, N2]);
+    expect([8, 9, 10, 11].map(normalBaPointsOf)).toEqual([N1, N2, null, N1]);
+    expect([22, 23, 24, 25, 28].map(normalBaPointsOf)).toEqual([N1, N2, null, N1, N2]);
+  });
+
+  it("entra uma vez por dia com a BAX ou a BAL anotada, e nunca na BAI", () => {
+    const onlyBal = { [scoreKey("2026-10-02", "BAL")]: 500 }; // Dia 2 só com BAL
+    expect(dayTotal(onlyBal, "2026-10-02", ANCHOR)).toBe(500 + N2);
+    const both = { ...onlyBal, [scoreKey("2026-10-02", "BAX")]: 1000 };
+    expect(dayTotal(both, "2026-10-02", ANCHOR)).toBe(1500 + N2);
+    expect(dayTotal({}, "2026-10-02", ANCHOR)).toBeNull();
+    expect(dayTotal({ [scoreKey("2026-10-03", "BAI")]: 900 }, "2026-10-03", ANCHOR)).toBe(900);
+  });
+
+  it("no dia do reset é refeita: conta antes e depois das 22h", () => {
+    const r = { [scoreKey("2026-10-15", "BAL", "pre")]: 30, [scoreKey("2026-10-15", "BAX")]: 50 };
+    expect(normalBaOf(r, "2026-10-15", "pre", ANCHOR)).toBe(N1);
+    expect(normalBaOf(r, "2026-10-15", "post", ANCHOR)).toBe(N1);
+    expect(scoreSummary(r, ANCHOR, "2026-10-15").week.current).toBe(50 + N1);
   });
 });
 

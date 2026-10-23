@@ -188,6 +188,7 @@ function EntryCard({ vm }: { vm: ScoresViewModel }) {
     return `${t("common:day", { number: g.cycleDay })} · ${weekday} ${f.date(d)}${d === vm.today ? ` · ${t("scores:entry.today")}` : ""}`;
   };
   if (!vm.date || !vm.day) return null;
+  const normal = vm.normalOf(vm.date);
   return (
     <Card>
       <CardHeader>
@@ -257,6 +258,17 @@ function EntryCard({ vm }: { vm: ScoresViewModel }) {
             );
           })}
         </div>
+        {/* BA normal: pontos fixos do dia, somados sozinhos com a BAX ou a BAL (no reset, antes e depois das 22h). */}
+        {normal && (
+          <p className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-muted-foreground">
+            <span className={cn("font-medium tabular-nums", normal.counted ? "text-gain" : "text-foreground")}>
+              + {f.n(normal.points * Math.max(1, normal.counted))}
+            </span>
+            <span>
+              {t(normal.counted ? "scores:entry.normalCounted" : "scores:entry.normalPending", { count: normal.counted })}
+            </span>
+          </p>
+        )}
       </CardContent>
     </Card>
   );
@@ -559,7 +571,7 @@ function HistoryCard({ vm }: { vm: ScoresViewModel }) {
               {vm.history.map((e) => {
                 const team = vm.teamOf(e.cycleDay, e.mode);
                 return (
-                  <TableRow key={`${e.date}-${e.mode}`} className="cursor-pointer" onClick={() => vm.setDate(e.date)}>
+                  <TableRow key={`${e.date}-${e.mode}-${e.phase}`} className="cursor-pointer" onClick={() => vm.setDate(e.date)}>
                     <TableCell className="whitespace-nowrap">
                       <span className="font-medium sm:hidden">D{e.cycleDay}</span>
                       <span className="hidden font-medium sm:inline">{t("common:day", { number: e.cycleDay })}</span>
@@ -572,7 +584,12 @@ function HistoryCard({ vm }: { vm: ScoresViewModel }) {
                     <TableCell>
                       <Badge variant={MODE_VISUALS[e.mode].badge}>{e.mode}</Badge>
                     </TableCell>
-                    <TableCell className="text-right font-semibold tabular-nums">{f.n(e.points)}</TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      <span className="font-semibold">{f.n(e.points)}</span>
+                      {e.normal !== null && (
+                        <span className="block text-[0.65rem] text-muted-foreground">{t("scores:history.normal", { value: f.n(e.normal) })}</span>
+                      )}
+                    </TableCell>
                     {/* Contra o mesmo dia e modo do mês anterior (28 dias antes). */}
                     <TableCell className="text-right">
                       {e.delta === null ? (
@@ -633,6 +650,7 @@ export function ScoresView() {
           <p>{t("help.text1")}</p>
           <p>{t("help.text2")}</p>
           <p>{t("help.text3")}</p>
+          <p>{t("help.text4")}</p>
         </HelpHint>
       </div>
       <QueryState isLoading={vm.isLoading} isError={vm.isError} retry={vm.retry}>

@@ -4,7 +4,8 @@
   "help": {
     "text1": "Fill in each mode's score on the game day (the day turns at 12:00). Since BA resets every 28 days, each day and week is compared with the same day and week last month: green is up, red is down.",
     "text2": "Saved on this device and, if you sign in, in your account too. Only you can see your scores.",
-    "text3": "On reset day (Thursday, Days 1, 8, 15 and 22), log twice: what you scored before 22:00 counts for the week that ends; after 22:00 the score restarts and counts for the new week."
+    "text3": "On reset day (Thursday, Days 1, 8, 15 and 22), log twice: what you scored before 22:00 counts for the week that ends; after 22:00 the score restarts and counts for the new week.",
+    "text4": "Normal BA: no need to log it. It's worth 166,750 and 210,500, alternating on each week's BAX/BAL days (there's none on BAI days), and it's added to the total as soon as you log your BAX or BAL. On reset day it's played again, so it counts before and after 22:00."
   },
   "locked": {
     "title": "Unlocks today at 22:00",
@@ -39,7 +40,10 @@
       "post": "After the reset (22:00–12:00)"
     },
     "countsFor": "counts for Week {{n}}",
-    "now": "now"
+    "now": "now",
+    "normalPending": "from normal BA: added to the total once you log your BAX or BAL",
+    "normalCounted_one": "from normal BA, already added to the day's total",
+    "normalCounted_other": "from normal BA (before and after reset), already added to the day's total"
   },
   "chart": {
     "title": "Performance",
@@ -70,6 +74,7 @@
     "points": "Points",
     "delta": "vs. last month",
     "team": "Team",
-    "preReset": "before reset"
+    "preReset": "before reset",
+    "normal": "+ {{value}} normal BA"
   }
 }

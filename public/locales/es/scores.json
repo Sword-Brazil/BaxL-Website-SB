@@ -4,7 +4,8 @@
   "help": {
     "text1": "Completa la puntuación de cada modo en el día de juego (el día cambia a las 12h). Como la BA se reinicia cada 28 días, cada día y semana se compara con el mismo día y semana del mes anterior: verde subió, rojo bajó.",
     "text2": "Se guarda en el dispositivo y, si inicias sesión, también en tu cuenta. Solo tú ves tus puntuaciones.",
-    "text3": "En el día del reset (jueves, Días 1, 8, 15 y 22), anota dos veces: lo que hiciste antes de las 22h cuenta en la semana que termina; después de las 22h la puntuación se reinicia y cuenta en la semana nueva."
+    "text3": "En el día del reset (jueves, Días 1, 8, 15 y 22), anota dos veces: lo que hiciste antes de las 22h cuenta en la semana que termina; después de las 22h la puntuación se reinicia y cuenta en la semana nueva.",
+    "text4": "BA normal: no hace falta anotarla. Vale 166.750 y 210.500, alternando en los días de BAX/BAL de cada semana (no existe en los días de BAI), y se suma sola al total en cuanto anotas la BAX o la BAL. En el día del reset se vuelve a jugar, así que cuenta antes y después de las 22h."
   },
   "locked": {
     "title": "Se libera hoy a las 22h",
@@ -39,7 +40,10 @@
       "post": "Después del reset (22h–12h)"
     },
     "countsFor": "cuenta en la Semana {{n}}",
-    "now": "ahora"
+    "now": "ahora",
+    "normalPending": "de la BA normal: se suman al total cuando anotes la BAX o la BAL",
+    "normalCounted_one": "de la BA normal, ya sumados al total del día",
+    "normalCounted_other": "de la BA normal (antes y después del reset), ya sumados al total del día"
   },
   "chart": {
     "title": "Rendimiento",
@@ -70,6 +74,7 @@
     "points": "Puntos",
     "delta": "vs. mes anterior",
     "team": "Equipo",
-    "preReset": "antes del reset"
+    "preReset": "antes del reset",
+    "normal": "+ {{value}} BA normal"
   }
 }
