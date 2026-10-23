@@ -162,7 +162,7 @@ export function RotationLegend({ className }: { className?: string }) {
   const { t } = useTranslation("common");
   return (
     <dl className={cn("grid grid-cols-[auto_1fr] items-center gap-x-2 gap-y-1 text-xs text-muted-foreground", className)}>
-      <dt className="font-heading font-bold text-foreground">1–6</dt>
+      <dt className="font-heading font-bold text-foreground">1–7</dt>
       <dd>{t("rotation.legend.numbers")}</dd>
       {CANCELS.map((c) => (
         <Fragment key={c}>
@@ -190,7 +190,7 @@ export function RotationLegend({ className }: { className?: string }) {
 }
 
 /**
- * Sequência em texto livre: se seguir a notação da comunidade (1–6, c/dc/qc, parênteses e |, /, *),
+ * Sequência em texto livre: se seguir a notação da comunidade (1–7, c/dc/qc, parênteses e |, /, *),
  * vira "chips"; senão aparece como foi escrita. Na prévia (`preview`), um texto com erro mostra os
  * chips até onde deu para ler e o aviso do que não foi entendido.
  */
