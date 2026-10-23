@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { searchByName } from "@/models/rules/search";
-import type { UniformRef } from "@/viewmodels/useCatalogViewModel";
+import { searchNames, type UniformRef } from "@/viewmodels/useCatalogViewModel";
 import { AgentPortrait } from "./AgentPortrait";
 
 const initials = (name: string) =>
@@ -42,7 +42,7 @@ export function UniformPicker({
   const [search, setSearch] = useState("");
   // Busca própria só pelo nome do personagem e do traje (sem acento nem maiúscula): o filtro
   // aproximado do cmdk casava letras soltas, inclusive do id do traje, e embaralhava a lista.
-  const found = searchByName(options, search, (o) => [o.agent.name, o.uniform.name]);
+  const found = searchByName(options, search, (o) => [...searchNames(o.agent), ...searchNames(o.uniform)]);
   const byAgent = new Map<string, UniformRef[]>();
   for (const o of found) byAgent.set(o.agent.id, [...(byAgent.get(o.agent.id) ?? []), o]);
   const close = (next: boolean) => {

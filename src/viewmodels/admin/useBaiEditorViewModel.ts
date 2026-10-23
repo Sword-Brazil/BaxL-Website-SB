@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { adminApi } from "@/models/api/admin";
 import { BaiBossesSchema } from "@/models/schemas/admin";
 
-type BossDraft = { name: string; imagePath: string; tips: string };
+type BossDraft = { name: string; nameEn: string; imagePath: string; tips: string };
 
 /** Sequência única de chefes da BAI. A posição vem da ordem da lista. */
 export function useBaiEditorViewModel(messages: { saved: string }) {
@@ -13,7 +13,7 @@ export function useBaiEditorViewModel(messages: { saved: string }) {
   // Rascunho local; sem rascunho, vale a lista do servidor.
   const [draft, setDraft] = useState<BossDraft[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const server = (query.data ?? []).map((b) => ({ name: b.name, imagePath: b.imagePath ?? "", tips: b.tips ?? "" }));
+  const server = (query.data ?? []).map((b) => ({ name: b.name, nameEn: b.nameEn ?? "", imagePath: b.imagePath ?? "", tips: b.tips ?? "" }));
   const bosses = draft ?? server;
   const dirty = draft !== null;
 
@@ -22,7 +22,7 @@ export function useBaiEditorViewModel(messages: { saved: string }) {
   const save = useMutation({
     mutationFn: () => {
       const parsed = BaiBossesSchema.safeParse(
-        bosses.map((b, i) => ({ position: i + 1, name: b.name, imagePath: b.imagePath || null, tips: b.tips || null })),
+        bosses.map((b, i) => ({ position: i + 1, name: b.name, nameEn: b.nameEn || null, imagePath: b.imagePath || null, tips: b.tips || null })),
       );
       if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Dados inválidos");
       return adminApi.saveBosses(parsed.data);
@@ -46,7 +46,7 @@ export function useBaiEditorViewModel(messages: { saved: string }) {
     isLoading: query.isLoading,
     isError: query.isError,
     retry: query.refetch,
-    add: () => edit((l) => [...l, { name: "", imagePath: "", tips: "" }]),
+    add: () => edit((l) => [...l, { name: "", nameEn: "", imagePath: "", tips: "" }]),
     update: (i: number, patch: Partial<BossDraft>) => edit((l) => l.map((b, idx) => (idx === i ? { ...b, ...patch } : b))),
     remove: (i: number) => edit((l) => l.filter((_, idx) => idx !== i)),
     move: (from: number, to: number) =>

@@ -13,8 +13,10 @@ const toRotation = (r: DbRotation): Rotation => ({
   effect: r.effect as BossEffect | null,
   position: r.position,
   title: r.title,
+  titleEn: r.titleEn,
   sequence: r.sequence,
   description: r.description,
+  descriptionEn: r.descriptionEn,
   videoUrl: r.videoUrl,
   updatedAt: r.updatedAt.toISOString(),
 });
@@ -47,8 +49,10 @@ export async function saveAgentRotations(agentId: string, input: AgentRotationsI
           effect: r.effect ?? null,
           position,
           title: r.title || null,
+          titleEn: r.titleEn || null,
           sequence: r.sequence,
           description: r.description || null,
+          descriptionEn: r.descriptionEn || null,
           videoUrl: r.videoUrl || null,
         },
       });

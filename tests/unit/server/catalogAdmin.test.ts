@@ -28,6 +28,17 @@ async function inputOf(agentId: string): Promise<AgentInput> {
 }
 
 describe("catálogo (admin)", () => {
+  it("salva o nome em inglês do agente e do traje; sem o campo, mantém; vazio, tira", async () => {
+    const { agent } = await createAgent("wanda");
+    const input = await inputOf(agent.id);
+    let saved = await updateAgent(agent.id, { ...input, nameEn: "Scarlet Witch", uniforms: [{ ...input.uniforms[0], nameEn: "Default" }] });
+    expect([saved.nameEn, saved.uniforms[0].nameEn]).toEqual(["Scarlet Witch", "Default"]);
+    saved = await updateAgent(agent.id, input);
+    expect([saved.nameEn, saved.uniforms[0].nameEn]).toEqual(["Scarlet Witch", "Default"]);
+    saved = await updateAgent(agent.id, { ...input, nameEn: "", uniforms: [{ ...input.uniforms[0], nameEn: "" }] });
+    expect([saved.nameEn, saved.uniforms[0].nameEn]).toEqual([null, null]);
+  });
+
   it("renomeia um traje", async () => {
     const { agent } = await createAgent("thor");
     const input = await inputOf(agent.id);

@@ -5,12 +5,15 @@ import { HttpError } from "@/server/http";
 const agentData = (input: AgentInput) => ({
   slug: input.slug,
   name: input.name,
+  // Ausente = mantém o nome em inglês; vazio = tira.
+  ...(input.nameEn !== undefined ? { nameEn: input.nameEn || null } : {}),
   active: input.active ?? true,
 });
 
 const uniformData = (u: AgentInput["uniforms"][number]) => ({
   slug: u.slug,
   name: u.name,
+  ...(u.nameEn !== undefined ? { nameEn: u.nameEn || null } : {}),
   imagePath: u.imagePath,
   active: u.active ?? true,
   gender: u.gender,

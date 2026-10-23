@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BOSS_EFFECTS, UNKNOWN, type BossEffect } from "@/models/domain/enums";
 import type { Rotation, Uniform } from "@/models/domain/types";
+import { pick } from "@/models/rules/localize";
+import { useContentLang } from "@/viewmodels/useContentLang";
 import { useRotationsViewModel, type RotationGroup } from "@/viewmodels/useRotationsViewModel";
 import { HelpHint } from "@/views/layout/HelpHint";
 import { QueryState } from "@/views/shared/QueryState";
@@ -49,7 +51,9 @@ function RotationCard({
   agentName: string;
 }) {
   const { t } = useTranslation("rotations");
-  const title = rotation.title || t("untitled", { n: index + 1 });
+  const lang = useContentLang();
+  const title = pick(rotation.title, rotation.titleEn, lang) || t("untitled", { n: index + 1 });
+  const description = pick(rotation.description, rotation.descriptionEn, lang);
   return (
     <article className="flex flex-col gap-2.5 rounded-lg border border-border/70 bg-background/50 p-3">
       <header className="flex flex-wrap items-center justify-between gap-2">
@@ -61,7 +65,7 @@ function RotationCard({
         )}
       </header>
       <RotationText text={rotation.sequence} />
-      {rotation.description && <p className="text-sm whitespace-pre-line text-muted-foreground">{rotation.description}</p>}
+      {description && <p className="text-sm whitespace-pre-line text-muted-foreground">{description}</p>}
       {/* No PC o vídeo não ocupa mais a largura toda. */}
       {rotation.videoUrl && (
         <div className="w-full md:max-w-[26rem]">

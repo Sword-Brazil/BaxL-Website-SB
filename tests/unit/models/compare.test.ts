@@ -15,6 +15,7 @@ const meta: MetaTeam = {
   dayNumber: 1,
   isPrimary: true,
   label: null,
+  labelEn: null,
   notes: null,
   position: 0,
   updatedAt: "",

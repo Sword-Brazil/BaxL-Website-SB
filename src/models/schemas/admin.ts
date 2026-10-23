@@ -69,6 +69,7 @@ export const MetaTeamSchema = z
     number: dayNumberSchema.optional(),
     isPrimary: z.boolean(),
     label: z.string().trim().max(60).optional().nullable(),
+    labelEn: z.string().trim().max(60).optional().nullable(),
     notes: z.string().trim().max(500).optional().nullable(),
     members: z
       .array(MetaTeamMemberSchema)
@@ -100,6 +101,7 @@ export type PriorityTarget = z.infer<typeof PriorityTargetSchema>;
 export const BaiBossSchema = z.object({
   position: z.number().int().min(1),
   name: z.string().trim().min(1).max(80),
+  nameEn: z.string().trim().max(80).optional().nullable(),
   imagePath: z.string().max(300).optional().nullable(),
   tips: z.string().trim().max(500).optional().nullable(),
 });
@@ -115,6 +117,8 @@ export const UniformInputSchema = z.object({
   id: idSchema.optional(),
   slug: slugSchema,
   name: z.string().trim().min(1).max(80),
+  /** Nome em inglês (o espanhol usa o mesmo). Ausente = mantém; vazio = tira. */
+  nameEn: z.string().trim().max(80).optional().nullable(),
   imagePath: z.string().max(300), // vazio = sem imagem (mostra as iniciais)
   active: z.boolean().optional(),
   // Atributos são de cada traje (UNKNOWN = não informado; não bloqueia restrições).
@@ -135,6 +139,7 @@ export const UniformInputSchema = z.object({
 export const AgentSchema = z.object({
   slug: slugSchema,
   name: z.string().trim().min(1).max(80),
+  nameEn: z.string().trim().max(80).optional().nullable(),
   active: z.boolean().optional(),
   uniforms: z
     .array(UniformInputSchema)
@@ -184,8 +189,10 @@ export const RotationInputSchema = z.object({
   uniformId: idSchema.nullable(),
   effect: z.enum(BOSS_EFFECTS).optional().nullable(),
   title: z.string().trim().max(80).optional().nullable(),
+  titleEn: z.string().trim().max(80).optional().nullable(),
   sequence: z.string().trim().min(1, { message: VALIDATION.rotationRequired }).max(1000),
   description: z.string().trim().max(3000).optional().nullable(),
+  descriptionEn: z.string().trim().max(3000).optional().nullable(),
   videoUrl: z
     .string()
     .trim()

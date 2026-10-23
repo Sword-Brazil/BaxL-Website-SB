@@ -360,6 +360,16 @@ export function MetaTeamEditorView({ scopeVm }: { scopeVm: MetaScopeViewModel })
                   <Input id="label" maxLength={60} value={vm.draft.label} onChange={(e) => vm.update({ label: e.target.value })} />
                 </Field>
                 <Field>
+                  <FieldLabel htmlFor="labelEn">{t("admin:metas.labelEn")}</FieldLabel>
+                  <Input
+                    id="labelEn"
+                    maxLength={60}
+                    value={vm.draft.labelEn}
+                    placeholder={t("admin:metas.labelEnPlaceholder")}
+                    onChange={(e) => vm.update({ labelEn: e.target.value })}
+                  />
+                </Field>
+                <Field>
                   <FieldLabel htmlFor="notes">{t("admin:metas.notes")}</FieldLabel>
                   <Textarea id="notes" maxLength={500} value={vm.draft.notes} onChange={(e) => vm.update({ notes: e.target.value })} />
                 </Field>
