@@ -13,10 +13,21 @@ import {
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { useTranslation } from "next-i18next/pages";
-import { CopyIcon, SparklesIcon, UnlockIcon, XIcon, ZapIcon } from "lucide-react";
+import { CopyIcon, CopyPlusIcon, SparklesIcon, UnlockIcon, XIcon, ZapIcon } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -251,6 +262,50 @@ function SlotRow({
   );
 }
 
+/**
+ * Dia sem restrição: copia a equipe para os outros dias livres de BAX e BAL, só nos que ainda
+ * não têm equipe ou substituindo em todos.
+ */
+function FreeDaysCopy({ vm }: { vm: TeamBuilderViewModel }) {
+  const { t } = useTranslation("days");
+  if (!vm.freeDays.length) return null;
+  const empty = vm.freeDays.length - vm.filledFreeDays;
+  const apply = (onlyEmpty: boolean) => {
+    const n = vm.applyToFreeDays(onlyEmpty);
+    toast.success(t("myTeam.freeDays.done", { count: n }));
+  };
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button size="sm" variant="outline">
+          <CopyPlusIcon data-icon="inline-start" />
+          {t("myTeam.freeDays.button")}
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{t("myTeam.freeDays.title")}</AlertDialogTitle>
+          <AlertDialogDescription>
+            {t("myTeam.freeDays.text", { count: vm.freeDays.length })}{" "}
+            {vm.filledFreeDays > 0 && t("myTeam.freeDays.filled", { count: vm.filledFreeDays })}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter className="sm:flex-wrap">
+          <AlertDialogCancel>{t("myTeam.freeDays.cancel")}</AlertDialogCancel>
+          {vm.filledFreeDays > 0 && empty > 0 && (
+            <AlertDialogAction variant="outline" onClick={() => apply(true)}>
+              {t("myTeam.freeDays.onlyEmpty", { count: empty })}
+            </AlertDialogAction>
+          )}
+          <AlertDialogAction onClick={() => apply(false)}>
+            {vm.filledFreeDays > 0 ? t("myTeam.freeDays.replaceAll", { count: vm.freeDays.length }) : t("myTeam.freeDays.apply", { count: vm.freeDays.length })}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
 /** Montagem da equipe do usuário para um dia (ou BAI): elenco, CTPs equipados, Meta e sugestão. */
 export function TeamBuilderPanel(props: { teamKey: TeamKey; criteria: Criterion[]; metaTeams: MetaTeam[]; priority: PriorityLists }) {
   const { t } = useTranslation(["days", "common"]);
@@ -363,6 +418,7 @@ export function TeamBuilderPanel(props: { teamKey: TeamKey; criteria: Criterion[
                 {t("days:myTeam.suggestion.apply")}
               </Button>
             )}
+            <FreeDaysCopy vm={vm} />
             <span className="ml-auto">
               <ExportImageButton onExport={exportPng} disabled={isExporting} />
             </span>

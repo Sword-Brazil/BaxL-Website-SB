@@ -4,7 +4,7 @@ import { metaTeamInclude } from "./metaTeamRepository";
 
 const dayInclude = {
   criteria: { orderBy: { attribute: "asc" } },
-  metaTeams: { include: metaTeamInclude, orderBy: [{ isPrimary: "desc" }, { updatedAt: "desc" }] },
+  metaTeams: { include: metaTeamInclude, orderBy: [{ isPrimary: "desc" }, { position: "asc" }, { updatedAt: "desc" }] },
   priorityEntries: { orderBy: { rank: "asc" } },
 } satisfies Prisma.BattleDayInclude;
 

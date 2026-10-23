@@ -16,6 +16,7 @@ const meta: MetaTeam = {
   isPrimary: true,
   label: null,
   notes: null,
+  position: 0,
   updatedAt: "",
   updatedBy: null,
   members: [

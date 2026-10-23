@@ -112,6 +112,8 @@ export interface MetaTeam {
   label: string | null;
   notes: string | null;
   members: MetaTeamMember[];
+  /** Ordem entre as alternativas do mesmo dia (a principal vem sempre primeiro). */
+  position: number;
   updatedAt: string;
   updatedBy: string | null;
 }

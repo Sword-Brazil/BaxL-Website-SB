@@ -35,6 +35,7 @@ export const adminApi = {
   createMetaTeam: (body: MetaTeamInput) => apiFetch<MetaTeam>("/api/admin/meta-teams", { method: "POST", body }),
   updateMetaTeam: (id: string, body: MetaTeamInput) => apiFetch<MetaTeam>(`/api/admin/meta-teams/${id}`, { method: "PUT", body }),
   deleteMetaTeam: (id: string) => apiFetch<void>(`/api/admin/meta-teams/${id}`, { method: "DELETE" }),
+  reorderMetaTeams: (ids: string[]) => apiFetch<void>("/api/admin/meta-teams/order", { method: "PUT", body: { ids } }),
 
   getPriority: (t: PriorityTarget) => apiFetch<PriorityLists>(priorityPath(t)),
   savePriority: (t: PriorityTarget, body: PriorityInput) => apiFetch<PriorityLists>(priorityPath(t), { method: "PUT", body }),
