@@ -44,6 +44,9 @@ const nextConfig: NextConfig = {
   // config e os JSON do disco; sem isto a função da Vercel não os tem e a página dá 500.
   outputFileTracingIncludes: {
     "/rotacoes/*": ["./next-i18next.config.js", "./public/locales/**/*.json"],
+    // Guia da Administração: fora de public/, lido do disco pelas rotas que exigem admin.
+    "/api/admin/guide": ["./private/guide/admin.json"],
+    "/api/admin/guide-image": ["./private/guide/*.jpg"],
   },
   turbopack: {
     rules: {

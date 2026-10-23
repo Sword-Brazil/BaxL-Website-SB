@@ -4,9 +4,11 @@ import { cn } from "@/lib/utils";
 import shots from "./guideShots.json";
 
 // Prints do guia em public/guide: `<tela>-<desktop|mobile>-<dark|light>.jpg`. As marcações (em %
-// da imagem) vêm do próprio DOM na hora do print, em guideShots.json.
+// da imagem) vêm do próprio DOM na hora do print, em guideShots.json. Os da Administração não
+// ficam aqui: vêm da API, só para administradores.
 export type GuideShotId = keyof typeof shots;
-type Variant = "desktop" | "mobile";
+export type ShotVariant = "desktop" | "mobile";
+type Theme = "dark" | "light";
 interface Marker {
   n: number;
   x: number;
@@ -14,13 +16,29 @@ interface Marker {
   w: number;
   h: number;
 }
+export interface ShotData {
+  width: number;
+  height: number;
+  markers: Marker[];
+}
+/** Prints de uma tela: as marcações de cada variante e o endereço de cada imagem. */
+export interface ShotSet {
+  shots: Record<ShotVariant, ShotData>;
+  src: (variant: ShotVariant, theme: Theme) => string;
+}
+
+/** Prints públicos (public/guide) de uma tela do guia. */
+export const publicShots = (id: GuideShotId): ShotSet => ({
+  shots: shots[id],
+  src: (variant, theme) => `/guide/${id}-${variant}-${theme}.jpg`,
+});
 
 /** Uma variante do print (PC ou celular), com a imagem do tema atual e as marcações por cima. */
-function Shot({ id, variant, name, className }: { id: GuideShotId; variant: Variant; name: string; className?: string }) {
+function Shot({ set, variant, name, className }: { set: ShotSet; variant: ShotVariant; name: string; className?: string }) {
   const { t } = useTranslation("about");
   const { resolvedTheme } = useTheme();
-  const shot = shots[id][variant];
-  const src = (theme: "dark" | "light") => `/guide/${id}-${variant}-${theme}.jpg`;
+  const shot = set.shots[variant];
+  const src = (theme: Theme) => set.src(variant, theme);
   return (
     // Respiro em volta: os números ficam no canto do que marcam e podem passar da borda do print.
     <figure className={cn("p-3", className)}>
@@ -69,11 +87,11 @@ function Shot({ id, variant, name, className }: { id: GuideShotId; variant: Vari
 }
 
 /** Print da tela com marcações numeradas: o do celular em telas pequenas, o do PC nas maiores. */
-export function AnnotatedShot({ id, name }: { id: GuideShotId; name: string }) {
+export function AnnotatedShot({ set, name }: { set: ShotSet; name: string }) {
   return (
     <>
-      <Shot id={id} variant="mobile" name={name} className="mx-auto w-full max-w-sm sm:hidden" />
-      <Shot id={id} variant="desktop" name={name} className="hidden sm:block" />
+      <Shot set={set} variant="mobile" name={name} className="mx-auto w-full max-w-sm sm:hidden" />
+      <Shot set={set} variant="desktop" name={name} className="hidden sm:block" />
     </>
   );
 }

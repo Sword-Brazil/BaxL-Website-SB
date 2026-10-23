@@ -38,7 +38,7 @@
         "5": "Tamanho da letra: aumente se estiver difícil de ler.",
         "6": "Tema claro ou escuro.",
         "7": "Seu nome no jogo: aparece nas imagens que você exporta.",
-        "8": "Minha conta: este guia, a Administração (só administradores) e Sair."
+        "8": "Minha conta: este guia e Sair."
       },
       "tips": {
         "1": "No celular, o idioma, a letra e o tema ficam dentro do menu (☰).",
@@ -165,20 +165,6 @@
         "1": "No dia do reset (quinta) anote duas vezes: antes e depois das 22h.",
         "2": "Não precisa anotar a BA normal: ela entra sozinha no total.",
         "3": "Verde cresceu, vermelho caiu, sempre contra o mesmo dia e semana do mês anterior."
-      }
-    },
-    "admin": {
-      "title": "Administração",
-      "intro": "Só para administradores. Aqui fica tudo o que os membros veem: restrições, equipes Meta, catálogo, rotações e contas.",
-      "markers": {
-        "1": "Abas: Visão geral, Dias, Metas, Catálogo, Rotações, CTPs, BAI, Usuários e Configurações.",
-        "2": "Dias: a restrição de cada dia de BAX e BAL.",
-        "3": "Metas: as equipes Meta e Alternativas de cada dia, a BAL livre e a BAI.",
-        "4": "Usuários: criar contas, trocar papel e senha e excluir quem saiu da aliança."
-      },
-      "tips": {
-        "1": "Tudo o que você publica aparece na hora para os membros, com data e autor.",
-        "2": "Conta marcada como Duplicada: a pessoa tem duas contas. Exclua a que não é usada."
       }
     }
   }

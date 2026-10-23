@@ -38,7 +38,7 @@
         "5": "Text size: make it bigger if it's hard to read.",
         "6": "Light or dark theme.",
         "7": "Your in-game name: shown on the images you export.",
-        "8": "My account: this guide, Administration (admins only) and Sign out."
+        "8": "My account: this guide and Sign out."
       },
       "tips": {
         "1": "On the phone, language, text size and theme are inside the menu (☰).",
@@ -165,20 +165,6 @@
         "1": "On reset day (Thursday) log twice: before and after 22:00.",
         "2": "No need to log normal BA: it's added to the total on its own.",
         "3": "Green went up, red went down, always against the same day and week last month."
-      }
-    },
-    "admin": {
-      "title": "Administration",
-      "intro": "Admins only. Everything members see lives here: restrictions, Meta teams, catalog, rotations and accounts.",
-      "markers": {
-        "1": "Tabs: Overview, Days, Metas, Catalog, Rotations, CTPs, BAI, Users and Settings.",
-        "2": "Days: each BAX and BAL day's restriction.",
-        "3": "Metas: each day's Meta and Alternative teams, free BAL and BAI.",
-        "4": "Users: create accounts, change role and password and delete who left the alliance."
-      },
-      "tips": {
-        "1": "Everything you publish shows up for members right away, with date and author.",
-        "2": "Account marked Duplicate: the person has two accounts. Delete the unused one."
       }
     }
   }

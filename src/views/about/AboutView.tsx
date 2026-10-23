@@ -1,14 +1,17 @@
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "next-i18next/pages";
 import { ArrowRightIcon, CircleHelpIcon, LifeBuoyIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuthViewModel } from "@/viewmodels/useAuthViewModel";
-import { AnnotatedShot, type GuideShotId } from "./AnnotatedShot";
+import { adminApi } from "@/models/api/admin";
+import { AnnotatedShot, publicShots, type GuideShotId, type ShotSet } from "./AnnotatedShot";
 
-/** Seções do guia, na ordem da página: o print, a tela que ele mostra e quantos itens tem. */
-const SECTIONS: { id: GuideShotId; href: string; markers: number; tips: number; adminOnly?: boolean; wide?: boolean }[] = [
+/** Seções públicas do guia, na ordem da página: o print, a tela que ele mostra e quantos itens tem. */
+const SECTIONS: { id: GuideShotId; href: string; markers: number; tips: number; wide?: boolean }[] = [
   { id: "header", href: "/", markers: 8, tips: 3, wide: true },
   { id: "cycle", href: "/", markers: 6, tips: 3 },
   { id: "day", href: "/", markers: 7, tips: 3 },
@@ -17,7 +20,6 @@ const SECTIONS: { id: GuideShotId; href: string; markers: number; tips: number; 
   { id: "rotations", href: "/rotacoes", markers: 4, tips: 2 },
   { id: "stats", href: "/estatisticas", markers: 8, tips: 2 },
   { id: "scores", href: "/minhas-pontuacoes", markers: 5, tips: 3 },
-  { id: "admin", href: "/admin", markers: 4, tips: 2, adminOnly: true },
 ];
 
 const START_STEPS = [
@@ -33,15 +35,25 @@ const Num = ({ n }: { n: number }) => (
   <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-spark font-heading text-xs font-bold text-white">{n}</span>
 );
 
-function GuideSection({ section }: { section: (typeof SECTIONS)[number] }) {
+/** Uma seção do guia já com os textos: das traduções (telas públicas) ou da API (Administração). */
+interface GuideSectionData {
+  id: string;
+  href: string;
+  title: string;
+  intro: string;
+  markers: string[];
+  tips: string[];
+  shots: ShotSet;
+  wide?: boolean;
+}
+
+function GuideSection({ section }: { section: GuideSectionData }) {
   const { t } = useTranslation("about");
-  const key = `sections.${section.id}`;
-  const name = t(`${key}.title`);
   return (
     <Card id={section.id} className="scroll-mt-20">
       <CardHeader>
-        <CardTitle className="font-heading text-xl">{name}</CardTitle>
-        <CardDescription>{t(`${key}.intro`)}</CardDescription>
+        <CardTitle className="font-heading text-xl">{section.title}</CardTitle>
+        <CardDescription>{section.intro}</CardDescription>
       </CardHeader>
       <CardContent
         className={
@@ -51,14 +63,14 @@ function GuideSection({ section }: { section: (typeof SECTIONS)[number] }) {
         }
       >
         <div className="-m-3">
-          <AnnotatedShot id={section.id} name={name} />
+          <AnnotatedShot set={section.shots} name={section.title} />
         </div>
         <div className="flex flex-col gap-4">
           <ol className={section.wide ? "grid gap-2 sm:grid-cols-2" : "flex flex-col gap-2"}>
-            {range(section.markers).map((n) => (
-              <li key={n} className="flex gap-2.5 text-sm">
-                <Num n={n} />
-                <span className="pt-0.5">{t(`${key}.markers.${n}`)}</span>
+            {section.markers.map((text, i) => (
+              <li key={i} className="flex gap-2.5 text-sm">
+                <Num n={i + 1} />
+                <span className="pt-0.5">{text}</span>
               </li>
             ))}
           </ol>
@@ -68,14 +80,14 @@ function GuideSection({ section }: { section: (typeof SECTIONS)[number] }) {
               {t("stuck")}
             </p>
             <ul className="flex list-disc flex-col gap-1.5 pl-5 text-sm text-muted-foreground marker:text-energy">
-              {range(section.tips).map((n) => (
-                <li key={n}>{t(`${key}.tips.${n}`)}</li>
+              {section.tips.map((text, i) => (
+                <li key={i}>{text}</li>
               ))}
             </ul>
           </div>
           <Button asChild variant="outline" size="sm" className="self-start">
             <Link href={section.href}>
-              {t("openPage", { name })}
+              {t("openPage", { name: section.title })}
               <ArrowRightIcon data-icon="inline-end" />
             </Link>
           </Button>
@@ -89,7 +101,28 @@ function GuideSection({ section }: { section: (typeof SECTIONS)[number] }) {
 export function AboutView() {
   const { t } = useTranslation("about");
   const { isAdmin } = useAuthViewModel();
-  const sections = SECTIONS.filter((s) => !s.adminOnly || isAdmin);
+  const { locale = "pt-BR" } = useRouter();
+  // A seção da Administração não está nas traduções nem em public/: só administradores a recebem.
+  const adminGuide = useQuery({ queryKey: ["admin-guide", locale], queryFn: () => adminApi.getGuide(locale), enabled: isAdmin, staleTime: Infinity });
+  const sections: GuideSectionData[] = SECTIONS.map((s) => {
+    const key = `sections.${s.id}`;
+    const markers = range(s.markers).map((n) => t(`${key}.markers.${n}`));
+    // Quem é admin vê o item "Minha conta" com a Administração.
+    if (s.id === "header" && adminGuide.data) markers[7] = adminGuide.data.header8;
+    return { ...s, title: t(`${key}.title`), intro: t(`${key}.intro`), markers, tips: range(s.tips).map((n) => t(`${key}.tips.${n}`)), shots: publicShots(s.id) };
+  });
+  if (isAdmin && adminGuide.data) {
+    const g = adminGuide.data;
+    sections.push({
+      id: "admin",
+      href: "/admin",
+      title: g.title,
+      intro: g.intro,
+      markers: Object.keys(g.markers).sort((a, b) => Number(a) - Number(b)).map((k) => g.markers[k]),
+      tips: Object.keys(g.tips).sort((a, b) => Number(a) - Number(b)).map((k) => g.tips[k]),
+      shots: { shots: g.shots, src: (variant, theme) => adminApi.guideImageUrl(`admin-${variant}-${theme}.jpg`) },
+    });
+  }
   return (
     <div className="flex flex-col gap-6">
       <div className="min-w-0">
@@ -104,7 +137,7 @@ export function AboutView() {
         <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">{t("toc")}</span>
         {[{ id: "start" }, ...sections, { id: "general" }].map((s) => (
           <Badge key={s.id} asChild variant="outline" className="h-7 px-3 text-xs">
-            <a href={`#${s.id}`}>{s.id === "start" || s.id === "general" ? t(`${s.id}.title`) : t(`sections.${s.id}.title`)}</a>
+            <a href={`#${s.id}`}>{"title" in s ? s.title : t(`${s.id}.title`)}</a>
           </Badge>
         ))}
       </nav>
