@@ -15,7 +15,8 @@
     "rotations": "Rotations",
     "login": "Sign in",
     "synced": "Synced with your account",
-    "scores": "Scores"
+    "scores": "Scores",
+    "about": "About the site"
   },
   "modes": {
     "BAX": "Alliance Battle Extreme",
@@ -171,7 +172,8 @@
     "close": "Close",
     "back": "Back",
     "help": "Help",
-    "exportImage": "Export image"
+    "exportImage": "Export image",
+    "fullGuide": "See the full site guide"
   },
   "states": {
     "loading": "Loading…",

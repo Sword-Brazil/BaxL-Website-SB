@@ -19,7 +19,7 @@ export function RotationsIndexView() {
           <h1 className="font-heading text-3xl font-bold">{t("title")}</h1>
           <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
         </div>
-        <HelpHint title={t("legendTitle")}>
+        <HelpHint title={t("legendTitle")} guide="rotations">
           <RotationLegend />
         </HelpHint>
       </div>

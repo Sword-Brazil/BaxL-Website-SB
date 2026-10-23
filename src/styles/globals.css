@@ -275,6 +275,83 @@
   --color-loss: var(--loss);
 }
 
+/*
+ * Barra de rolagem no estilo do site: trilho quase invisível e alça na cor de energia (ciano),
+ * que acende ao passar o mouse e ao arrastar. A espessura acompanha a tela: fina no celular (onde
+ * a barra só aparece ao rolar), média no tablet e um pouco mais larga no PC, onde o mouse precisa
+ * de um alvo maior. `.scrollbar-slim` é para faixas horizontais (ex.: os 28 dias do ciclo).
+ * Chrome/Edge/Safari usam ::-webkit-scrollbar (que permite a espessura em px); o Firefox, que não
+ * tem esses seletores, recebe scrollbar-color/scrollbar-width. Não juntar os dois no mesmo
+ * navegador: no Chrome, scrollbar-width/color desligam o ::-webkit-scrollbar.
+ */
+:root {
+  --scrollbar-size: 6px;
+  --scrollbar-slim: 4px;
+  --scrollbar-thumb: color-mix(in oklch, var(--energy) 45%, transparent);
+  --scrollbar-thumb-hover: color-mix(in oklch, var(--energy) 75%, transparent);
+  --scrollbar-thumb-active: var(--energy);
+  --scrollbar-track: color-mix(in oklch, var(--foreground) 4%, transparent);
+}
+@media (width >= 40rem) {
+  :root {
+    --scrollbar-size: 8px;
+    --scrollbar-slim: 6px;
+  }
+}
+@media (width >= 80rem) {
+  :root {
+    --scrollbar-size: 10px;
+    --scrollbar-slim: 6px;
+  }
+}
+/* Toque (celular e tablet): a barra é só um indicador, não um alvo. */
+@media (pointer: coarse) {
+  :root {
+    --scrollbar-size: 4px;
+    --scrollbar-slim: 3px;
+  }
+}
+
+::-webkit-scrollbar {
+  width: var(--scrollbar-size);
+  height: var(--scrollbar-size);
+}
+.scrollbar-slim::-webkit-scrollbar {
+  height: var(--scrollbar-slim);
+  width: var(--scrollbar-slim);
+}
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 9999px;
+  /* Borda transparente: a alça fica um pouco mais fina que o trilho, como os painéis com respiro. */
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  min-height: 2.5rem;
+}
+.scrollbar-slim::-webkit-scrollbar-thumb {
+  border-width: 1px;
+  min-width: 2.5rem;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
+}
+::-webkit-scrollbar-thumb:active {
+  background-color: var(--scrollbar-thumb-active);
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+    scrollbar-width: thin;
+  }
+}
+
 /* Canto chanfrado no estilo dos painéis do MFF. */
 @utility chamfer {
   clip-path: polygon(0.75rem 0, 100% 0, 100% calc(100% - 0.75rem), calc(100% - 0.75rem) 100%, 0 100%, 0 0.75rem);

@@ -239,7 +239,7 @@ export function RosterView() {
             <Badge variant="energy" className="h-7 px-3 text-sm">
               {t("roster:owned", { owned: vm.ownedAgentCount, total: vm.totalAgents })}
             </Badge>
-            <HelpHint title={t("roster:help.title")}>
+            <HelpHint title={t("roster:help.title")} guide="roster">
               <p>{t("roster:help.text1")}</p>
               <p>{t("roster:help.text2")}</p>
             </HelpHint>

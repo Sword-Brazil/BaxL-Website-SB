@@ -274,7 +274,7 @@ function BuilderDialog({ vm }: { vm: Vm }) {
 function DayStrip({ vm }: { vm: Vm }) {
   const { t } = useTranslation(["cycle", "common"]);
   return (
-    <nav aria-label={t("cycle:cycleDays")} className="overflow-x-auto pb-1 [scrollbar-width:thin]">
+    <nav aria-label={t("cycle:cycleDays")} className="scrollbar-slim overflow-x-auto pb-1">
       <ol className="flex min-w-max gap-1">
         {vm.allDays.map((d) => {
           const isToday = vm.currentDay === d.number;
@@ -335,7 +335,7 @@ export function CycleView() {
               <ResetTeamsOptions />
             </PopoverContent>
           </Popover>
-          <HelpHint title={t("cycle:legend.title")}>
+          <HelpHint title={t("cycle:legend.title")} guide="cycle">
             <p>{t("cycle:legend.owned")}</p>
             <p>{t("cycle:legend.dim")}</p>
             <p>{t("cycle:legend.ctp")}</p>
