@@ -6,9 +6,16 @@
 // Dia do reset (Dias 1, 8, 15 e 22, quinta): o dia de jogo vai das 12h às 12h, mas o reset semanal
 // é às 22h. O que se joga antes das 22h conta para a semana que acaba ("|pre" na chave); depois, a
 // pontuação recomeça e conta para a semana nova (chave sem sufixo, como nos outros dias).
+//
+// BA normal: obrigatória antes da BAX, tem pontuação fixa por dia (não existe nos dias de BAI). Não é
+// digitada: entra sozinha no total assim que a BAX ou a BAL é anotada, e no dia do reset conta antes
+// e depois das 22h.
 import { CYCLE_LENGTH, WEEK_LENGTH, isBaiDay } from "@/models/domain/enums";
 
 export type ScoreMode = "BAX" | "BAL" | "BAI";
+
+/** Pontos da BA normal, alternando nos dias de BAX/BAL de cada semana (a BAI fica de fora). */
+export const NORMAL_BA_POINTS = [166_750, 210_500] as const;
 export const SCORE_MODES = ["BAX", "BAL", "BAI"] as const satisfies readonly ScoreMode[];
 
 /** A tela libera no reset semanal de 22/10/2026 às 22h (Brasília): a contagem começa limpa ali. */
@@ -73,6 +80,26 @@ export const modesOfDay = (day: GameDay): ScoreMode[] => (day.isBai ? ["BAI"] : 
 /** Dia do reset semanal (1º dia de cada semana do ciclo): tem a parte antes e a depois das 22h. */
 export const isResetDay = (day: GameDay) => (day.cycleDay - 1) % WEEK_LENGTH === 0;
 
+/**
+ * Pontos da BA normal de um dia do ciclo: nos dias de BAX/BAL da semana (1, 2, 4, 5, 6 e 7) alterna
+ * 166.750 e 210.500, começando a cada semana pelo menor. null nos dias de BAI.
+ */
+export function normalBaPointsOf(cycleDay: number): number | null {
+  if (isBaiDay(cycleDay)) return null;
+  const weekDays = Array.from({ length: WEEK_LENGTH }, (_, i) => i + 1).filter((n) => !isBaiDay(n));
+  const index = weekDays.indexOf(((cycleDay - 1) % WEEK_LENGTH) + 1);
+  return NORMAL_BA_POINTS[index % NORMAL_BA_POINTS.length];
+}
+
+/**
+ * BA normal de uma parte do dia: conta quando a BAX ou a BAL dela foi anotada. No dia do reset ela é
+ * refeita depois das 22h, então conta nas duas partes.
+ */
+export function normalBaOf(scores: Record<string, number>, date: string, phase: ScorePhase, anchorDate: string): number | null {
+  const played = (["BAX", "BAL"] as const).some((m) => scores[scoreKey(date, m, phase)] !== undefined);
+  return played ? normalBaPointsOf(gameDayOf(date, anchorDate).cycleDay) : null;
+}
+
 /** Partes do dia que dá para preencher: no dia do reset, antes e depois das 22h (a de antes não existe no 1º dia contado). */
 export const phasesOfDay = (day: GameDay, firstDate = SCORES_FIRST_DATE): ScorePhase[] =>
   isResetDay(day) && day.date > firstDate ? ["pre", "post"] : ["post"];
@@ -128,13 +155,13 @@ const sumOf = (values: (number | undefined)[]) => {
   return filled.length ? filled.reduce((a, b) => a + b, 0) : null;
 };
 
-/** Pontos de uma parte do dia (soma dos modos; null sem nenhum). */
-const phaseTotal = (scores: Record<string, number>, date: string, phase: ScorePhase) =>
-  sumOf(SCORE_MODES.map((m) => scores[scoreKey(date, m, phase)]));
+/** Pontos de uma parte do dia (soma dos modos e da BA normal; null sem nenhum). */
+const phaseTotal = (scores: Record<string, number>, date: string, phase: ScorePhase, anchorDate: string) =>
+  sumOf([...SCORE_MODES.map((m) => scores[scoreKey(date, m, phase)]), normalBaOf(scores, date, phase, anchorDate) ?? undefined]);
 
 /** Soma do dia de jogo inteiro (no dia do reset, antes e depois das 22h); null sem nenhum valor. */
-export function dayTotal(scores: Record<string, number>, date: string): number | null {
-  return sumOf([phaseTotal(scores, date, "pre") ?? undefined, phaseTotal(scores, date, "post") ?? undefined]);
+export function dayTotal(scores: Record<string, number>, date: string, anchorDate: string): number | null {
+  return sumOf([phaseTotal(scores, date, "pre", anchorDate) ?? undefined, phaseTotal(scores, date, "post", anchorDate) ?? undefined]);
 }
 
 /**
@@ -142,12 +169,18 @@ export function dayTotal(scores: Record<string, number>, date: string): number |
  * antes do reset de `from` é do período anterior e fica de fora; a do reset seguinte (`to` + 1)
  * entra quando `withNextReset` (período já fechado). null se nada estiver preenchido.
  */
-export function sumPeriod(scores: Record<string, number>, from: string, to: string, withNextReset = false): number | null {
+export function sumPeriod(
+  scores: Record<string, number>,
+  anchorDate: string,
+  from: string,
+  to: string,
+  withNextReset = false,
+): number | null {
   const parts = dateRange(from, to).flatMap((d) => [
-    phaseTotal(scores, d, "post"),
-    d === from ? null : phaseTotal(scores, d, "pre"),
+    phaseTotal(scores, d, "post", anchorDate),
+    d === from ? null : phaseTotal(scores, d, "pre", anchorDate),
   ]);
-  if (withNextReset) parts.push(phaseTotal(scores, addDays(to, 1), "pre"));
+  if (withNextReset) parts.push(phaseTotal(scores, addDays(to, 1), "pre", anchorDate));
   return sumOf(parts.map((v) => v ?? undefined));
 }
 
@@ -158,6 +191,8 @@ export interface SeasonDay extends GameDay, Comparison {
   BAX: number | null;
   BAL: number | null;
   BAI: number | null;
+  /** BA normal somada com a BAX do dia. */
+  normal: number | null;
   /** Dia que ainda não chegou. */
   future: boolean;
 }
@@ -173,8 +208,9 @@ export function seasonDays(scores: Record<string, number>, anchorDate: string, s
       BAX: value("BAX"),
       BAL: value("BAL"),
       BAI: value("BAI"),
+      normal: future ? null : sumOf([normalBaOf(scores, date, "pre", anchorDate) ?? undefined, normalBaOf(scores, date, "post", anchorDate) ?? undefined]),
       future,
-      ...compare(future ? null : dayTotal(scores, date), dayTotal(scores, previousSeasonDate(date))),
+      ...compare(future ? null : dayTotal(scores, date, anchorDate), dayTotal(scores, previousSeasonDate(date), anchorDate)),
     };
   });
 }
@@ -189,7 +225,7 @@ export interface SeasonWeek extends Comparison {
 }
 
 /** As 4 semanas de uma temporada, cada uma comparada com a mesma semana da temporada anterior. */
-export function seasonWeeks(scores: Record<string, number>, seasonStart: string, today: string): SeasonWeek[] {
+export function seasonWeeks(scores: Record<string, number>, anchorDate: string, seasonStart: string, today: string): SeasonWeek[] {
   return Array.from({ length: CYCLE_LENGTH / WEEK_LENGTH }, (_, i) => {
     const start = addDays(seasonStart, i * WEEK_LENGTH);
     const end = addDays(start, WEEK_LENGTH - 1);
@@ -204,8 +240,8 @@ export function seasonWeeks(scores: Record<string, number>, seasonStart: string,
       partial,
       future,
       ...compare(
-        future ? null : sumPeriod(scores, start, to, closed),
-        sumPeriod(scores, previousSeasonDate(start), previousSeasonDate(future ? end : to), future || closed),
+        future ? null : sumPeriod(scores, anchorDate, start, to, closed),
+        sumPeriod(scores, anchorDate, previousSeasonDate(start), previousSeasonDate(future ? end : to), future || closed),
       ),
     };
   });
@@ -234,17 +270,17 @@ export function scoreSummary(scores: Record<string, number>, anchorDate: string,
   const current = gameDayOf(today, anchorDate);
   const weekStart = addDays(current.seasonStart, (current.week - 1) * WEEK_LENGTH);
   const period = (from: string) =>
-    compare(sumPeriod(scores, from, today), sumPeriod(scores, previousSeasonDate(from), previousSeasonDate(today)));
+    compare(sumPeriod(scores, anchorDate, from, today), sumPeriod(scores, anchorDate, previousSeasonDate(from), previousSeasonDate(today)));
   const dates = [...new Set(scoreEntries(scores, anchorDate).map((e) => e.date))];
   const best = dates.reduce<{ date: string; total: number } | null>((b, d) => {
-    const t = dayTotal(scores, d) ?? 0;
+    const t = dayTotal(scores, d, anchorDate) ?? 0;
     return !b || t > b.total ? { date: d, total: t } : b;
   }, null);
   return {
-    today: compare(dayTotal(scores, today), dayTotal(scores, previousSeasonDate(today))),
+    today: compare(dayTotal(scores, today, anchorDate), dayTotal(scores, previousSeasonDate(today), anchorDate)),
     week: period(weekStart),
     season: period(current.seasonStart),
-    seasonDays: dateRange(current.seasonStart, today).filter((d) => dayTotal(scores, d) !== null).length,
+    seasonDays: dateRange(current.seasonStart, today).filter((d) => dayTotal(scores, d, anchorDate) !== null).length,
     best,
   };
 }
