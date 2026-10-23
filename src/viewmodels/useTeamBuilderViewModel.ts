@@ -6,7 +6,7 @@ import type { Criterion, MetaTeam, PriorityLists } from "@/models/domain/types";
 import { compareWithMeta } from "@/models/rules/compare";
 import { dayCtpId, equippedCtps, type CtpSlot } from "@/models/rules/ctpAssign";
 import { matchesRestriction } from "@/models/rules/restriction";
-import { freeDayKeys } from "@/models/rules/selections";
+import { freeTeamKeys } from "@/models/rules/selections";
 import { hasMetaStrikerTags, metaStrikerOptions } from "@/models/rules/striker";
 import { suggestTeam } from "@/models/rules/suggest";
 import type { TeamKey, UserTeam } from "@/models/schemas/selections";
@@ -32,7 +32,8 @@ export function useTeamBuilderViewModel({
   priority: PriorityLists;
 }) {
   const catalog = useCatalogViewModel();
-  const { doc, hydrated, setSlot, clearSlot, setStriker, setCtpSlot, equipCtp, applyTeam, applyTeamTo, setFreePick } = useSelectionsStore();
+  const store = useSelectionsStore();
+  const { doc, hydrated, equipCtp, applyTeamTo, setFreePick, setSyncFreeDays } = store;
   const cycle = useQuery({ queryKey: ["cycle"], queryFn: getCycle });
   const [armedCtp, setArmedCtp] = useState<string | null>(null);
 
@@ -91,6 +92,24 @@ export function useTeamBuilderViewModel({
     [pool, priority, criteria, catalog.agents],
   );
 
+  // Dia livre (sem restrição, ou a BAI): os outros dias livres. Com a sincronização ligada, cada
+  // mudança nesta equipe vai junto para eles.
+  const freeDays = criteria.length === 0 ? freeTeamKeys(cycle.data, teamKey) : [];
+  const syncFreeDays = doc.syncFreeDays !== false;
+  /** Depois de mudar a equipe: repete a equipe nova nos outros dias livres, se a sincronização estiver ligada. */
+  const mirror = () => {
+    if (!syncFreeDays || !freeDays.length) return;
+    applyTeamTo(freeDays, useSelectionsStore.getState().doc.teams[teamKey] ?? {});
+  };
+  const applyTeam = (key: TeamKey, next: UserTeam) => {
+    store.applyTeam(key, next);
+    mirror();
+  };
+  const setCtpSlot = (key: TeamKey, slot: Slot, ctpSlot: CtpSlot) => {
+    store.setCtpSlot(key, slot, ctpSlot);
+    mirror();
+  };
+
   /** Copia uma equipe Meta/Alternativa mantendo só o que o usuário possui (na escolha livre, tudo). */
   const copyTeam = (source: MetaTeam) => {
     const next: UserTeam = {};
@@ -123,16 +142,26 @@ export function useTeamBuilderViewModel({
     if (!pick.ctpSlot) setCtpSlot(teamKey, slot, ctpSlot);
   };
 
-  // Dia sem restrição: a mesma equipe pode ir para todos os outros dias livres de BAX e BAL.
-  const freeDays = criteria.length === 0 && teamKey !== "BAI" ? freeDayKeys(cycle.data, teamKey) : [];
   const hasTeam = Object.values(team).some(Boolean);
   const filledFreeDays = freeDays.filter((k) => Object.values(doc.teams[k] ?? {}).some(Boolean));
+  const sameTeam = (k: string) => JSON.stringify(doc.teams[k] ?? {}) === JSON.stringify(team);
 
   return {
     catalog,
     team,
-    /** Outros dias livres (sem restrição) de BAX e BAL; vazio se este dia tiver restrição. */
+    /** Outros dias livres (BAX/BAL sem restrição e BAI); vazio se este dia tiver restrição. */
     freeDays: hasTeam ? freeDays : [],
+    /** Este é um dia livre (dá para sincronizar com os outros)? Quantos são os outros. */
+    isFreeDay: criteria.length === 0 && freeDays.length > 0,
+    otherFreeDays: freeDays.length,
+    syncFreeDays,
+    /** Liga a sincronização; ao ligar, os outros dias livres ficam iguais a este. */
+    setSyncFreeDays: (on: boolean) => {
+      setSyncFreeDays(on);
+      if (on && hasTeam) applyTeamTo(freeDays, team);
+    },
+    /** Algum outro dia livre está com equipe diferente desta? */
+    freeDaysDiffer: freeDays.some((k) => !sameTeam(k)),
     /** Quantos desses dias já têm equipe montada. */
     filledFreeDays: filledFreeDays.length,
     /** Copia esta equipe para os outros dias livres: só nos vazios ou em todos. Devolve quantos. */
@@ -176,9 +205,18 @@ export function useTeamBuilderViewModel({
     isOwned: (uniformId: string) => owned.has(uniformId),
     suggestion,
     hydrated,
-    setSlot: (slot: Slot, uniformId: string) => setSlot(teamKey, slot, uniformId, agentIdOf),
-    clearSlot: (slot: Slot) => clearSlot(teamKey, slot),
-    setStriker: (slot: Slot, strikerUniformId: string | null) => setStriker(teamKey, slot, strikerUniformId),
+    setSlot: (slot: Slot, uniformId: string) => {
+      store.setSlot(teamKey, slot, uniformId, agentIdOf);
+      mirror();
+    },
+    clearSlot: (slot: Slot) => {
+      store.clearSlot(teamKey, slot);
+      mirror();
+    },
+    setStriker: (slot: Slot, strikerUniformId: string | null) => {
+      store.setStriker(teamKey, slot, strikerUniformId);
+      mirror();
+    },
     /**
      * Strikers possíveis para a posição: os mesmos personagens liberados para a equipe, menos o
      * próprio, só entre os marcados como Striker meta no catálogo.

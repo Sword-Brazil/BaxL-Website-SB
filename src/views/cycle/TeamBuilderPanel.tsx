@@ -13,7 +13,7 @@ import {
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { useTranslation } from "next-i18next/pages";
-import { CopyIcon, CopyPlusIcon, SparklesIcon, UnlockIcon, XIcon, ZapIcon } from "lucide-react";
+import { CopyIcon, CopyPlusIcon, Link2Icon, SparklesIcon, UnlockIcon, XIcon, ZapIcon } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -263,12 +263,13 @@ function SlotRow({
 }
 
 /**
- * Dia sem restrição: copia a equipe para os outros dias livres de BAX e BAL, só nos que ainda
- * não têm equipe ou substituindo em todos.
+ * Dia livre: copia a equipe para os outros dias livres (BAX/BAL sem restrição e BAI), só nos que
+ * ainda não têm equipe ou substituindo em todos. Com a sincronização ligada, só aparece se algum
+ * deles ainda estiver diferente (ex.: equipes montadas antes).
  */
 function FreeDaysCopy({ vm }: { vm: TeamBuilderViewModel }) {
   const { t } = useTranslation("days");
-  if (!vm.freeDays.length) return null;
+  if (!vm.freeDays.length || (vm.syncFreeDays && !vm.freeDaysDiffer)) return null;
   const empty = vm.freeDays.length - vm.filledFreeDays;
   const apply = (onlyEmpty: boolean) => {
     const n = vm.applyToFreeDays(onlyEmpty);
@@ -279,7 +280,7 @@ function FreeDaysCopy({ vm }: { vm: TeamBuilderViewModel }) {
       <AlertDialogTrigger asChild>
         <Button size="sm" variant="outline">
           <CopyPlusIcon data-icon="inline-start" />
-          {t("myTeam.freeDays.button")}
+          {vm.syncFreeDays ? t("myTeam.freeDays.equalize") : t("myTeam.freeDays.button")}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
@@ -380,6 +381,27 @@ export function TeamBuilderPanel(props: { teamKey: TeamKey; criteria: Criterion[
               <span className="text-xs text-muted-foreground">{t("days:myTeam.freePick.help")}</span>
             </span>
           </label>
+
+          {/* Dia livre: a mesma equipe em todos os dias sem restrição e na BAI. */}
+          {vm.isFreeDay && (
+            <label
+              className={cn(
+                "flex cursor-pointer items-start gap-3 rounded-lg border p-3",
+                vm.syncFreeDays ? "border-energy/40 bg-energy/5" : "border-border",
+              )}
+            >
+              <Switch checked={vm.syncFreeDays} onCheckedChange={vm.setSyncFreeDays} className="mt-0.5" />
+              <span className="flex min-w-0 flex-col gap-0.5">
+                <span className="flex items-center gap-1.5 text-sm font-medium">
+                  <Link2Icon className="size-3.5 text-energy" />
+                  {t("days:myTeam.freeDays.syncLabel")}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {vm.syncFreeDays ? t("days:myTeam.freeDays.syncOn", { count: vm.otherFreeDays }) : t("days:myTeam.freeDays.syncOff")}
+                </span>
+              </span>
+            </label>
+          )}
 
           {!vm.freePick && (!vm.hasRoster || vm.candidates.length === 0) && (
             <Alert>

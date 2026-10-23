@@ -1,7 +1,7 @@
 import type * as React from "react";
 import Link from "next/link";
 import { useTranslation } from "next-i18next/pages";
-import { ExternalLinkIcon, PencilIcon, PlusIcon, SwordIcon, Trash2Icon, TriangleAlertIcon, XIcon, ZapIcon } from "lucide-react";
+import { ExternalLinkIcon, Link2Icon, PencilIcon, PlusIcon, SwordIcon, Trash2Icon, TriangleAlertIcon, XIcon, ZapIcon } from "lucide-react";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import {
   AlertDialog,
@@ -30,6 +30,7 @@ import type { MetaScopeViewModel } from "@/viewmodels/admin/useMetaScopeViewMode
 import { useMetaTeamEditorViewModel, type MemberDraft } from "@/viewmodels/admin/useMetaTeamEditorViewModel";
 import { useRotationsViewModel } from "@/viewmodels/useRotationsViewModel";
 import { AlternativesOrder } from "./AlternativesOrder";
+import { FreeDaySyncedBadge } from "./FreeDaysSync";
 import { MetaCycleBoard } from "./MetaCycleBoard";
 import { ReservesEditor } from "./ReservesEditor";
 import { TeamStrip } from "@/views/shared/TeamStrip";
@@ -191,7 +192,7 @@ function DamageDealerToggle({
 }
 
 /** Equipes do escopo. Dias de BAX/BAL: quadro do ciclo inteiro; BAL livre e BAI: lista do escopo. */
-export function MetaTeamEditorView({ scopeVm }: { scopeVm: MetaScopeViewModel }) {
+export function MetaTeamEditorView({ scopeVm, freeSync = false }: { scopeVm: MetaScopeViewModel; freeSync?: boolean }) {
   const { t } = useTranslation(["admin", "common"]);
   const vm = useMetaTeamEditorViewModel(scopeVm, { saved: t("admin:common.saved"), deleted: t("admin:metas.deleted") });
   const { catalog } = scopeVm;
@@ -200,10 +201,15 @@ export function MetaTeamEditorView({ scopeVm }: { scopeVm: MetaScopeViewModel })
   return (
     <div className="flex flex-col gap-4">
       {scopeVm.isDay ? (
-        <MetaCycleBoard scopeVm={scopeVm} vm={vm} />
+        <MetaCycleBoard scopeVm={scopeVm} vm={vm} freeSync={freeSync} />
       ) : (
         <>
-          <div className="flex flex-wrap justify-end gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            {scopeVm.scope === "BAI" && freeSync && (
+              <span className="mr-auto">
+                <FreeDaySyncedBadge />
+              </span>
+            )}
             <AlternativesOrder teams={vm.teams} catalog={catalog} onSave={vm.reorder} isSaving={vm.isReordering} />
             <Button variant="energy" onClick={() => vm.startNew()}>
               <PlusIcon data-icon="inline-start" />
@@ -276,6 +282,12 @@ export function MetaTeamEditorView({ scopeVm }: { scopeVm: MetaScopeViewModel })
             </DialogTitle>
             <DialogDescription>{t("admin:metas.help")}</DialogDescription>
             {scopeVm.isDay && <RestrictionBadges criteria={scopeVm.criteria} />}
+            {freeSync && (scopeVm.scope === "BAI" || (scopeVm.isDay && scopeVm.criteria.length === 0)) && (
+              <p className="flex items-start gap-1.5 text-xs text-energy">
+                <Link2Icon className="mt-0.5 size-3.5 shrink-0" aria-hidden />
+                {t("admin:metas.freeSync.dialog")}
+              </p>
+            )}
           </DialogHeader>
           {vm.draft && (
             <form

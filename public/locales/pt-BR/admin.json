@@ -110,7 +110,14 @@
       "down": "Descer a {{n}}ª"
     },
     "labelEn": "Rótulo em inglês (opcional)",
-    "labelEnPlaceholder": "Vazio: \"Alternativa N\" vira \"Alternative N\""
+    "labelEnPlaceholder": "Vazio: \"Alternativa N\" vira \"Alternative N\"",
+    "freeSync": {
+      "label": "Dias sem restrição e BAI sempre iguais",
+      "on": "Ligado: mudar as equipes ou as reservas de um destes dias copia tudo para os outros (substitui o que eles têm).",
+      "off": "Desligado: cada dia sem restrição e a BAI têm as próprias equipes.",
+      "badge": "Sincronizado",
+      "dialog": "Dia livre sincronizado: ao salvar, os outros dias sem restrição e a BAI ficam iguais a este."
+    }
   },
   "priority": {
     "solo": "Soladores",

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { CycleOverview } from "@/models/domain/types";
-import { freeDayKeys } from "@/models/rules/selections";
+import { freeDayKeys, freeTeamKeys } from "@/models/rules/selections";
 
 const EMPTY = { solo: [], support: [] };
 const mode = (criteria: { attribute: "GENDER"; value: string }[]) => ({ criteria, metaTeams: [], priority: EMPTY, reserves: EMPTY });
@@ -22,5 +22,12 @@ describe("freeDayKeys", () => {
     expect(freeDayKeys(cycle)).toEqual(["BAX-1", "BAL-2", "BAX-4", "BAL-4"]);
     expect(freeDayKeys(cycle, "BAX-4")).toEqual(["BAX-1", "BAL-2", "BAL-4"]);
     expect(freeDayKeys(undefined)).toEqual([]);
+  });
+});
+
+describe("freeTeamKeys", () => {
+  it("os dias livres da equipe do jogador incluem a BAI; da BAI, só os de BAX e BAL", () => {
+    expect(freeTeamKeys(cycle, "BAX-1")).toEqual(["BAL-2", "BAX-4", "BAL-4", "BAI"]);
+    expect(freeTeamKeys(cycle, "BAI")).toEqual(["BAX-1", "BAL-2", "BAX-4", "BAL-4"]);
   });
 });

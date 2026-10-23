@@ -97,7 +97,7 @@
       },
       "tips": {
         "1": "¿Todo en rojo? Todavía no marcaste la plantilla. Márcalo en Mi plantilla o activa Elegir entre todos los personajes.",
-        "2": "Los días sin restricción pueden usar el mismo equipo: el sitio ofrece copiarlo a los otros días libres.",
+        "2": "Los días sin restricción y la BAI usan el mismo equipo: cambia uno y los demás cambian también (se puede apagar en el armador).",
         "3": "Todo se guarda solo. Basta con cerrar la ventana."
       }
     },

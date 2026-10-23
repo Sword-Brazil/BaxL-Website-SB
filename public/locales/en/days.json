@@ -123,8 +123,8 @@
     "freeDays": {
       "button": "Use on free days",
       "title": "Same team on free days",
-      "text_one": "Copy this team to the other BAX/BAL day with no restriction?",
-      "text_other": "Copy this team to the other {{count}} BAX/BAL days with no restriction?",
+      "text_one": "Copy this team to the other free day (no restriction or BAI)?",
+      "text_other": "Copy this team to the other {{count}} free days (BAX and BAL days without restriction, and BAI)?",
       "filled_one": "{{count}} of them already has a team.",
       "filled_other": "{{count}} of them already have a team.",
       "cancel": "Cancel",
@@ -135,7 +135,12 @@
       "apply_one": "Copy ({{count}})",
       "apply_other": "Copy to all ({{count}})",
       "done_one": "Team copied to {{count}} free day.",
-      "done_other": "Team copied to {{count}} free days."
+      "done_other": "Team copied to {{count}} free days.",
+      "equalize": "Match the other free days",
+      "syncLabel": "Same team on every free day",
+      "syncOn_one": "Changing this team also changes the other free day.",
+      "syncOn_other": "Changing this team also changes the other {{count}} free days (BAX and BAL days without restriction, and BAI).",
+      "syncOff": "Off: each free day has its own team. Use the button below to copy."
     }
   }
 }

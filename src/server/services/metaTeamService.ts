@@ -6,6 +6,7 @@ import { prisma } from "@/server/db";
 import { HttpError } from "@/server/http";
 import { metaTeamInclude } from "@/server/repositories/metaTeamRepository";
 import { assertCtpsExist, assertRestriction, findBattleDay, loadActiveUniforms } from "./curationGuards";
+import { mirrorFreePlace } from "./freeDaysService";
 import { toMetaTeam } from "./mappers";
 
 /** Strikers dos Causadores de Dano: trajes ativos do catálogo, de um personagem diferente do próprio. */
@@ -101,6 +102,7 @@ export async function saveMetaTeam(input: MetaTeamInput, userId: string, id?: st
       include: metaTeamInclude,
     });
   });
+  await mirrorFreePlace({ scope: input.scope, battleDayId });
   return toMetaTeam(saved);
 }
 
@@ -120,11 +122,14 @@ export async function reorderMetaTeams(ids: string[]): Promise<void> {
     select: { id: true },
   });
   await prisma.$transaction([...ids, ...others.map((o) => o.id)].map((id, i) => prisma.metaTeam.update({ where: { id }, data: { position: i + 1 } })));
+  await mirrorFreePlace({ scope, battleDayId });
 }
 
 export async function deleteMetaTeam(id: string) {
+  const team = await prisma.metaTeam.findUnique({ where: { id }, select: { scope: true, battleDayId: true } });
   const { count } = await prisma.metaTeam.deleteMany({ where: { id } });
-  if (count === 0) throw new HttpError(404, "NOT_FOUND", "Equipe não encontrada");
+  if (count === 0 || !team) throw new HttpError(404, "NOT_FOUND", "Equipe não encontrada");
+  await mirrorFreePlace(team);
 }
 
 /** Lista para o editor: equipes de um escopo (e dia, se DAY). */

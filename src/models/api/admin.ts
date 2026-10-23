@@ -67,6 +67,9 @@ export const adminApi = {
   getGuide: (locale: string) => apiFetch<AdminGuide>(`/api/admin/guide?${new URLSearchParams({ locale })}`),
   guideImageUrl: (name: string) => `/api/admin/guide-image?${new URLSearchParams({ name })}`,
 
+  getFreeDaysSync: () => apiFetch<{ sync: boolean }>("/api/admin/free-days"),
+  setFreeDaysSync: (sync: boolean) => apiFetch<{ sync: boolean }>("/api/admin/free-days", { method: "PUT", body: { sync } }),
+
   getSettings: () => apiFetch<Settings>("/api/admin/settings"),
   saveSettings: (body: SettingsInput) => apiFetch<Settings>("/api/admin/settings", { method: "PUT", body }),
 
