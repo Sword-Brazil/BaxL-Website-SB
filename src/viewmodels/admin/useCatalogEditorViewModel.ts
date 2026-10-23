@@ -25,14 +25,16 @@ const attributesOf = (u: RestrictableAttributes): RestrictableAttributes => ({
 const blank: AgentInput = {
   slug: "",
   name: "",
+  nameEn: "",
   active: true,
-  uniforms: [{ slug: "padrao", name: "Padrão", imagePath: "", active: true, effects: [], isMetaStriker: false, ...UNKNOWN_ATTRIBUTES }],
+  uniforms: [{ slug: "padrao", name: "Padrão", nameEn: "Default", imagePath: "", active: true, effects: [], isMetaStriker: false, ...UNKNOWN_ATTRIBUTES }],
 };
 
 /** Traje novo começa com os atributos de um traje já cadastrado (ajuste o que for diferente). */
 const newUniform = (from?: RestrictableAttributes): UniformInput => ({
   slug: "",
   name: "",
+  nameEn: "",
   imagePath: "",
   active: true,
   effects: [],
@@ -43,11 +45,13 @@ const newUniform = (from?: RestrictableAttributes): UniformInput => ({
 const toInput = (a: Agent): AgentInput => ({
   slug: a.slug,
   name: a.name,
+  nameEn: a.nameEn ?? "",
   active: a.active,
   uniforms: a.uniforms.map((u) => ({
     id: u.id,
     slug: u.slug,
     name: u.name,
+    nameEn: u.nameEn ?? "",
     imagePath: u.imagePath,
     active: u.active,
     effects: u.effects,
@@ -73,7 +77,7 @@ const fileToBase64 = (file: File) =>
 export function useCatalogEditorViewModel(messages: { saved: string; uploaded: string; tooBig: string; badType: string }) {
   const qc = useQueryClient();
   const notifyError = useNotifyError();
-  const catalog = useCatalogViewModel();
+  const catalog = useCatalogViewModel({ raw: true });
   const [search, setSearch] = useState("");
   const [editingId, setEditingId] = useState<string | null | undefined>(undefined); // undefined = fechado, null = novo
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);

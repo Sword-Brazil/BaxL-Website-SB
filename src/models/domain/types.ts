@@ -8,6 +8,7 @@ import type {
   CtpQuality,
   CtpType,
   DayMode,
+  Mode,
   Gender,
   PriorityRole,
   Role,
@@ -32,6 +33,8 @@ export interface Uniform extends RestrictableAttributes {
   agentId: string;
   slug: string;
   name: string;
+  /** Nome em inglês (o espanhol usa o mesmo); null = só o português. */
+  nameEn: string | null;
   imagePath: string;
   /** Imagem a exibir: a do traje ou, se ele não tiver, o retrato do personagem ("" = iniciais). */
   portrait: string;
@@ -46,11 +49,17 @@ export interface Agent {
   id: string;
   slug: string;
   name: string;
+  nameEn: string | null;
   active: boolean;
   uniforms: Uniform[];
   /** CTPs da Meta para o personagem: o 1 (padrão) e o 2 (opcional); cada equipe Meta escolhe um por dia. */
   metaCtp1Id: string | null;
   metaCtp2Id: string | null;
+  /** Modos em que pontua: automático (pelas equipes Meta em que é Causador de Dano) ou escolhidos pelo admin. */
+  scoringAuto: boolean;
+  scoringModes: Mode[];
+  /** Modos das equipes Meta em que é Causador de Dano (a detecção automática). */
+  detectedScoringModes: Mode[];
 }
 
 export interface Ctp {
@@ -88,12 +97,18 @@ export interface Rotation {
   effect: BossEffect | null;
   position: number;
   title: string | null;
-  /** Sequência em texto livre (a notação 1–6 / c / dc / qc vira "chips" quando reconhecida). */
+  titleEn: string | null;
+  /** Sequência em texto livre (a notação 1–7 / c / dc / qc vira "chips" quando reconhecida). */
   sequence: string;
   /** Quando usar, os delays, o que observar. */
   description: string | null;
-  /** Vídeo de referência (YouTube ou .mp4/.webm externo). */
+  descriptionEn: string | null;
+  /** Vídeo de referência (YouTube ou .mp4/.webm externo), para qualquer modo. */
   videoUrl: string | null;
+  /** Demonstração da rotação em cada modo. */
+  videoBax: string | null;
+  videoBal: string | null;
+  videoBai: string | null;
   updatedAt: string;
 }
 
@@ -110,6 +125,7 @@ export interface MetaTeam {
   dayNumber: number | null;
   isPrimary: boolean;
   label: string | null;
+  labelEn: string | null;
   notes: string | null;
   members: MetaTeamMember[];
   /** Ordem entre as alternativas do mesmo dia (a principal vem sempre primeiro). */
@@ -135,6 +151,7 @@ export interface BaiBoss {
   id: string;
   position: number;
   name: string;
+  nameEn: string | null;
   imagePath: string | null;
   tips: string | null;
 }

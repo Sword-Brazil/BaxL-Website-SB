@@ -1,11 +1,12 @@
 import type { ReactNode } from "react";
-import { CircleHelpIcon } from "lucide-react";
+import Link from "next/link";
+import { ArrowRightIcon, CircleHelpIcon } from "lucide-react";
 import { useTranslation } from "next-i18next/pages";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverHeader, PopoverTitle, PopoverTrigger } from "@/components/ui/popover";
 
-/** Ajuda curta da tela (FR-030). */
-export function HelpHint({ title, children }: { title: string; children: ReactNode }) {
+/** Ajuda curta da tela (FR-030), com o link para a seção da tela no guia (/sobre). */
+export function HelpHint({ title, children, guide }: { title: string; children: ReactNode; guide?: string }) {
   const { t } = useTranslation("common");
   return (
     <Popover>
@@ -19,6 +20,13 @@ export function HelpHint({ title, children }: { title: string; children: ReactNo
           <PopoverTitle>{title}</PopoverTitle>
         </PopoverHeader>
         <div className="space-y-2 text-muted-foreground">{children}</div>
+        <Link
+          href={`/sobre${guide ? `#${guide}` : ""}`}
+          className="flex items-center gap-1 text-xs font-medium text-energy underline-offset-4 hover:underline"
+        >
+          {t("actions.fullGuide")}
+          <ArrowRightIcon className="size-3.5" />
+        </Link>
       </PopoverContent>
     </Popover>
   );

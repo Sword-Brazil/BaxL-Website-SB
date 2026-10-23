@@ -15,7 +15,8 @@
     "rotations": "Rotações",
     "login": "Entrar",
     "synced": "Sincronizado com a sua conta",
-    "scores": "Pontuações"
+    "scores": "Pontuações",
+    "about": "Sobre o site"
   },
   "modes": {
     "BAX": "Batalha de Aliança Extrema",
@@ -71,7 +72,7 @@
   "rotation": {
     "title": "Rotação",
     "skill": "Habilidade {{n}}",
-    "ultimate": "Habilidade 6 (Ultimate / Despertada / Tier-4)",
+    "ultimate": "Habilidade 7 (Ultimate / Despertada / Tier-4)",
     "optional": "Opcional",
     "cancels": {
       "c": "cancelar logo após usar",
@@ -79,7 +80,7 @@
       "qc": "cancelamento rápido"
     },
     "legend": {
-      "numbers": "Habilidades na ordem da tela. 6 = Ultimate, Despertada ou Tier-4.",
+      "numbers": "Habilidades na ordem da tela. 7 = Ultimate, Despertada ou Tier-4.",
       "c": "Cancel: cancele a animação logo após usar, soltando a próxima habilidade.",
       "dc": "Delayed Cancel: espere uma fração de segundo (o efeito do golpe ou o fim da animação) antes de cancelar e apertar a próxima.",
       "qc": "Quick Cancel: cancelamento rápido logo após o comando.",
@@ -97,7 +98,7 @@
     },
     "errors": {
       "empty": "Escreva a rotação.",
-      "token": "Não entendi “{{token}}”: use 1–6 (com c, dc ou qc), parênteses, |, / ou *.",
+      "token": "Não entendi “{{token}}”: use 1–7 (com c, dc ou qc), parênteses, |, / ou *.",
       "unclosedGroup": "Falta fechar um parêntese.",
       "unopenedGroup": "Há um “)” sem “(” antes.",
       "nestedGroup": "Não dá para abrir um parêntese dentro de outro.",
@@ -171,7 +172,8 @@
     "close": "Fechar",
     "back": "Voltar",
     "help": "Ajuda",
-    "exportImage": "Exportar imagem"
+    "exportImage": "Exportar imagem",
+    "fullGuide": "Ver o guia completo do site"
   },
   "states": {
     "loading": "Carregando…",

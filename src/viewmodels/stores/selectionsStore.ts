@@ -25,6 +25,8 @@ interface SelectionsState {
   setOwnedUniforms: (uniformIds: string[], owned: boolean) => void;
   /** Liga/desliga a escolha livre: todos os personagens nas equipes, sem depender do elenco. */
   setFreePick: (on: boolean) => void;
+  /** Liga/desliga a mesma equipe em todos os dias livres (sem restrição) e na BAI. */
+  setSyncFreeDays: (on: boolean) => void;
   /** Coloca o uniforme no slot; remove o mesmo agente de outro slot da equipe (invariante). */
   setSlot: (teamKey: TeamKey, slot: Slot, uniformId: string, agentOf: (uniformId: string) => string | undefined) => void;
   clearSlot: (teamKey: TeamKey, slot: Slot) => void;
@@ -69,6 +71,8 @@ export const useSelectionsStore = create<SelectionsState>()(
       setNickname: (nickname) => set(({ doc }) => ({ doc: touch(doc, { nickname: nickname.trim().slice(0, 30) }) })),
 
       setFreePick: (on) => set(({ doc }) => ({ doc: touch(doc, { freePick: on }) })),
+
+      setSyncFreeDays: (on) => set(({ doc }) => ({ doc: touch(doc, { syncFreeDays: on }) })),
 
       toggleOwnedUniform: (uniformId) =>
         set(({ doc }) => {

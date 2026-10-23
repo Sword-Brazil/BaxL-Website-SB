@@ -8,6 +8,7 @@ type DbMetaTeam = {
   isPrimary: boolean;
   position: number;
   label: string | null;
+  labelEn: string | null;
   notes: string | null;
   updatedAt: Date;
   battleDay: { mode: string; number: number } | null;
@@ -31,6 +32,7 @@ export function toMetaTeam(t: DbMetaTeam): MetaTeam {
     isPrimary: t.isPrimary,
     position: t.position,
     label: t.label,
+    labelEn: t.labelEn,
     notes: t.notes,
     members: [...t.members]
       .sort((a, b) => SLOTS.indexOf(a.slot as Slot) - SLOTS.indexOf(b.slot as Slot))

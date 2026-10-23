@@ -1,19 +1,19 @@
 // Importa o snapshot do Guia BAX/BAL/BAI (prisma/data/guiabaxbal-*.json) para o banco:
 // agentes e trajes, restrições dos 28 dias e equipes Meta e Alternativa (BAX, BAL e BAI). As listas
 // da sugestão saem das equipes na hora (effectivePriority); reservas cadastradas são mantidas. Uso: npm run import:guiabaxbal [-- --replace | --attributes-only]
-// - Agentes e trajes: cria os que faltam. Os atributos são de cada traje: os deduzidos para o
+// - Agentes e trajes: cria os que faltam (com o nome em inglês de catalog-names-en.json ou do guia). Os atributos são de cada traje: os deduzidos para o
 //   traje (ex.: Jean Grey "Fênix Negra" vilã) ou, sem isso, os do personagem no guia; só são
 //   preenchidos onde o traje ainda está "não informado".
 // - Equipes: só substitui as existentes com --replace.
 // - --attributes-only: só agentes, trajes e atributos; não mexe em restrições nem equipes.
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { PrismaClient } from "@prisma/client";
+import { createPrismaClient } from "../src/server/prismaClient";
 import { CRITERION_ATTRIBUTES, UNKNOWN } from "../src/models/domain/enums";
 import { convertSnapshot, DEFAULT_UNIFORM, slugify, type ImportedTeam } from "../src/models/import/guiabaxbal";
 
 if (existsSync(".env.local")) process.loadEnvFile(".env.local");
-const prisma = new PrismaClient();
+const prisma = createPrismaClient();
 const FIELD = { GENDER: "gender", SIDE: "side", SPECIES: "species", ATTACK_TYPE: "attackType" } as const;
 
 async function main() {
@@ -22,7 +22,13 @@ async function main() {
   const dir = path.join("prisma", "data");
   const file = readdirSync(dir).filter((f) => f.startsWith("guiabaxbal-")).sort().at(-1);
   if (!file) throw new Error("Snapshot prisma/data/guiabaxbal-*.json não encontrado");
-  const { agents, days, bai } = convertSnapshot(JSON.parse(readFileSync(path.join(dir, file), "utf8")));
+  const snapshot = JSON.parse(readFileSync(path.join(dir, file), "utf8"));
+  const { agents, days, bai } = convertSnapshot(snapshot);
+  // Nomes em inglês: os revisados (catalog-names-en.json) e, sem eles, os do próprio guia.
+  const namesEn: { agents: Record<string, string>; uniforms: Record<string, string> } = JSON.parse(
+    readFileSync(path.join(dir, "catalog-names-en.json"), "utf8"),
+  );
+  const guideEn = (table: Record<string, { en?: string }> | undefined, name: string) => table?.[name]?.en?.split("\t").at(-1)?.trim() || null;
   console.log(`Snapshot ${file}: ${agents.length} agentes, ${days.length} dias, BAI ${bai.length ? "sim" : "não"}`);
 
   const existingTeams = await prisma.metaTeam.count({ where: { scope: { in: ["DAY", "BAI"] } } });
@@ -37,13 +43,21 @@ async function main() {
   for (const a of agents) {
     const agent =
       (await prisma.agent.findUnique({ where: { slug: a.slug } })) ??
-      (await prisma.agent.create({ data: { slug: a.slug, name: a.name } }));
+      (await prisma.agent.create({
+        data: { slug: a.slug, name: a.name, nameEn: namesEn.agents[a.slug] || guideEn(snapshot.charTranslations, a.name) },
+      }));
     for (const name of a.uniforms) {
       const slug = name === DEFAULT_UNIFORM ? "padrao" : slugify(name);
       let u = await prisma.uniform.upsert({
         where: { agentId_slug: { agentId: agent.id, slug } },
         update: {},
-        create: { agentId: agent.id, slug, name, imagePath: "" },
+        create: {
+          agentId: agent.id,
+          slug,
+          name,
+          nameEn: namesEn.uniforms[`${a.slug}/${slug}`] || guideEn(snapshot.costumeTranslations, name),
+          imagePath: "",
+        },
       });
       const own = a.uniformAttributes[name] ?? {};
       const missing = Object.fromEntries(

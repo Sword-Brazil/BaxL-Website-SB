@@ -1,9 +1,9 @@
 // Rotação do Solador na notação da comunidade:
-//   1–6 = habilidades na ordem da tela (6 = Ultimate / Despertada / Tier-4)
+//   1–7 = habilidades na ordem da tela (7 = Ultimate / Despertada / Tier-4)
 //   c = cancelar logo após usar · dc = cancelar com atraso · qc = cancelamento rápido
 //   ( ) = trecho opcional / "recheio" antes do bônus principal
 //   | = fim da rotação atual · / = começa a próxima rotação · * = recomeça do início (loop)
-// Ex.: "1 2c (3dc 4) 6 | 5 4 *". Separadores aceitos entre os passos: espaço, vírgula, ">", "→", "-".
+// Ex.: "1 2c (3dc 4) 7 | 5 6 *". Separadores aceitos entre os passos: espaço, vírgula, ">", "→", "-".
 
 export const CANCELS = ["c", "dc", "qc"] as const;
 export type Cancel = (typeof CANCELS)[number];
@@ -12,7 +12,7 @@ export type Cancel = (typeof CANCELS)[number];
 export const MARKERS = { "|": "end", "/": "next", "*": "restart" } as const;
 export type Marker = (typeof MARKERS)[keyof typeof MARKERS];
 
-export const ULTIMATE_SKILL = 6;
+export const ULTIMATE_SKILL = 7;
 export const MAX_ROTATION_STEPS = 30;
 
 export interface RotationStep {
@@ -50,7 +50,7 @@ export type RotationParse =
   | { ok: true; parts: RotationPart[] }
   | { ok: false; error: RotationError; token?: string; parts: (RotationPart | RotationUnknown)[] };
 
-const STEP = /^([1-6])(dc|qc|c)?$/;
+const STEP = /^([1-7])(dc|qc|c)?$/;
 
 export const isMarker = (p: RotationPart | RotationUnknown): p is RotationMarker => "marker" in p;
 export const isUnknown = (p: RotationPart | RotationUnknown): p is RotationUnknown => "unknown" in p;

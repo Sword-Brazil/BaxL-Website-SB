@@ -52,6 +52,16 @@ export function BaiEditorView() {
                       <Trash2Icon className="text-destructive" />
                     </Button>
                   </div>
+                  <Field className="sm:col-span-2 sm:col-start-2">
+                    <FieldLabel htmlFor={`boss-name-en-${i}`}>{t("bai.nameEn")}</FieldLabel>
+                    <Input
+                      id={`boss-name-en-${i}`}
+                      maxLength={80}
+                      value={b.nameEn}
+                      placeholder={t("catalog.nameEnPlaceholder")}
+                      onChange={(e) => vm.update(i, { nameEn: e.target.value })}
+                    />
+                  </Field>
                   <Field className="sm:col-span-4">
                     <FieldLabel htmlFor={`boss-tips-${i}`}>{t("bai.tips")}</FieldLabel>
                     <Textarea id={`boss-tips-${i}`} maxLength={500} value={b.tips} onChange={(e) => vm.update(i, { tips: e.target.value })} />

@@ -15,9 +15,11 @@ import {
 import { Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitle, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { SLOTS, type BossEffect, type DayMode } from "@/models/domain/enums";
+import { SLOTS, type BossEffect, type DayMode, type Mode } from "@/models/domain/enums";
 import type { CycleDay, CycleModeDay, MetaTeam } from "@/models/domain/types";
 import type { UserTeam } from "@/models/schemas/selections";
+import { pick, teamLabel } from "@/models/rules/localize";
+import { useContentLang } from "@/viewmodels/useContentLang";
 import { useCycleViewModel, type CycleViewModel, type WeekFilter } from "@/viewmodels/useCycleViewModel";
 import { useMetaUpdatesNotice } from "@/viewmodels/useMetaUpdatesNotice";
 import { useTeamsExportViewModel } from "@/viewmodels/useTeamsExportViewModel";
@@ -40,6 +42,7 @@ function TeamStrip(props: {
   team: StripMember[];
   vm: Vm;
   effect?: BossEffect;
+  mode?: Mode;
 }) {
   const { vm } = props;
   return (
@@ -50,6 +53,7 @@ function TeamStrip(props: {
       catalog={vm.catalog}
       isOwned={vm.hasRoster ? vm.isOwned : undefined}
       effect={props.effect}
+      mode={props.mode}
     />
   );
 }
@@ -96,6 +100,7 @@ function ModePanel({
   updated: boolean;
 }) {
   const { t } = useTranslation(["cycle", "common"]);
+  const lang = useContentLang();
   const [meta, ...alts] = data?.metaTeams ?? [];
   const mine = userMembers(vm.userTeam(mode, day), vm);
   const look = MODE_VISUALS[mode];
@@ -116,12 +121,12 @@ function ModePanel({
         </span>
       </div>
       {meta ? (
-        <TeamStrip label={t("cycle:meta")} tone="meta" team={teamMembers(meta)} vm={vm} effect={effect} />
+        <TeamStrip label={t("cycle:meta")} tone="meta" team={teamMembers(meta)} vm={vm} effect={effect} mode={mode} />
       ) : (
         <p className="rounded-md border border-dashed p-3 text-center text-xs text-muted-foreground">{t("cycle:noTeam")}</p>
       )}
       {alts.map((alt) => (
-        <TeamStrip key={alt.id} label={alt.label ?? t("cycle:alternative")} tone="alt" team={teamMembers(alt)} vm={vm} effect={effect} />
+        <TeamStrip key={alt.id} label={teamLabel(alt.label, alt.labelEn, lang) ?? t("cycle:alternative")} tone="alt" team={teamMembers(alt)} vm={vm} effect={effect} mode={mode} />
       ))}
       {mine.length > 0 && <TeamStrip label={t("cycle:mine")} tone="mine" team={mine} vm={vm} effect={effect} />}
       <Button variant={mine.length ? "ghost" : "outline"} size="sm" className="self-start" onClick={() => vm.openBuilder(mode, day)}>
@@ -135,6 +140,7 @@ function ModePanel({
 /** Dia de BAI: ocupa a linha inteira (não há BAX nem BAL). */
 function BaiPanel({ day, vm }: { day: number; vm: Vm }) {
   const { t } = useTranslation(["cycle", "common"]);
+  const lang = useContentLang();
   const [meta, ...alts] = vm.bai?.metaTeams ?? [];
   const mine = userMembers(vm.userTeam("BAI", day), vm);
   return (
@@ -152,7 +158,7 @@ function BaiPanel({ day, vm }: { day: number; vm: Vm }) {
             <SwordsIcon className="size-4 text-villain" aria-label={t("cycle:bai.bosses")} />
             {vm.bai.bosses.map((b) => (
               <Badge key={b.id} variant="villain">
-                {b.position}. {b.name}
+                {b.position}. {pick(b.name, b.nameEn, lang)}
               </Badge>
             ))}
           </div>
@@ -160,12 +166,12 @@ function BaiPanel({ day, vm }: { day: number; vm: Vm }) {
       </div>
       <div className="grid gap-2 md:grid-cols-2">
         {meta ? (
-          <TeamStrip label={t("cycle:meta")} tone="meta" team={teamMembers(meta)} vm={vm} />
+          <TeamStrip label={t("cycle:meta")} tone="meta" team={teamMembers(meta)} vm={vm} mode="BAI" />
         ) : (
           <p className="rounded-md border border-dashed p-3 text-center text-xs text-muted-foreground">{t("cycle:noTeam")}</p>
         )}
         {alts.map((alt) => (
-          <TeamStrip key={alt.id} label={alt.label ?? t("cycle:alternative")} tone="alt" team={teamMembers(alt)} vm={vm} />
+          <TeamStrip key={alt.id} label={teamLabel(alt.label, alt.labelEn, lang) ?? t("cycle:alternative")} tone="alt" team={teamMembers(alt)} vm={vm} mode="BAI" />
         ))}
         {mine.length > 0 && <TeamStrip label={t("cycle:mine")} tone="mine" team={mine} vm={vm} />}
       </div>
@@ -274,7 +280,7 @@ function BuilderDialog({ vm }: { vm: Vm }) {
 function DayStrip({ vm }: { vm: Vm }) {
   const { t } = useTranslation(["cycle", "common"]);
   return (
-    <nav aria-label={t("cycle:cycleDays")} className="overflow-x-auto pb-1 [scrollbar-width:thin]">
+    <nav aria-label={t("cycle:cycleDays")} className="scrollbar-slim overflow-x-auto pb-1">
       <ol className="flex min-w-max gap-1">
         {vm.allDays.map((d) => {
           const isToday = vm.currentDay === d.number;
@@ -335,7 +341,7 @@ export function CycleView() {
               <ResetTeamsOptions />
             </PopoverContent>
           </Popover>
-          <HelpHint title={t("cycle:legend.title")}>
+          <HelpHint title={t("cycle:legend.title")} guide="cycle">
             <p>{t("cycle:legend.owned")}</p>
             <p>{t("cycle:legend.dim")}</p>
             <p>{t("cycle:legend.ctp")}</p>

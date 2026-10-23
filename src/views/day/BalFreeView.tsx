@@ -1,6 +1,8 @@
 import { useTranslation } from "next-i18next/pages";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { teamLabel } from "@/models/rules/localize";
+import { useContentLang } from "@/viewmodels/useContentLang";
 import { useSelectionsStore } from "@/viewmodels/stores/selectionsStore";
 import { useCatalogViewModel } from "@/viewmodels/useCatalogViewModel";
 import { useBalFreeViewModel } from "@/viewmodels/useDayViewModel";
@@ -12,6 +14,7 @@ import { TeamStrip } from "@/views/shared/TeamStrip";
 
 export function BalFreeView() {
   const { t } = useTranslation(["days", "cycle", "common"]);
+  const lang = useContentLang();
   const vm = useBalFreeViewModel();
   const catalog = useCatalogViewModel();
   const owned = new Set(useSelectionsStore((s) => s.doc.roster.ownedUniformIds));
@@ -27,7 +30,7 @@ export function BalFreeView() {
           </h1>
           <p className="text-sm text-muted-foreground">{t("days:free.subtitle")}</p>
         </div>
-        <HelpHint title={t("days:free.help.title")}>
+        <HelpHint title={t("days:free.help.title")} guide="day">
           <p>{t("days:free.help.text1")}</p>
         </HelpHint>
       </div>
@@ -47,8 +50,9 @@ export function BalFreeView() {
             {vm.teams.map((team) => (
               <TeamStrip
                 key={team.id}
-                label={team.isPrimary ? t("cycle:meta") : (team.label ?? t("cycle:alternative"))}
+                label={team.isPrimary ? t("cycle:meta") : (teamLabel(team.label, team.labelEn, lang) ?? t("cycle:alternative"))}
                 tone={team.isPrimary ? "meta" : "alt"}
+                mode="BAL"
                 members={team.members}
                 catalog={catalog}
                 isOwned={owned.size ? (u) => owned.has(u) : undefined}

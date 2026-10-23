@@ -1,0 +1,171 @@
+{
+  "title": "Acerca del sitio",
+  "subtitle": "Una guía rápida de cada pantalla: para qué sirve, dónde está cada cosa y qué buscar cuando te trabes.",
+  "toc": "Ir a",
+  "openPage": "Abrir {{name}}",
+  "zoom": "Abrir la captura en tamaño real",
+  "shotAlt": "Captura de {{name}} con las marcas numeradas",
+  "stuck": "¿No sabes qué hacer?",
+  "start": {
+    "title": "Por dónde empezar",
+    "subtitle": "Cuatro pasos y el sitio arma los equipos con lo que tienes.",
+    "steps": {
+      "1": "Toca el icono del lápiz arriba y escribe tu nombre en el juego.",
+      "2": "En Mi plantilla, marca los agentes y uniformes que tienes y equípales los CTP.",
+      "3": "En Batalla de Alianza, abre el día de hoy y mira la Meta. Toca Armar mi equipo para armar el tuyo.",
+      "4": "Después de jugar, anota cuánto hiciste en Puntuaciones y sigue tu evolución."
+    }
+  },
+  "general": {
+    "title": "Dudas generales",
+    "items": {
+      "saved": "Todo lo que marcas (plantilla, equipos, CTP, nombre y puntuaciones) se guarda en el dispositivo y en tu cuenta: entra en otro dispositivo y está todo ahí.",
+      "sync": "Si te pregunta qué versión mantener, es porque este dispositivo y tu cuenta son distintos. Elige la que tiene tus cambios más recientes.",
+      "help": "Cada pantalla tiene un botón de ayuda (?) en la esquina, con un resumen de qué hacer ahí.",
+      "password": "¿Olvidaste la contraseña o no tienes acceso? Habla con un administrador de la alianza: solo ellos crean cuentas y cambian contraseñas.",
+      "error": "¿Apareció un aviso de error? Inténtalo de nuevo en un momento. Si sigue, avisa a un administrador."
+    }
+  },
+  "sections": {
+    "header": {
+      "title": "Barra superior",
+      "intro": "Está en todas las pantallas. Desde aquí cambias de pantalla y ajustas el sitio a tu gusto.",
+      "markers": {
+        "1": "Menú (celular): abre las pantallas del sitio y también el idioma, el tamaño de letra y el tema.",
+        "2": "Pantallas del sitio (PC): Batalla de Alianza, Mi plantilla, Rotaciones, Estadísticas y Puntuaciones.",
+        "3": "Apoyar: la clave Pix para ayudar a quien mantiene el sitio.",
+        "4": "Idioma: portugués, inglés o español.",
+        "5": "Tamaño de letra: auméntalo si cuesta leer.",
+        "6": "Tema claro u oscuro.",
+        "7": "Tu nombre en el juego: aparece en las imágenes que exportas.",
+        "8": "Mi cuenta: esta guía y Salir."
+      },
+      "tips": {
+        "1": "En el celular, el idioma, la letra y el tema están dentro del menú (☰).",
+        "2": "¿Perdido? Toca Batalla de Alianza: siempre abre en el día de hoy.",
+        "3": "Para volver a esta guía, abre Mi cuenta y toca Acerca del sitio."
+      }
+    },
+    "cycle": {
+      "title": "Batalla de Alianza: el ciclo",
+      "intro": "La pantalla de inicio. Muestra los 28 días del ciclo con la BAX y la BAL lado a lado; en los días de BAI, solo hay BAI.",
+      "markers": {
+        "1": "Los 28 días del ciclo: toca un día para ir a él. El de hoy se ilumina y los de BAI van en rojo.",
+        "2": "Hoy: vuelve al día actual de la BA desde cualquier punto de la página.",
+        "3": "Semanas: muestra solo una semana (S1 a S4) o todas.",
+        "4": "Exportar: descarga la tabla del ciclo (completa, solo la Meta o solo tus equipos) para compartir en el grupo.",
+        "5": "Limpiar equipos: borra los equipos que armaste (todos o de un modo). La plantilla y los CTP se quedan.",
+        "6": "Ayuda: qué significan los colores, la marca verde y el icono de CTP en los retratos."
+      },
+      "tips": {
+        "1": "El día de BA cambia a las 12h y la puntuación semanal se reinicia a las 22h del día de reset (hora de Brasilia).",
+        "2": "Retrato apagado = todavía no tienes el agente. Márcalo en Mi plantilla.",
+        "3": "Marco azul es héroe, rojo es villano."
+      }
+    },
+    "day": {
+      "title": "El día: Meta y mi equipo",
+      "intro": "Cada día tiene la BAX y la BAL, con la restricción, el equipo Meta, las alternativas y el equipo que armaste.",
+      "markers": {
+        "1": "Estás aquí: el día actual de la BA y cuánto falta para que cambie.",
+        "2": "Efecto de la temporada: aturde al jefe con este efecto en todos los días del modo.",
+        "3": "Restricción del día: quién puede luchar (ej.: solo villanos, solo femeninos). Si hay varias, valen todas juntas.",
+        "4": "Meta: el equipo recomendado por Sword Brasil, con el uniforme y el CTP de cada agente.",
+        "5": "Alternativa: otra buena opción si te falta alguien de la Meta.",
+        "6": "Mi equipo: el equipo que armaste para el día.",
+        "7": "Armar o editar mi equipo: abre el armador (siguiente sección)."
+      },
+      "tips": {
+        "1": "El líder con Ver rotación es el Causante de Daño: tócalo para ver cómo usar sus habilidades.",
+        "2": "Marca verde en el nombre = tienes el agente. Sin ella (y con el retrato apagado), marca el agente en Mi plantilla.",
+        "3": "¿No tienes a nadie de la Meta? Usa la Alternativa o Aplicar sugerencia en el armador."
+      }
+    },
+    "team": {
+      "title": "Armar mi equipo",
+      "intro": "Elige los tres agentes del día (líder y dos apoyos), y el CTP y el Striker de cada uno. Solo aparecen los que cumplen la restricción.",
+      "markers": {
+        "1": "Elegir entre todos los personajes: arma sin llenar la plantilla (la restricción sigue valiendo).",
+        "2": "Copiar Meta o Copiar Alternativa: copia el equipo recomendado de una vez.",
+        "3": "Aplicar sugerencia: el mejor equipo posible con lo que tienes.",
+        "4": "Cambiar agente: elige otro agente para esta posición.",
+        "5": "CTP 1 y CTP 2: cuál de los dos CTP del personaje usar este día.",
+        "6": "Striker: el apoyo de la Trascendencia 4 del personaje (opcional).",
+        "7": "Sellos: verde = igual a la Meta, ámbar = distinto, rojo = no tienes el agente o el uniforme.",
+        "8": "CTP: arrastra un CTP hasta un agente, o toca el CTP y después el agente.",
+        "9": "Sugerencia para tu plantilla: el equipo que usará Aplicar sugerencia."
+      },
+      "tips": {
+        "1": "¿Todo en rojo? Todavía no marcaste la plantilla. Márcalo en Mi plantilla o activa Elegir entre todos los personajes.",
+        "2": "Los días sin restricción y la BAI usan el mismo equipo: cambia uno y los demás cambian también (se puede apagar en el armador).",
+        "3": "Todo se guarda solo. Basta con cerrar la ventana."
+      }
+    },
+    "roster": {
+      "title": "Mi plantilla",
+      "intro": "Marca los agentes y uniformes que tienes y los CTP de cada uno. Eso arma tus equipos y las sugerencias.",
+      "markers": {
+        "1": "Buscar agente por nombre.",
+        "2": "Filtros por género, lado, especie y tipo de ataque (en el celular, en el botón Filtros).",
+        "3": "Cuántos agentes marcaste.",
+        "4": "Uniforme: toca para marcar o desmarcar. Tener un uniforme ya cuenta el agente como tuyo.",
+        "5": "Marcar todos los uniformes del agente de una vez (o Desmarcar).",
+        "6": "CTP 1 y CTP 2 del personaje: valen en todos los días. El 2 es opcional, para alternar por día.",
+        "7": "Equipar CTP: arrastra un CTP hasta el personaje (en PC, está al lado de la lista).",
+        "8": "Ayuda de la pantalla."
+      },
+      "tips": {
+        "1": "¿No encuentras un agente? Limpia la búsqueda y los filtros.",
+        "2": "Marca la plantilla una sola vez: el resto del sitio usa esas marcas desde entonces."
+      }
+    },
+    "rotations": {
+      "title": "Rotaciones",
+      "intro": "El orden de las habilidades de cada Causante de Daño de las Metas, por traje, con explicación y video cuando lo hay.",
+      "markers": {
+        "1": "Todos los personajes: vuelve a la lista de quién tiene rotación.",
+        "2": "El personaje y para qué traje vale la rotación.",
+        "3": "La rotación: las habilidades en orden, de izquierda a derecha, con la descripción debajo.",
+        "4": "Cómo leer la notación: qué significan c, dc, qc, los paréntesis y los símbolos."
+      },
+      "tips": {
+        "1": "Los números son las habilidades en el orden de la pantalla del juego. 7 es la Ultimate, Despertada o Tier-4.",
+        "2": "También puedes llegar aquí desde el botón Ver rotación en el líder de cada día."
+      }
+    },
+    "stats": {
+      "title": "Estadísticas",
+      "intro": "Quién aparece más en los equipos del ciclo (buenas inversiones) y los CTP que equipaste.",
+      "markers": {
+        "1": "Metas: cuenta los equipos recomendados por Sword Brasil.",
+        "2": "Mis equipos: cuenta los equipos que armaste.",
+        "3": "Modo: todos, solo BAX, solo BAL o solo BAI.",
+        "4": "Incluir alternativas en el conteo.",
+        "5": "Exportar la lista.",
+        "6": "Ver como gráfico o como tabla.",
+        "7": "Mis CTP equipados, por tipo y calidad.",
+        "8": "Ayuda de la pantalla."
+      },
+      "tips": {
+        "1": "¿No sabes en quién invertir? Mira quién está arriba en Metas: aparece más veces en el ciclo.",
+        "2": "¿Gráfico de CTP vacío? Equipa los CTP en Mi plantilla."
+      }
+    },
+    "scores": {
+      "title": "Puntuaciones",
+      "intro": "Anota cuánto hiciste en cada modo y mira si mejoraste contra el mismo día del mes anterior. Solo tú ves tus puntuaciones.",
+      "markers": {
+        "1": "Resumen: hoy, la semana, la temporada y tu mejor día.",
+        "2": "Elige el día que vas a anotar (abre en el día de hoy).",
+        "3": "Puntos de cada modo: se guarda al salir del campo. Borrar el número lo elimina.",
+        "4": "El equipo que armaste para ese día, para recordar con quién jugaste.",
+        "5": "Ayuda: cómo funcionan el reset, la BA normal y las comparaciones."
+      },
+      "tips": {
+        "1": "En el día de reset (jueves) anota dos veces: antes y después de las 22h.",
+        "2": "No hace falta anotar la BA normal: entra sola en el total.",
+        "3": "Verde subió, rojo bajó, siempre contra el mismo día y semana del mes anterior."
+      }
+    }
+  }
+}

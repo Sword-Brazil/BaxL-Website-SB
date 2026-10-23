@@ -3,10 +3,10 @@
 // Idempotente: pode rodar de novo depois de adicionar fotos (mantém as já ligadas).
 import { copyFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { PrismaClient } from "@prisma/client";
+import { createPrismaClient } from "../src/server/prismaClient";
 
 if (existsSync(".env.local")) process.loadEnvFile(".env.local");
-const prisma = new PrismaClient();
+const prisma = createPrismaClient();
 
 interface Manifest {
   chars: { file: string; agent: string; uniform: string | null }[];

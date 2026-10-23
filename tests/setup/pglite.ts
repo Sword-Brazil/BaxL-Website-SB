@@ -14,6 +14,4 @@ for (const dir of readdirSync(MIGRATIONS, { withFileTypes: true }).filter((d) =>
   await pg.exec(readFileSync(path.join(MIGRATIONS, dir, "migration.sql"), "utf8"));
 }
 
-// O adaptador traz tipos de uma versão mais nova do Prisma; em tempo de execução é compatível.
-const adapter = new PrismaPGlite(pg) as unknown as NonNullable<ConstructorParameters<typeof PrismaClient>[0]>["adapter"];
-(globalThis as unknown as { prisma?: PrismaClient }).prisma = new PrismaClient({ adapter });
+(globalThis as unknown as { prisma?: PrismaClient }).prisma = new PrismaClient({ adapter: new PrismaPGlite(pg) });

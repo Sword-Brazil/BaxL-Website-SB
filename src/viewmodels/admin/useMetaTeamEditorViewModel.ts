@@ -30,6 +30,7 @@ export interface TeamDraft {
   id?: string;
   isPrimary: boolean;
   label: string;
+  labelEn: string;
   notes: string;
   members: Record<Slot, MemberDraft>;
 }
@@ -66,6 +67,7 @@ function memberDraft(catalog: CatalogViewModel, m: MetaTeam["members"][number]):
 const emptyDraft = (isPrimary: boolean): TeamDraft => ({
   isPrimary,
   label: "",
+  labelEn: "",
   notes: "",
   members: Object.fromEntries(SLOTS.map((s) => [s, emptyMember()])) as TeamDraft["members"],
 });
@@ -74,6 +76,7 @@ const fromTeam = (catalog: CatalogViewModel, t: MetaTeam): TeamDraft => ({
   id: t.id,
   isPrimary: t.isPrimary,
   label: t.label ?? "",
+  labelEn: t.labelEn ?? "",
   notes: t.notes ?? "",
   members: Object.fromEntries(t.members.map((m) => [m.slot, memberDraft(catalog, m)])) as TeamDraft["members"],
 });
@@ -110,6 +113,7 @@ export function useMetaTeamEditorViewModel(scopeVm: MetaScopeViewModel, messages
         ...(isDay ? { mode, number } : {}),
         isPrimary: d.isPrimary,
         label: d.label || null,
+        labelEn: d.labelEn || null,
         notes: d.notes || null,
         members: SLOTS.map((slot) => {
           const m = d.members[slot];

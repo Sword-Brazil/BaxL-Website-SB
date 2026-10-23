@@ -24,7 +24,7 @@
     "catalog": "Agentes, uniformes e imagens.",
     "ctps": "Tipos, fotos e disponibilidade dos CTPs.",
     "bai": "Sequência de chefes da BAI.",
-    "users": "Membros e administradores: criar contas, papéis e senhas.",
+    "users": "Membros e administradores: criar contas, papéis, senhas e excluir quem saiu da aliança.",
     "settings": "Âncora do ciclo e horários de virada.",
     "rotations": "Rotações dos personagens (Causadores de Dano), por traje, com descrição e vídeo."
   },
@@ -108,6 +108,15 @@
       "oldest": "Mais antiga primeiro",
       "up": "Subir a {{n}}ª",
       "down": "Descer a {{n}}ª"
+    },
+    "labelEn": "Rótulo em inglês (opcional)",
+    "labelEnPlaceholder": "Vazio: \"Alternativa N\" vira \"Alternative N\"",
+    "freeSync": {
+      "label": "Dias sem restrição e BAI sempre iguais",
+      "on": "Ligado: mudar as equipes ou as reservas de um destes dias copia tudo para os outros (substitui o que eles têm).",
+      "off": "Desligado: cada dia sem restrição e a BAI têm as próprias equipes.",
+      "badge": "Sincronizado",
+      "dialog": "Dia livre sincronizado: ao salvar, os outros dias sem restrição e a BAI ficam iguais a este."
     }
   },
   "priority": {
@@ -149,7 +158,10 @@
     "variedUniforms_other": "{{count}} trajes com atributos diferentes",
     "effects": "Efeitos no chefe (atordoa na temporada do efeito)",
     "metaStriker": "Striker meta",
-    "metaStrikerHelp": "Só os trajes marcados aparecem para escolher como Striker dos Causadores de Dano (Metas e equipes dos jogadores)."
+    "metaStrikerHelp": "Só os trajes marcados aparecem para escolher como Striker dos Causadores de Dano (Metas e equipes dos jogadores).",
+    "nameEn": "Nome em inglês",
+    "nameEnHint": "Aparece para quem usa o site em inglês ou espanhol. Vazio = mostra o nome em português.",
+    "nameEnPlaceholder": "Ex.: Marvel Zombies"
   },
   "ctps": {
     "title": "Catálogo de CTPs",
@@ -170,7 +182,8 @@
     "name": "Nome",
     "image": "Imagem (caminho)",
     "tips": "Dicas",
-    "help": "Os chefes aparecem nesta ordem na página da BAI."
+    "help": "Os chefes aparecem nesta ordem na página da BAI.",
+    "nameEn": "Nome em inglês (opcional)"
   },
   "users": {
     "title": "Usuários e papéis",
@@ -189,7 +202,13 @@
     "newUser": "Nova conta",
     "username": "Nome de usuário",
     "usernameHint": "Usado para entrar. Ex.: o nick do jogo (3 a 30 letras, números, espaço, ponto, hífen ou sublinhado). Maiúsculas não importam.",
-    "resetHelp": "Defina uma senha nova e passe para a pessoa. A senha antiga deixa de funcionar na hora."
+    "resetHelp": "Defina uma senha nova e passe para a pessoa. A senha antiga deixa de funcionar na hora.",
+    "deleted": "Conta excluída",
+    "deleteTitle": "Excluir conta",
+    "deleteConfirm": "Excluir a conta de {{name}}? Saem junto o elenco, as equipes e as pontuações dela, e a sessão aberta termina. Não dá para desfazer.",
+    "duplicate": "Duplicada",
+    "duplicateHint": "Repete o nome de usuário ou o apelido de outra conta (escrito de outro jeito). Exclua a que não é usada.",
+    "nicknameHint": "Nome no jogo. Não pode repetir o de outra conta (maiúsculas, acentos e pontuação não contam)."
   },
   "settings": {
     "title": "Configurações do calendário",
@@ -216,15 +235,25 @@
     "titleLabel": "Título (opcional)",
     "titlePlaceholder": "Ex.: Abertura, Fase 2, Contra chefes",
     "sequence": "Rotação",
-    "sequencePlaceholder": "Ex.: 1 2c (3dc 4) 6 | 5 4 * — ou escreva do seu jeito",
-    "sequenceHint": "Texto livre. Na notação da comunidade (1–6, c, dc, qc, parênteses) vira blocos; use | para o fim da rotação, / para começar a próxima e * para recomeçar do início.",
+    "sequencePlaceholder": "Ex.: 1 2c (3dc 4) 7 | 5 6 * — ou escreva do seu jeito",
+    "sequenceHint": "Texto livre. Na notação da comunidade (1–7, c, dc, qc, parênteses) vira blocos; use | para o fim da rotação, / para começar a próxima e * para recomeçar do início.",
     "legendTitle": "Notação da comunidade",
     "legendFree": "A notação é opcional: escreva do jeito que explicar melhor.",
     "description": "Descrição",
     "descriptionPlaceholder": "Quando usar, quanto esperar em cada delay, o que observar…",
-    "video": "Vídeo de referência (opcional)",
+    "video": "Vídeo geral (qualquer modo, opcional)",
     "videoHint": "Link do YouTube (vídeo ou Shorts; use ?t= para começar no trecho certo) ou de um arquivo .mp4/.webm. Toca mudo e em loop; o vídeo não é guardado no sistema.",
     "add": "Adicionar rotação",
-    "effect": "Temporada"
+    "effect": "Temporada",
+    "english": "Em inglês (opcional; o espanhol usa o mesmo)",
+    "videoOf": "Vídeo de demonstração na {{mode}}",
+    "suggestVideo": "Sugerir vídeo",
+    "scoring": {
+      "title": "Modos em que pontua (Causador de Dano)",
+      "auto": "Automático, pelas equipes Meta",
+      "detected": "Detectado nas equipes Meta: {{modes}}. Aparece um campo de vídeo para cada modo.",
+      "none": "Ainda não é Causador de Dano em nenhuma equipe Meta. Desligue o automático para escolher os modos.",
+      "manual": "Escolha os modos: aparece um campo de vídeo de demonstração para cada um."
+    }
   }
 }

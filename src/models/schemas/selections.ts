@@ -56,6 +56,8 @@ export const UserSelectionsSchema = z.object({
   equipment: EquipmentSchema.default({ ctpByAgent: {} }),
   /** Montar equipes escolhendo entre todos os personagens (só a restrição do dia vale), sem elenco. */
   freePick: z.boolean().default(false),
+  /** Mesma equipe nos dias de BAX/BAL sem restrição e na BAI: mudar uma muda todas. */
+  syncFreeDays: z.boolean().default(true),
   /** Pontuação do jogador por dia de jogo e modo ("AAAA-MM-DD|BAX"), preenchida por ele mesmo. */
   scores: z
     .record(z.string().regex(SCORE_KEY_RE), z.number().int().min(0).max(MAX_SCORE))

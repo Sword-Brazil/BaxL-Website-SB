@@ -11,6 +11,7 @@ const team = (isPrimary: boolean, uniforms: [string, string, string]): MetaTeam 
   dayNumber: null,
   isPrimary,
   label: null,
+  labelEn: null,
   notes: null,
   position: 0,
   updatedAt: "",

@@ -10,7 +10,14 @@ export const emptySelections = (): UserSelections => ({
   teams: {},
   equipment: { ctpByAgent: {} },
   freePick: false,
+  syncFreeDays: true,
 });
+
+/** Dias livres para a equipe do jogador: os de BAX/BAL sem restrição e a BAI, menos `except`. */
+export const freeTeamKeys = (cycle: CycleOverview | undefined, except?: string): string[] => [
+  ...freeDayKeys(cycle, except),
+  ...(except === "BAI" ? [] : ["BAI"]),
+];
 
 /** Equipes (chaves "BAX-n"/"BAL-n") dos dias de BAX e BAL sem restrição, menos `except`. */
 export function freeDayKeys(cycle: CycleOverview | undefined, except?: string): string[] {

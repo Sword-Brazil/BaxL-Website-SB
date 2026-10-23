@@ -15,7 +15,8 @@
     "rotations": "Rotations",
     "login": "Sign in",
     "synced": "Synced with your account",
-    "scores": "Scores"
+    "scores": "Scores",
+    "about": "About the site"
   },
   "modes": {
     "BAX": "Alliance Battle Extreme",
@@ -71,7 +72,7 @@
   "rotation": {
     "title": "Rotation",
     "skill": "Skill {{n}}",
-    "ultimate": "Skill 6 (Ultimate / Awakened / Tier-4)",
+    "ultimate": "Skill 7 (Ultimate / Awakened / Tier-4)",
     "optional": "Optional",
     "cancels": {
       "c": "cancel right after use",
@@ -79,7 +80,7 @@
       "qc": "quick cancel"
     },
     "legend": {
-      "numbers": "Skills in on-screen order. 6 = Ultimate, Awakened or Tier-4.",
+      "numbers": "Skills in on-screen order. 7 = Ultimate, Awakened or Tier-4.",
       "c": "Cancel: cancel the animation right after using it, firing the next skill.",
       "dc": "Delayed Cancel: wait a split second (the hit effect or the end of the animation) before cancelling into the next one.",
       "qc": "Quick Cancel: cancel immediately after the input.",
@@ -97,7 +98,7 @@
     },
     "errors": {
       "empty": "Write the rotation.",
-      "token": "Couldn't read “{{token}}”: use 1–6 (with c, dc or qc), parentheses, |, / or *.",
+      "token": "Couldn't read “{{token}}”: use 1–7 (with c, dc or qc), parentheses, |, / or *.",
       "unclosedGroup": "A parenthesis is not closed.",
       "unopenedGroup": "There is a “)” without a “(” before it.",
       "nestedGroup": "You can't open a parenthesis inside another.",
@@ -171,7 +172,8 @@
     "close": "Close",
     "back": "Back",
     "help": "Help",
-    "exportImage": "Export image"
+    "exportImage": "Export image",
+    "fullGuide": "See the full site guide"
   },
   "states": {
     "loading": "Loading…",

@@ -646,7 +646,7 @@ export function ScoresView() {
           </h1>
           <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
         </div>
-        <HelpHint title={t("title")}>
+        <HelpHint title={t("title")} guide="scores">
           <p>{t("help.text1")}</p>
           <p>{t("help.text2")}</p>
           <p>{t("help.text3")}</p>

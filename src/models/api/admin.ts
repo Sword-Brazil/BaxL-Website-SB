@@ -18,8 +18,19 @@ import { apiFetch } from "./client";
 const priorityPath = (t: PriorityTarget) =>
   t.scope === "DAY" ? `/api/admin/priority/DAY/${t.mode}/${t.number}` : "/api/admin/priority/BAI";
 
+export interface AdminGuide {
+  title: string;
+  intro: string;
+  markers: Record<string, string>;
+  tips: Record<string, string>;
+  header8: string;
+  shots: Record<"desktop" | "mobile", { width: number; height: number; markers: { n: number; x: number; y: number; w: number; h: number }[] }>;
+}
+
 export interface AdminUser extends SessionUser {
   createdAt: string;
+  /** Conta antiga que repete o usuário ou o apelido de outra (criada antes do bloqueio). */
+  duplicate: boolean;
 }
 
 export const adminApi = {
@@ -52,6 +63,13 @@ export const adminApi = {
   deleteCtp: (id: string) => apiFetch<void>(`/api/admin/ctps/${id}`, { method: "DELETE" }),
   uploadAsset: (body: AssetUploadInput) => apiFetch<{ imagePath: string }>("/api/admin/assets", { method: "POST", body }),
 
+  /** Seção da Administração no guia (Sobre): textos e marcações dos prints, só para admins. */
+  getGuide: (locale: string) => apiFetch<AdminGuide>(`/api/admin/guide?${new URLSearchParams({ locale })}`),
+  guideImageUrl: (name: string) => `/api/admin/guide-image?${new URLSearchParams({ name })}`,
+
+  getFreeDaysSync: () => apiFetch<{ sync: boolean }>("/api/admin/free-days"),
+  setFreeDaysSync: (sync: boolean) => apiFetch<{ sync: boolean }>("/api/admin/free-days", { method: "PUT", body: { sync } }),
+
   getSettings: () => apiFetch<Settings>("/api/admin/settings"),
   saveSettings: (body: SettingsInput) => apiFetch<Settings>("/api/admin/settings", { method: "PUT", body }),
 
@@ -61,6 +79,7 @@ export const adminApi = {
     ),
   createUser: (body: CreateUserInput) => apiFetch<SessionUser>("/api/admin/users", { method: "POST", body }),
   changeRole: (id: string, role: Role) => apiFetch<SessionUser>(`/api/admin/users/${id}/role`, { method: "PATCH", body: { role } }),
+  deleteUser: (id: string) => apiFetch<void>(`/api/admin/users/${id}`, { method: "DELETE" }),
   resetPassword: (id: string, password: string) =>
     apiFetch<void>(`/api/admin/users/${id}/reset-password`, { method: "POST", body: { password } }),
 };

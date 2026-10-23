@@ -24,7 +24,7 @@
     "catalog": "Agents, uniforms and images.",
     "ctps": "CTP types, photos and availability.",
     "bai": "BAI boss sequence.",
-    "users": "Members and administrators: accounts, roles and passwords.",
+    "users": "Members and administrators: accounts, roles, passwords and removing who left the alliance.",
     "settings": "Cycle anchor and turnover times.",
     "rotations": "Character rotations (damage dealers), per uniform, with a description and video."
   },
@@ -108,6 +108,15 @@
       "oldest": "Oldest first",
       "up": "Move #{{n}} up",
       "down": "Move #{{n}} down"
+    },
+    "labelEn": "English label (optional)",
+    "labelEnPlaceholder": "Empty: \"Alternativa N\" becomes \"Alternative N\"",
+    "freeSync": {
+      "label": "Unrestricted days and BAI always the same",
+      "on": "On: changing the teams or reserves of one of these days copies everything to the others (replacing what they have).",
+      "off": "Off: each unrestricted day and BAI have their own teams.",
+      "badge": "Synced",
+      "dialog": "Synced free day: saving makes the other unrestricted days and BAI the same as this one."
     }
   },
   "priority": {
@@ -149,7 +158,10 @@
     "variedUniforms_other": "{{count}} uniforms with different attributes",
     "effects": "Boss effects (stuns in that effect's season)",
     "metaStriker": "Meta Striker",
-    "metaStrikerHelp": "Only tagged uniforms can be picked as the Damage Dealers' Striker (Metas and players' teams)."
+    "metaStrikerHelp": "Only tagged uniforms can be picked as the Damage Dealers' Striker (Metas and players' teams).",
+    "nameEn": "English name",
+    "nameEnHint": "Shown to people using the site in English or Spanish. Empty = shows the Portuguese name.",
+    "nameEnPlaceholder": "E.g. Marvel Zombies"
   },
   "ctps": {
     "title": "CTP catalog",
@@ -170,7 +182,8 @@
     "name": "Name",
     "image": "Image (path)",
     "tips": "Tips",
-    "help": "Bosses appear in this order on the BAI page."
+    "help": "Bosses appear in this order on the BAI page.",
+    "nameEn": "English name (optional)"
   },
   "users": {
     "title": "Users and roles",
@@ -189,7 +202,13 @@
     "newUser": "New account",
     "username": "Username",
     "usernameHint": "Used to sign in. E.g. the in-game nick (3 to 30 letters, digits, space, dot, hyphen or underscore). Case doesn't matter.",
-    "resetHelp": "Set a new password and hand it to the person. The old password stops working right away."
+    "resetHelp": "Set a new password and hand it to the person. The old password stops working right away.",
+    "deleted": "Account deleted",
+    "deleteTitle": "Delete account",
+    "deleteConfirm": "Delete {{name}}'s account? Their roster, teams and scores go with it, and their open session ends. This can't be undone.",
+    "duplicate": "Duplicate",
+    "duplicateHint": "Repeats another account's username or nickname (spelled differently). Delete the one that isn't used.",
+    "nicknameHint": "In-game name. Can't repeat another account's (case, accents and punctuation don't count)."
   },
   "settings": {
     "title": "Calendar settings",
@@ -216,15 +235,25 @@
     "titleLabel": "Title (optional)",
     "titlePlaceholder": "E.g. Opener, Phase 2, Against bosses",
     "sequence": "Rotation",
-    "sequencePlaceholder": "E.g. 1 2c (3dc 4) 6 | 5 4 * — or write it your way",
-    "sequenceHint": "Free text. The community notation (1–6, c, dc, qc, parentheses) shows as blocks; use | for the end of the rotation, / to start the next one and * to restart from the beginning.",
+    "sequencePlaceholder": "E.g. 1 2c (3dc 4) 7 | 5 6 * — or write it your way",
+    "sequenceHint": "Free text. The community notation (1–7, c, dc, qc, parentheses) shows as blocks; use | for the end of the rotation, / to start the next one and * to restart from the beginning.",
     "legendTitle": "Community notation",
     "legendFree": "The notation is optional: write it however explains it best.",
     "description": "Description",
     "descriptionPlaceholder": "When to use it, how long each delay is, what to watch for…",
-    "video": "Reference video (optional)",
+    "video": "General video (any mode, optional)",
     "videoHint": "YouTube link (video or Shorts; add ?t= to start at the right moment) or a .mp4/.webm file. It plays muted and looped; the video is not stored in the system.",
     "add": "Add rotation",
-    "effect": "Season"
+    "effect": "Season",
+    "english": "In English (optional; Spanish uses the same)",
+    "videoOf": "Demo video in {{mode}}",
+    "suggestVideo": "Suggest a video",
+    "scoring": {
+      "title": "Modes where they score (Damage Dealer)",
+      "auto": "Automatic, from the Meta teams",
+      "detected": "Found in the Meta teams: {{modes}}. A video field shows up for each mode.",
+      "none": "Not a Damage Dealer in any Meta team yet. Turn automatic off to pick the modes.",
+      "manual": "Pick the modes: a demo video field shows up for each one."
+    }
   }
 }

@@ -29,7 +29,7 @@ async function createDoc(userId: string, json: string, updatedAt: Date) {
  * Caso contrário outro aparelho salvou antes: 409 (o cliente pergunta qual versão manter).
  */
 export async function putSelections(userId: string, doc: UserSelections, baseUpdatedAt?: string | null): Promise<UserSelections> {
-  const json = JSON.stringify({ version: doc.version, nickname: doc.nickname, roster: doc.roster, teams: doc.teams, equipment: doc.equipment, freePick: doc.freePick, scores: doc.scores });
+  const json = JSON.stringify({ version: doc.version, nickname: doc.nickname, roster: doc.roster, teams: doc.teams, equipment: doc.equipment, freePick: doc.freePick, syncFreeDays: doc.syncFreeDays, scores: doc.scores });
   const base = baseUpdatedAt ? new Date(baseUpdatedAt) : null;
   if (base && Number.isNaN(base.getTime())) throw conflict();
 

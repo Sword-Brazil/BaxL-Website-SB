@@ -24,7 +24,7 @@
     "catalog": "Agentes, uniformes e imágenes.",
     "ctps": "Tipos, fotos y disponibilidad de los CTPs.",
     "bai": "Secuencia de jefes de la BAI.",
-    "users": "Miembros y administradores: cuentas, roles y contraseñas.",
+    "users": "Miembros y administradores: cuentas, roles, contraseñas y eliminar a quien dejó la alianza.",
     "settings": "Ancla del ciclo y horarios de cambio.",
     "rotations": "Rotaciones de los personajes (causantes de daño), por traje, con descripción y vídeo."
   },
@@ -108,6 +108,15 @@
       "oldest": "Más antigua primero",
       "up": "Subir la {{n}}ª",
       "down": "Bajar la {{n}}ª"
+    },
+    "labelEn": "Etiqueta en inglés (opcional)",
+    "labelEnPlaceholder": "Vacío: \"Alternativa N\" pasa a \"Alternative N\"",
+    "freeSync": {
+      "label": "Días sin restricción y BAI siempre iguales",
+      "on": "Activado: cambiar los equipos o las reservas de uno de estos días copia todo a los demás (reemplaza lo que tienen).",
+      "off": "Apagado: cada día sin restricción y la BAI tienen sus propios equipos.",
+      "badge": "Sincronizado",
+      "dialog": "Día libre sincronizado: al guardar, los otros días sin restricción y la BAI quedan iguales a este."
     }
   },
   "priority": {
@@ -149,7 +158,10 @@
     "variedUniforms_other": "{{count}} trajes con atributos distintos",
     "effects": "Efectos en el jefe (aturde en la temporada del efecto)",
     "metaStriker": "Striker meta",
-    "metaStrikerHelp": "Solo los trajes marcados aparecen para elegir como Striker de los Causantes de Daño (Metas y equipos de los jugadores)."
+    "metaStrikerHelp": "Solo los trajes marcados aparecen para elegir como Striker de los Causantes de Daño (Metas y equipos de los jugadores).",
+    "nameEn": "Nombre en inglés",
+    "nameEnHint": "Se muestra a quien usa el sitio en inglés o español. Vacío = muestra el nombre en portugués.",
+    "nameEnPlaceholder": "Ej.: Marvel Zombies"
   },
   "ctps": {
     "title": "Catálogo de CTPs",
@@ -170,7 +182,8 @@
     "name": "Nombre",
     "image": "Imagen (ruta)",
     "tips": "Consejos",
-    "help": "Los jefes aparecen en este orden en la página de la BAI."
+    "help": "Los jefes aparecen en este orden en la página de la BAI.",
+    "nameEn": "Nombre en inglés (opcional)"
   },
   "users": {
     "title": "Usuarios y roles",
@@ -189,7 +202,13 @@
     "newUser": "Nueva cuenta",
     "username": "Nombre de usuario",
     "usernameHint": "Se usa para entrar. Ej.: el nick del juego (3 a 30 letras, números, espacio, punto, guion o guion bajo). Mayúsculas no importan.",
-    "resetHelp": "Define una contraseña nueva y pásala a la persona. La anterior deja de funcionar al momento."
+    "resetHelp": "Define una contraseña nueva y pásala a la persona. La anterior deja de funcionar al momento.",
+    "deleted": "Cuenta eliminada",
+    "deleteTitle": "Eliminar cuenta",
+    "deleteConfirm": "¿Eliminar la cuenta de {{name}}? Se van con ella su elenco, sus equipos y sus puntuaciones, y su sesión abierta termina. No se puede deshacer.",
+    "duplicate": "Duplicada",
+    "duplicateHint": "Repite el nombre de usuario o el apodo de otra cuenta (escrito de otra forma). Elimina la que no se usa.",
+    "nicknameHint": "Nombre en el juego. No puede repetir el de otra cuenta (mayúsculas, acentos y puntuación no cuentan)."
   },
   "settings": {
     "title": "Configuración del calendario",
@@ -216,15 +235,25 @@
     "titleLabel": "Título (opcional)",
     "titlePlaceholder": "Ej.: Apertura, Fase 2, Contra jefes",
     "sequence": "Rotación",
-    "sequencePlaceholder": "Ej.: 1 2c (3dc 4) 6 | 5 4 * — o escríbela a tu manera",
-    "sequenceHint": "Texto libre. La notación de la comunidad (1–6, c, dc, qc, paréntesis) aparece en bloques; usa | para el fin de la rotación, / para empezar la siguiente y * para volver al inicio.",
+    "sequencePlaceholder": "Ej.: 1 2c (3dc 4) 7 | 5 6 * — o escríbela a tu manera",
+    "sequenceHint": "Texto libre. La notación de la comunidad (1–7, c, dc, qc, paréntesis) aparece en bloques; usa | para el fin de la rotación, / para empezar la siguiente y * para volver al inicio.",
     "legendTitle": "Notación de la comunidad",
     "legendFree": "La notación es opcional: escribe como mejor se explique.",
     "description": "Descripción",
     "descriptionPlaceholder": "Cuándo usarla, cuánto esperar en cada delay, qué observar…",
-    "video": "Vídeo de referencia (opcional)",
+    "video": "Video general (cualquier modo, opcional)",
     "videoHint": "Enlace de YouTube (vídeo o Shorts; usa ?t= para empezar en el momento justo) o de un archivo .mp4/.webm. Se reproduce sin sonido y en bucle; el vídeo no se guarda en el sistema.",
     "add": "Añadir rotación",
-    "effect": "Temporada"
+    "effect": "Temporada",
+    "english": "En inglés (opcional; el español usa el mismo)",
+    "videoOf": "Video de demostración en {{mode}}",
+    "suggestVideo": "Sugerir video",
+    "scoring": {
+      "title": "Modos en los que puntúa (Causante de Daño)",
+      "auto": "Automático, por los equipos Meta",
+      "detected": "Detectado en los equipos Meta: {{modes}}. Aparece un campo de video para cada modo.",
+      "none": "Aún no es Causante de Daño en ningún equipo Meta. Apaga el automático para elegir los modos.",
+      "manual": "Elige los modos: aparece un campo de video de demostración para cada uno."
+    }
   }
 }

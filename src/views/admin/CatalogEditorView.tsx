@@ -197,6 +197,16 @@ function UniformCard({ index, vm }: { index: number; vm: Vm }) {
       />
       <Controller
         control={form.control}
+        name={`uniforms.${index}.nameEn`}
+        render={({ field }) => (
+          <Field>
+            <FieldLabel htmlFor={`u-name-en-${index}`}>{t("catalog.nameEn")}</FieldLabel>
+            <Input id={`u-name-en-${index}`} {...field} value={field.value ?? ""} placeholder={t("catalog.nameEnPlaceholder")} />
+          </Field>
+        )}
+      />
+      <Controller
+        control={form.control}
         name={`uniforms.${index}.slug`}
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
@@ -370,6 +380,17 @@ export function CatalogEditorView() {
                       <Input id="agent-slug" {...field} className="font-mono text-xs" aria-invalid={fieldState.invalid} />
                       <FieldDescription>{t("admin:catalog.slugAuto")}</FieldDescription>
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
+                <Controller
+                  control={form.control}
+                  name="nameEn"
+                  render={({ field }) => (
+                    <Field className="sm:col-span-2">
+                      <FieldLabel htmlFor="agent-name-en">{t("admin:catalog.nameEn")}</FieldLabel>
+                      <Input id="agent-name-en" {...field} value={field.value ?? ""} placeholder="Ex.: Scarlet Witch" />
+                      <FieldDescription>{t("admin:catalog.nameEnHint")}</FieldDescription>
                     </Field>
                   )}
                 />

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { BAL_EFFECTS, BAX_EFFECTS, BOSS_EFFECTS, CRITERION_VALUES, CTP_QUALITIES, CTP_TYPES, ROLES, SLOTS, UNKNOWN } from "@/models/domain/enums";
+import { BAL_EFFECTS, BAX_EFFECTS, BOSS_EFFECTS, CRITERION_VALUES, CTP_QUALITIES, CTP_TYPES, MODES, ROLES, SLOTS, UNKNOWN } from "@/models/domain/enums";
 import {
   attackTypeSchema,
   criterionAttributeSchema,
@@ -69,6 +69,7 @@ export const MetaTeamSchema = z
     number: dayNumberSchema.optional(),
     isPrimary: z.boolean(),
     label: z.string().trim().max(60).optional().nullable(),
+    labelEn: z.string().trim().max(60).optional().nullable(),
     notes: z.string().trim().max(500).optional().nullable(),
     members: z
       .array(MetaTeamMemberSchema)
@@ -100,6 +101,7 @@ export type PriorityTarget = z.infer<typeof PriorityTargetSchema>;
 export const BaiBossSchema = z.object({
   position: z.number().int().min(1),
   name: z.string().trim().min(1).max(80),
+  nameEn: z.string().trim().max(80).optional().nullable(),
   imagePath: z.string().max(300).optional().nullable(),
   tips: z.string().trim().max(500).optional().nullable(),
 });
@@ -115,6 +117,8 @@ export const UniformInputSchema = z.object({
   id: idSchema.optional(),
   slug: slugSchema,
   name: z.string().trim().min(1).max(80),
+  /** Nome em inglês (o espanhol usa o mesmo). Ausente = mantém; vazio = tira. */
+  nameEn: z.string().trim().max(80).optional().nullable(),
   imagePath: z.string().max(300), // vazio = sem imagem (mostra as iniciais)
   active: z.boolean().optional(),
   // Atributos são de cada traje (UNKNOWN = não informado; não bloqueia restrições).
@@ -135,6 +139,7 @@ export const UniformInputSchema = z.object({
 export const AgentSchema = z.object({
   slug: slugSchema,
   name: z.string().trim().min(1).max(80),
+  nameEn: z.string().trim().max(80).optional().nullable(),
   active: z.boolean().optional(),
   uniforms: z
     .array(UniformInputSchema)
@@ -179,24 +184,39 @@ export const AssetUploadSchema = z.object({
 });
 export type AssetUploadInput = z.infer<typeof AssetUploadSchema>;
 
+/** Vídeo de rotação: YouTube ou .mp4/.webm externo (vazio = sem vídeo). */
+const videoSchema = z
+  .string()
+  .trim()
+  .max(300)
+  .refine((v) => !v || !!parseRotationVideo(v), { message: VALIDATION.rotationVideo })
+  .optional()
+  .nullable();
+
 /** Rotação em texto livre (sem formato obrigatório); o vídeo precisa ser YouTube ou .mp4/.webm. */
 export const RotationInputSchema = z.object({
   uniformId: idSchema.nullable(),
   effect: z.enum(BOSS_EFFECTS).optional().nullable(),
   title: z.string().trim().max(80).optional().nullable(),
+  titleEn: z.string().trim().max(80).optional().nullable(),
   sequence: z.string().trim().min(1, { message: VALIDATION.rotationRequired }).max(1000),
   description: z.string().trim().max(3000).optional().nullable(),
-  videoUrl: z
-    .string()
-    .trim()
-    .max(300)
-    .refine((v) => !v || !!parseRotationVideo(v), { message: VALIDATION.rotationVideo })
-    .optional()
-    .nullable(),
+  descriptionEn: z.string().trim().max(3000).optional().nullable(),
+  videoUrl: videoSchema,
+  /** Demonstração da rotação em cada modo (BAX, BAL, BAI). */
+  videoBax: videoSchema,
+  videoBal: videoSchema,
+  videoBai: videoSchema,
 });
 export type RotationInput = z.infer<typeof RotationInputSchema>;
 
-export const AgentRotationsSchema = z.object({ rotations: z.array(RotationInputSchema).max(40) });
+export const AgentRotationsSchema = z.object({
+  rotations: z.array(RotationInputSchema).max(40),
+  /** Modos em que o personagem pontua: automático (pelas equipes Meta) ou os escolhidos. Ausente = mantém. */
+  scoring: z
+    .object({ auto: z.boolean(), modes: z.array(z.enum(MODES)).max(MODES.length).refine((ms) => new Set(ms).size === ms.length) })
+    .optional(),
+});
 export type AgentRotationsInput = z.infer<typeof AgentRotationsSchema>;
 
 /** Temporada atual: o efeito da BAX e o da BAL, escolhidos separadamente. */

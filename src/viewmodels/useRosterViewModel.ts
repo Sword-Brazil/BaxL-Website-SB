@@ -9,7 +9,7 @@ import { matchesRestriction } from "@/models/rules/restriction";
 import { ownedAgentIds, rosterAgents, uniformsInTeams, visibleUniforms } from "@/models/rules/roster";
 import { UserSelectionsSchema } from "@/models/schemas/selections";
 import { useSelectionsStore } from "./stores/selectionsStore";
-import { useCatalogViewModel } from "./useCatalogViewModel";
+import { searchNames, useCatalogViewModel } from "./useCatalogViewModel";
 
 type Filters = Partial<Record<CriterionAttribute, string>>;
 
@@ -32,7 +32,7 @@ export function useRosterViewModel(messages: { imported: string; invalid: string
   const agents = useMemo(() => {
     const q = search.trim().toLowerCase();
     const criteria = CRITERION_ATTRIBUTES.flatMap((a) => (filters[a] ? [{ attribute: a, value: filters[a]! }] : []));
-    return activeAgents.filter((a) => (!q || a.name.toLowerCase().includes(q)) && a.uniforms.some((u) => matchesRestriction(u, criteria)));
+    return activeAgents.filter((a) => (!q || searchNames(a).some((n) => n.toLowerCase().includes(q))) && a.uniforms.some((u) => matchesRestriction(u, criteria)));
   }, [activeAgents, search, filters]);
 
   const isAgentOwned = (agentId: string) => ownedAgents.has(agentId);

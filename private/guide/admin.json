@@ -1,0 +1,120 @@
+{
+ "$comment": "Guia da Administração (página Sobre): só administradores recebem, pela API /api/admin/guide. Fica fora de public/ e das traduções públicas para membros não verem como o admin é.",
+ "shots": {
+  "desktop": {
+   "width": 1280,
+   "height": 1000,
+   "markers": [
+    {
+     "n": 1,
+     "x": 1,
+     "y": 9.45,
+     "w": 98.01,
+     "h": 3.83
+    },
+    {
+     "n": 2,
+     "x": 10.14,
+     "y": 9.45,
+     "w": 4.3,
+     "h": 3.83
+    },
+    {
+     "n": 3,
+     "x": 14.76,
+     "y": 9.45,
+     "w": 5.52,
+     "h": 3.83
+    },
+    {
+     "n": 4,
+     "x": 45.12,
+     "y": 9.45,
+     "w": 7.16,
+     "h": 3.83
+    }
+   ]
+  },
+  "mobile": {
+   "width": 390,
+   "height": 844,
+   "markers": [
+    {
+     "n": 1,
+     "x": 3.27,
+     "y": 11.2,
+     "w": 93.46,
+     "h": 14.6
+    },
+    {
+     "n": 2,
+     "x": 33.27,
+     "y": 11.2,
+     "w": 14.1,
+     "h": 4.53
+    },
+    {
+     "n": 3,
+     "x": 48.45,
+     "y": 11.2,
+     "w": 18.12,
+     "h": 4.53
+    },
+    {
+     "n": 4,
+     "x": 58.07,
+     "y": 16.23,
+     "w": 23.51,
+     "h": 4.53
+    }
+   ]
+  }
+ },
+ "texts": {
+  "pt-BR": {
+   "title": "Administração",
+   "intro": "Só para administradores. Aqui fica tudo o que os membros veem: restrições, equipes Meta, catálogo, rotações e contas.",
+   "markers": {
+    "1": "Abas: Visão geral, Dias, Metas, Catálogo, Rotações, CTPs, BAI, Usuários e Configurações.",
+    "2": "Dias: a restrição de cada dia de BAX e BAL.",
+    "3": "Metas: as equipes Meta e Alternativas de cada dia, a BAL livre e a BAI.",
+    "4": "Usuários: criar contas, trocar papel e senha e excluir quem saiu da aliança."
+   },
+   "tips": {
+    "1": "Tudo o que você publica aparece na hora para os membros, com data e autor.",
+    "2": "Conta marcada como Duplicada: a pessoa tem duas contas. Exclua a que não é usada."
+   },
+   "header8": "Minha conta: este guia, a Administração e Sair."
+  },
+  "en": {
+   "title": "Administration",
+   "intro": "Admins only. Everything members see lives here: restrictions, Meta teams, catalog, rotations and accounts.",
+   "markers": {
+    "1": "Tabs: Overview, Days, Metas, Catalog, Rotations, CTPs, BAI, Users and Settings.",
+    "2": "Days: each BAX and BAL day's restriction.",
+    "3": "Metas: each day's Meta and Alternative teams, free BAL and BAI.",
+    "4": "Users: create accounts, change role and password and delete who left the alliance."
+   },
+   "tips": {
+    "1": "Everything you publish shows up for members right away, with date and author.",
+    "2": "Account marked Duplicate: the person has two accounts. Delete the unused one."
+   },
+   "header8": "My account: this guide, Administration and Sign out."
+  },
+  "es": {
+   "title": "Administración",
+   "intro": "Solo para administradores. Aquí está todo lo que ven los miembros: restricciones, equipos Meta, catálogo, rotaciones y cuentas.",
+   "markers": {
+    "1": "Pestañas: Visión general, Días, Metas, Catálogo, Rotaciones, CTP, BAI, Usuarios y Configuración.",
+    "2": "Días: la restricción de cada día de BAX y BAL.",
+    "3": "Metas: los equipos Meta y Alternativos de cada día, la BAL libre y la BAI.",
+    "4": "Usuarios: crear cuentas, cambiar rol y contraseña y eliminar a quien dejó la alianza."
+   },
+   "tips": {
+    "1": "Todo lo que publicas aparece al momento para los miembros, con fecha y autor.",
+    "2": "Cuenta marcada como Duplicada: la persona tiene dos cuentas. Elimina la que no se usa."
+   },
+   "header8": "Mi cuenta: esta guía, la Administración y Salir."
+  }
+ }
+}

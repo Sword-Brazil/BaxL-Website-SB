@@ -5,30 +5,34 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// Postgres do Supabase: DATABASE_URL é o pooler (app/serverless) e DIRECT_URL a conexão
-// direta, usada pelo `prisma migrate`.
+// Postgres do Supabase. As URLs ficam fora do schema (Prisma 7): DATABASE_URL (pooler) no app,
+// em src/server/db.ts, e DIRECT_URL (conexão de sessão) nas migrações, em prisma.config.ts.
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
 }
 
 // ---------- Catálogo ----------
 
 model Agent {
-  id         String     @id @default(cuid())
-  slug       String     @unique
-  name       String
-  active     Boolean    @default(true)
-  uniforms   Uniform[]
+  id           String     @id @default(cuid())
+  slug         String     @unique
+  name         String
+  // Nome em inglês (o espanhol usa o mesmo); vazio = mostra o nome em português.
+  nameEn       String?
+  active       Boolean    @default(true)
+  uniforms     Uniform[]
   // CTPs da Meta para o personagem: o 1 (padrão) e o 2 (opcional), alternados por dia nas equipes.
-  metaCtp1Id String?
-  metaCtp1   Ctp?       @relation("AgentMetaCtp1", fields: [metaCtp1Id], references: [id], onDelete: SetNull)
-  metaCtp2Id String?
-  metaCtp2   Ctp?       @relation("AgentMetaCtp2", fields: [metaCtp2Id], references: [id], onDelete: SetNull)
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  rotations  Rotation[]
+  metaCtp1Id   String?
+  metaCtp1     Ctp?       @relation("AgentMetaCtp1", fields: [metaCtp1Id], references: [id], onDelete: SetNull)
+  metaCtp2Id   String?
+  metaCtp2     Ctp?       @relation("AgentMetaCtp2", fields: [metaCtp2Id], references: [id], onDelete: SetNull)
+  // Modos em que o personagem pontua (Causador de Dano): automático pelas equipes Meta ou os
+  // escolhidos pelo admin em scoringModes (BAX, BAL, BAI).
+  scoringAuto  Boolean    @default(true)
+  scoringModes String[]   @default([])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  rotations    Rotation[]
 }
 
 model Uniform {
@@ -37,6 +41,7 @@ model Uniform {
   agent           Agent            @relation(fields: [agentId], references: [id])
   slug            String
   name            String
+  nameEn          String?
   imagePath       String
   // Atributos são do traje (ex.: Fênix Negra é vilã), não do personagem. UNKNOWN = não informado.
   gender          String           @default("UNKNOWN")
@@ -85,6 +90,8 @@ model Settings {
   // Temporada atual: efeito que atordoa o chefe em todos os dias de BAX e de BAL.
   baxEffect       String   @default("PARALYSIS")
   balEffect       String   @default("SHOCK")
+  // Dias de BAX/BAL sem restrição e a BAI com as mesmas equipes e reservas: editar um copia para os outros.
+  syncFreeDays    Boolean  @default(true)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
@@ -126,6 +133,8 @@ model MetaTeam {
   position    Int              @default(0)
   label       String?
   notes       String?
+  // Rótulo em inglês (vazio = mostra o português; "Alternativa N" é traduzido sozinho).
+  labelEn     String?
   members     MetaTeamMember[]
   updatedById String?
   updatedBy   User?            @relation(fields: [updatedById], references: [id])
@@ -160,21 +169,27 @@ model MetaTeamMember {
 // Rotação de um personagem (Causador de Dano), em texto livre, com descrição e vídeo opcional.
 // uniformId null = vale para todos os trajes do personagem.
 model Rotation {
-  id          String   @id @default(cuid())
-  agentId     String
-  agent       Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  uniformId   String?
-  uniform     Uniform? @relation("RotationUniform", fields: [uniformId], references: [id], onDelete: Cascade)
+  id            String   @id @default(cuid())
+  agentId       String
+  agent         Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  uniformId     String?
+  uniform       Uniform? @relation("RotationUniform", fields: [uniformId], references: [id], onDelete: Cascade)
   // Temporada (efeito do chefe) da rotação; null = vale para todas.
-  effect      String?
-  position    Int
-  title       String?
-  sequence    String
-  description String?
-  // Link do YouTube ou de um .mp4/.webm externo: o sistema não hospeda vídeo.
-  videoUrl    String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  effect        String?
+  position      Int
+  title         String?
+  titleEn       String?
+  sequence      String
+  description   String?
+  descriptionEn String?
+  // Link do YouTube ou de um .mp4/.webm externo: o sistema não hospeda vídeo. videoUrl vale para
+  // qualquer modo; os outros são a demonstração em cada modo.
+  videoBax      String?
+  videoBal      String?
+  videoBai      String?
+  videoUrl      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@index([agentId, position])
 }
@@ -201,6 +216,7 @@ model BaiBoss {
   id        String   @id @default(cuid())
   position  Int      @unique
   name      String
+  nameEn    String?
   imagePath String?
   tips      String?
   createdAt DateTime @default(now())
@@ -216,8 +232,12 @@ model User {
   id           String             @id @default(cuid())
   // Guardado em minúsculas, com espaços simples (ex.: "sword menezes").
   username     String             @unique
+  // Chaves de identidade (src/models/rules/userIdentity.ts): bloqueiam a mesma pessoa em duas
+  // contas, com o nome escrito de outro jeito. Preenchidas pelo usersService.
+  usernameKey  String?            @unique
   passwordHash String
   nickname     String?
+  nicknameKey  String?            @unique
   role         String             @default("USER")
   selections   UserSelectionsDoc?
   metaTeams    MetaTeam[]

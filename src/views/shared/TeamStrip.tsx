@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "next-i18next/pages";
 import { cn } from "@/lib/utils";
-import { DISPLAY_SLOTS, type BossEffect, type Slot } from "@/models/domain/enums";
+import { DISPLAY_SLOTS, type BossEffect, type Mode, type Slot } from "@/models/domain/enums";
 import type { MetaTeamMember } from "@/models/domain/types";
 import type { CatalogViewModel } from "@/viewmodels/useCatalogViewModel";
 import { MemberChip } from "./MemberChip";
@@ -12,9 +12,9 @@ export type StripMember = { slot: Slot; uniformId: string; ctpId?: string | null
   Pick<MetaTeamMember, "isDamageDealer" | "strikerUniformId">
 >;
 
-/** Tela de rotações do personagem, abrindo no traje usado na equipe (e na temporada atual). */
-export const rotationHref = (agentSlug: string, uniformSlug: string, effect?: BossEffect) =>
-  `/rotacoes/${agentSlug}?traje=${encodeURIComponent(uniformSlug)}${effect ? `&efeito=${effect}` : ""}`;
+/** Tela de rotações do personagem, abrindo no traje usado na equipe (na temporada e no vídeo do modo). */
+export const rotationHref = (agentSlug: string, uniformSlug: string, effect?: BossEffect, mode?: Mode) =>
+  `/rotacoes/${agentSlug}?traje=${encodeURIComponent(uniformSlug)}${effect ? `&efeito=${effect}` : ""}${mode ? `&modo=${mode}` : ""}`;
 
 /**
  * Uma equipe (Meta, Alternativa ou a do usuário) em 3 colunas compactas: Esquerda · Líder · Direita.
@@ -27,6 +27,7 @@ export function TeamStrip({
   catalog,
   isOwned,
   effect,
+  mode,
   action,
 }: {
   label: string;
@@ -37,6 +38,8 @@ export function TeamStrip({
   isOwned?: (uniformId: string) => boolean;
   /** Efeito da temporada no modo do dia: marca quem atordoa o chefe. */
   effect?: BossEffect;
+  /** Modo da equipe (BAX, BAL ou BAI): a tela de rotações abre no vídeo desse modo. */
+  mode?: Mode;
   action?: ReactNode;
 }) {
   const { t } = useTranslation("common");
@@ -81,7 +84,7 @@ export function TeamStrip({
                 striker={m?.strikerUniformId && (isMine || m.isDamageDealer) ? catalog.uniformById(m.strikerUniformId) : null}
                 stunEffect={effect && ref?.uniform.effects.includes(effect) ? effect : undefined}
                 // Causador de Dano da Meta/Alternativa: tocar leva às rotações do personagem.
-                href={!isMine && m?.isDamageDealer && ref ? rotationHref(ref.agent.slug, ref.uniform.slug, effect) : undefined}
+                href={!isMine && m?.isDamageDealer && ref ? rotationHref(ref.agent.slug, ref.uniform.slug, effect, mode) : undefined}
               />
             </li>
           );
