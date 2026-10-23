@@ -24,7 +24,7 @@
     "catalog": "Agentes, uniformes e imágenes.",
     "ctps": "Tipos, fotos y disponibilidad de los CTPs.",
     "bai": "Secuencia de jefes de la BAI.",
-    "users": "Miembros y administradores: cuentas, roles y contraseñas.",
+    "users": "Miembros y administradores: cuentas, roles, contraseñas y eliminar a quien dejó la alianza.",
     "settings": "Ancla del ciclo y horarios de cambio.",
     "rotations": "Rotaciones de los personajes (causantes de daño), por traje, con descripción y vídeo."
   },
@@ -189,7 +189,13 @@
     "newUser": "Nueva cuenta",
     "username": "Nombre de usuario",
     "usernameHint": "Se usa para entrar. Ej.: el nick del juego (3 a 30 letras, números, espacio, punto, guion o guion bajo). Mayúsculas no importan.",
-    "resetHelp": "Define una contraseña nueva y pásala a la persona. La anterior deja de funcionar al momento."
+    "resetHelp": "Define una contraseña nueva y pásala a la persona. La anterior deja de funcionar al momento.",
+    "deleted": "Cuenta eliminada",
+    "deleteTitle": "Eliminar cuenta",
+    "deleteConfirm": "¿Eliminar la cuenta de {{name}}? Se van con ella su elenco, sus equipos y sus puntuaciones, y su sesión abierta termina. No se puede deshacer.",
+    "duplicate": "Duplicada",
+    "duplicateHint": "Repite el nombre de usuario o el apodo de otra cuenta (escrito de otra forma). Elimina la que no se usa.",
+    "nicknameHint": "Nombre en el juego. No puede repetir el de otra cuenta (mayúsculas, acentos y puntuación no cuentan)."
   },
   "settings": {
     "title": "Configuración del calendario",

@@ -7,6 +7,7 @@ import { loadEnvConfig } from "@next/env";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { BATTLE_DAY_NUMBERS, CTP_QUALITIES, CTP_TYPES, DAY_MODES, type Role } from "../src/models/domain/enums";
+import { identityKey } from "../src/models/rules/userIdentity";
 
 // .env.local com expansão de ${VAR} (ex.: a senha do banco dentro das URLs), como no Next.
 loadEnvConfig(process.cwd(), true, { info: () => {}, error: console.error });
@@ -33,7 +34,7 @@ async function seedAdmin() {
   await prisma.user.upsert({
     where: { username },
     update: { passwordHash, role: "ADMIN" satisfies Role },
-    create: { username, passwordHash, role: "ADMIN" satisfies Role, nickname: display },
+    create: { username, usernameKey: identityKey(username), passwordHash, role: "ADMIN" satisfies Role, nickname: display, nicknameKey: identityKey(display) },
   });
   console.log(`✔ Administrador: ${display}`);
 }

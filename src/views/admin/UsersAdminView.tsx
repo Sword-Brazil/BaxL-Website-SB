@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "next-i18next/pages";
 import { Controller } from "react-hook-form";
-import { KeyRoundIcon, PlusIcon, SearchIcon, TriangleAlertIcon } from "lucide-react";
+import { KeyRoundIcon, PlusIcon, SearchIcon, Trash2Icon, TriangleAlertIcon } from "lucide-react";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import {
   AlertDialog,
@@ -34,6 +34,7 @@ export function UsersAdminView() {
     saved: t("admin:common.saved"),
     passwordReset: t("admin:users.passwordReset"),
     lastAdmin: t("admin:users.lastAdmin"),
+    deleted: t("admin:users.deleted"),
   });
   const [pendingRole, setPendingRole] = useState<{ id: string; name: string; role: Role } | null>(null);
   const createError = vm.createForm.formState.errors.root?.message;
@@ -69,6 +70,11 @@ export function UsersAdminView() {
                 </span>
                 <span className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Badge variant={u.role === "USER" ? "outline" : "brazil"}>{t(`admin:users.roles.${u.role}`)}</Badge>
+                  {u.duplicate && (
+                    <Badge variant="destructive" title={t("admin:users.duplicateHint")}>
+                      {t("admin:users.duplicate")}
+                    </Badge>
+                  )}
                 </span>
               </div>
               <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
@@ -87,6 +93,16 @@ export function UsersAdminView() {
                 <Button size="sm" variant="ghost" onClick={() => vm.setResetUserId(u.id)} disabled={u.id === me?.id}>
                   <KeyRoundIcon data-icon="inline-start" />
                   {t("admin:users.resetPassword")}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-destructive hover:text-destructive"
+                  onClick={() => vm.setDeleteTarget({ id: u.id, name: displayName(u) })}
+                  disabled={u.id === me?.id}
+                >
+                  <Trash2Icon data-icon="inline-start" />
+                  {t("admin:common.delete")}
                 </Button>
               </div>
             </li>
@@ -120,6 +136,21 @@ export function UsersAdminView() {
             <AlertDialogCancel>{t("admin:common.cancel")}</AlertDialogCancel>
             <AlertDialogAction onClick={() => pendingRole && vm.changeRole(pendingRole.id, pendingRole.role)}>
               {t("admin:common.save")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={!!vm.deleteTarget} onOpenChange={(open) => !open && vm.setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("admin:users.deleteTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{vm.deleteTarget && t("admin:users.deleteConfirm", { name: vm.deleteTarget.name })}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("admin:common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" disabled={vm.isDeleting} onClick={vm.confirmDelete}>
+              {t("admin:common.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -178,7 +209,7 @@ export function UsersAdminView() {
                 strength
                 description={t("auth:fields.passwordHint")}
               />
-              <TextField control={vm.createForm.control} name="nickname" label={t("auth:fields.nickname")} />
+              <TextField control={vm.createForm.control} name="nickname" label={t("auth:fields.nickname")} description={t("admin:users.nicknameHint")} />
             </FieldGroup>
           </form>
           <DialogFooter>

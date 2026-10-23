@@ -20,6 +20,8 @@ const priorityPath = (t: PriorityTarget) =>
 
 export interface AdminUser extends SessionUser {
   createdAt: string;
+  /** Conta antiga que repete o usuário ou o apelido de outra (criada antes do bloqueio). */
+  duplicate: boolean;
 }
 
 export const adminApi = {
@@ -61,6 +63,7 @@ export const adminApi = {
     ),
   createUser: (body: CreateUserInput) => apiFetch<SessionUser>("/api/admin/users", { method: "POST", body }),
   changeRole: (id: string, role: Role) => apiFetch<SessionUser>(`/api/admin/users/${id}/role`, { method: "PATCH", body: { role } }),
+  deleteUser: (id: string) => apiFetch<void>(`/api/admin/users/${id}`, { method: "DELETE" }),
   resetPassword: (id: string, password: string) =>
     apiFetch<void>(`/api/admin/users/${id}/reset-password`, { method: "POST", body: { password } }),
 };

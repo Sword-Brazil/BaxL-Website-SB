@@ -9,8 +9,8 @@ import { ApiError } from "@/models/api/client";
 import type { Role } from "@/models/domain/enums";
 import { AdminResetPasswordSchema, CreateUserSchema, type CreateUserInput } from "@/models/schemas/admin";
 
-/** Gestão de contas (só administradores): busca, novas contas de qualquer papel, troca de papel e de senha. */
-export function useUsersAdminViewModel(messages: { created: string; saved: string; passwordReset: string; lastAdmin: string }) {
+/** Gestão de contas (só administradores): busca, novas contas de qualquer papel, troca de papel e de senha, exclusão. */
+export function useUsersAdminViewModel(messages: { created: string; saved: string; passwordReset: string; lastAdmin: string; deleted: string }) {
   const qc = useQueryClient();
   const notifyError = useNotifyError();
   const [q, setQ] = useState("");
@@ -35,9 +35,10 @@ export function useUsersAdminViewModel(messages: { created: string; saved: strin
       createForm.reset();
       toast.success(messages.created);
     },
+    // 409: usuário ou apelido já de outra conta; o servidor diz qual campo.
     onError: (e: Error) =>
       e instanceof ApiError && e.status === 409
-        ? createForm.setError("username", { message: e.message })
+        ? createForm.setError(e.fields?.nickname ? "nickname" : "username", { message: e.message })
         : createForm.setError("root", { message: e.message }),
   });
 
@@ -61,6 +62,20 @@ export function useUsersAdminViewModel(messages: { created: string; saved: strin
       toast.success(messages.passwordReset);
     },
     onError: (e: Error) => resetForm.setError("password", { message: e.message }),
+  });
+
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+  const remove = useMutation({
+    mutationFn: adminApi.deleteUser,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+      setDeleteTarget(null);
+      toast.success(messages.deleted);
+    },
+    onError: (e: Error) => {
+      setDeleteTarget(null);
+      notifyError(e);
+    },
   });
 
   const data = query.data;
@@ -89,5 +104,9 @@ export function useUsersAdminViewModel(messages: { created: string; saved: strin
     setResetUserId,
     submitReset: resetForm.handleSubmit((v) => resetUserId && resetPassword.mutate({ id: resetUserId, password: v.password })),
     isResetting: resetPassword.isPending,
+    deleteTarget,
+    setDeleteTarget,
+    confirmDelete: () => deleteTarget && remove.mutate(deleteTarget.id),
+    isDeleting: remove.isPending,
   };
 }
