@@ -35,6 +35,8 @@ interface SelectionsState {
   /** Equipa (ou remove) o CTP 1 ou 2 de um personagem do usuário (vale em todos os dias desse slot). */
   equipCtp: (agentId: string, ctpId: string | null, slot?: CtpSlot) => void;
   applyTeam: (teamKey: TeamKey, team: UserTeam) => void;
+  /** A mesma equipe em vários dias de uma vez (ex.: todos os dias sem restrição). */
+  applyTeamTo: (teamKeys: TeamKey[], team: UserTeam) => void;
   /** Pontuação do jogador num dia de jogo, modo e parte do dia (null apaga). */
   setScore: (date: string, mode: ScoreMode, points: number | null, phase?: ScorePhase) => void;
   resetMode: (mode: Mode) => void;
@@ -134,6 +136,11 @@ export const useSelectionsStore = create<SelectionsState>()(
         })),
 
       applyTeam: (teamKey, team) => set(({ doc }) => ({ doc: withTeam(doc, teamKey, () => ({ ...team })) })),
+
+      applyTeamTo: (teamKeys, team) =>
+        set(({ doc }) => ({
+          doc: touch(doc, { teams: { ...doc.teams, ...Object.fromEntries(teamKeys.map((k) => [k, structuredClone(team)])) } }),
+        })),
 
       setScore: (date, mode, points, phase = "post") =>
         set(({ doc }) => {

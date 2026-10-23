@@ -119,6 +119,23 @@
     "dayCtp": {
       "slot": "CTP {{n}} do personagem · vale em todos os dias com o CTP {{n}}",
       "legacy": "Só neste dia (escolha o CTP 1 ou 2 para unificar)"
+    },
+    "freeDays": {
+      "button": "Usar nos dias livres",
+      "title": "Mesma equipe nos dias livres",
+      "text_one": "Copiar esta equipe para o outro dia sem restrição de BAX e BAL?",
+      "text_other": "Copiar esta equipe para os outros {{count}} dias sem restrição de BAX e BAL?",
+      "filled_one": "{{count}} deles já tem equipe.",
+      "filled_other": "{{count}} deles já têm equipe.",
+      "cancel": "Cancelar",
+      "onlyEmpty_one": "Só no dia vazio ({{count}})",
+      "onlyEmpty_other": "Só nos vazios ({{count}})",
+      "replaceAll_one": "Substituir ({{count}})",
+      "replaceAll_other": "Substituir em todos ({{count}})",
+      "apply_one": "Copiar ({{count}})",
+      "apply_other": "Copiar para todos ({{count}})",
+      "done_one": "Equipe copiada para {{count}} dia livre.",
+      "done_other": "Equipe copiada para {{count}} dias livres."
     }
   }
 }
