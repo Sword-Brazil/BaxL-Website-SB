@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/server/db";
 import { HttpError } from "@/server/http";
-import { deleteMetaTeam, saveMetaTeam } from "@/server/services/metaTeamService";
+import { deleteMetaTeam, listMetaTeams, reorderMetaTeams, saveMetaTeam } from "@/server/services/metaTeamService";
 import { setRestriction } from "@/server/services/restrictionService";
 import { savePriority } from "@/server/services/priorityService";
 import { changeRole, createUser as createAccount, listUsers } from "@/server/services/usersService";
@@ -71,6 +71,23 @@ describe("curadoria", () => {
     await saveMetaTeam({ ...base, isPrimary: false, members: withSlots(1, { agentCtp2Id: liberation }) }, curatorId);
     const again = await prisma.metaTeamMember.findFirstOrThrow({ where: { metaTeamId: day6.id, slot: "SOLO" } });
     expect(again.ctpId).toBe(liberation);
+  });
+
+  it("alternativa nova entra no fim; o ADMIN reordena e a principal segue primeiro", async () => {
+    const primary = await saveMetaTeam(team(fem), curatorId);
+    const a = await saveMetaTeam({ ...team([fem[1], fem[0], fem[2]]), isPrimary: false, label: "A" }, curatorId);
+    const b = await saveMetaTeam({ ...team([fem[2], fem[0], fem[1]]), isPrimary: false, label: "B" }, curatorId);
+    const day = await dayId("BAX", 6);
+    expect((await listMetaTeams("DAY", day)).map((t) => t.label ?? "P")).toEqual(["P", "A", "B"]);
+
+    await reorderMetaTeams([b.id, a.id]);
+    expect((await listMetaTeams("DAY", day)).map((t) => t.label ?? "P")).toEqual(["P", "B", "A"]);
+    expect(primary.isPrimary).toBe(true);
+
+    // Equipes de dias diferentes não se misturam.
+    const other = await saveMetaTeam({ ...team(fem), number: 13 }, curatorId);
+    await expect(reorderMetaTeams([a.id, other.id])).rejects.toSatisfy(status(400));
+    await expect(reorderMetaTeams(["naoexiste0000000000000000"])).rejects.toSatisfy(status(404));
   });
 
   it("o Causador de Dano guarda o Striker meta; quem não é Causador de Dano não tem Striker", async () => {

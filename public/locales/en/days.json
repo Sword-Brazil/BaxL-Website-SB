@@ -119,6 +119,23 @@
     "dayCtp": {
       "slot": "Character's CTP {{n}} · applies to every day using CTP {{n}}",
       "legacy": "This day only (pick CTP 1 or 2 to unify)"
+    },
+    "freeDays": {
+      "button": "Use on free days",
+      "title": "Same team on free days",
+      "text_one": "Copy this team to the other BAX/BAL day with no restriction?",
+      "text_other": "Copy this team to the other {{count}} BAX/BAL days with no restriction?",
+      "filled_one": "{{count}} of them already has a team.",
+      "filled_other": "{{count}} of them already have a team.",
+      "cancel": "Cancel",
+      "onlyEmpty_one": "Only the empty day ({{count}})",
+      "onlyEmpty_other": "Only empty ones ({{count}})",
+      "replaceAll_one": "Replace ({{count}})",
+      "replaceAll_other": "Replace all ({{count}})",
+      "apply_one": "Copy ({{count}})",
+      "apply_other": "Copy to all ({{count}})",
+      "done_one": "Team copied to {{count}} free day.",
+      "done_other": "Team copied to {{count}} free days."
     }
   }
 }

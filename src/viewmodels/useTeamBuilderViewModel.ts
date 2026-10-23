@@ -1,9 +1,12 @@
 import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getCycle } from "@/models/api/cycle";
 import { DISPLAY_SLOTS, type Slot } from "@/models/domain/enums";
 import type { Criterion, MetaTeam, PriorityLists } from "@/models/domain/types";
 import { compareWithMeta } from "@/models/rules/compare";
 import { dayCtpId, equippedCtps, type CtpSlot } from "@/models/rules/ctpAssign";
 import { matchesRestriction } from "@/models/rules/restriction";
+import { freeDayKeys } from "@/models/rules/selections";
 import { hasMetaStrikerTags, metaStrikerOptions } from "@/models/rules/striker";
 import { suggestTeam } from "@/models/rules/suggest";
 import type { TeamKey, UserTeam } from "@/models/schemas/selections";
@@ -29,7 +32,8 @@ export function useTeamBuilderViewModel({
   priority: PriorityLists;
 }) {
   const catalog = useCatalogViewModel();
-  const { doc, hydrated, setSlot, clearSlot, setStriker, setCtpSlot, equipCtp, applyTeam, setFreePick } = useSelectionsStore();
+  const { doc, hydrated, setSlot, clearSlot, setStriker, setCtpSlot, equipCtp, applyTeam, applyTeamTo, setFreePick } = useSelectionsStore();
+  const cycle = useQuery({ queryKey: ["cycle"], queryFn: getCycle });
   const [armedCtp, setArmedCtp] = useState<string | null>(null);
 
   const owned = useMemo(() => new Set(doc.roster.ownedUniformIds), [doc.roster.ownedUniformIds]);
@@ -119,9 +123,24 @@ export function useTeamBuilderViewModel({
     if (!pick.ctpSlot) setCtpSlot(teamKey, slot, ctpSlot);
   };
 
+  // Dia sem restrição: a mesma equipe pode ir para todos os outros dias livres de BAX e BAL.
+  const freeDays = criteria.length === 0 && teamKey !== "BAI" ? freeDayKeys(cycle.data, teamKey) : [];
+  const hasTeam = Object.values(team).some(Boolean);
+  const filledFreeDays = freeDays.filter((k) => Object.values(doc.teams[k] ?? {}).some(Boolean));
+
   return {
     catalog,
     team,
+    /** Outros dias livres (sem restrição) de BAX e BAL; vazio se este dia tiver restrição. */
+    freeDays: hasTeam ? freeDays : [],
+    /** Quantos desses dias já têm equipe montada. */
+    filledFreeDays: filledFreeDays.length,
+    /** Copia esta equipe para os outros dias livres: só nos vazios ou em todos. Devolve quantos. */
+    applyToFreeDays: (onlyEmpty: boolean) => {
+      const keys = onlyEmpty ? freeDays.filter((k) => !filledFreeDays.includes(k)) : freeDays;
+      if (keys.length) applyTeamTo(keys, team);
+      return keys.length;
+    },
     metaTeams,
     /** Na ordem da tela: Esquerda · Líder · Direita. */
     slots: DISPLAY_SLOTS.map((slot) => {

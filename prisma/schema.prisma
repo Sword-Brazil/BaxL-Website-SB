@@ -122,6 +122,8 @@ model MetaTeam {
   battleDayId String?
   battleDay   BattleDay?       @relation(fields: [battleDayId], references: [id])
   isPrimary   Boolean          @default(false)
+  // Ordem das alternativas no dia (o ADMIN reordena); a principal vem sempre primeiro.
+  position    Int              @default(0)
   label       String?
   notes       String?
   members     MetaTeamMember[]

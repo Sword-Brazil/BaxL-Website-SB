@@ -12,6 +12,7 @@ const team = (isPrimary: boolean, uniforms: [string, string, string]): MetaTeam 
   isPrimary,
   label: null,
   notes: null,
+  position: 0,
   updatedAt: "",
   updatedBy: null,
   members: (["SOLO", "SUPPORT_1", "SUPPORT_2"] as const).map((slot, i) => ({ slot, uniformId: uniforms[i], ctpId: null, ...NO_ROTATION })),

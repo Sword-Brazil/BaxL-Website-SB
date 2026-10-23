@@ -12,6 +12,6 @@ export const metaTeamRepository = {
     prisma.metaTeam.findMany({
       where: { scope, battleDayId },
       include: metaTeamInclude,
-      orderBy: [{ isPrimary: "desc" }, { updatedAt: "desc" }],
+      orderBy: [{ isPrimary: "desc" }, { position: "asc" }, { updatedAt: "desc" }],
     }),
 };

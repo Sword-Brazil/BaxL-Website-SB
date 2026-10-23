@@ -99,7 +99,16 @@
     "striker": "Striker meta de {{name}}",
     "pickStriker": "Elegir Striker",
     "removeStriker": "Quitar Striker",
-    "strikerHelp": "Apoyo desbloqueado en Trascendencia 4: entra en la partida y usa una sola habilidad para daño extra."
+    "strikerHelp": "Apoyo desbloqueado en Trascendencia 4: entra en la partida y usa una sola habilidad para daño extra.",
+    "order": {
+      "button": "Ordenar alternativas",
+      "title": "Orden de las alternativas",
+      "help": "La Meta principal siempre va primero. Mueve las alternativas o usa un orden listo, y guarda.",
+      "newest": "Más reciente primero",
+      "oldest": "Más antigua primero",
+      "up": "Subir la {{n}}ª",
+      "down": "Bajar la {{n}}ª"
+    }
   },
   "priority": {
     "solo": "Solistas",

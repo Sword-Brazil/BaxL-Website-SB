@@ -29,6 +29,7 @@ import type { CatalogViewModel, UniformRef } from "@/viewmodels/useCatalogViewMo
 import type { MetaScopeViewModel } from "@/viewmodels/admin/useMetaScopeViewModel";
 import { useMetaTeamEditorViewModel, type MemberDraft } from "@/viewmodels/admin/useMetaTeamEditorViewModel";
 import { useRotationsViewModel } from "@/viewmodels/useRotationsViewModel";
+import { AlternativesOrder } from "./AlternativesOrder";
 import { MetaCycleBoard } from "./MetaCycleBoard";
 import { ReservesEditor } from "./ReservesEditor";
 import { TeamStrip } from "@/views/shared/TeamStrip";
@@ -202,7 +203,8 @@ export function MetaTeamEditorView({ scopeVm }: { scopeVm: MetaScopeViewModel })
         <MetaCycleBoard scopeVm={scopeVm} vm={vm} />
       ) : (
         <>
-          <div className="flex justify-end">
+          <div className="flex flex-wrap justify-end gap-2">
+            <AlternativesOrder teams={vm.teams} catalog={catalog} onSave={vm.reorder} isSaving={vm.isReordering} />
             <Button variant="energy" onClick={() => vm.startNew()}>
               <PlusIcon data-icon="inline-start" />
               {t("admin:metas.newTeam")}

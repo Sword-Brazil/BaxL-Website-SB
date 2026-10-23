@@ -99,7 +99,16 @@
     "striker": "{{name}}'s meta Striker",
     "pickStriker": "Pick a Striker",
     "removeStriker": "Remove Striker",
-    "strikerHelp": "Support unlocked at Transcendence 4: joins the fight and uses a single skill for extra damage."
+    "strikerHelp": "Support unlocked at Transcendence 4: joins the fight and uses a single skill for extra damage.",
+    "order": {
+      "button": "Order alternatives",
+      "title": "Alternatives order",
+      "help": "The main Meta always comes first. Move the alternatives or use a ready-made order, then save.",
+      "newest": "Newest first",
+      "oldest": "Oldest first",
+      "up": "Move #{{n}} up",
+      "down": "Move #{{n}} down"
+    }
   },
   "priority": {
     "solo": "Solos",

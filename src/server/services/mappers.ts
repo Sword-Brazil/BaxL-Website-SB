@@ -6,6 +6,7 @@ type DbMetaTeam = {
   id: string;
   scope: string;
   isPrimary: boolean;
+  position: number;
   label: string | null;
   notes: string | null;
   updatedAt: Date;
@@ -28,6 +29,7 @@ export function toMetaTeam(t: DbMetaTeam): MetaTeam {
     mode: (t.battleDay?.mode as DayMode) ?? null,
     dayNumber: t.battleDay?.number ?? null,
     isPrimary: t.isPrimary,
+    position: t.position,
     label: t.label,
     notes: t.notes,
     members: [...t.members]

@@ -93,9 +93,32 @@ export async function saveMetaTeam(input: MetaTeamInput, userId: string, id?: st
       await tx.metaTeamMember.deleteMany({ where: { metaTeamId: id } });
       return tx.metaTeam.update({ where: { id }, data: { ...data, members: { create: members } }, include: metaTeamInclude });
     }
-    return tx.metaTeam.create({ data: { ...data, members: { create: members } }, include: metaTeamInclude });
+    // Equipe nova entra no fim da lista do dia.
+    const last = await tx.metaTeam.aggregate({ where: { scope: input.scope, battleDayId }, _max: { position: true } });
+    return tx.metaTeam.create({
+      data: { ...data, position: (last._max.position ?? 0) + 1, members: { create: members } },
+      include: metaTeamInclude,
+    });
   });
   return toMetaTeam(saved);
+}
+
+/**
+ * Nova ordem das equipes de um mesmo escopo e dia (a principal continua sempre primeiro). Todas
+ * precisam ser do mesmo lugar; as que não vierem na lista ficam depois, na ordem em que estavam.
+ */
+export async function reorderMetaTeams(ids: string[]): Promise<void> {
+  const teams = await prisma.metaTeam.findMany({ where: { id: { in: ids } }, select: { id: true, scope: true, battleDayId: true } });
+  if (teams.length !== new Set(ids).size) throw new HttpError(404, "NOT_FOUND", "Equipe não encontrada");
+  const places = new Set(teams.map((t) => `${t.scope}#${t.battleDayId ?? ""}`));
+  if (places.size !== 1) throw new HttpError(400, "VALIDATION_ERROR", "As equipes precisam ser do mesmo dia");
+  const { scope, battleDayId } = teams[0];
+  const others = await prisma.metaTeam.findMany({
+    where: { scope, battleDayId, id: { notIn: ids } },
+    orderBy: [{ position: "asc" }, { updatedAt: "desc" }],
+    select: { id: true },
+  });
+  await prisma.$transaction([...ids, ...others.map((o) => o.id)].map((id, i) => prisma.metaTeam.update({ where: { id }, data: { position: i + 1 } })));
 }
 
 export async function deleteMetaTeam(id: string) {
@@ -108,7 +131,7 @@ export async function listMetaTeams(scope: string, battleDayId: string | null) {
   const rows = await prisma.metaTeam.findMany({
     where: { scope, battleDayId },
     include: metaTeamInclude,
-    orderBy: [{ isPrimary: "desc" }, { updatedAt: "desc" }],
+    orderBy: [{ isPrimary: "desc" }, { position: "asc" }, { updatedAt: "desc" }],
   });
   return rows.map(toMetaTeam);
 }
