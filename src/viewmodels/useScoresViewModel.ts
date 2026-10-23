@@ -9,6 +9,8 @@ import {
   dateRange,
   gameDayOf,
   modesOfDay,
+  normalBaOf,
+  normalBaPointsOf,
   phasesOfDay,
   previousSeasonDate,
   scoreEntries,
@@ -77,13 +79,22 @@ export function useScoresViewModel() {
   const season = seasonChoice && seasons.includes(seasonChoice) ? seasonChoice : (current?.seasonStart ?? null);
   // Cada dia e semana da temporada escolhida contra o mesmo dia e semana da anterior.
   const days = anchor && today && season ? seasonDays(scores, anchor, season, today) : [];
-  const weeks = today && season ? seasonWeeks(scores, season, today) : [];
+  const weeks = anchor && today && season ? seasonWeeks(scores, anchor, season, today) : [];
   const summary = anchor && today ? scoreSummary(scores, anchor, today) : null;
 
-  // Histórico: mais recente primeiro, cada registro contra o mesmo dia e modo do mês anterior.
+  // Histórico: mais recente primeiro, cada registro contra o mesmo dia e modo do mês anterior, com a
+  // BA normal que entrou junto.
   const history = anchor
     ? scoreEntries(scores, anchor)
-        .map((e) => ({ ...e, ...compare(e.points, scores[scoreKey(previousSeasonDate(e.date), e.mode, e.phase)] ?? null) }))
+        .map((e) => ({
+          ...e,
+          ...compare(e.points, scores[scoreKey(previousSeasonDate(e.date), e.mode, e.phase)] ?? null),
+          // A BA normal da parte do dia aparece uma vez: na BAX, ou na BAL se a BAX não foi anotada.
+          normal:
+            e.mode === "BAX" || (e.mode === "BAL" && scores[scoreKey(e.date, "BAX", e.phase)] === undefined)
+              ? normalBaOf(scores, e.date, e.phase, anchor)
+              : null,
+        }))
         .reverse()
     : [];
 
@@ -114,6 +125,14 @@ export function useScoresViewModel() {
       if (!locked && dates.includes(d) && (anchor ? phasesOfDay(gameDayOf(d, anchor)).includes(phase) : false)) setScore(d, mode, points, phase);
     },
     teamOf,
+    /** BA normal do dia (null na BAI): os pontos fixos e em quantas partes do dia já entraram no total. */
+    normalOf: (d: string) => {
+      if (!anchor) return null;
+      const points = normalBaPointsOf(gameDayOf(d, anchor).cycleDay);
+      if (points === null) return null;
+      const counted = (["pre", "post"] as const).filter((p) => normalBaOf(scores, d, p, anchor) !== null).length;
+      return { points, counted };
+    },
     seasons,
     season,
     setSeason,
