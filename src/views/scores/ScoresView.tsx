@@ -309,6 +309,10 @@ function CompareTooltip({ active, payload }: { active?: boolean; payload?: { pay
   );
 }
 
+/** Traço dos gráficos de pontuação: verde-escuro (esta temporada / ganho), vermelho-escuro (mês anterior / perda). */
+const LINE_GAIN = "#166534";
+const LINE_LOSS = "#991b1b";
+
 /**
  * Esta temporada (área forte) contra o mês anterior (área clara e tracejada), no estilo do "Area
  * Chart - Interactive" do shadcn.
@@ -317,8 +321,8 @@ function CompareArea({ id, data }: { id: string; data: CompareRow[] }) {
   const { t } = useTranslation("scores");
   const f = useFormat();
   const config = {
-    previous: { label: t("compare.previous"), color: "var(--ramp3-1)" },
-    current: { label: t("compare.current"), color: "var(--ramp3-3)" },
+    previous: { label: t("compare.previous"), color: LINE_LOSS },
+    current: { label: t("compare.current"), color: LINE_GAIN },
   } satisfies ChartConfig;
   const single = data.filter((d) => d.current !== null).length <= 1;
   return (
@@ -360,10 +364,6 @@ function CompareArea({ id, data }: { id: string; data: CompareRow[] }) {
     </ChartContainer>
   );
 }
-
-/** Traço do gráfico de crescimento: verde-escuro no ganho, vermelho-escuro na perda. */
-const LINE_GAIN = "#166534";
-const LINE_LOSS = "#991b1b";
 
 /** Crescimento contra o mês anterior: verde acima do zero, vermelho abaixo. */
 function GrowthArea({ id, data }: { id: string; data: CompareRow[] }) {
