@@ -3,15 +3,13 @@ import { adminApi } from "@/models/api/admin";
 import type { CycleOverview } from "@/models/domain/types";
 import { useNotifyError } from "@/viewmodels/useNotify";
 
-/** Dias de BAX/BAL sem restrição, na ordem do ciclo (ex.: "BAX 2"). */
-export const freeDayLabels = (cycle: CycleOverview | undefined) =>
-  (cycle?.days ?? []).flatMap((d) =>
-    d.isBai ? [] : (["BAX", "BAL"] as const).filter((m) => (m === "BAX" ? d.bax : d.bal)?.criteria.length === 0).map((m) => `${m} ${d.number}`),
-  );
+/** Dias sem restrição de um modo, na ordem do ciclo (ex.: "BAX 2"). */
+export const freeDayLabels = (cycle: CycleOverview | undefined, mode: "BAX" | "BAL") =>
+  (cycle?.days ?? []).flatMap((d) => (!d.isBai && (mode === "BAX" ? d.bax : d.bal)?.criteria.length === 0 ? [`${mode} ${d.number}`] : []));
 
 /**
- * Curadoria: dias sem restrição e BAI com as mesmas equipes e reservas. Ligado, editar um deles
- * copia para os outros (feito no servidor).
+ * Curadoria: dias sem restrição do mesmo modo com as mesmas equipes e reservas (BAX com BAX, BAL
+ * com BAL). Ligado, editar um deles copia para os outros do modo (feito no servidor).
  */
 export function useFreeDaysSyncViewModel() {
   const qc = useQueryClient();

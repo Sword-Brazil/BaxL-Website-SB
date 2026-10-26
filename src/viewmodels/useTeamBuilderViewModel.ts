@@ -92,8 +92,8 @@ export function useTeamBuilderViewModel({
     [pool, priority, criteria, catalog.agents],
   );
 
-  // Dia livre (sem restrição, ou a BAI): os outros dias livres. Com a sincronização ligada, cada
-  // mudança nesta equipe vai junto para eles.
+  // Dia livre (sem restrição): os outros dias livres do mesmo modo (BAX com BAX, BAL com BAL). Com a
+  // sincronização ligada, cada mudança nesta equipe vai junto para eles.
   const freeDays = criteria.length === 0 ? freeTeamKeys(cycle.data, teamKey) : [];
   const syncFreeDays = doc.syncFreeDays !== false;
   /** Depois de mudar a equipe: repete a equipe nova nos outros dias livres, se a sincronização estiver ligada. */
@@ -149,7 +149,7 @@ export function useTeamBuilderViewModel({
   return {
     catalog,
     team,
-    /** Outros dias livres (BAX/BAL sem restrição e BAI); vazio se este dia tiver restrição. */
+    /** Outros dias livres do mesmo modo; vazio se este dia tiver restrição (ou for a BAI). */
     freeDays: hasTeam ? freeDays : [],
     /** Este é um dia livre (dá para sincronizar com os outros)? Quantos são os outros. */
     isFreeDay: criteria.length === 0 && freeDays.length > 0,

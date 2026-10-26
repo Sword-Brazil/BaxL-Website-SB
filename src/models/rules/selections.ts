@@ -13,11 +13,14 @@ export const emptySelections = (): UserSelections => ({
   syncFreeDays: true,
 });
 
-/** Dias livres para a equipe do jogador: os de BAX/BAL sem restrição e a BAI, menos `except`. */
-export const freeTeamKeys = (cycle: CycleOverview | undefined, except?: string): string[] => [
-  ...freeDayKeys(cycle, except),
-  ...(except === "BAI" ? [] : ["BAI"]),
-];
+/**
+ * Dias livres que repetem a equipe do jogador: só os do mesmo modo (BAX com BAX, BAL com BAL),
+ * sem restrição, menos o próprio. A BAI é uma equipe só para todas as BAIs: não tem outros.
+ */
+export const freeTeamKeys = (cycle: CycleOverview | undefined, teamKey: string): string[] => {
+  const mode = teamKey.split("-")[0];
+  return mode === "BAX" || mode === "BAL" ? freeDayKeys(cycle, teamKey).filter((k) => k.startsWith(`${mode}-`)) : [];
+};
 
 /** Equipes (chaves "BAX-n"/"BAL-n") dos dias de BAX e BAL sem restrição, menos `except`. */
 export function freeDayKeys(cycle: CycleOverview | undefined, except?: string): string[] {
