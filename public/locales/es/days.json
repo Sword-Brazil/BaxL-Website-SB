@@ -123,8 +123,8 @@
     "freeDays": {
       "button": "Usar en los días libres",
       "title": "Mismo equipo en los días libres",
-      "text_one": "¿Copiar este equipo al otro día libre (sin restricción o BAI)?",
-      "text_other": "¿Copiar este equipo a los otros {{count}} días libres (días de BAX y BAL sin restricción y la BAI)?",
+      "text_one": "¿Copiar este equipo al otro día libre de este modo?",
+      "text_other": "¿Copiar este equipo a los otros {{count}} días libres de este modo?",
       "filled_one": "{{count}} de ellos ya tiene equipo.",
       "filled_other": "{{count}} de ellos ya tienen equipo.",
       "cancel": "Cancelar",
@@ -137,9 +137,9 @@
       "done_one": "Equipo copiado a {{count}} día libre.",
       "done_other": "Equipo copiado a {{count}} días libres.",
       "equalize": "Igualar los otros días libres",
-      "syncLabel": "Mismo equipo en todos los días libres",
+      "syncLabel": "Mismo equipo en los días libres de este modo",
       "syncOn_one": "Al cambiar este equipo, el otro día libre cambia también.",
-      "syncOn_other": "Al cambiar este equipo, los otros {{count}} días libres (días de BAX y BAL sin restricción y la BAI) cambian también.",
+      "syncOn_other": "Al cambiar este equipo, los otros {{count}} días libres de este modo cambian también.",
       "syncOff": "Apagado: cada día libre tiene su equipo. Usa el botón de abajo para copiar."
     }
   }

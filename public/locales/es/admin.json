@@ -112,11 +112,11 @@
     "labelEn": "Etiqueta en inglés (opcional)",
     "labelEnPlaceholder": "Vacío: \"Alternativa N\" pasa a \"Alternative N\"",
     "freeSync": {
-      "label": "Días sin restricción y BAI siempre iguales",
-      "on": "Activado: cambiar los equipos o las reservas de uno de estos días copia todo a los demás (reemplaza lo que tienen).",
-      "off": "Apagado: cada día sin restricción y la BAI tienen sus propios equipos.",
+      "label": "Días sin restricción siempre iguales (por modo)",
+      "on": "Activado: cambiar los equipos o las reservas de un día sin restricción copia todo a los demás del mismo modo (BAX solo a BAX, BAL solo a BAL), reemplazando lo que tienen.",
+      "off": "Apagado: cada día sin restricción tiene sus propios equipos.",
       "badge": "Sincronizado",
-      "dialog": "Día libre sincronizado: al guardar, los otros días sin restricción y la BAI quedan iguales a este."
+      "dialog": "Día libre sincronizado: al guardar, los otros días sin restricción de este modo quedan iguales a este."
     }
   },
   "priority": {

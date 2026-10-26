@@ -16,8 +16,8 @@ export default function AdminMetasPage() {
   return (
     <AdminLayout title={t("metas.title")} help={t("metas.help")}>
       <MetaScopeBar vm={scopeVm} />
-      {/* Só dias de BAX/BAL e BAI entram na sincronização (a BAL livre é outra lista). */}
-      {scopeVm.scope !== "BAL_FREE" && <FreeDaysSyncCard vm={freeSync} cycle={scopeVm.cycle.data} />}
+      {/* Só os dias de BAX/BAL entram na sincronização (a BAI e a BAL livre já são uma lista só). */}
+      {scopeVm.isDay && <FreeDaysSyncCard vm={freeSync} cycle={scopeVm.cycle.data} />}
       <MetaTeamEditorView scopeVm={scopeVm} freeSync={freeSync.sync} />
     </AdminLayout>
   );

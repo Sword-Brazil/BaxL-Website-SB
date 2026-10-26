@@ -6,10 +6,10 @@ import type { CycleOverview } from "@/models/domain/types";
 import { cn } from "@/lib/utils";
 import { freeDayLabels, type FreeDaysSyncViewModel } from "@/viewmodels/admin/useFreeDaysSyncViewModel";
 
-/** Chave da sincronização dos dias sem restrição e da BAI, com a lista de quais são. */
+/** Chave da sincronização dos dias sem restrição, com a lista de quais são (por modo). */
 export function FreeDaysSyncCard({ vm, cycle }: { vm: FreeDaysSyncViewModel; cycle: CycleOverview | undefined }) {
   const { t } = useTranslation("admin");
-  const days = freeDayLabels(cycle);
+  const groups = (["BAX", "BAL"] as const).map((m) => freeDayLabels(cycle, m)).filter((g) => g.length > 0);
   return (
     <label
       className={cn(
@@ -24,19 +24,22 @@ export function FreeDaysSyncCard({ vm, cycle }: { vm: FreeDaysSyncViewModel; cyc
           {t("metas.freeSync.label")}
         </span>
         <span className="text-xs text-muted-foreground">{vm.sync ? t("metas.freeSync.on") : t("metas.freeSync.off")}</span>
-        <span className="flex flex-wrap gap-1">
-          {[...days, "BAI"].map((d) => (
-            <Badge key={d} variant="outline" className="text-[0.65rem]">
-              {d}
-            </Badge>
-          ))}
-        </span>
+        {/* Um grupo por modo: BAX só repete em BAX, BAL só em BAL. */}
+        {groups.map((g) => (
+          <span key={g[0]} className="flex flex-wrap gap-1">
+            {g.map((d) => (
+              <Badge key={d} variant="outline" className="text-[0.65rem]">
+                {d}
+              </Badge>
+            ))}
+          </span>
+        ))}
       </span>
     </label>
   );
 }
 
-/** Selo de um dia livre sincronizado, no quadro do ciclo e na BAI. */
+/** Selo de um dia livre sincronizado, no quadro do ciclo. */
 export function FreeDaySyncedBadge() {
   const { t } = useTranslation("admin");
   return (

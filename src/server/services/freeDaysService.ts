@@ -8,10 +8,10 @@ export interface TeamPlace {
 
 const samePlace = (a: TeamPlace, b: TeamPlace) => a.scope === b.scope && a.battleDayId === b.battleDayId;
 
-/** Dias de BAX/BAL sem restrição e a BAI: os lugares que ficam iguais quando a sincronização está ligada. */
-export async function freePlaces(): Promise<TeamPlace[]> {
-  const days = await prisma.battleDay.findMany({ where: { criteria: { none: {} } }, select: { id: true }, orderBy: [{ mode: "asc" }, { number: "asc" }] });
-  return [...days.map((d) => ({ scope: "DAY", battleDayId: d.id })), { scope: "BAI", battleDayId: null }];
+/** Dias sem restrição de um modo (só BAX ou só BAL): os lugares que ficam iguais quando a sincronização está ligada. */
+export async function freePlaces(mode: string): Promise<TeamPlace[]> {
+  const days = await prisma.battleDay.findMany({ where: { mode, criteria: { none: {} } }, select: { id: true }, orderBy: { number: "asc" } });
+  return days.map((d) => ({ scope: "DAY", battleDayId: d.id }));
 }
 
 export async function getFreeDaysSync(): Promise<{ sync: boolean }> {
@@ -25,13 +25,16 @@ export async function setFreeDaysSync(sync: boolean): Promise<{ sync: boolean }>
 }
 
 /**
- * Depois de mudar as equipes ou as reservas de um dia livre (ou da BAI), copia tudo dele para os
- * outros dias livres e a BAI, substituindo o que eles tinham. Não faz nada se o lugar tiver
- * restrição, se for a BAL livre ou se a sincronização estiver desligada. Devolve quantos lugares mudaram.
+ * Depois de mudar as equipes ou as reservas de um dia livre, copia tudo dele para os outros dias
+ * livres do mesmo modo (BAX só para BAX, BAL só para BAL), substituindo o que eles tinham. Não faz
+ * nada se o dia tiver restrição, fora dos dias de BAX/BAL (a BAI e a BAL livre já são uma lista só)
+ * ou se a sincronização estiver desligada. Devolve quantos lugares mudaram.
  */
 export async function mirrorFreePlace(source: TeamPlace): Promise<number> {
-  if (source.scope !== "DAY" && source.scope !== "BAI") return 0;
-  const [places, { sync }] = await Promise.all([freePlaces(), getFreeDaysSync()]);
+  if (source.scope !== "DAY" || !source.battleDayId) return 0;
+  const day = await prisma.battleDay.findUnique({ where: { id: source.battleDayId }, select: { mode: true } });
+  if (!day) return 0;
+  const [places, { sync }] = await Promise.all([freePlaces(day.mode), getFreeDaysSync()]);
   if (!sync || !places.some((p) => samePlace(p, source))) return 0;
   const targets = places.filter((p) => !samePlace(p, source));
 

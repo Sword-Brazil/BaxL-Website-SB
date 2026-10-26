@@ -30,7 +30,6 @@ import type { MetaScopeViewModel } from "@/viewmodels/admin/useMetaScopeViewMode
 import { useMetaTeamEditorViewModel, type MemberDraft } from "@/viewmodels/admin/useMetaTeamEditorViewModel";
 import { useRotationsViewModel } from "@/viewmodels/useRotationsViewModel";
 import { AlternativesOrder } from "./AlternativesOrder";
-import { FreeDaySyncedBadge } from "./FreeDaysSync";
 import { MetaCycleBoard } from "./MetaCycleBoard";
 import { ReservesEditor } from "./ReservesEditor";
 import { TeamStrip } from "@/views/shared/TeamStrip";
@@ -205,11 +204,6 @@ export function MetaTeamEditorView({ scopeVm, freeSync = false }: { scopeVm: Met
       ) : (
         <>
           <div className="flex flex-wrap items-center justify-end gap-2">
-            {scopeVm.scope === "BAI" && freeSync && (
-              <span className="mr-auto">
-                <FreeDaySyncedBadge />
-              </span>
-            )}
             <AlternativesOrder teams={vm.teams} catalog={catalog} onSave={vm.reorder} isSaving={vm.isReordering} />
             <Button variant="energy" onClick={() => vm.startNew()}>
               <PlusIcon data-icon="inline-start" />
@@ -282,7 +276,7 @@ export function MetaTeamEditorView({ scopeVm, freeSync = false }: { scopeVm: Met
             </DialogTitle>
             <DialogDescription>{t("admin:metas.help")}</DialogDescription>
             {scopeVm.isDay && <RestrictionBadges criteria={scopeVm.criteria} />}
-            {freeSync && (scopeVm.scope === "BAI" || (scopeVm.isDay && scopeVm.criteria.length === 0)) && (
+            {freeSync && scopeVm.isDay && scopeVm.criteria.length === 0 && (
               <p className="flex items-start gap-1.5 text-xs text-energy">
                 <Link2Icon className="mt-0.5 size-3.5 shrink-0" aria-hidden />
                 {t("admin:metas.freeSync.dialog")}
