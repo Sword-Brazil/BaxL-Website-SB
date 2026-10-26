@@ -263,7 +263,7 @@ function SlotRow({
 }
 
 /**
- * Dia livre: copia a equipe para os outros dias livres (BAX/BAL sem restrição e BAI), só nos que
+ * Dia livre: copia a equipe para os outros dias livres do mesmo modo (BAX ou BAL), só nos que
  * ainda não têm equipe ou substituindo em todos. Com a sincronização ligada, só aparece se algum
  * deles ainda estiver diferente (ex.: equipes montadas antes).
  */
@@ -382,7 +382,7 @@ export function TeamBuilderPanel(props: { teamKey: TeamKey; criteria: Criterion[
             </span>
           </label>
 
-          {/* Dia livre: a mesma equipe em todos os dias sem restrição e na BAI. */}
+          {/* Dia livre: a mesma equipe em todos os dias sem restrição do mesmo modo. */}
           {vm.isFreeDay && (
             <label
               className={cn(

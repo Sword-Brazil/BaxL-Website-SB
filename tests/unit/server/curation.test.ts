@@ -224,7 +224,7 @@ describe("curadoria", () => {
     ).rejects.toSatisfy(status(422));
   });
 
-  describe("dias sem restrição e BAI sincronizados", () => {
+  describe("dias sem restrição sincronizados por modo", () => {
     const free = (number: number, isPrimary = true) => ({
       scope: "DAY" as const,
       mode: "BAL" as const,
@@ -235,22 +235,29 @@ describe("curadoria", () => {
     const teamsAt = async (where: object) =>
       (await prisma.metaTeam.findMany({ where, include: { members: true } })).map((t) => [t.isPrimary, t.members.map((m) => m.uniformId).sort()]);
 
-    it("salvar a Meta de um dia livre copia para os outros dias livres e para a BAI, não para dia com restrição", async () => {
+    it("salvar a Meta de um dia livre copia só para os dias livres do mesmo modo (nem outro modo, nem BAI)", async () => {
       await saveMetaTeam(free(1), curatorId);
-      const expected = [[true, [...fem].sort()]];
-      expect(await teamsAt({ battleDayId: await dayId("BAX", 2) })).toEqual(expected);
-      expect(await teamsAt({ scope: "BAI" })).toEqual(expected);
-      expect(await teamsAt({ battleDayId: await dayId("BAX", 6) })).toEqual([]);
+      const freeBal = await prisma.battleDay.findMany({ where: { mode: "BAL", criteria: { none: {} } }, select: { id: true } });
+      expect(freeBal.length).toBeGreaterThan(1);
+      expect(await prisma.metaTeam.count({ where: { scope: "DAY" } })).toBe(freeBal.length);
+      expect(await teamsAt({ battleDayId: { in: freeBal.map((d) => d.id) } })).toEqual(freeBal.map(() => [true, [...fem].sort()]));
+      expect(await teamsAt({ battleDay: { mode: "BAX" } })).toEqual([]);
+      expect(await teamsAt({ scope: "BAI" })).toEqual([]);
     });
 
-    it("excluir e salvar reservas também sincronizam", async () => {
-      const team = await saveMetaTeam(free(1), curatorId);
+    it("excluir e salvar reservas também sincronizam no modo; a BAI não espelha", async () => {
+      await saveMetaTeam(free(1), curatorId);
+      const freeBal = await prisma.battleDay.count({ where: { mode: "BAL", criteria: { none: {} } } });
+      const [other] = await prisma.battleDay.findMany({ where: { mode: "BAL", number: { not: 1 }, criteria: { none: {} } }, select: { id: true } });
+      await savePriority({ scope: "DAY", mode: "BAL", number: 1 }, { solo: [{ uniformId: fem[0] }], support: [] });
+      expect(await prisma.priorityEntry.count({ where: { battleDayId: other.id } })).toBe(1);
+      expect(await prisma.priorityEntry.count({ where: { battleDay: { mode: "BAX" } } })).toBe(0);
+      const copy = await prisma.metaTeam.findFirstOrThrow({ where: { battleDayId: other.id } });
+      await deleteMetaTeam(copy.id);
+      expect(await prisma.metaTeam.count({ where: { scope: "DAY" } })).toBe(0);
       await savePriority({ scope: "BAI" }, { solo: [{ uniformId: fem[0] }], support: [] });
-      expect(await prisma.priorityEntry.count({ where: { battleDayId: await dayId("BAL", 1) } })).toBe(1);
-      const baiCopy = await prisma.metaTeam.findFirstOrThrow({ where: { scope: "BAI" } });
-      expect(baiCopy.id).not.toBe(team.id);
-      await deleteMetaTeam(baiCopy.id);
-      expect(await prisma.metaTeam.count({ where: { scope: { in: ["DAY", "BAI"] } } })).toBe(0);
+      expect(await prisma.priorityEntry.count({ where: { scope: "BAI" } })).toBe(1);
+      expect(await prisma.priorityEntry.count({ where: { scope: "DAY" } })).toBe(freeBal);
     });
 
     it("com a sincronização desligada, cada dia livre fica com a sua equipe", async () => {

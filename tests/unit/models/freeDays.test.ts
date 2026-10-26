@@ -26,8 +26,10 @@ describe("freeDayKeys", () => {
 });
 
 describe("freeTeamKeys", () => {
-  it("os dias livres da equipe do jogador incluem a BAI; da BAI, só os de BAX e BAL", () => {
-    expect(freeTeamKeys(cycle, "BAX-1")).toEqual(["BAL-2", "BAX-4", "BAL-4", "BAI"]);
-    expect(freeTeamKeys(cycle, "BAI")).toEqual(["BAX-1", "BAL-2", "BAX-4", "BAL-4"]);
+  it("só repete no mesmo modo: BAX com BAX, BAL com BAL; a BAI não tem outros", () => {
+    expect(freeTeamKeys(cycle, "BAX-1")).toEqual(["BAX-4"]);
+    expect(freeTeamKeys(cycle, "BAL-2")).toEqual(["BAL-4"]);
+    expect(freeTeamKeys(cycle, "BAI")).toEqual([]);
+    expect(freeTeamKeys(undefined, "BAX-1")).toEqual([]);
   });
 });

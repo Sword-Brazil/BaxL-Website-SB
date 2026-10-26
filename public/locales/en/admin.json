@@ -112,11 +112,11 @@
     "labelEn": "English label (optional)",
     "labelEnPlaceholder": "Empty: \"Alternativa N\" becomes \"Alternative N\"",
     "freeSync": {
-      "label": "Unrestricted days and BAI always the same",
-      "on": "On: changing the teams or reserves of one of these days copies everything to the others (replacing what they have).",
-      "off": "Off: each unrestricted day and BAI have their own teams.",
+      "label": "Unrestricted days always the same (per mode)",
+      "on": "On: changing the teams or reserves of an unrestricted day copies everything to the others of the same mode (BAX only to BAX, BAL only to BAL), replacing what they have.",
+      "off": "Off: each unrestricted day has its own teams.",
       "badge": "Synced",
-      "dialog": "Synced free day: saving makes the other unrestricted days and BAI the same as this one."
+      "dialog": "Synced free day: saving makes the other unrestricted days of this mode the same as this one."
     }
   },
   "priority": {
