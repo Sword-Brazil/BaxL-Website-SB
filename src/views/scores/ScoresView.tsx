@@ -361,6 +361,10 @@ function CompareArea({ id, data }: { id: string; data: CompareRow[] }) {
   );
 }
 
+/** Traço do gráfico de crescimento: verde-escuro no ganho, vermelho-escuro na perda. */
+const LINE_GAIN = "#166534";
+const LINE_LOSS = "#991b1b";
+
 /** Crescimento contra o mês anterior: verde acima do zero, vermelho abaixo. */
 function GrowthArea({ id, data }: { id: string; data: CompareRow[] }) {
   const { t } = useTranslation("scores");
@@ -383,8 +387,8 @@ function GrowthArea({ id, data }: { id: string; data: CompareRow[] }) {
             <stop offset={1} stopColor="var(--loss)" stopOpacity={0.4} />
           </linearGradient>
           <linearGradient id={`${id}-line`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset={zero} stopColor="var(--gain)" />
-            <stop offset={zero} stopColor="var(--loss)" />
+            <stop offset={zero} stopColor={LINE_GAIN} />
+            <stop offset={zero} stopColor={LINE_LOSS} />
           </linearGradient>
         </defs>
         <CartesianGrid vertical={false} strokeOpacity={0.5} />
@@ -399,7 +403,7 @@ function GrowthArea({ id, data }: { id: string; data: CompareRow[] }) {
           connectNulls
           fill={`url(#${id}-fill)`}
           // Degradê no traço só com ganho e perda juntos: numa linha reta (um sinal só) ele fica sem cor.
-          stroke={max > 0 && min < 0 ? `url(#${id}-line)` : min < 0 ? "var(--loss)" : "var(--gain)"}
+          stroke={max > 0 && min < 0 ? `url(#${id}-line)` : min < 0 ? LINE_LOSS : LINE_GAIN}
           strokeWidth={2}
           dot={
             single
@@ -407,7 +411,7 @@ function GrowthArea({ id, data }: { id: string; data: CompareRow[] }) {
                   p.payload?.delta === null || p.payload?.delta === undefined ? (
                     <g key={p.index} />
                   ) : (
-                    <circle key={p.index} cx={p.cx} cy={p.cy} r={4} fill={p.payload.delta >= 0 ? "var(--gain)" : "var(--loss)"} />
+                    <circle key={p.index} cx={p.cx} cy={p.cy} r={4} fill={p.payload.delta >= 0 ? LINE_GAIN : LINE_LOSS} />
                   )
               : false
           }
