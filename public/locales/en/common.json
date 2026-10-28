@@ -363,11 +363,16 @@
     "BURN": "Burn",
     "FRACTURE": "Fracture",
     "SHOCK": "Shock",
-    "TRAP": "Trap",
-    "all": "All seasons"
+    "TRAP": "Trap"
+  },
+  "seasons": {
+    "PARALYSIS_SHOCK": "Paralysis and Shock",
+    "SILENCE_TRAP": "Silence and Trap",
+    "BURN_FRACTURE": "Burn and Fracture"
   },
   "season": {
     "stunHint": "Current season: stun the boss with {{effect}}",
-    "stuns": "Stuns the boss ({{effect}})"
+    "stuns": "Stuns the boss ({{effect}})",
+    "current": "Current"
   }
 }

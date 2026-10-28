@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { adminApi } from "@/models/api/admin";
 import { ApiError } from "@/models/api/client";
-import type { BossEffect, Mode } from "@/models/domain/enums";
+import { BOSS_EFFECTS, type BossEffect, type Mode } from "@/models/domain/enums";
 import { effectiveScoringModes, sortModes } from "@/models/rules/scoringModes";
 import type { Agent, Rotation } from "@/models/domain/types";
 import { AgentRotationsSchema } from "@/models/schemas/admin";
@@ -15,8 +15,6 @@ export interface RotationDraft {
   /** Chave só da tela (para a lista não se embaralhar ao reordenar). */
   key: string;
   uniformId: string | null;
-  /** Temporada (efeito do chefe); null = todas. */
-  effect: BossEffect | null;
   title: string;
   titleEn: string;
   sequence: string;
@@ -26,15 +24,18 @@ export interface RotationDraft {
   videoBax: string;
   videoBal: string;
   videoBai: string;
+  /** Vídeo de cada temporada, pelo efeito do chefe (vazio = usa o do modo). */
+  effectVideos: Record<BossEffect, string>;
 }
 
 let nextKey = 0;
 const newKey = () => `r${++nextKey}`;
 
+const emptyEffectVideos = () => Object.fromEntries(BOSS_EFFECTS.map((e) => [e, ""])) as Record<BossEffect, string>;
+
 const fromRotation = (r: Rotation): RotationDraft => ({
   key: newKey(),
   uniformId: r.uniformId,
-  effect: r.effect,
   title: r.title ?? "",
   titleEn: r.titleEn ?? "",
   sequence: r.sequence,
@@ -44,13 +45,13 @@ const fromRotation = (r: Rotation): RotationDraft => ({
   videoBax: r.videoBax ?? "",
   videoBal: r.videoBal ?? "",
   videoBai: r.videoBai ?? "",
+  effectVideos: { ...emptyEffectVideos(), ...r.effectVideos },
 });
 
-/** Rotação nova; `from` copia traje e temporada da anterior (o mais comum é variar só um deles). */
+/** Rotação nova; `from` copia o traje da anterior. */
 const blankDraft = (from?: RotationDraft): RotationDraft => ({
   key: newKey(),
   uniformId: from?.uniformId ?? null,
-  effect: from?.effect ?? null,
   title: "",
   titleEn: "",
   sequence: "",
@@ -60,6 +61,7 @@ const blankDraft = (from?: RotationDraft): RotationDraft => ({
   videoBax: "",
   videoBal: "",
   videoBai: "",
+  effectVideos: emptyEffectVideos(),
 });
 
 /**
@@ -107,10 +109,11 @@ export function useRotationsEditorViewModel(messages: { saved: string }) {
     mutationFn: async () => {
       const parsed = AgentRotationsSchema.safeParse({
         rotations: drafts
-          .filter((d) => [d.sequence, d.title, d.description, d.videoUrl, d.videoBax, d.videoBal, d.videoBai].some((v) => v.trim()))
+          .filter((d) =>
+            [d.sequence, d.title, d.description, d.videoUrl, d.videoBax, d.videoBal, d.videoBai, ...Object.values(d.effectVideos)].some((v) => v.trim()),
+          )
           .map((d) => ({
             uniformId: d.uniformId,
-            effect: d.effect,
             title: d.title || null,
             titleEn: d.titleEn || null,
             sequence: d.sequence,
@@ -120,6 +123,7 @@ export function useRotationsEditorViewModel(messages: { saved: string }) {
             videoBax: d.videoBax || null,
             videoBal: d.videoBal || null,
             videoBai: d.videoBai || null,
+            effectVideos: Object.fromEntries(Object.entries(d.effectVideos).filter(([, v]) => v.trim())),
           })),
         scoring,
       });
@@ -174,6 +178,8 @@ export function useRotationsEditorViewModel(messages: { saved: string }) {
         return copy;
       }),
     update,
+    setEffectVideo: (key: string, effect: BossEffect, url: string) =>
+      setDrafts((ds) => ds.map((d) => (d.key === key ? { ...d, effectVideos: { ...d.effectVideos, [effect]: url } } : d))),
     submit: () => agent && save.mutate(),
   };
 }

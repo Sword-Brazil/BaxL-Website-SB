@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { BAL_EFFECTS, BAX_EFFECTS, BOSS_EFFECTS, CRITERION_VALUES, CTP_QUALITIES, CTP_TYPES, MODES, ROLES, SLOTS, UNKNOWN } from "@/models/domain/enums";
+import { BOSS_EFFECTS, CRITERION_VALUES, CTP_QUALITIES, CTP_TYPES, MODES, ROLES, SEASONS, SLOTS, UNKNOWN } from "@/models/domain/enums";
 import {
   attackTypeSchema,
   criterionAttributeSchema,
@@ -196,7 +196,6 @@ const videoSchema = z
 /** Rotação em texto livre (sem formato obrigatório); o vídeo precisa ser YouTube ou .mp4/.webm. */
 export const RotationInputSchema = z.object({
   uniformId: idSchema.nullable(),
-  effect: z.enum(BOSS_EFFECTS).optional().nullable(),
   title: z.string().trim().max(80).optional().nullable(),
   titleEn: z.string().trim().max(80).optional().nullable(),
   sequence: z.string().trim().min(1, { message: VALIDATION.rotationRequired }).max(1000),
@@ -207,6 +206,8 @@ export const RotationInputSchema = z.object({
   videoBax: videoSchema,
   videoBal: videoSchema,
   videoBai: videoSchema,
+  /** Demonstração em cada temporada, pelo efeito do chefe (vazio = usa o vídeo do modo). */
+  effectVideos: z.partialRecord(z.enum(BOSS_EFFECTS), videoSchema).optional(),
 });
 export type RotationInput = z.infer<typeof RotationInputSchema>;
 
@@ -219,6 +220,6 @@ export const AgentRotationsSchema = z.object({
 });
 export type AgentRotationsInput = z.infer<typeof AgentRotationsSchema>;
 
-/** Temporada atual: o efeito da BAX e o da BAL, escolhidos separadamente. */
-export const SeasonSchema = z.object({ BAX: z.enum(BAX_EFFECTS), BAL: z.enum(BAL_EFFECTS) });
+/** Temporada atual: um dos 3 pares de efeitos (BAX e BAL). */
+export const SeasonSchema = z.object({ id: z.enum(SEASONS) });
 export type SeasonInput = z.infer<typeof SeasonSchema>;

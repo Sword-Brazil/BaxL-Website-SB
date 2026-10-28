@@ -50,8 +50,7 @@
     "help": "Pick one value per attribute. Leave \"Any\" to not restrict that attribute. BAI days (3, 10, 17, 24) are not listed.",
     "season": {
       "title": "Current season",
-      "help": "Effect that stuns the boss this season (28 days). Applies to every day of the mode; change it when the season changes.",
-      "effectOf": "{{mode}} effect"
+      "help": "Pair of effects that stuns the boss this season (28 days): the first in BAX, the second in BAL. Applies to every day of the mode; change it when the season changes."
     }
   },
   "metas": {
@@ -244,9 +243,11 @@
     "video": "General video (any mode, optional)",
     "videoHint": "YouTube link (video or Shorts; add ?t= to start at the right moment) or a .mp4/.webm file. It plays muted and looped; the video is not stored in the system.",
     "add": "Add rotation",
-    "effect": "Season",
     "english": "In English (optional; Spanish uses the same)",
     "videoOf": "Demo video in {{mode}}",
+    "seasonVideos": "Videos per season (optional)",
+    "seasonVideosHelp": "The rotation is the same in every season; only the video changes. Leave it empty to use the mode video.",
+    "videoOfSeason": "{{mode}} video ({{effect}})",
     "suggestVideo": "Suggest a video",
     "scoring": {
       "title": "Modes where they score (Damage Dealer)",

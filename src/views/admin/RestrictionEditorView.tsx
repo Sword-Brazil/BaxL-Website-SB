@@ -5,11 +5,11 @@ import { RotateCcwIcon, SaveIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CRITERION_ATTRIBUTES, CRITERION_VALUES, DAY_MODES, EFFECTS_BY_MODE, type BossEffect, type DayMode } from "@/models/domain/enums";
+import { CRITERION_ATTRIBUTES, CRITERION_VALUES, DAY_MODES, type BossEffect, type DayMode } from "@/models/domain/enums";
 import { MODE_VISUALS } from "@/views/shared/modeVisuals";
 import { ANY, useRestrictionEditorViewModel } from "@/viewmodels/admin/useRestrictionEditorViewModel";
 import { QueryState } from "@/views/shared/QueryState";
-import { BossEffectBadge, BossEffectIcon } from "@/views/shared/BossEffect";
+import { BossEffectBadge, SeasonPicker } from "@/views/shared/BossEffect";
 import { useSeasonEditorViewModel } from "@/viewmodels/admin/useSeasonEditorViewModel";
 
 type SeasonVm = ReturnType<typeof useSeasonEditorViewModel>;
@@ -74,7 +74,7 @@ function ModeDays({ mode, effect }: { mode: DayMode; effect: BossEffect | null }
   );
 }
 
-/** Temporada atual: escolhe o efeito que atordoa o chefe na BAX e na BAL (todos os dias do modo). */
+/** Temporada atual: escolhe o par de efeitos que atordoa o chefe na BAX e na BAL (todos os dias do modo). */
 function SeasonCard({ vm }: { vm: SeasonVm }) {
   const { t } = useTranslation(["admin", "common"]);
   return (
@@ -95,26 +95,7 @@ function SeasonCard({ vm }: { vm: SeasonVm }) {
         </span>
       </div>
       <QueryState isLoading={vm.isLoading} isError={vm.isError} retry={vm.retry}>
-        <div className="grid gap-2 sm:grid-cols-2">
-          {DAY_MODES.map((mode) => (
-            <label key={mode} className="flex min-w-0 flex-col gap-1">
-              <span className="text-xs text-muted-foreground">{t("admin:days.season.effectOf", { mode })}</span>
-              <Select value={vm.season?.[mode]} onValueChange={(v) => vm.setEffect(mode, v as BossEffect)}>
-                <SelectTrigger className="w-full" aria-label={t("admin:days.season.effectOf", { mode })}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {EFFECTS_BY_MODE[mode].map((e) => (
-                    <SelectItem key={e} value={e}>
-                      <BossEffectIcon effect={e} />
-                      {t(`common:effects.${e}`)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </label>
-          ))}
-        </div>
+        <SeasonPicker value={vm.season} onChange={vm.setSeason} current={vm.savedId} label={t("admin:days.season.title")} />
       </QueryState>
     </section>
   );

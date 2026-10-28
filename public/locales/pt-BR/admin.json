@@ -50,8 +50,7 @@
     "help": "Escolha um valor por atributo. Deixe \"Qualquer\" para não restringir aquele atributo. Os dias de BAI (3, 10, 17, 24) não aparecem aqui.",
     "season": {
       "title": "Temporada atual",
-      "help": "Efeito que atordoa o chefe nesta temporada (28 dias). Vale para todos os dias do modo; troque quando a temporada mudar.",
-      "effectOf": "Efeito da {{mode}}"
+      "help": "Par de efeitos que atordoa o chefe nesta temporada (28 dias): o primeiro na BAX, o segundo na BAL. Vale para todos os dias do modo; troque quando a temporada mudar."
     }
   },
   "metas": {
@@ -244,9 +243,11 @@
     "video": "Vídeo geral (qualquer modo, opcional)",
     "videoHint": "Link do YouTube (vídeo ou Shorts; use ?t= para começar no trecho certo) ou de um arquivo .mp4/.webm. Toca mudo e em loop; o vídeo não é guardado no sistema.",
     "add": "Adicionar rotação",
-    "effect": "Temporada",
     "english": "Em inglês (opcional; o espanhol usa o mesmo)",
     "videoOf": "Vídeo de demonstração na {{mode}}",
+    "seasonVideos": "Vídeos por temporada (opcional)",
+    "seasonVideosHelp": "A rotação é a mesma em todas as temporadas; só o vídeo muda. Deixe vazio para usar o vídeo do modo.",
+    "videoOfSeason": "Vídeo na {{mode}} ({{effect}})",
     "suggestVideo": "Sugerir vídeo",
     "scoring": {
       "title": "Modos em que pontua (Causador de Dano)",

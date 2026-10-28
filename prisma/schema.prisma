@@ -87,9 +87,8 @@ model Settings {
   dayTurnoverHour Int      @default(12)
   weeklyResetHour Int      @default(22)
   baiWeekday      Int      @default(3)
-  // Temporada atual: efeito que atordoa o chefe em todos os dias de BAX e de BAL.
-  baxEffect       String   @default("PARALYSIS")
-  balEffect       String   @default("SHOCK")
+  // Temporada atual (SEASONS): o par de efeitos que atordoa o chefe na BAX e na BAL.
+  season          String   @default("PARALYSIS_SHOCK")
   // Dias de BAX/BAL sem restrição e a BAI com as mesmas equipes e reservas: editar um copia para os outros.
   syncFreeDays    Boolean  @default(true)
   createdAt       DateTime @default(now())
@@ -174,8 +173,6 @@ model Rotation {
   agent         Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
   uniformId     String?
   uniform       Uniform? @relation("RotationUniform", fields: [uniformId], references: [id], onDelete: Cascade)
-  // Temporada (efeito do chefe) da rotação; null = vale para todas.
-  effect        String?
   position      Int
   title         String?
   titleEn       String?
@@ -188,6 +185,9 @@ model Rotation {
   videoBal      String?
   videoBai      String?
   videoUrl      String?
+  // Demonstração em cada temporada, por efeito do chefe ({ "PARALYSIS": url, ... }): a rotação é a
+  // mesma o ano todo, só o vídeo muda. Sem vídeo do efeito, vale o do modo.
+  effectVideos  Json     @default("{}")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 

@@ -363,11 +363,16 @@
     "BURN": "Quemadura",
     "FRACTURE": "Fractura",
     "SHOCK": "Choque",
-    "TRAP": "Trampa",
-    "all": "Todas las temporadas"
+    "TRAP": "Trampa"
+  },
+  "seasons": {
+    "PARALYSIS_SHOCK": "Parálisis y Choque",
+    "SILENCE_TRAP": "Silencio y Trampa",
+    "BURN_FRACTURE": "Quemadura y Fractura"
   },
   "season": {
     "stunHint": "Temporada actual: aturde al jefe con {{effect}}",
-    "stuns": "Aturde al jefe ({{effect}})"
+    "stuns": "Aturde al jefe ({{effect}})",
+    "current": "Actual"
   }
 }

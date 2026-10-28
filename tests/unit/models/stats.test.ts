@@ -22,7 +22,7 @@ const EMPTY = { solo: [], support: [] };
 const modeDay = (teams: MetaTeam[]) => ({ criteria: [], metaTeams: teams, priority: EMPTY, reserves: EMPTY });
 
 const cycle: CycleOverview = {
-  season: { BAX: "PARALYSIS", BAL: "SHOCK" },
+  season: { id: "PARALYSIS_SHOCK", BAX: "PARALYSIS", BAL: "SHOCK" },
   days: [
     { number: 1, weekday: "QUI", week: 1, isBai: false, bax: modeDay([team(true, ["a", "b", "c"]), team(false, ["a", "d", "e"])]), bal: modeDay([team(true, ["a", "x", "y"])]) },
     { number: 3, weekday: "SÁB", week: 1, isBai: true, bax: null, bal: null },

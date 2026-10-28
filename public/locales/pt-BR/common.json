@@ -363,11 +363,16 @@
     "BURN": "Queimadura",
     "FRACTURE": "Fratura",
     "SHOCK": "Choque",
-    "TRAP": "Armadilha",
-    "all": "Todas as temporadas"
+    "TRAP": "Armadilha"
+  },
+  "seasons": {
+    "PARALYSIS_SHOCK": "Paralisia e Choque",
+    "SILENCE_TRAP": "Silêncio e Armadilha",
+    "BURN_FRACTURE": "Queimadura e Fratura"
   },
   "season": {
     "stunHint": "Temporada atual: atordoe o chefe com {{effect}}",
-    "stuns": "Atordoa o chefe ({{effect}})"
+    "stuns": "Atordoa o chefe ({{effect}})",
+    "current": "Atual"
   }
 }
