@@ -42,6 +42,8 @@ function App({ Component, pageProps }: AppProps) {
     // Erros graves (rede, banco, servidor, acesso negado, sessão) viram o alerta fixo na tela, de
     // qualquer consulta ou ação; os leves ficam com cada tela (notificação ou o aviso da própria tela).
     const onError = (e: Error) => {
+      // Site em manutenção vale para qualquer rota, inclusive o login e o /api/auth/me.
+      if (classifyError(e) === "MAINTENANCE") return notifyErrorClient(i18n.t.bind(i18n), e);
       // Senha errada (401) e bloqueio (429) no login aparecem no próprio formulário.
       if (e instanceof ApiError && e.url?.startsWith("/api/auth/")) return;
       if (e instanceof ApiError && e.status === 401) client.setQueryData(["me"], null);

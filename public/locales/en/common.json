@@ -323,6 +323,10 @@
       "title": "Can't reach the database",
       "text": "The server couldn't access the data right now. Try again in a moment; if it keeps happening, tell an administrator."
     },
+    "MAINTENANCE": {
+      "title": "Site under maintenance",
+      "text": "A bigger part of the site is being built and the database is being updated, so the site is down for a few minutes. Nothing you've marked is lost."
+    },
     "SERVER": {
       "title": "Server error",
       "text": "Something went wrong on our side. Try again; if it keeps happening, tell an administrator."
@@ -374,5 +378,10 @@
     "stunHint": "Current season: stun the boss with {{effect}}",
     "stuns": "Stuns the boss ({{effect}})",
     "current": "Current"
+  },
+  "maintenance": {
+    "autoCheck": "This screen checks again every 30 seconds and takes you back to the site as soon as everything is ready.",
+    "retry": "Try now",
+    "checking": "Checking…"
   }
 }

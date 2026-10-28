@@ -9,7 +9,7 @@ import type { SessionData } from "@/server/session";
  * (voltando depois para onde a pessoa ia) e APIs respondem 401. Cada rota de API também confere a
  * sessão no banco (requireUser/requireRole); aqui é a primeira barreira, sem acessar o banco.
  */
-const PUBLIC_APIS = new Set(["/api/auth/login", "/api/auth/logout", "/api/auth/me"]);
+const PUBLIC_APIS = new Set(["/api/auth/login", "/api/auth/logout", "/api/auth/me", "/api/health"]);
 const LOCALE_PREFIX = /^\/(pt-BR|en|es)(?=\/|$)/;
 
 async function hasSession(request: NextRequest) {
