@@ -66,6 +66,10 @@ function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
     // Seleções do usuário salvas no aparelho (localStorage).
     useSelectionsStore.persist.rehydrate();
+    // App instalável (PWA). Fora do build de produção, o cache do service worker atrapalharia o dev.
+    if (process.env.NODE_ENV === "production" && "serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js", { scope: "/", updateViaCache: "none" }).catch(() => undefined);
+    }
   }, []);
 
   return (
