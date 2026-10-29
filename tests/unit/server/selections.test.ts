@@ -24,12 +24,14 @@ describe("selectionsService", () => {
     expect(doc?.nickname).toBe("TenMenezes");
   });
 
-  it("as pontuações do jogador (dia e modo) e o CTP 2 voltam da conta", async () => {
+  it("as pontuações do jogador (dia e modo), a temporada de cada ciclo e o CTP 2 voltam da conta", async () => {
     const u = await createUser();
     const scores = { "2026-10-22|BAX": 1250000, "2026-10-24|BAI": 3400000 };
-    await putSelections(u.id, { ...emptySelections(), scores, equipment: { ctpByAgent: { a: "c1" }, ctp2ByAgent: { a: "c2" } } });
+    const scoreSeasons = { "2026-10-01": "PARALYSIS_SHOCK" as const };
+    await putSelections(u.id, { ...emptySelections(), scores, scoreSeasons, equipment: { ctpByAgent: { a: "c1" }, ctp2ByAgent: { a: "c2" } } });
     const doc = await getSelections(u.id);
     expect(doc?.scores).toEqual(scores);
+    expect(doc?.scoreSeasons).toEqual(scoreSeasons);
     expect(doc?.equipment.ctp2ByAgent).toEqual({ a: "c2" });
   });
 

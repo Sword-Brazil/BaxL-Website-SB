@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { BATTLE_DAY_NUMBERS, SLOTS } from "@/models/domain/enums";
+import { BATTLE_DAY_NUMBERS, SEASONS, SLOTS } from "@/models/domain/enums";
 import { MAX_SCORE, SCORE_KEY_RE } from "@/models/rules/scores";
 import { idSchema } from "./common";
 import { VALIDATION } from "./messages";
@@ -62,6 +62,14 @@ export const UserSelectionsSchema = z.object({
   scores: z
     .record(z.string().regex(SCORE_KEY_RE), z.number().int().min(0).max(MAX_SCORE))
     .refine((s) => Object.keys(s).length <= 5000)
+    .optional(),
+  /**
+   * Temporada do jogo (par de efeitos) de cada ciclo de 28 dias com pontuação, pela data do Dia 1.
+   * A administração troca a temporada sem guardar histórico; aqui fica a que valia em cada ciclo.
+   */
+  scoreSeasons: z
+    .record(z.string().regex(/^\d{4}-\d{2}-\d{2}$/), z.enum(SEASONS))
+    .refine((s) => Object.keys(s).length <= 500)
     .optional(),
 });
 export type UserSelections = z.infer<typeof UserSelectionsSchema>;

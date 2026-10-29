@@ -12,6 +12,7 @@ import {
   scoreKey,
   scoreSummary,
   seasonDays,
+  seasonTotal,
   seasonWeeks,
   seasonsWithScores,
 } from "@/models/rules/scores";
@@ -109,6 +110,36 @@ describe("dia do reset (antes e depois das 22h)", () => {
 
   it("a semana atual, no dia do reset, começa só com o que veio depois das 22h", () => {
     expect(scoreSummary(r, ANCHOR, "2026-10-15").week.current).toBe(50 + N1);
+  });
+
+  it("antes das 22h do dia do reset, os cartões ainda são da semana que acaba (com a parte de hoje)", () => {
+    const s = scoreSummary(r, ANCHOR, "2026-10-15", true);
+    expect(s.counted).toEqual({ week: 2, seasonStart: "2026-10-01" });
+    expect(s.week.current).toBe(100 + N2 + 30 + N1);
+    // Depois das 22h: semana nova, e a que fechou aparece como semana anterior.
+    const after = scoreSummary(r, ANCHOR, "2026-10-15");
+    expect(after.counted.week).toBe(3);
+    expect(after.lastWeek).toBe(100 + N2 + 30 + N1);
+  });
+
+  it("antes das 22h do Dia 1, a temporada ainda é a que acaba (a semana completa não some)", () => {
+    // Semana 4 inteira (22–28/10) mais o Dia 1 (29/10) antes do reset.
+    const full = {
+      [scoreKey("2026-10-22", "BAX")]: 10,
+      [scoreKey("2026-10-28", "BAL")]: 20,
+      [scoreKey("2026-10-29", "BAX", "pre")]: 5,
+    };
+    const before = scoreSummary(full, ANCHOR, "2026-10-29", true);
+    expect(before.counted).toEqual({ week: 4, seasonStart: "2026-10-01" });
+    expect(before.week.current).toBe(35 + 2 * N1 + N2);
+    expect(before.season.current).toBe(35 + 2 * N1 + N2);
+    // Depois das 22h: temporada nova, vazia, e a Semana 4 fechada fica como semana anterior.
+    const after = scoreSummary(full, ANCHOR, "2026-10-29");
+    expect(after.counted).toEqual({ week: 1, seasonStart: "2026-10-29" });
+    expect(after.season.current).toBeNull();
+    expect(after.lastWeek).toBe(35 + 2 * N1 + N2);
+    // O total da temporada que acabou continua no comparativo.
+    expect(seasonTotal(seasonWeeks(full, ANCHOR, "2026-10-01", "2026-10-29")).current).toBe(35 + 2 * N1 + N2);
   });
 
   it("a parte antes do reset do Dia 1 é da temporada anterior", () => {

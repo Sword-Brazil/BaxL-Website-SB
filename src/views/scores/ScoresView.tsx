@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { WEEKDAYS, weekdayOf } from "@/models/domain/enums";
+import { WEEKDAYS, weekdayOf, type SeasonId } from "@/models/domain/enums";
 import { addDays, parsePoints, type Comparison } from "@/models/rules/scores";
 import { useScoresViewModel, type ScoresViewModel } from "@/viewmodels/useScoresViewModel";
 import { HelpHint } from "@/views/layout/HelpHint";
@@ -44,6 +44,12 @@ function useFormat() {
     pct: (v: number) => `${v > 0 ? "+" : ""}${percent.format(v)}`,
     date: (d: string) => date.format(new Date(`${d}T00:00:00Z`)),
   };
+}
+
+/** "Temporada · Paralisia e Choque" (só o rótulo, sem a temporada do jogo conhecida). */
+function useSeasonName() {
+  const { t } = useTranslation("common");
+  return (id: SeasonId | null, label: string) => (id ? `${label} · ${t(`seasons.${id}`)}` : label);
 }
 
 /** Antes do reset das 22h: cadeado e contagem regressiva. */
@@ -84,7 +90,7 @@ function GrowthBadge({ cmp, className }: { cmp: Comparison; className?: string }
 }
 
 /** Cartão de número com crescimento, no estilo dos "section cards" do dashboard do shadcn. */
-function StatCard({ label, cmp, footer }: { label: string; cmp: Comparison; footer?: string }) {
+function StatCard({ label, cmp, footer, note }: { label: string; cmp: Comparison; footer?: string; note?: string }) {
   const { t } = useTranslation("scores");
   const f = useFormat();
   return (
@@ -108,6 +114,7 @@ function StatCard({ label, cmp, footer }: { label: string; cmp: Comparison; foot
           </span>
         )}
         {footer && <span>{footer}</span>}
+        {note && <span className="font-medium text-foreground">{note}</span>}
       </CardFooter>
     </Card>
   );
@@ -115,17 +122,24 @@ function StatCard({ label, cmp, footer }: { label: string; cmp: Comparison; foot
 
 function SummaryCards({ vm }: { vm: ScoresViewModel }) {
   const { t } = useTranslation("scores");
+  const seasonName = useSeasonName();
   const f = useFormat();
   const s = vm.summary;
-  if (!s || !vm.current) return null;
+  if (!s) return null;
   return (
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       <StatCard label={t("cards.today")} cmp={s.today} footer={t("cards.todayFooter")} />
-      <StatCard label={t("cards.week", { n: vm.current.week })} cmp={s.week} footer={t("cards.weekFooter")} />
+      {/* No dia do reset, antes das 22h, ainda é a semana (e a temporada) que acaba. */}
       <StatCard
-        label={t("cards.season")}
+        label={t("cards.week", { n: s.counted.week })}
+        cmp={s.week}
+        footer={t("cards.weekFooter")}
+        note={s.lastWeek === null ? undefined : t("cards.lastWeek", { value: f.n(s.lastWeek) })}
+      />
+      <StatCard
+        label={seasonName(vm.gameSeasonOf(s.counted.seasonStart), t("cards.season"))}
         cmp={s.season}
-        footer={t("cards.seasonFooter", { count: s.seasonDays, date: f.date(vm.current.seasonStart) })}
+        footer={t("cards.seasonFooter", { count: s.seasonDays, date: f.date(s.counted.seasonStart) })}
       />
       <Card className="bg-linear-to-t from-energy/5 to-card">
         <CardHeader>
@@ -478,7 +492,8 @@ function CompareTable({ rows, unit }: { rows: CompareRow[]; unit: string }) {
 function PerformanceCard({ vm }: { vm: ScoresViewModel }) {
   const { t } = useTranslation(["scores", "common"]);
   const f = useFormat();
-  const seasonLabel = (start: string) => `${f.date(start)} – ${f.date(addDays(start, 27))}`;
+  const seasonName = useSeasonName();
+  const seasonLabel = (start: string) => seasonName(vm.gameSeasonOf(start), `${f.date(start)} – ${f.date(addDays(start, 27))}`);
   const days: CompareRow[] = vm.days.map((d) => ({
     ...d,
     label: `D${d.cycleDay}`,
@@ -518,6 +533,17 @@ function PerformanceCard({ vm }: { vm: ScoresViewModel }) {
                 ))}
               </SelectContent>
             </Select>
+          )}
+          {/* Total da temporada escolhida (soma das semanas), contra o mês anterior até o mesmo ponto. */}
+          {vm.total.current !== null && (
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border bg-energy/5 px-3 py-2">
+              <span className="text-xs text-muted-foreground">{vm.season ? seasonName(vm.gameSeasonOf(vm.season), t("scores:chart.total")) : t("scores:chart.total")}</span>
+              <span className="font-heading text-xl font-bold tabular-nums">{f.n(vm.total.current)}</span>
+              <GrowthBadge cmp={vm.total} />
+              {vm.total.previous !== null && (
+                <span className="text-xs text-muted-foreground">{t("scores:compare.previousWas", { value: f.n(vm.total.previous) })}</span>
+              )}
+            </div>
           )}
           {empty && (
             <p className="absolute inset-x-6 top-1/3 z-10 rounded-md border border-dashed bg-card/90 p-6 text-center text-sm text-muted-foreground">

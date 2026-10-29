@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { SLOTS, type Mode, type Slot } from "@/models/domain/enums";
+import { SLOTS, type Mode, type SeasonId, type Slot } from "@/models/domain/enums";
 import { equipCtp, type CtpSlot } from "@/models/rules/ctpAssign";
 import { scoreKey, type ScoreMode, type ScorePhase } from "@/models/rules/scores";
 import { emptySelections } from "@/models/rules/selections";
@@ -41,6 +41,8 @@ interface SelectionsState {
   applyTeamTo: (teamKeys: TeamKey[], team: UserTeam) => void;
   /** Pontuação do jogador num dia de jogo, modo e parte do dia (null apaga). */
   setScore: (date: string, mode: ScoreMode, points: number | null, phase?: ScorePhase) => void;
+  /** Temporada do jogo que valeu no ciclo que começa em `seasonStart` (Dia 1). */
+  setScoreSeason: (seasonStart: string, season: SeasonId) => void;
   resetMode: (mode: Mode) => void;
   /** Apaga todas as equipes montadas (BAX, BAL e BAI); elenco, CTPs e nome ficam. */
   resetAllTeams: () => void;
@@ -153,6 +155,11 @@ export const useSelectionsStore = create<SelectionsState>()(
           else scores[scoreKey(date, mode, phase)] = points;
           return { doc: touch(doc, { scores }) };
         }),
+
+      setScoreSeason: (seasonStart, season) =>
+        set(({ doc }) =>
+          doc.scoreSeasons?.[seasonStart] === season ? {} : { doc: touch(doc, { scoreSeasons: { ...doc.scoreSeasons, [seasonStart]: season } }) },
+        ),
 
       resetMode: (mode) =>
         set(({ doc }) => ({

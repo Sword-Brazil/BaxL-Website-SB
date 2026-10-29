@@ -106,3 +106,35 @@ describe("ctpsOfUses", () => {
     ]);
   });
 });
+
+describe("filtro de papel (Causador de Dano ou Suporte/Líder)", () => {
+  // Na Meta do Dia 1 (BAX), "b" é o Causador de Dano; nas outras, ninguém.
+  const dd: CycleOverview = {
+    ...cycle,
+    days: [
+      {
+        ...cycle.days[0],
+        bax: modeDay([{ ...team(true, ["a", "b", "c"]), members: team(true, ["a", "b", "c"]).members.map((m) => ({ ...m, isDamageDealer: m.uniformId === "b" })) }]),
+      },
+    ],
+  };
+
+  it("Metas: conta só as aparições no papel escolhido", () => {
+    expect(agentRepetition(dd, agentOf, { mode: "ALL", includeAlternatives: false, role: "DAMAGE" }).map((r) => r.agentId)).toEqual(["b"]);
+    const supports = agentRepetition(dd, agentOf, { mode: "ALL", includeAlternatives: false, role: "SUPPORT" });
+    expect(supports.some((r) => r.agentId === "b" && r.uses.some((u) => u.mode === "BAX"))).toBe(false);
+    expect(supports.find((r) => r.agentId === "a")?.total).toBe(2); // BAX e BAL do Dia 1
+  });
+
+  it("minhas equipes: o Causador de Dano é quem tem Striker escolhido", () => {
+    const teams = {
+      "BAX-1": { SOLO: { uniformId: "a", ctpId: null }, SUPPORT_1: { uniformId: "b", ctpId: null, strikerUniformId: "s" } },
+      "BAL-1": { SOLO: { uniformId: "b", ctpId: null } },
+    };
+    expect(myAgentRepetition(teams, agentOf, "ALL", undefined, "DAMAGE")).toMatchObject([{ agentId: "b", total: 1 }]);
+    expect(myAgentRepetition(teams, agentOf, "ALL", undefined, "SUPPORT").map((r) => [r.agentId, r.total])).toEqual([
+      ["a", 1],
+      ["b", 1],
+    ]);
+  });
+});
