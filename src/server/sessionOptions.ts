@@ -28,6 +28,16 @@ export function shortSessionOptions(): SessionOptions {
   return { ...base, cookieOptions: { ...base.cookieOptions, maxAge: undefined } };
 }
 
+/**
+ * Com "manter logado", o cookie é regravado (mais 30 dias) no máximo uma vez por dia em que o site
+ * é aberto: quem usa o site não precisa entrar de novo, só quem ficar 30 dias sem abrir.
+ */
+export const RENEW_AFTER_MS = 24 * 60 * 60 * 1000;
+
+export function shouldRenewSession(data: { userId?: string; remember?: boolean; renewedAt?: number }, now = Date.now()): boolean {
+  return !!data.userId && data.remember !== false && (data.renewedAt === undefined || now - data.renewedAt >= RENEW_AFTER_MS);
+}
+
 /** A sessão ainda vale? `expiresAt` só existe nas sessões sem "manter logado". */
 export function isSessionActive(data: { userId?: string; expiresAt?: number }, now = Date.now()): boolean {
   return !!data.userId && (data.expiresAt === undefined || now < data.expiresAt);

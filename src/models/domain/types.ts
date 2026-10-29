@@ -12,6 +12,7 @@ import type {
   Gender,
   PriorityRole,
   Role,
+  SeasonId,
   Side,
   Slot,
   Species,
@@ -93,8 +94,6 @@ export interface Rotation {
   id: string;
   agentId: string;
   uniformId: string | null;
-  /** Temporada (efeito do chefe) em que a rotação vale; null = todas. */
-  effect: BossEffect | null;
   position: number;
   title: string | null;
   titleEn: string | null;
@@ -109,11 +108,17 @@ export interface Rotation {
   videoBax: string | null;
   videoBal: string | null;
   videoBai: string | null;
+  /**
+   * Demonstração em cada temporada, pelo efeito do chefe (cada efeito é uma temporada num modo):
+   * na BAX da temporada vale o vídeo do efeito dela; sem ele, o videoBax (idem BAL).
+   */
+  effectVideos: Partial<Record<BossEffect, string>>;
   updatedAt: string;
 }
 
 /** Temporada atual: efeito que atordoa o chefe em todos os dias de cada modo. */
 export interface Season {
+  id: SeasonId;
   BAX: BaxEffect;
   BAL: BalEffect;
 }

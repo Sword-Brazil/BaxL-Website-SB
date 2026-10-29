@@ -40,7 +40,7 @@ export const CRITERION_VALUES = {
 
 /**
  * Efeito que atordoa o chefe da BA. Cada temporada (um ciclo de 28 dias) tem um efeito na BAX e
- * outro na BAL; a curadoria escolhe os dois. Trajes com skill desse efeito atordoam o chefe.
+ * outro na BAL (ver SEASONS). Trajes com skill desse efeito atordoam o chefe.
  */
 export const BAX_EFFECTS = ["SILENCE", "PARALYSIS", "BURN"] as const;
 export const BAL_EFFECTS = ["FRACTURE", "SHOCK", "TRAP"] as const;
@@ -49,6 +49,20 @@ export type BalEffect = (typeof BAL_EFFECTS)[number];
 export const BOSS_EFFECTS = [...BAX_EFFECTS, ...BAL_EFFECTS] as const;
 export type BossEffect = (typeof BOSS_EFFECTS)[number];
 export const EFFECTS_BY_MODE: Record<DayMode, readonly BossEffect[]> = { BAX: BAX_EFFECTS, BAL: BAL_EFFECTS };
+
+/** As 3 temporadas do jogo, cada uma com um par fixo de efeitos: o da BAX e o da BAL. */
+export const SEASONS = ["PARALYSIS_SHOCK", "SILENCE_TRAP", "BURN_FRACTURE"] as const;
+export type SeasonId = (typeof SEASONS)[number];
+export const SEASON_EFFECTS: Record<SeasonId, { BAX: BaxEffect; BAL: BalEffect }> = {
+  PARALYSIS_SHOCK: { BAX: "PARALYSIS", BAL: "SHOCK" },
+  SILENCE_TRAP: { BAX: "SILENCE", BAL: "TRAP" },
+  BURN_FRACTURE: { BAX: "BURN", BAL: "FRACTURE" },
+};
+export const DEFAULT_SEASON: SeasonId = "PARALYSIS_SHOCK";
+
+/** Temporada a que um efeito pertence (cada efeito está em uma só). */
+export const seasonOfEffect = (effect: BossEffect): SeasonId =>
+  SEASONS.find((s) => SEASON_EFFECTS[s].BAX === effect || SEASON_EFFECTS[s].BAL === effect)!;
 
 export const CTP_TYPES = [
   "RAGE", // Fúria

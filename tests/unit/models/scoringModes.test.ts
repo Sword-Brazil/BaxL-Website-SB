@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { effectiveScoringModes, modeOfTeam, rotationVideos, sortModes, videoSearchUrl } from "@/models/rules/scoringModes";
+import { effectiveScoringModes, hasSeasonVideos, modeOfTeam, rotationVideos, sortModes, videoSearchUrl } from "@/models/rules/scoringModes";
 
 describe("modos em que o personagem pontua", () => {
   it("o modo vem do dia, da BAI ou da BAL livre", () => {
@@ -19,12 +19,26 @@ describe("modos em que o personagem pontua", () => {
 
 describe("vídeos da rotação", () => {
   it("o geral primeiro, depois cada modo que tiver vídeo", () => {
-    expect(rotationVideos({ videoUrl: "g", videoBax: null, videoBal: "l", videoBai: "i" })).toEqual([
-      { mode: null, url: "g" },
-      { mode: "BAL", url: "l" },
-      { mode: "BAI", url: "i" },
+    expect(rotationVideos({ videoUrl: "g", videoBax: null, videoBal: "l", videoBai: "i", effectVideos: {} }, null)).toEqual([
+      { mode: null, url: "g", seasonal: false },
+      { mode: "BAL", url: "l", seasonal: false },
+      { mode: "BAI", url: "i", seasonal: false },
     ]);
-    expect(rotationVideos({ videoUrl: null, videoBax: null, videoBal: null, videoBai: null })).toEqual([]);
+    expect(rotationVideos({ videoUrl: null, videoBax: null, videoBal: null, videoBai: null, effectVideos: {} }, "PARALYSIS_SHOCK")).toEqual([]);
+  });
+
+  it("na BAX e na BAL vale o vídeo da temporada; sem ele, o do modo", () => {
+    const r = { videoUrl: null, videoBax: "x", videoBal: "l", videoBai: null, effectVideos: { PARALYSIS: "p", TRAP: "t" } };
+    expect(rotationVideos(r, "PARALYSIS_SHOCK")).toEqual([
+      { mode: "BAX", url: "p", seasonal: true },
+      { mode: "BAL", url: "l", seasonal: false },
+    ]);
+    expect(rotationVideos(r, "SILENCE_TRAP")).toEqual([
+      { mode: "BAX", url: "x", seasonal: false },
+      { mode: "BAL", url: "t", seasonal: true },
+    ]);
+    expect(hasSeasonVideos(r)).toBe(true);
+    expect(hasSeasonVideos({ effectVideos: {} })).toBe(false);
   });
 
   it("a sugestão é uma busca no YouTube pelo personagem e modo", () => {

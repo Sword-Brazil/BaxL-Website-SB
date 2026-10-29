@@ -67,14 +67,14 @@ describe("rotações por personagem", () => {
     await expect(saveAgentRotations("nao-existe", { rotations: [] })).rejects.toSatisfy((e) => e instanceof HttpError && e.status === 404);
   });
 
-  it("guarda a temporada de cada rotação (null = todas)", async () => {
+  it("guarda o vídeo de cada temporada pelo efeito (sem vídeo = nenhum)", async () => {
     const saved = await saveAgentRotations(agentId, {
       rotations: [
-        { uniformId: null, effect: "PARALYSIS", sequence: "1 2 3" },
-        { uniformId: null, effect: "SHOCK", sequence: "4 5 6" },
+        { uniformId: null, sequence: "1 2 3", effectVideos: { PARALYSIS: "https://youtu.be/dQw4w9WgXcQ", TRAP: "https://cdn.example.com/trap.mp4" } },
         { uniformId: null, sequence: "geral" },
       ],
     });
-    expect(saved.map((r) => r.effect)).toEqual(["PARALYSIS", "SHOCK", null]);
+    expect(saved.map((r) => r.effectVideos)).toEqual([{ PARALYSIS: "https://youtu.be/dQw4w9WgXcQ", TRAP: "https://cdn.example.com/trap.mp4" }, {}]);
+    expect((await listRotations())[0].effectVideos).toEqual(saved[0].effectVideos);
   });
 });

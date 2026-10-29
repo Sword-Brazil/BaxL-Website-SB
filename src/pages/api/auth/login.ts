@@ -14,14 +14,16 @@ export default handler({
     session.userId = user.id;
     session.sid = sid;
     session.loginAt = new Date().toISOString();
-    // "Manter logado": cookie de 30 dias. Sem ele: cookie de sessão, que vale até fechar o
-    // navegador (e no máximo 12 h), então o site volta a pedir o login.
+    // "Manter logado": cookie de 30 dias, renovado nos dias em que o site é aberto. Sem ele: cookie
+    // de sessão, que vale até fechar o navegador (e no máximo 12 h), então o site volta a pedir o login.
     session.remember = remember;
     if (remember) {
       delete session.expiresAt;
+      session.renewedAt = Date.now();
       session.updateConfig(sessionOptions());
     } else {
       session.expiresAt = Date.now() + SHORT_SESSION_MS;
+      delete session.renewedAt;
       session.updateConfig(shortSessionOptions());
     }
     await session.save();

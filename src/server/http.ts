@@ -14,6 +14,7 @@ export type ErrorCode =
   | "RATE_LIMITED"
   | "METHOD_NOT_ALLOWED"
   | "SERVICE_UNAVAILABLE"
+  | "MAINTENANCE"
   | "INTERNAL_ERROR";
 
 export class HttpError extends Error {
@@ -91,6 +92,25 @@ export function isDatabaseUnavailable(e: unknown): boolean {
   );
 }
 
+/**
+ * Códigos do Prisma de banco e código fora de sincronia: tabela ou coluna que não existe, ou dado
+ * num formato que o código não espera. Acontece quando o banco de produção recebe uma migração
+ * antes do código que a usa (ou o código sobe antes da migração).
+ */
+const SCHEMA_MISMATCH_CODES = new Set(["P2021", "P2022", "P2023"]);
+/** Os mesmos erros vindos do Postgres numa consulta SQL direta: tabela e coluna inexistentes. */
+const SCHEMA_MISMATCH_PG_CODES = new Set(["42P01", "42703"]);
+
+/** O banco está numa versão diferente da que o código espera (site em manutenção)? */
+export function isSchemaMismatch(e: unknown): boolean {
+  if (!(e instanceof Prisma.PrismaClientKnownRequestError)) return false;
+  if (SCHEMA_MISMATCH_CODES.has(e.code)) return true;
+  // Com o adaptador de driver (Prisma 7), o código do Postgres vem em driverAdapterError.cause.
+  const meta = e.meta as { code?: unknown; driverAdapterError?: { cause?: { originalCode?: unknown } } } | undefined;
+  const pgCode = meta?.driverAdapterError?.cause?.originalCode ?? meta?.code;
+  return e.code === "P2010" && SCHEMA_MISMATCH_PG_CODES.has(String(pgCode));
+}
+
 /** Roteia por método HTTP e converte HttpError no formato de erro padrão da API. */
 export function handler(handlers: Partial<Record<Method, Handler>>) {
   return async (req: NextApiRequest, res: NextApiResponse) => {
@@ -108,6 +128,10 @@ export function handler(handlers: Partial<Record<Method, Handler>>) {
       // Valor único repetido (ex.: dois trajes com o mesmo identificador): é um conflito, não um 500.
       if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
         return sendError(res, 409, "CONFLICT", "Já existe um registro com esse identificador");
+      }
+      if (isSchemaMismatch(e)) {
+        res.setHeader("Retry-After", "30");
+        return sendError(res, 503, "MAINTENANCE", "O site está em manutenção. Volte em alguns minutos.");
       }
       if (isDatabaseUnavailable(e)) {
         res.setHeader("Retry-After", "5");

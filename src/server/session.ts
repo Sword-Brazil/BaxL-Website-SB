@@ -4,7 +4,7 @@ import type { Role } from "@/models/domain/enums";
 import type { SessionUser } from "@/models/domain/types";
 import { prisma } from "@/server/db";
 import { HttpError } from "@/server/http";
-import { isSessionActive, sessionOptions, shortSessionOptions } from "@/server/sessionOptions";
+import { isSessionActive, sessionOptions, shortSessionOptions, shouldRenewSession } from "@/server/sessionOptions";
 
 export interface SessionData {
   userId?: string;
@@ -16,6 +16,8 @@ export interface SessionData {
   remember?: boolean;
   /** Fim da sessão curta (ms desde 1970). */
   expiresAt?: number;
+  /** Última vez que o cookie de "manter logado" foi regravado (ms desde 1970). */
+  renewedAt?: number;
 }
 
 export async function getSession(req: NextApiRequest, res: NextApiResponse) {
@@ -41,6 +43,10 @@ export async function getSessionUser(req: NextApiRequest, res: NextApiResponse):
   if (!user) {
     session.destroy();
     return null;
+  }
+  if (shouldRenewSession(session)) {
+    session.renewedAt = Date.now();
+    await session.save();
   }
   return toSessionUser(user);
 }

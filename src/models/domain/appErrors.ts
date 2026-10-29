@@ -8,6 +8,8 @@ export const APP_ERRORS = {
   NETWORK: "CRITICAL",
   /** O servidor não alcançou o banco de dados (503). */
   DATABASE: "CRITICAL",
+  /** Banco atualizado e código ainda não (ou o contrário): site em manutenção (503 MAINTENANCE). */
+  MAINTENANCE: "CRITICAL",
   /** Erro inesperado no servidor (500). */
   SERVER: "CRITICAL",
   /** Acesso indevido: sem permissão ou origem não permitida (403). */
@@ -31,14 +33,14 @@ export const appErrorChannel = (kind: AppErrorKind): "alert" | "toast" => (APP_E
 
 /** Tipo do erro a partir do status HTTP (ApiError) ou da falha de rede do fetch. */
 export function classifyError(error: unknown): AppErrorKind {
-  const status = (error as { status?: unknown } | null)?.status;
+  const { status, code } = (error ?? {}) as { status?: unknown; code?: unknown };
   if (typeof status !== "number") return error instanceof TypeError ? "NETWORK" : "UNKNOWN";
   if (status === 401) return "SESSION_EXPIRED";
   if (status === 403) return "FORBIDDEN";
   if (status === 404) return "NOT_FOUND";
   if (status === 409) return "CONFLICT";
   if (status === 429) return "RATE_LIMITED";
-  if (status === 503) return "DATABASE";
+  if (status === 503) return code === "MAINTENANCE" ? "MAINTENANCE" : "DATABASE";
   if (status >= 500) return "SERVER";
   if (status >= 400) return "INVALID";
   return "UNKNOWN";

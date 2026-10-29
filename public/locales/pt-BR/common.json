@@ -323,6 +323,10 @@
       "title": "Sem conexão com o banco de dados",
       "text": "O servidor não conseguiu acessar os dados agora. Tente de novo em instantes; se continuar, avise um administrador."
     },
+    "MAINTENANCE": {
+      "title": "Site em manutenção",
+      "text": "Uma parte maior do site está sendo desenvolvida e o banco de dados está passando por mudanças. Por isso ele está fora do ar por alguns minutos. Nada do que você marcou se perde."
+    },
     "SERVER": {
       "title": "Erro no servidor",
       "text": "Algo deu errado do nosso lado. Tente de novo; se continuar, avise um administrador."
@@ -363,11 +367,21 @@
     "BURN": "Queimadura",
     "FRACTURE": "Fratura",
     "SHOCK": "Choque",
-    "TRAP": "Armadilha",
-    "all": "Todas as temporadas"
+    "TRAP": "Armadilha"
+  },
+  "seasons": {
+    "PARALYSIS_SHOCK": "Paralisia e Choque",
+    "SILENCE_TRAP": "Silêncio e Armadilha",
+    "BURN_FRACTURE": "Queimadura e Fratura"
   },
   "season": {
     "stunHint": "Temporada atual: atordoe o chefe com {{effect}}",
-    "stuns": "Atordoa o chefe ({{effect}})"
+    "stuns": "Atordoa o chefe ({{effect}})",
+    "current": "Atual"
+  },
+  "maintenance": {
+    "autoCheck": "Esta tela confere sozinha a cada 30 segundos e volta para o site assim que tudo estiver pronto.",
+    "retry": "Tentar agora",
+    "checking": "Conferindo…"
   }
 }
