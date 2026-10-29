@@ -50,8 +50,7 @@
     "help": "Elige un valor por atributo. Deja \"Cualquiera\" para no restringir ese atributo. Los días de BAI (3, 10, 17, 24) no aparecen aquí.",
     "season": {
       "title": "Temporada actual",
-      "help": "Efecto que aturde al jefe en esta temporada (28 días). Vale para todos los días del modo; cámbialo cuando cambie la temporada.",
-      "effectOf": "Efecto de la {{mode}}"
+      "help": "Par de efectos que aturde al jefe en esta temporada (28 días): el primero en la BAX, el segundo en la BAL. Vale para todos los días del modo; cámbialo cuando cambie la temporada."
     }
   },
   "metas": {
@@ -244,9 +243,11 @@
     "video": "Video general (cualquier modo, opcional)",
     "videoHint": "Enlace de YouTube (vídeo o Shorts; usa ?t= para empezar en el momento justo) o de un archivo .mp4/.webm. Se reproduce sin sonido y en bucle; el vídeo no se guarda en el sistema.",
     "add": "Añadir rotación",
-    "effect": "Temporada",
     "english": "En inglés (opcional; el español usa el mismo)",
     "videoOf": "Video de demostración en {{mode}}",
+    "seasonVideos": "Videos por temporada (opcional)",
+    "seasonVideosHelp": "La rotación es la misma en todas las temporadas; solo cambia el video. Déjalo vacío para usar el video del modo.",
+    "videoOfSeason": "Video en la {{mode}} ({{effect}})",
     "suggestVideo": "Sugerir video",
     "scoring": {
       "title": "Modos en los que puntúa (Causante de Daño)",

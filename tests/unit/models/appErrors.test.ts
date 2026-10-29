@@ -18,6 +18,12 @@ describe("padrão de erros do app", () => {
     expect(classifyError(new Error("qualquer"))).toBe("UNKNOWN");
   });
 
+  it("503 com código MAINTENANCE é manutenção (banco e código fora de sincronia), não banco fora do ar", () => {
+    expect(classifyError(new ApiError(503, "MAINTENANCE", "x"))).toBe("MAINTENANCE");
+    expect(classifyError(new ApiError(503, "SERVICE_UNAVAILABLE", "x"))).toBe("DATABASE");
+    expect(appErrorChannel("MAINTENANCE")).toBe("alert");
+  });
+
   it("graves (rede, banco, servidor, acesso negado, sessão) viram alerta fixo; o resto, notificação", () => {
     for (const kind of ["NETWORK", "DATABASE", "SERVER", "FORBIDDEN", "SESSION_EXPIRED"] as const) {
       expect(APP_ERRORS[kind]).toBe("CRITICAL");

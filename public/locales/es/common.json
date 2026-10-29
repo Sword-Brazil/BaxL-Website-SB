@@ -323,6 +323,10 @@
       "title": "Sin conexión con la base de datos",
       "text": "El servidor no pudo acceder a los datos ahora. Inténtalo en unos instantes; si sigue, avisa a un administrador."
     },
+    "MAINTENANCE": {
+      "title": "Sitio en mantenimiento",
+      "text": "Se está desarrollando una parte más grande del sitio y la base de datos está cambiando, por eso el sitio está caído unos minutos. Nada de lo que marcaste se pierde."
+    },
     "SERVER": {
       "title": "Error en el servidor",
       "text": "Algo salió mal de nuestro lado. Inténtalo de nuevo; si sigue, avisa a un administrador."
@@ -363,11 +367,21 @@
     "BURN": "Quemadura",
     "FRACTURE": "Fractura",
     "SHOCK": "Choque",
-    "TRAP": "Trampa",
-    "all": "Todas las temporadas"
+    "TRAP": "Trampa"
+  },
+  "seasons": {
+    "PARALYSIS_SHOCK": "Parálisis y Choque",
+    "SILENCE_TRAP": "Silencio y Trampa",
+    "BURN_FRACTURE": "Quemadura y Fractura"
   },
   "season": {
     "stunHint": "Temporada actual: aturde al jefe con {{effect}}",
-    "stuns": "Aturde al jefe ({{effect}})"
+    "stuns": "Aturde al jefe ({{effect}})",
+    "current": "Actual"
+  },
+  "maintenance": {
+    "autoCheck": "Esta pantalla vuelve a comprobar cada 30 segundos y te lleva de vuelta al sitio en cuanto todo esté listo.",
+    "retry": "Intentar ahora",
+    "checking": "Comprobando…"
   }
 }

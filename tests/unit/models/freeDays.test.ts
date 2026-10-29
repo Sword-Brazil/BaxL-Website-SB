@@ -7,7 +7,7 @@ const mode = (criteria: { attribute: "GENDER"; value: string }[]) => ({ criteria
 const female = [{ attribute: "GENDER" as const, value: "FEMALE" }];
 
 const cycle: CycleOverview = {
-  season: { BAX: "PARALYSIS", BAL: "SHOCK" },
+  season: { id: "PARALYSIS_SHOCK", BAX: "PARALYSIS", BAL: "SHOCK" },
   days: [
     { number: 1, weekday: "QUI", week: 1, isBai: false, bax: mode([]), bal: mode(female) },
     { number: 2, weekday: "SEX", week: 1, isBai: false, bax: mode(female), bal: mode([]) },

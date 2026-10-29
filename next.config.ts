@@ -37,7 +37,11 @@ const SECURITY_HEADERS = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   async headers() {
-    return [{ source: "/:path*", headers: SECURITY_HEADERS }];
+    return [
+      { source: "/:path*", headers: SECURITY_HEADERS },
+      // Service worker sempre conferido no servidor: versão nova do site chega na próxima abertura.
+      { source: "/sw.js", headers: [{ key: "Cache-Control", value: "no-cache, no-store, must-revalidate" }] },
+    ];
   },
   i18n: i18nConfig.i18n,
   // /rotacoes/[slug] gera a página na hora (fallback: "blocking") e o serverSideTranslations lê a

@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { useTranslation } from "next-i18next/pages";
-import { ArrowDownIcon, ArrowUpIcon, PencilIcon, PlusIcon, SearchIcon, SwordIcon, Trash2Icon, TriangleAlertIcon } from "lucide-react";
+import { ArrowDownIcon, ArrowUpIcon, ChevronRightIcon, PencilIcon, PlusIcon, SearchIcon, SwordIcon, Trash2Icon, TriangleAlertIcon } from "lucide-react";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,10 +8,10 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { DAY_MODES, EFFECTS_BY_MODE, MODES, type BossEffect, type Mode } from "@/models/domain/enums";
+import { BOSS_EFFECTS, DAY_MODES, MODES, SEASON_EFFECTS, SEASONS, type Mode } from "@/models/domain/enums";
 import type { Agent } from "@/models/domain/types";
 import { parseRotationVideo } from "@/models/rules/rotationVideo";
 import { videoSearchUrl } from "@/models/rules/scoringModes";
@@ -21,14 +22,14 @@ import { HelpHint } from "@/views/layout/HelpHint";
 import { QueryState } from "@/views/shared/QueryState";
 import { RotationLegend, RotationText } from "@/views/shared/RotationSequence";
 import { RotationVideoPlayer } from "@/views/shared/RotationVideoPlayer";
-import { BossEffectBadge, BossEffectIcon } from "@/views/shared/BossEffect";
+import { SeasonLabel, seasonTint } from "@/views/shared/BossEffect";
 import { UniformPreview } from "@/views/rotations/UniformPreview";
 
 type Vm = ReturnType<typeof useRotationsEditorViewModel>;
 
 const ALL = "__all";
 
-/** Uma rotação: traje, temporada, título, sequência livre (com prévia), descrição e vídeo. */
+/** Uma rotação: traje, título, sequência livre (com prévia), descrição e vídeos (por modo e por temporada). */
 const VIDEO_FIELD = { BAX: "videoBax", BAL: "videoBal", BAI: "videoBai" } as const satisfies Record<Mode, keyof RotationDraft>;
 
 /** Link de vídeo (geral ou de um modo), com a validação, a prévia e a sugestão de busca no YouTube. */
@@ -138,7 +139,6 @@ function RotationEditor({ draft, index, total, agent, vm }: { draft: RotationDra
       <div className="flex items-center gap-2">
         <UniformPreview uniform={uniform} name={agent.name} fallbackSrc={agent.uniforms.find((u) => u.portrait)?.portrait} className="size-12" />
         <span className="font-heading text-xs tracking-widest text-spark uppercase">{t("admin:rotations.item", { n: index + 1 })}</span>
-        {draft.effect && <BossEffectBadge effect={draft.effect} />}
         <div className="ml-auto flex gap-1">
           <Button type="button" size="icon-sm" variant="ghost" disabled={index === 0} onClick={() => vm.move(draft.key, -1)} aria-label={t("admin:rotations.moveUp")}>
             <ArrowUpIcon />
@@ -151,29 +151,7 @@ function RotationEditor({ draft, index, total, agent, vm }: { draft: RotationDra
           </Button>
         </div>
       </div>
-      <div className="grid gap-3 sm:grid-cols-3">
-        <Field>
-          <FieldLabel htmlFor={id("effect")}>{t("admin:rotations.effect")}</FieldLabel>
-          <Select value={draft.effect ?? ALL} onValueChange={(v) => vm.update(draft.key, { effect: v === ALL ? null : (v as BossEffect) })}>
-            <SelectTrigger id={id("effect")} className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={ALL}>{t("common:effects.all")}</SelectItem>
-              {DAY_MODES.map((mode) => (
-                <SelectGroup key={mode}>
-                  <SelectLabel>{mode}</SelectLabel>
-                  {EFFECTS_BY_MODE[mode].map((e) => (
-                    <SelectItem key={e} value={e}>
-                      <BossEffectIcon effect={e} />
-                      {t(`common:effects.${e}`)}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              ))}
-            </SelectContent>
-          </Select>
-        </Field>
+      <div className="grid gap-3 sm:grid-cols-2">
         <Field>
           <FieldLabel htmlFor={id("uniform")}>{t("admin:rotations.uniform")}</FieldLabel>
           <Select value={draft.uniformId ?? ALL} onValueChange={(v) => vm.update(draft.key, { uniformId: v === ALL ? null : v })}>
@@ -263,7 +241,54 @@ function RotationEditor({ draft, index, total, agent, vm }: { draft: RotationDra
           onChange={(v) => vm.update(draft.key, { [VIDEO_FIELD[mode]]: v })}
         />
       ))}
+      <SeasonVideos draft={draft} agent={agent} vm={vm} />
     </li>
+  );
+}
+
+/**
+ * Vídeos por temporada: a rotação é a mesma o ano todo, mas a demonstração na BAX/BAL pode mudar
+ * com a temporada. Vazio = usa o vídeo do modo. Fechado enquanto não houver nenhum.
+ */
+function SeasonVideos({ draft, agent, vm }: { draft: RotationDraft; agent: Agent; vm: Vm }) {
+  const { t } = useTranslation("admin");
+  const filled = BOSS_EFFECTS.filter((e) => draft.effectVideos[e].trim()).length;
+  // Aberto de início só se já houver vídeo; depois, quem manda é o admin (não fecha ao apagar um link).
+  const [open, setOpen] = useState(filled > 0);
+  const modes = DAY_MODES.filter((m) => vm.scoringModes.includes(m) || SEASONS.some((s) => draft.effectVideos[SEASON_EFFECTS[s][m]].trim()));
+  if (!modes.length) return null;
+  return (
+    <details open={open} onToggle={(e) => setOpen(e.currentTarget.open)} className="group rounded-lg border border-dashed">
+      <summary className="flex cursor-pointer list-none items-center gap-2 p-3 text-sm font-medium [&::-webkit-details-marker]:hidden">
+        <ChevronRightIcon className="size-4 shrink-0 transition-transform group-open:rotate-90" />
+        <span className="min-w-0 flex-1">{t("rotations.seasonVideos")}</span>
+        {filled > 0 && <Badge variant="outline">{filled}</Badge>}
+      </summary>
+      <div className="flex flex-col gap-4 border-t border-dashed p-3">
+        <p className="text-xs text-muted-foreground">{t("rotations.seasonVideosHelp")}</p>
+        {SEASONS.map((season) => (
+          <div key={season} className="flex flex-col gap-3">
+            <p className="flex items-center gap-1.5 self-start rounded-full border px-2.5 py-1 text-xs font-medium" style={seasonTint(season)}>
+              <SeasonLabel season={season} />
+            </p>
+            {modes.map((mode) => {
+              const effect = SEASON_EFFECTS[season][mode];
+              return (
+                <VideoField
+                  key={mode}
+                  id={`video-${effect}-${draft.key}`}
+                  label={t("rotations.videoOfSeason", { mode, effect: t(`common:effects.${effect}`) })}
+                  value={draft.effectVideos[effect]}
+                  agent={agent}
+                  mode={mode}
+                  onChange={(v) => vm.setEffectVideo(draft.key, effect, v)}
+                />
+              );
+            })}
+          </div>
+        ))}
+      </div>
+    </details>
   );
 }
 

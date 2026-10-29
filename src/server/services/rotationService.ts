@@ -1,16 +1,21 @@
-import type { BossEffect } from "@/models/domain/enums";
+import { BOSS_EFFECTS } from "@/models/domain/enums";
 import type { Rotation } from "@/models/domain/types";
 import type { AgentRotationsInput } from "@/models/schemas/admin";
 import { prisma } from "@/server/db";
 import { HttpError } from "@/server/http";
 
-type DbRotation = Omit<Rotation, "updatedAt" | "effect"> & { effect: string | null; updatedAt: Date };
+type DbRotation = Omit<Rotation, "updatedAt" | "effectVideos"> & { effectVideos: unknown; updatedAt: Date };
+
+/** Só os efeitos conhecidos com link (o JSON do banco não tem tipo). */
+const toEffectVideos = (raw: unknown): Rotation["effectVideos"] => {
+  const obj = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
+  return Object.fromEntries(BOSS_EFFECTS.flatMap((e) => (typeof obj[e] === "string" && obj[e] ? [[e, obj[e]]] : [])));
+};
 
 const toRotation = (r: DbRotation): Rotation => ({
   id: r.id,
   agentId: r.agentId,
   uniformId: r.uniformId,
-  effect: r.effect as BossEffect | null,
   position: r.position,
   title: r.title,
   titleEn: r.titleEn,
@@ -21,6 +26,7 @@ const toRotation = (r: DbRotation): Rotation => ({
   videoBax: r.videoBax,
   videoBal: r.videoBal,
   videoBai: r.videoBai,
+  effectVideos: toEffectVideos(r.effectVideos),
   updatedAt: r.updatedAt.toISOString(),
 });
 
@@ -53,7 +59,6 @@ export async function saveAgentRotations(agentId: string, input: AgentRotationsI
         data: {
           agentId,
           uniformId: r.uniformId,
-          effect: r.effect ?? null,
           position,
           title: r.title || null,
           titleEn: r.titleEn || null,
@@ -64,6 +69,7 @@ export async function saveAgentRotations(agentId: string, input: AgentRotationsI
           videoBax: r.videoBax || null,
           videoBal: r.videoBal || null,
           videoBai: r.videoBai || null,
+          effectVideos: toEffectVideos(r.effectVideos),
         },
       });
     }

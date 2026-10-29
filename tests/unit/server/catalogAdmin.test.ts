@@ -98,9 +98,10 @@ describe("catálogo (admin)", () => {
 });
 
 describe("temporada", () => {
-  it("começa em Paralisia / Choque e troca BAX e BAL separadamente", async () => {
+  it("começa em Paralisia e Choque e troca o par inteiro (BAX e BAL juntos)", async () => {
     await prisma.settings.create({ data: { id: 1, cycleAnchor: new Date() } });
-    expect(await getSeason()).toEqual({ BAX: "PARALYSIS", BAL: "SHOCK" });
-    expect(await setSeason({ BAX: "BURN", BAL: "SHOCK" })).toEqual({ BAX: "BURN", BAL: "SHOCK" });
+    expect(await getSeason()).toEqual({ id: "PARALYSIS_SHOCK", BAX: "PARALYSIS", BAL: "SHOCK" });
+    expect(await setSeason({ id: "BURN_FRACTURE" })).toEqual({ id: "BURN_FRACTURE", BAX: "BURN", BAL: "FRACTURE" });
+    expect(await setSeason({ id: "SILENCE_TRAP" })).toEqual({ id: "SILENCE_TRAP", BAX: "SILENCE", BAL: "TRAP" });
   });
 });

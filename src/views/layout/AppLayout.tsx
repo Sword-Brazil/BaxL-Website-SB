@@ -22,7 +22,9 @@ import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuL
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { displayName } from "@/models/domain/types";
+import { useCriticalErrorStore } from "@/viewmodels/stores/criticalErrorStore";
 import { useAuthViewModel } from "@/viewmodels/useAuthViewModel";
+import { MaintenanceScreen } from "@/views/status/MaintenanceScreen";
 import { BrandMark } from "./BrandMark";
 import { CriticalErrorBanner } from "./CriticalErrorBanner";
 import { FontSizeMenu } from "./FontSizeMenu";
@@ -186,6 +188,8 @@ export function AppLayout({ title, children, wide = false }: { title?: string; c
   const { pathname } = useRouter();
   // Site privado: quem ainda não entrou (só vê a tela de login) não tem navegação.
   const { isLoggedIn } = useAuthViewModel();
+  // Banco e código fora de sincronia: a tela de manutenção ocupa o lugar de qualquer página.
+  const maintenance = useCriticalErrorStore((s) => s.kind === "MAINTENANCE");
   const pageTitle = title ? `${title} · ${t("brand.name")}` : t("brand.title");
 
   return (
@@ -263,9 +267,15 @@ export function AppLayout({ title, children, wide = false }: { title?: string; c
         </header>
 
         <main className={cn("mx-auto w-full flex-1 px-4 py-6", wide ? "max-w-7xl" : "max-w-6xl")}>
-          <CriticalErrorBanner />
-          <SecurityNotices />
-          {children}
+          {maintenance ? (
+            <MaintenanceScreen />
+          ) : (
+            <>
+              <CriticalErrorBanner />
+              <SecurityNotices />
+              {children}
+            </>
+          )}
         </main>
         <SelectionsSyncDialog />
 
