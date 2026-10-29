@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { SLOTS } from "@/models/domain/enums";
+import { useEffect, useState } from "react";
+import { SLOTS, type SeasonId } from "@/models/domain/enums";
 import { brtDateKey } from "@/models/rules/battleClock";
 import { dayCtpId } from "@/models/rules/ctpAssign";
 import {
@@ -34,9 +34,9 @@ import { useCatalogViewModel } from "./useCatalogViewModel";
  * servidor), quando a contagem começa.
  */
 export function useScoresViewModel() {
-  const { clock, settings, isLoading: clockLoading, isError, refetch } = useBattleClockViewModel();
+  const { clock, settings, season: gameSeason, isLoading: clockLoading, isError, refetch } = useBattleClockViewModel();
   const catalog = useCatalogViewModel();
-  const { doc, hydrated, setScore } = useSelectionsStore();
+  const { doc, hydrated, setScore, setScoreSeason } = useSelectionsStore();
   const [selected, setSelected] = useState<string | null>(null);
   /** Temporada dos gráficos (data do Dia 1); null = a atual. */
   const [seasonChoice, setSeason] = useState<string | null>(null);
@@ -83,6 +83,19 @@ export function useScoresViewModel() {
   // Cada dia e semana da temporada escolhida contra o mesmo dia e semana da anterior.
   const days = anchor && today && season ? seasonDays(scores, anchor, season, today) : [];
   const weeks = anchor && today && season ? seasonWeeks(scores, anchor, season, today) : [];
+
+  // Temporada do jogo (par de efeitos) que vale agora é a do ciclo que os cartões contam. Ela fica
+  // guardada no ciclo assim que ele tem pontuação, para o nome continuar depois que a administração
+  // trocar a temporada (sem histórico no servidor).
+  const countedSeason = summary?.counted.seasonStart ?? null;
+  const countedHasScores = !!anchor && !!countedSeason && scoreEntries(scores, anchor).some((e) => e.seasonStart === countedSeason);
+  const unlocked = hydrated && now !== null && now >= Date.parse(SCORES_UNLOCK_AT);
+  useEffect(() => {
+    if (unlocked && countedHasScores && countedSeason && gameSeason) setScoreSeason(countedSeason, gameSeason.id);
+  }, [unlocked, countedHasScores, countedSeason, gameSeason, setScoreSeason]);
+  /** Temporada do jogo de um ciclo (Dia 1): a guardada, ou a atual para o ciclo que está contando. */
+  const gameSeasonOf = (start: string): SeasonId | null =>
+    doc.scoreSeasons?.[start] ?? (start === countedSeason ? (gameSeason?.id ?? null) : null);
 
   // Histórico: mais recente primeiro, cada registro contra o mesmo dia e modo do mês anterior, com a
   // BA normal que entrou junto.
@@ -142,6 +155,7 @@ export function useScoresViewModel() {
     weeks,
     /** Total da temporada escolhida (soma das semanas) contra a anterior. */
     total: seasonTotal(weeks),
+    gameSeasonOf,
     summary,
     history,
     current,
