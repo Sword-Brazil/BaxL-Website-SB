@@ -261,16 +261,32 @@ export interface ScoreSummary {
   week: Comparison;
   /** Temporada atual (até hoje) contra a anterior até o mesmo dia. */
   season: Comparison;
+  /**
+   * Semana e temporada que os cartões mostram. No dia do reset, antes das 22h, ainda são as que
+   * estão acabando (a pontuação desse horário conta para elas).
+   */
+  counted: { week: number; seasonStart: string };
+  /** Total da semana fechada antes da semana dos cartões (null sem pontuação nela). */
+  lastWeek: number | null;
   seasonDays: number;
   best: { date: string; total: number } | null;
 }
 
-/** Números dos cartões: hoje, semana e temporada atuais (contra o mês anterior) e o melhor dia. */
-export function scoreSummary(scores: Record<string, number>, anchorDate: string, today: string): ScoreSummary {
-  const current = gameDayOf(today, anchorDate);
+/**
+ * Números dos cartões: hoje, semana e temporada atuais (contra o mês anterior) e o melhor dia.
+ * `beforeReset`: agora é antes do reset das 22h do dia do reset, então semana e temporada são as que
+ * acabam — até ontem, mais a parte de hoje antes do reset.
+ */
+export function scoreSummary(scores: Record<string, number>, anchorDate: string, today: string, beforeReset = false): ScoreSummary {
+  const closing = beforeReset && isResetDay(gameDayOf(today, anchorDate));
+  const until = closing ? addDays(today, -1) : today;
+  const current = gameDayOf(until, anchorDate);
   const weekStart = addDays(current.seasonStart, (current.week - 1) * WEEK_LENGTH);
   const period = (from: string) =>
-    compare(sumPeriod(scores, anchorDate, from, today), sumPeriod(scores, anchorDate, previousSeasonDate(from), previousSeasonDate(today)));
+    compare(
+      sumPeriod(scores, anchorDate, from, until, closing),
+      sumPeriod(scores, anchorDate, previousSeasonDate(from), previousSeasonDate(until), closing),
+    );
   const dates = [...new Set(scoreEntries(scores, anchorDate).map((e) => e.date))];
   const best = dates.reduce<{ date: string; total: number } | null>((b, d) => {
     const t = dayTotal(scores, d, anchorDate) ?? 0;
@@ -280,9 +296,20 @@ export function scoreSummary(scores: Record<string, number>, anchorDate: string,
     today: compare(dayTotal(scores, today, anchorDate), dayTotal(scores, previousSeasonDate(today), anchorDate)),
     week: period(weekStart),
     season: period(current.seasonStart),
+    counted: { week: current.week, seasonStart: current.seasonStart },
+    lastWeek: sumPeriod(scores, anchorDate, addDays(weekStart, -WEEK_LENGTH), addDays(weekStart, -1), true),
     seasonDays: dateRange(current.seasonStart, today).filter((d) => dayTotal(scores, d, anchorDate) !== null).length,
     best,
   };
+}
+
+/**
+ * Total da temporada (soma das semanas) contra a anterior. As semanas que ainda não chegaram ficam
+ * de fora dos dois lados, para a temporada em andamento comparar só até hoje.
+ */
+export function seasonTotal(weeks: SeasonWeek[]): Comparison {
+  const started = weeks.filter((w) => !w.future);
+  return compare(sumOf(started.map((w) => w.current ?? undefined)), sumOf(started.map((w) => w.previous ?? undefined)));
 }
 
 /** Lê o número digitado ("1.234.567", "1 234 567"); null se vazio ou inválido. */

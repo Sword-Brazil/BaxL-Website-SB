@@ -6,7 +6,7 @@ import { getCycle } from "@/models/api/cycle";
 import { ctpColor } from "@/models/domain/ctpColors";
 import { dayCtpId } from "@/models/rules/ctpAssign";
 import { ownedAgentIds, rosterAgents, uniformsInTeams } from "@/models/rules/roster";
-import { agentRepetition, ctpsOfUses, ctpUsage, myAgentRepetition, myTeamCompositions, type StatsMode } from "@/models/rules/stats";
+import { agentRepetition, ctpsOfUses, ctpUsage, myAgentRepetition, myTeamCompositions, type StatsMode, type StatsRole } from "@/models/rules/stats";
 import { renderStatsHtml } from "@/models/rules/statsExport";
 import { useSelectionsStore } from "./stores/selectionsStore";
 import { useCatalogViewModel } from "./useCatalogViewModel";
@@ -27,6 +27,7 @@ export function useStatsViewModel() {
   const catalog = useCatalogViewModel();
   const { doc, hydrated } = useSelectionsStore();
   const [mode, setMode] = useState<StatsMode>("ALL");
+  const [role, setRole] = useState<StatsRole>("ALL");
   const [source, setSource] = useState<RepetitionSource>("META");
   const [includeAlternatives, setIncludeAlternatives] = useState(false);
   const [showAll, setShowAll] = useState(false);
@@ -35,13 +36,13 @@ export function useStatsViewModel() {
   const repetition = useMemo(
     () =>
       source === "MINE"
-        ? myAgentRepetition(doc.teams, agentOf, mode, (pick, agentId) => dayCtpId(pick, doc.equipment, agentId))
+        ? myAgentRepetition(doc.teams, agentOf, mode, (pick, agentId) => dayCtpId(pick, doc.equipment, agentId), role)
         : cycle.data
-          ? agentRepetition(cycle.data, agentOf, { mode, includeAlternatives })
+          ? agentRepetition(cycle.data, agentOf, { mode, includeAlternatives, role })
           : [],
     // agentOf é derivado de catalog.agents
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [source, doc.teams, doc.equipment, cycle.data, catalog.agents, mode, includeAlternatives],
+    [source, doc.teams, doc.equipment, cycle.data, catalog.agents, mode, includeAlternatives, role],
   );
 
   const compositions = useMemo(
@@ -104,7 +105,7 @@ export function useStatsViewModel() {
       }),
       days: r.uses.map((u) => ({ mode: u.mode, day: u.day, ctp: ctpLabel(u.ctpId) })),
     }));
-    const modeLabel = mode === "ALL" ? t("cycle:all") : mode;
+    const modeLabel = [mode === "ALL" ? t("cycle:all") : mode, ...(role === "ALL" ? [] : [t(`stats:repetition.roles.${role}`)])].join(" · ");
     const html = renderStatsHtml(
       rows,
       {
@@ -128,7 +129,8 @@ export function useStatsViewModel() {
     const url = URL.createObjectURL(new Blob([html], { type: "text/html;charset=utf-8" }));
     const a = document.createElement("a");
     a.href = url;
-    a.download = `estatisticas-${source === "MINE" ? "minhas-equipes" : "metas"}-${mode.toLowerCase()}-${now.toISOString().slice(0, 10)}.html`;
+    const roleSuffix = role === "ALL" ? "" : role === "DAMAGE" ? "-dano" : "-suportes";
+    a.download = `estatisticas-${source === "MINE" ? "minhas-equipes" : "metas"}-${mode.toLowerCase()}${roleSuffix}-${now.toISOString().slice(0, 10)}.html`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -137,6 +139,8 @@ export function useStatsViewModel() {
     catalog,
     mode,
     setMode,
+    role,
+    setRole,
     source,
     setSource,
     compositions,

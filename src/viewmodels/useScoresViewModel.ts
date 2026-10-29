@@ -17,6 +17,7 @@ import {
   scoreKey,
   scoreSummary,
   seasonDays,
+  seasonTotal,
   seasonWeeks,
   seasonsWithScores,
   type ScoreMode,
@@ -75,12 +76,13 @@ export function useScoresViewModel() {
   };
 
   const current = today && anchor ? gameDayOf(today, anchor) : null;
+  // No dia do reset, antes das 22h, os cartões ainda mostram a semana e a temporada que acabam.
+  const summary = anchor && today ? scoreSummary(scores, anchor, today, !!clock?.beforeWeeklyReset) : null;
   const seasons = anchor && today ? seasonsWithScores(scores, anchor, today) : [];
-  const season = seasonChoice && seasons.includes(seasonChoice) ? seasonChoice : (current?.seasonStart ?? null);
+  const season = seasonChoice && seasons.includes(seasonChoice) ? seasonChoice : (summary?.counted.seasonStart ?? null);
   // Cada dia e semana da temporada escolhida contra o mesmo dia e semana da anterior.
   const days = anchor && today && season ? seasonDays(scores, anchor, season, today) : [];
   const weeks = anchor && today && season ? seasonWeeks(scores, anchor, season, today) : [];
-  const summary = anchor && today ? scoreSummary(scores, anchor, today) : null;
 
   // Histórico: mais recente primeiro, cada registro contra o mesmo dia e modo do mês anterior, com a
   // BA normal que entrou junto.
@@ -138,6 +140,8 @@ export function useScoresViewModel() {
     setSeason,
     days,
     weeks,
+    /** Total da temporada escolhida (soma das semanas) contra a anterior. */
+    total: seasonTotal(weeks),
     summary,
     history,
     current,

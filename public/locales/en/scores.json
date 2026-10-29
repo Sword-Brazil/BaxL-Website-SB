@@ -22,7 +22,8 @@
     "seasonFooter_other": "{{count}} days filled · since {{date}}",
     "best": "Best day",
     "bestFooter": "Day {{day}} · {{date}}",
-    "bestNone": "No day filled yet"
+    "bestNone": "No day filled yet",
+    "lastWeek": "Last week: {{value}}"
   },
   "entry": {
     "title": "Log score",
@@ -53,7 +54,8 @@
     "empty": "Log a day's score to see the charts.",
     "partial": "partial",
     "season": "Season",
-    "seasonOption": "Season {{range}}"
+    "seasonOption": "Season {{range}}",
+    "total": "Season total"
   },
   "compare": {
     "current": "This season",

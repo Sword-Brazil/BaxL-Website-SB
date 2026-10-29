@@ -22,7 +22,8 @@
     "seasonFooter_other": "{{count}} dias preenchidos · desde {{date}}",
     "best": "Melhor dia",
     "bestFooter": "Dia {{day}} · {{date}}",
-    "bestNone": "Nenhum dia preenchido ainda"
+    "bestNone": "Nenhum dia preenchido ainda",
+    "lastWeek": "Semana anterior: {{value}}"
   },
   "entry": {
     "title": "Preencher pontuação",
@@ -53,7 +54,8 @@
     "empty": "Preencha a pontuação de um dia para ver os gráficos.",
     "partial": "parcial",
     "season": "Temporada",
-    "seasonOption": "Temporada {{range}}"
+    "seasonOption": "Temporada {{range}}",
+    "total": "Total da temporada"
   },
   "compare": {
     "current": "Esta temporada",
