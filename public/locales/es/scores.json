@@ -55,7 +55,11 @@
     "partial": "parcial",
     "season": "Temporada",
     "seasonOption": "Temporada {{range}}",
-    "total": "Total de la temporada"
+    "total": "Total de la temporada",
+    "part": {
+      "pre": "12h",
+      "post": "22h"
+    }
   },
   "compare": {
     "current": "Esta temporada",

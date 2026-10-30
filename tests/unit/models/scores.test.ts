@@ -21,6 +21,9 @@ const ANCHOR = "2026-10-01"; // Dia 1 de um ciclo
 // BA normal somada com a BAX: 166.750 e 210.500 alternando nos dias de BAX/BAL da semana.
 const N1 = 166_750;
 const N2 = 210_500;
+/** Parte de um dia no gráfico por dia (o dia do reset aparece em duas). */
+const part = (days: ReturnType<typeof seasonDays>, date: string, phase: "pre" | "post" = "post") =>
+  days.find((d) => d.date === date && d.phase === phase);
 
 describe("gameDayOf", () => {
   it("dia do ciclo, semana e temporada a partir da âncora", () => {
@@ -48,15 +51,13 @@ const scores = {
 describe("comparação com a temporada anterior (mesmo dia do ciclo, 28 dias antes)", () => {
   it("cada dia da temporada contra o mesmo dia da anterior, com diferença e %", () => {
     const days = seasonDays(scores, ANCHOR, "2026-10-01", "2026-10-24");
-    expect(days).toHaveLength(28);
-    const d22 = days[21];
+    const d22 = part(days, "2026-10-22")!;
     expect(d22).toMatchObject({ cycleDay: 22, current: 240 + N1, previous: 200 + N1, delta: 40, normal: N1 });
-    expect(days[22].normal).toBe(N2);
     expect(d22.pct).toBeCloseTo(40 / (200 + N1));
-    expect(days[22]).toMatchObject({ cycleDay: 23, current: 150 + N2, previous: 200 + N2, delta: -50 });
-    expect(days[23]).toMatchObject({ cycleDay: 24, current: 900, previous: 1000, delta: -100, normal: null });
+    expect(part(days, "2026-10-23")).toMatchObject({ cycleDay: 23, current: 150 + N2, previous: 200 + N2, delta: -50, normal: N2 });
+    expect(part(days, "2026-10-24")).toMatchObject({ cycleDay: 24, current: 900, previous: 1000, delta: -100, normal: null });
     // Dia que ainda não chegou: só o valor da temporada anterior.
-    expect(days[24]).toMatchObject({ cycleDay: 25, future: true, current: null, delta: null });
+    expect(part(days, "2026-10-25")).toMatchObject({ cycleDay: 25, future: true, current: null, delta: null });
     expect(compare(10, 0).pct).toBeNull();
   });
 
@@ -73,7 +74,7 @@ describe("comparação com a temporada anterior (mesmo dia do ciclo, 28 dias ant
     expect(s.week).toMatchObject({ current: 1290 + N1 + N2, previous: 1400 + N1 + N2, delta: -110 });
     expect(s.season).toMatchObject({ current: 1290 + N1 + N2, previous: 1400 + N1 + N2 });
     expect(s.seasonDays).toBe(3);
-    expect(s.best).toEqual({ date: "2026-09-25", total: 200 + N2 });
+    expect(s.best).toEqual({ date: "2026-09-25", phase: "post", split: false, total: 200 + N2 });
   });
 
   it("temporadas com pontuação, da mais recente para a mais antiga", () => {
@@ -103,9 +104,9 @@ describe("dia do reset (antes e depois das 22h)", () => {
     expect(weeks[1]).toMatchObject({ week: 2, current: 100 + N2 + 30 + N1 });
     // A BA normal é refeita depois do reset: Dia 15 depois das 22h + Dia 16, cada um com a dele.
     expect(weeks[2]).toMatchObject({ week: 3, current: 50 + N1 + 70 + N2 });
-    // O dia do reset zera às 22h: fica só com o que veio depois; o de antes vai para o Dia 14.
+    // O dia do reset zera às 22h: fica só com o que veio depois; nenhum dia soma a parte de antes.
     expect(dayTotal(r, "2026-10-15", ANCHOR)).toBe(50 + N1);
-    expect(dayTotal(r, "2026-10-14", ANCHOR)).toBe(100 + N2 + 30 + N1);
+    expect(dayTotal(r, "2026-10-14", ANCHOR)).toBe(100 + N2);
     const pre = scoreEntries(r, ANCHOR).find((e) => e.phase === "pre")!;
     expect(pre).toMatchObject({ cycleDay: 15, week: 2 });
   });
@@ -130,19 +131,36 @@ describe("dia do reset (antes e depois das 22h)", () => {
     expect(scoreSummary({ [scoreKey("2026-10-15", "BAX", "pre")]: 30 }, ANCHOR, "2026-10-15").today.current).toBeNull();
   });
 
-  it("gráfico por dia, melhor dia e dias contados também zeram às 22h do dia do reset", () => {
+  it("gráfico por dia: o dia do reset aparece em duas partes, cada uma na semana em que conta", () => {
     const days = seasonDays(r, ANCHOR, "2026-10-01", "2026-10-16");
-    expect(days[13]).toMatchObject({ cycleDay: 14, current: 100 + N2 + 30 + N1, normal: N2 + N1 });
-    expect(days[14]).toMatchObject({ cycleDay: 15, current: 50 + N1, normal: N1 });
-    // Os dias somam as semanas.
+    expect(part(days, "2026-10-14")).toMatchObject({ cycleDay: 14, split: false, current: 100 + N2, normal: N2 });
+    expect(part(days, "2026-10-15", "pre")).toMatchObject({ cycleDay: 15, week: 3, split: true, current: 30 + N1, normal: N1 });
+    expect(part(days, "2026-10-15")).toMatchObject({ cycleDay: 15, split: true, current: 50 + N1, normal: N1 });
+    // As partes somam as semanas: Dia 8 depois das 22h até o Dia 15 antes das 22h é a Semana 2.
     const weeks = seasonWeeks(r, ANCHOR, "2026-10-01", "2026-10-21");
-    expect(days.slice(7, 14).reduce((a, d) => a + (d.current ?? 0), 0)).toBe(weeks[1].current);
-    expect(days.slice(14, 21).reduce((a, d) => a + (d.current ?? 0), 0)).toBe(weeks[2].current);
-    const s = scoreSummary(r, ANCHOR, "2026-10-16");
-    expect(s.best).toEqual({ date: "2026-10-14", total: 100 + N2 + 30 + N1 });
-    expect(s.seasonDays).toBe(3);
-    // Antes das 22h do reset: a parte de hoje entra no dia anterior, da semana que acaba.
-    expect(scoreSummary(r, ANCHOR, "2026-10-15", true).seasonDays).toBe(1);
+    const sum = (from: number, to: number) => days.slice(from, to).reduce((a, d) => a + (d.current ?? 0), 0);
+    const i = (date: string, phase: "pre" | "post") => days.indexOf(part(days, date, phase)!);
+    expect(sum(i("2026-10-08", "post"), i("2026-10-15", "pre") + 1)).toBe(weeks[1].current);
+    expect(sum(i("2026-10-15", "post"), days.length)).toBe(weeks[2].current);
+  });
+
+  it("a temporada vai do Dia 1 depois das 22h até o Dia 1 seguinte antes das 22h", () => {
+    const days = seasonDays({}, ANCHOR, "2026-09-03", "2026-10-30");
+    expect(days[0]).toMatchObject({ date: "2026-09-03", phase: "post" });
+    expect(days.at(-1)).toMatchObject({ date: "2026-10-01", cycleDay: 1, phase: "pre" });
+    // Dias 8, 15 e 22 em duas partes: 28 dias + 3 + a parte final do Dia 1 seguinte.
+    expect(days).toHaveLength(32);
+  });
+
+  it("melhor dia: cada parte do dia do reset vale sozinha", () => {
+    const big = { ...r, [scoreKey("2026-10-15", "BAX", "pre")]: 1_000_000 };
+    expect(scoreSummary(big, ANCHOR, "2026-10-16").best).toEqual({ date: "2026-10-15", phase: "pre", split: true, total: 1_000_000 + N1 });
+    expect(scoreSummary(r, ANCHOR, "2026-10-16").best).toEqual({ date: "2026-10-14", phase: "post", split: false, total: 100 + N2 });
+    expect(scoreSummary(r, ANCHOR, "2026-10-16").seasonDays).toBe(3);
+    // Dia 1 antes do reset: conta como dia jogado da temporada que acaba, não da nova.
+    const d1 = { [scoreKey("2026-10-28", "BAX")]: 10, [scoreKey("2026-10-29", "BAX", "pre")]: 5 };
+    expect(scoreSummary(d1, ANCHOR, "2026-10-29", true).seasonDays).toBe(2);
+    expect(scoreSummary(d1, ANCHOR, "2026-10-29").seasonDays).toBe(0);
   });
 
   it("antes das 22h do Dia 1, a temporada ainda é a que acaba (a semana completa não some)", () => {
