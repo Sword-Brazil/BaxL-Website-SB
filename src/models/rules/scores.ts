@@ -255,7 +255,7 @@ export function seasonsWithScores(scores: Record<string, number>, anchorDate: st
 }
 
 export interface ScoreSummary {
-  /** Hoje contra o mesmo dia da temporada anterior. */
+  /** Hoje (no dia do reset, só a parte antes ou depois das 22h) contra o mesmo dia da temporada anterior. */
   today: Comparison;
   /** Semana atual (até hoje) contra a mesma semana da temporada anterior até o mesmo dia. */
   week: Comparison;
@@ -292,8 +292,10 @@ export function scoreSummary(scores: Record<string, number>, anchorDate: string,
     const t = dayTotal(scores, d, anchorDate) ?? 0;
     return !b || t > b.total ? { date: d, total: t } : b;
   }, null);
+  // No dia do reset a pontuação do dia zera às 22h: o cartão de hoje mostra só a parte que vale agora.
+  const phase: ScorePhase = closing ? "pre" : "post";
   return {
-    today: compare(dayTotal(scores, today, anchorDate), dayTotal(scores, previousSeasonDate(today), anchorDate)),
+    today: compare(phaseTotal(scores, today, phase, anchorDate), phaseTotal(scores, previousSeasonDate(today), phase, anchorDate)),
     week: period(weekStart),
     season: period(current.seasonStart),
     counted: { week: current.week, seasonStart: current.seasonStart },
