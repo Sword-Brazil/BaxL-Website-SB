@@ -147,7 +147,9 @@ function SummaryCards({ vm }: { vm: ScoresViewModel }) {
           <CardTitle className="font-heading text-2xl font-bold tabular-nums sm:text-3xl">{s.best ? f.n(s.best.total) : "—"}</CardTitle>
         </CardHeader>
         <CardFooter className="text-xs text-muted-foreground">
-          {s.best ? t("cards.bestFooter", { day: vm.dayOf(s.best.date)?.cycleDay, date: f.date(s.best.date) }) : t("cards.bestNone")}
+          {s.best
+            ? `${t("cards.bestFooter", { day: vm.dayOf(s.best.date)?.cycleDay, date: f.date(s.best.date) })}${s.best.split ? ` · ${t(`entry.phase.${s.best.phase}`)}` : ""}`
+            : t("cards.bestNone")}
         </CardFooter>
       </Card>
     </div>
@@ -494,10 +496,11 @@ function PerformanceCard({ vm }: { vm: ScoresViewModel }) {
   const f = useFormat();
   const seasonName = useSeasonName();
   const seasonLabel = (start: string) => seasonName(vm.gameSeasonOf(start), `${f.date(start)} – ${f.date(addDays(start, 27))}`);
+  // O dia do reset aparece em duas partes: 12h–22h (fecha a semana) e 22h–12h (abre a nova).
   const days: CompareRow[] = vm.days.map((d) => ({
     ...d,
-    label: `D${d.cycleDay}`,
-    detail: `${t(`common:weekdays.${weekdayOf(d.cycleDay)}`)} ${f.date(d.date)}${d.isBai ? " · BAI" : ""}`,
+    label: `D${d.cycleDay}${d.split ? ` ${t(`scores:chart.part.${d.phase}`)}` : ""}`,
+    detail: `${t(`common:weekdays.${weekdayOf(d.cycleDay)}`)} ${f.date(d.date)}${d.isBai ? " · BAI" : ""}${d.split ? ` · ${t(`scores:entry.phase.${d.phase}`)}` : ""}`,
   }));
   const weeks: CompareRow[] = vm.weeks.map((w) => ({
     ...w,

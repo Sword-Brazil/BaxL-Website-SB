@@ -160,8 +160,8 @@ const phaseTotal = (scores: Record<string, number>, date: string, phase: ScorePh
   sumOf([...SCORE_MODES.map((m) => scores[scoreKey(date, m, phase)]), normalBaOf(scores, date, phase, anchorDate) ?? undefined]);
 
 /**
- * Pontos do dia: a pontuação zera no reset das 22h, então no dia do reset só conta o que veio depois
- * das 22h. A parte de antes entra só nos totais da semana e da temporada que acabam. null sem nenhum valor.
+ * Pontos do dia de 12h a 12h; no dia do reset, só a parte depois das 22h (a de antes é da semana que
+ * acaba). null sem nenhum valor.
  */
 export function dayTotal(scores: Record<string, number>, date: string, anchorDate: string): number | null {
   return phaseTotal(scores, date, "post", anchorDate);
@@ -191,30 +191,45 @@ export function sumPeriod(
 export const previousSeasonDate = (date: string) => addDays(date, -CYCLE_LENGTH);
 
 export interface SeasonDay extends GameDay, Comparison {
+  /** Parte do dia: no dia do reset, antes (12h–22h) ou depois (22h–12h) das 22h; nos outros, "post". */
+  phase: ScorePhase;
+  /** Dia do reset, dividido nas duas partes. */
+  split: boolean;
   BAX: number | null;
   BAL: number | null;
   BAI: number | null;
-  /** BA normal do dia (no dia do reset, só a de depois das 22h). */
+  /** BA normal da parte do dia. */
   normal: number | null;
   /** Dia que ainda não chegou. */
   future: boolean;
 }
 
-/** Os 28 dias de uma temporada, cada um comparado com o mesmo dia da temporada anterior. */
+/**
+ * Os dias de uma temporada, cada um comparado com o mesmo dia da temporada anterior. O dia do reset
+ * aparece em duas partes, cada uma onde conta: das 12h às 22h fecha a semana que acaba e das 22h às
+ * 12h abre a nova. A temporada começa no Dia 1 depois das 22h e termina com o Dia 1 seguinte antes
+ * das 22h, então as partes somam as semanas e a temporada.
+ */
 export function seasonDays(scores: Record<string, number>, anchorDate: string, seasonStart: string, today: string): SeasonDay[] {
-  return Array.from({ length: CYCLE_LENGTH }, (_, i) => {
-    const date = addDays(seasonStart, i);
+  const nextStart = addDays(seasonStart, CYCLE_LENGTH);
+  return dateRange(seasonStart, nextStart).flatMap((date) => {
+    const day = gameDayOf(date, anchorDate);
+    // O 1º dia contado começa às 22h: não tem a parte de antes.
+    const phases: ScorePhase[] = isResetDay(day) && date !== SCORES_FIRST_DATE ? ["pre", "post"] : ["post"];
     const future = date > today;
-    const value = (mode: ScoreMode) => (future ? null : (scores[scoreKey(date, mode)] ?? null));
-    return {
-      ...gameDayOf(date, anchorDate),
-      BAX: value("BAX"),
-      BAL: value("BAL"),
-      BAI: value("BAI"),
-      normal: future ? null : normalBaOf(scores, date, "post", anchorDate),
-      future,
-      ...compare(future ? null : dayTotal(scores, date, anchorDate), dayTotal(scores, previousSeasonDate(date), anchorDate)),
-    };
+    return phases
+      .filter((phase) => (phase === "pre" ? date !== seasonStart : date !== nextStart))
+      .map((phase) => ({
+        ...day,
+        phase,
+        split: phases.length > 1,
+        BAX: future ? null : (scores[scoreKey(date, "BAX", phase)] ?? null),
+        BAL: future ? null : (scores[scoreKey(date, "BAL", phase)] ?? null),
+        BAI: future ? null : (scores[scoreKey(date, "BAI", phase)] ?? null),
+        normal: future ? null : normalBaOf(scores, date, phase, anchorDate),
+        future,
+        ...compare(future ? null : phaseTotal(scores, date, phase, anchorDate), phaseTotal(scores, previousSeasonDate(date), phase, anchorDate)),
+      }));
   });
 }
 
@@ -272,7 +287,8 @@ export interface ScoreSummary {
   /** Total da semana fechada antes da semana dos cartões (null sem pontuação nela). */
   lastWeek: number | null;
   seasonDays: number;
-  best: { date: string; total: number } | null;
+  /** Melhor dia (no dia do reset, cada parte conta sozinha). */
+  best: { date: string; phase: ScorePhase; split: boolean; total: number } | null;
 }
 
 /**
@@ -291,9 +307,9 @@ export function scoreSummary(scores: Record<string, number>, anchorDate: string,
       sumPeriod(scores, anchorDate, previousSeasonDate(from), previousSeasonDate(until), closing),
     );
   // Melhor dia: cada parte do dia do reset (antes e depois das 22h) vale sozinha, sem somar as duas.
-  const best = scoreEntries(scores, anchorDate).reduce<{ date: string; total: number } | null>((b, e) => {
+  const best = scoreEntries(scores, anchorDate).reduce<ScoreSummary["best"]>((b, e) => {
     const t = phaseTotal(scores, e.date, e.phase, anchorDate) ?? 0;
-    return !b || t > b.total ? { date: e.date, total: t } : b;
+    return !b || t > b.total ? { date: e.date, phase: e.phase, split: isResetDay(e), total: t } : b;
   }, null);
   // No dia do reset a pontuação do dia zera às 22h: o cartão de hoje mostra só a parte que vale agora.
   const phase: ScorePhase = closing ? "pre" : "post";
