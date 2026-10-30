@@ -122,6 +122,12 @@ describe("dia do reset (antes e depois das 22h)", () => {
     expect(after.lastWeek).toBe(100 + N2 + 30 + N1);
   });
 
+  it("o cartão de hoje zera às 22h do dia do reset (só a parte que vale agora)", () => {
+    expect(scoreSummary(r, ANCHOR, "2026-10-15", true).today.current).toBe(30 + N1);
+    expect(scoreSummary(r, ANCHOR, "2026-10-15").today.current).toBe(50 + N1);
+    expect(scoreSummary({ [scoreKey("2026-10-15", "BAX", "pre")]: 30 }, ANCHOR, "2026-10-15").today.current).toBeNull();
+  });
+
   it("antes das 22h do Dia 1, a temporada ainda é a que acaba (a semana completa não some)", () => {
     // Semana 4 inteira (22–28/10) mais o Dia 1 (29/10) antes do reset.
     const full = {
