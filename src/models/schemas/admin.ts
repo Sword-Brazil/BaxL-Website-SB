@@ -79,6 +79,8 @@ export const MetaTeamSchema = z
     mode: dayModeSchema.optional(),
     number: dayNumberSchema.optional(),
     isPrimary: z.boolean(),
+    /** Dobradinha: sai no site e na mensagem do dia. */
+    isDuo: z.boolean().optional(),
     label: z.string().trim().max(60).optional().nullable(),
     labelEn: z.string().trim().max(60).optional().nullable(),
     notes: z.string().trim().max(500).optional().nullable(),

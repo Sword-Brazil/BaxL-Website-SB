@@ -31,6 +31,8 @@ export interface MemberDraft {
 export interface TeamDraft {
   id?: string;
   isPrimary: boolean;
+  /** Dobradinha. */
+  isDuo: boolean;
   label: string;
   labelEn: string;
   notes: string;
@@ -72,6 +74,7 @@ function memberDraft(catalog: CatalogViewModel, m: MetaTeam["members"][number]):
 
 const emptyDraft = (isPrimary: boolean): TeamDraft => ({
   isPrimary,
+  isDuo: false,
   label: "",
   labelEn: "",
   notes: "",
@@ -83,6 +86,7 @@ const emptyDraft = (isPrimary: boolean): TeamDraft => ({
 const fromTeam = (catalog: CatalogViewModel, t: MetaTeam): TeamDraft => ({
   id: t.id,
   isPrimary: t.isPrimary,
+  isDuo: t.isDuo,
   label: t.label ?? "",
   labelEn: t.labelEn ?? "",
   notes: t.notes ?? "",
@@ -122,6 +126,7 @@ export function useMetaTeamEditorViewModel(scopeVm: MetaScopeViewModel, messages
         scope,
         ...(isDay ? { mode, number } : {}),
         isPrimary: d.isPrimary,
+        isDuo: d.isDuo,
         label: d.label || null,
         labelEn: d.labelEn || null,
         notes: d.notes || null,

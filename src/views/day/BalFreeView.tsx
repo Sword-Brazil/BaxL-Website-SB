@@ -55,6 +55,7 @@ export function BalFreeView() {
                 mode="BAL"
                 members={team.members}
                 videoUrl={team.videoUrl}
+                duo={team.isDuo}
                 catalog={catalog}
                 isOwned={owned.size ? (u) => owned.has(u) : undefined}
               />

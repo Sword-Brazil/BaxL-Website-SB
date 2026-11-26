@@ -45,15 +45,22 @@ export const brtDateKey = (instant: string | Date) => brtDate.format(new Date(in
  *   de cada semana do ciclo (Dias 1, 8, 15 e 22: quinta 12:00 → sexta 12:00), e muda apenas
  *   `weekIndex` (a semana para a qual a pontuação conta): até 21:59 ainda vale a semana anterior.
  */
-export function getBattleClock(now: Date, settings: Settings): BattleClock {
-  const nowMs = now.getTime();
-  const nowWall = toBrtWall(nowMs);
-
+/** Dias de batalha desde o Dia 1 da âncora (vira no horário de virada, em Brasília). */
+function elapsedBattleDays(nowWall: number, settings: Pick<Settings, "cycleAnchor" | "dayTurnoverHour">) {
   // Âncora normalizada para o horário de virada, na data (BRT) do Dia 1.
   const anchorWallRaw = toBrtWall(Date.parse(settings.cycleAnchor));
   const anchorWall = Math.floor(anchorWallRaw / DAY) * DAY + settings.dayTurnoverHour * HOUR;
+  return { anchorWall, elapsedDays: Math.floor((nowWall - anchorWall) / DAY) };
+}
 
-  const elapsedDays = Math.floor((nowWall - anchorWall) / DAY);
+/** Número do ciclo de 28 dias desde a âncora (0 = o da âncora): muda no Dia 1, na virada das 12h. */
+export const cycleNumber = (now: Date, settings: Pick<Settings, "cycleAnchor" | "dayTurnoverHour">) =>
+  Math.floor(elapsedBattleDays(toBrtWall(now.getTime()), settings).elapsedDays / CYCLE_LENGTH);
+
+export function getBattleClock(now: Date, settings: Settings): BattleClock {
+  const nowMs = now.getTime();
+  const nowWall = toBrtWall(nowMs);
+  const { anchorWall, elapsedDays } = elapsedBattleDays(nowWall, settings);
   const cycleIndex = mod(elapsedDays, CYCLE_LENGTH);
   const cycleDay = cycleIndex + 1;
   const dayStartWall = anchorWall + elapsedDays * DAY;

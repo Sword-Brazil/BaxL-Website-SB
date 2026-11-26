@@ -50,7 +50,7 @@
     "help": "Pick one value per attribute. Leave \"Any\" to not restrict that attribute. BAI days (3, 10, 17, 24) are not listed.",
     "season": {
       "title": "Current season",
-      "help": "Pair of effects that stuns the boss this season (28 days): the first in BAX, the second in BAL. Applies to every day of the mode; change it when the season changes."
+      "help": "Effect pair that stuns the boss this season (28 days): the first in BAX, the second in BAL. It changes by itself on Day 1 of each cycle, in the order Paralysis and Shock → Burn and Fracture → Silence and Trap. Only change it here if it is wrong; the next ones follow the order from it."
     }
   },
   "metas": {
@@ -65,6 +65,7 @@
     "newTeam": "New team",
     "editTeam": "Edit team",
     "isPrimary": "Primary team",
+    "isDuo": "Duo (shows on the site and in the day message)",
     "label": "Label (e.g. alternative without uniform X)",
     "notes": "Notes",
     "pickAgent": "Pick agent…",

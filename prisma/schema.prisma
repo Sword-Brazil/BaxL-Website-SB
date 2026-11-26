@@ -89,6 +89,8 @@ model Settings {
   baiWeekday      Int      @default(3)
   // Temporada atual (SEASONS): o par de efeitos que atordoa o chefe na BAX e na BAL.
   season          String   @default("PARALYSIS_SHOCK")
+  // Ciclo (cycleNumber) em que `season` valia: a cada Dia 1 a temporada passa para a seguinte.
+  seasonCycle     Int?
   // Dias de BAX/BAL sem restrição e a BAI com as mesmas equipes e reservas: editar um copia para os outros.
   syncFreeDays    Boolean  @default(true)
   createdAt       DateTime @default(now())
@@ -128,6 +130,8 @@ model MetaTeam {
   battleDayId  String?
   battleDay    BattleDay?       @relation(fields: [battleDayId], references: [id])
   isPrimary    Boolean          @default(false)
+  // Dobradinha (marcada pelo admin): sai no site e na mensagem do dia.
+  isDuo        Boolean          @default(false)
   // Ordem das alternativas no dia (o ADMIN reordena); a principal vem sempre primeiro.
   position     Int              @default(0)
   label        String?

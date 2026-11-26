@@ -60,6 +60,7 @@ export async function saveMetaTeam(input: MetaTeamInput, userId: string, id?: st
     scope: input.scope,
     battleDayId,
     isPrimary: input.isPrimary,
+    isDuo: !!input.isDuo,
     label: input.label || null,
     labelEn: input.labelEn || null,
     notes: input.notes || null,

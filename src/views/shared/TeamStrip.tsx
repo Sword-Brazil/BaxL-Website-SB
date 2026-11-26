@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "next-i18next/pages";
-import { CirclePlayIcon } from "lucide-react";
+import { CirclePlayIcon, UsersIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DISPLAY_SLOTS, type BossEffect, type Mode, type Slot } from "@/models/domain/enums";
 import type { MetaTeamMember } from "@/models/domain/types";
@@ -17,6 +17,22 @@ export type StripMember = { slot: Slot; uniformId: string; ctpId?: string | null
 export const rotationHref = (agentSlug: string, uniformSlug: string, effect?: BossEffect, mode?: Mode) =>
   `/rotacoes/${agentSlug}?traje=${encodeURIComponent(uniformSlug)}${effect ? `&efeito=${effect}` : ""}${mode ? `&modo=${mode}` : ""}`;
 
+/** Selo de dobradinha (na equipe e no dia). */
+export function DuoBadge({ className }: { className?: string }) {
+  const { t } = useTranslation("common");
+  return (
+    <span
+      className={cn(
+        "inline-flex shrink-0 items-center gap-1 rounded-full border border-spark/50 bg-spark/15 px-1.5 py-px font-heading text-[0.6rem] tracking-wider text-spark normal-case",
+        className,
+      )}
+    >
+      <UsersIcon className="size-3" aria-hidden />
+      {t("team.duo")}
+    </span>
+  );
+}
+
 /**
  * Uma equipe (Meta, Alternativa ou a do usuário) em 3 colunas compactas: Esquerda · Líder · Direita.
  * Na Meta/Alternativa, a foto do Causador de Dano leva à tela de rotações dele.
@@ -31,6 +47,7 @@ export function TeamStrip({
   mode,
   action,
   videoUrl,
+  duo,
 }: {
   label: string;
   tone: TeamTone;
@@ -45,6 +62,8 @@ export function TeamStrip({
   action?: ReactNode;
   /** Vídeo da equipe (o da temporada atual, quando cadastrado): abre em outra aba. */
   videoUrl?: string | null;
+  /** Equipe marcada como dobradinha. */
+  duo?: boolean;
 }) {
   const { t } = useTranslation("common");
   const isMine = tone === "mine";
@@ -66,6 +85,7 @@ export function TeamStrip({
         >
           <span aria-hidden className="h-3 w-0.5 shrink-0 rounded-full bg-current" />
           <span className="truncate">{label}</span>
+          {duo && <DuoBadge />}
         </p>
         {(action || videoUrl) && (
           <div className="flex shrink-0 items-center gap-1">

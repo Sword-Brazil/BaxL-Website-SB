@@ -44,6 +44,7 @@ export function useDayMessageViewModel(catalog: CatalogViewModel) {
     };
 
     const teams = day.metaTeams.map((team) => ({
+      duo: team.isDuo,
       videoUrl: team.videoUrl ?? fallbackVideo(team),
       members: team.members.flatMap((m) => {
         const n = nameOf(m.uniformId);
@@ -87,11 +88,12 @@ export function useDayMessageViewModel(catalog: CatalogViewModel) {
 
   return {
     /** Monta a mensagem e copia; avisa se o navegador não deixar copiar. */
-    copy: async (mode: DayMode, day: CycleModeDay, season: Season | null) => {
+    copy: async (mode: DayMode, number: number, day: CycleModeDay, season: Season | null) => {
       const text = qc.fetchQuery({ queryKey: ROTATIONS_KEY, queryFn: getRotations }).then((rotations) => {
         const { teams, rotationBlocks } = build(mode, day, season?.id ?? null, rotations);
         return buildDayMessage({
           mode,
+          day: number,
           effect: season ? t(`common:effects.${season[mode]}`) : null,
           criteria: day.criteria.map((c) => t(`common:values.${c.value}`)),
           teams,
@@ -102,6 +104,9 @@ export function useDayMessageViewModel(catalog: CatalogViewModel) {
             leader: t("cycle:message.leader"),
             and: t("cycle:message.and"),
             meta: t("cycle:meta"),
+            day: (n) => t("common:day", { number: n }),
+            noRestriction: t("common:restriction.none"),
+            duo: t("common:team.duo"),
             striker: (striker, target, female) => t("cycle:message.striker", { striker, target, context: female ? "female" : undefined }),
           },
         });

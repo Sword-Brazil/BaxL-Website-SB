@@ -18,6 +18,7 @@ const meta: MetaTeam = {
   labelEn: null,
   videoUrl: null,
   seasonVideos: {},
+  isDuo: false,
   notes: null,
   position: 0,
   updatedAt: "",

@@ -14,6 +14,7 @@ const team = (isPrimary: boolean, [solo, s1, s2]: string[]): MetaTeam => ({
   labelEn: null,
   videoUrl: null,
   seasonVideos: {},
+  isDuo: false,
   notes: null,
   position: 0,
   updatedAt: "",

@@ -50,7 +50,7 @@
     "help": "Escolha um valor por atributo. Deixe \"Qualquer\" para não restringir aquele atributo. Os dias de BAI (3, 10, 17, 24) não aparecem aqui.",
     "season": {
       "title": "Temporada atual",
-      "help": "Par de efeitos que atordoa o chefe nesta temporada (28 dias): o primeiro na BAX, o segundo na BAL. Vale para todos os dias do modo; troque quando a temporada mudar."
+      "help": "Par de efeitos que atordoa o chefe nesta temporada (28 dias): o primeiro na BAX, o segundo na BAL. Muda sozinha no Dia 1 de cada ciclo, na ordem Paralisia e Choque → Queimadura e Fratura → Silêncio e Armadilha. Só troque aqui se estiver errada; as seguintes continuam a ordem a partir dela."
     }
   },
   "metas": {
@@ -65,6 +65,7 @@
     "newTeam": "Nova equipe",
     "editTeam": "Editar equipe",
     "isPrimary": "Equipe principal",
+    "isDuo": "Dobradinha (sai no site e na mensagem do dia)",
     "label": "Rótulo (ex.: alternativa sem uniforme X)",
     "notes": "Observações",
     "pickAgent": "Escolher agente…",

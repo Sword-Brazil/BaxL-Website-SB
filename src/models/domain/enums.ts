@@ -50,8 +50,11 @@ export const BOSS_EFFECTS = [...BAX_EFFECTS, ...BAL_EFFECTS] as const;
 export type BossEffect = (typeof BOSS_EFFECTS)[number];
 export const EFFECTS_BY_MODE: Record<DayMode, readonly BossEffect[]> = { BAX: BAX_EFFECTS, BAL: BAL_EFFECTS };
 
-/** As 3 temporadas do jogo, cada uma com um par fixo de efeitos: o da BAX e o da BAL. */
-export const SEASONS = ["PARALYSIS_SHOCK", "SILENCE_TRAP", "BURN_FRACTURE"] as const;
+/**
+ * As 3 temporadas do jogo, cada uma com um par fixo de efeitos (o da BAX e o da BAL), na ordem em
+ * que se sucedem: a cada ciclo de 28 dias vem a seguinte, e depois da última volta a primeira.
+ */
+export const SEASONS = ["PARALYSIS_SHOCK", "BURN_FRACTURE", "SILENCE_TRAP"] as const;
 export type SeasonId = (typeof SEASONS)[number];
 export const SEASON_EFFECTS: Record<SeasonId, { BAX: BaxEffect; BAL: BalEffect }> = {
   PARALYSIS_SHOCK: { BAX: "PARALYSIS", BAL: "SHOCK" },
@@ -59,6 +62,10 @@ export const SEASON_EFFECTS: Record<SeasonId, { BAX: BaxEffect; BAL: BalEffect }
   BURN_FRACTURE: { BAX: "BURN", BAL: "FRACTURE" },
 };
 export const DEFAULT_SEASON: SeasonId = "PARALYSIS_SHOCK";
+
+/** A temporada `cycles` ciclos depois (ou antes, se negativo) de `season`. */
+export const seasonAfter = (season: SeasonId, cycles: number): SeasonId =>
+  SEASONS[(((SEASONS.indexOf(season) + cycles) % SEASONS.length) + SEASONS.length) % SEASONS.length];
 
 /** Temporada a que um efeito pertence (cada efeito está em uma só). */
 export const seasonOfEffect = (effect: BossEffect): SeasonId =>

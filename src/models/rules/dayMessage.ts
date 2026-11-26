@@ -17,6 +17,8 @@ export interface DayMessageMember {
 
 export interface DayMessageTeam {
   members: DayMessageMember[];
+  /** Dobradinha: sai no número do time. */
+  duo: boolean;
   videoUrl: string | null;
 }
 
@@ -32,11 +34,17 @@ export interface DayMessageLabels {
   leader: string;
   and: string;
   meta: string;
+  /** "Dia 5": o dia da BA no ciclo. */
+  day: (n: number) => string;
+  noRestriction: string;
+  duo: string;
   striker: (striker: string, target: string, female: boolean) => string;
 }
 
 export interface DayMessageInput {
   mode: string;
+  /** Dia da BA no ciclo (1–28). */
+  day: number;
   /** Efeito da temporada no modo (vai em maiúsculas, como no jogo). */
   effect: string | null;
   /** Valores da restrição do dia, já traduzidos. */
@@ -63,8 +71,9 @@ function metaName(team: DayMessageTeam | undefined): string | null {
   return (members.find((m) => m.isDamageDealer) ?? members[0])?.agentName ?? null;
 }
 
-export function buildDayMessage({ mode, effect, criteria, teams, rotations, labels }: DayMessageInput): string {
-  const head = [mode, effect?.toUpperCase(), ...criteria].filter(Boolean).join(" ");
+export function buildDayMessage({ mode, day, effect, criteria, teams, rotations, labels }: DayMessageInput): string {
+  const restriction = criteria.length ? criteria : [labels.noRestriction];
+  const head = [mode, labels.day(day).toUpperCase(), effect?.toUpperCase(), ...restriction].filter(Boolean).join(" ");
   const name = metaName(teams[0]);
   const blocks: string[] = [`*${name ? `${head} | ${name} ${labels.meta}` : head}:*`];
 
@@ -76,7 +85,8 @@ export function buildDayMessage({ mode, effect, criteria, teams, rotations, labe
       const strikers = team.members
         .filter((m) => m.isDamageDealer && m.strikerName)
         .map((m) => labels.striker(m.strikerName!, m.agentName, m.female));
-      blocks.push([`*${i + 1}-* ${line}`, ...strikers].join("\n"));
+      const number = team.duo ? `*${i + 1}- ${labels.duo}:*` : `*${i + 1}-*`;
+      blocks.push([`${number} ${line}`, ...strikers].join("\n"));
       if (team.videoUrl) blocks.push(team.videoUrl);
     });
   }

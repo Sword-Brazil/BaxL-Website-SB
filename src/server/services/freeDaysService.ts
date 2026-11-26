@@ -51,6 +51,7 @@ export async function mirrorFreePlace(source: TeamPlace): Promise<number> {
           data: {
             ...p,
             isPrimary: t.isPrimary,
+            isDuo: t.isDuo,
             position: t.position,
             label: t.label,
             labelEn: t.labelEn,

@@ -317,6 +317,7 @@ export function MetaTeamEditorView({ scopeVm, freeSync = false }: { scopeVm: Met
                     label={team.isPrimary ? t("common:team.primary") : (team.label ?? t("common:team.alternative"))}
                     tone={team.isPrimary ? "meta" : "alt"}
                     members={team.members}
+                    duo={team.isDuo}
                     catalog={catalog}
                     action={
                       <div className="flex items-center gap-1">
@@ -464,6 +465,10 @@ export function MetaTeamEditorView({ scopeVm, freeSync = false }: { scopeVm: Met
                     onCheckedChange={(isPrimary) => vm.update({ isPrimary })}
                   />
                   <FieldLabel htmlFor="isPrimary">{t("admin:metas.isPrimary")}</FieldLabel>
+                </Field>
+                <Field orientation="horizontal">
+                  <Switch id="isDuo" checked={vm.draft.isDuo} onCheckedChange={(isDuo) => vm.update({ isDuo })} />
+                  <FieldLabel htmlFor="isDuo">{t("admin:metas.isDuo")}</FieldLabel>
                 </Field>
                 <Field>
                   <FieldLabel htmlFor="label">{t("admin:metas.label")}</FieldLabel>

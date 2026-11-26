@@ -7,6 +7,9 @@ const labels: DayMessageLabels = {
   leader: "Líder",
   and: "e",
   meta: "Meta",
+  day: (n) => `Dia ${n}`,
+  noRestriction: "Sem restrição",
+  duo: "Dobradinha",
   striker: (striker, target, female) => `${striker} striker ${female ? "na" : "no"} ${target}`,
 };
 
@@ -24,11 +27,13 @@ describe("mensagem do dia", () => {
   it("segue o modelo do grupo: título, times com Striker e vídeo, rotações", () => {
     const text = buildDayMessage({
       mode: "BAX",
+      day: 5,
       effect: "Queimadura",
       criteria: ["Universal", "Humano"],
       labels,
       teams: [
         {
+          duo: false,
           videoUrl: "https://youtu.be/vcZ3Mp2aW48?t=189",
           // Fora de ordem de propósito: o líder sempre vem primeiro.
           members: [
@@ -38,6 +43,7 @@ describe("mensagem do dia", () => {
           ],
         },
         {
+          duo: true,
           videoUrl: "https://youtu.be/R_mgXn3Qh9I",
           members: [
             m("SOLO", "Robbie Reyes", "Robbie Reyes"),
@@ -61,7 +67,7 @@ describe("mensagem do dia", () => {
         { name: "Motoqueiro Fantasma (Vingadores Selvagens)", rotations: [{ title: null, sequence: "1c2c5c3dc4 1c2\n3dc5c6dc4", description: null }] },
       ],
     });
-    expect(text).toBe(`*BAX QUEIMADURA Universal Humano | Wanda Meta:*
+    expect(text).toBe(`*BAX DIA 5 QUEIMADURA Universal Humano | Wanda Meta:*
 
 *Melhores times:*
 
@@ -70,7 +76,7 @@ Loki striker na Wanda
 
 https://youtu.be/vcZ3Mp2aW48?t=189
 
-*2-* Robbie Reyes Líder, Motoqueiro Fantasma (Vingadores Selvagens) e Ghost Panther
+*2- Dobradinha:* Robbie Reyes Líder, Motoqueiro Fantasma (Vingadores Selvagens) e Ghost Panther
 Loki striker no Motoqueiro Fantasma
 
 https://youtu.be/R_mgXn3Qh9I
@@ -89,27 +95,29 @@ Skill 1: use quando a Wanda começar a descer em direção ao chão durante a an
 3dc5c6dc4`);
   });
 
-  it("sem Causador de Dano, a Meta leva o nome do líder; sem vídeo nem rotação, as partes somem", () => {
+  it("sem restrição, avisa; sem Causador de Dano, a Meta leva o nome do líder; sem vídeo nem rotação, as partes somem", () => {
     const text = buildDayMessage({
       mode: "BAL",
+      day: 12,
       effect: null,
       criteria: [],
       labels,
-      teams: [{ videoUrl: null, members: [m("SOLO", "Thor", "Thor"), m("SUPPORT_1", "Loki", "Loki"), m("SUPPORT_2", "Hela", "Hela")] }],
+      teams: [{ duo: false, videoUrl: null, members: [m("SOLO", "Thor", "Thor"), m("SUPPORT_1", "Loki", "Loki"), m("SUPPORT_2", "Hela", "Hela")] }],
       rotations: [{ name: "X", rotations: [] }],
     });
-    expect(text).toBe("*BAL | Thor Meta:*\n\n*Melhores times:*\n\n*1-* Thor Líder, Loki e Hela");
+    expect(text).toBe("*BAL DIA 12 Sem restrição | Thor Meta:*\n\n*Melhores times:*\n\n*1-* Thor Líder, Loki e Hela");
   });
 
   it("título de rotação vai em itálico antes da sequência", () => {
     const text = buildDayMessage({
       mode: "BAX",
+      day: 1,
       effect: "Paralisia",
       criteria: [],
       labels,
       teams: [],
       rotations: [{ name: "Wanda", rotations: [{ title: "Abertura", sequence: "1c2", description: null }, { title: null, sequence: "3c4", description: "Loop" }] }],
     });
-    expect(text).toBe("*BAX PARALISIA:*\n\n*Rotação:*\n\n- *Wanda:*\n_Abertura_\n1c2\n\n3c4\n\nLoop");
+    expect(text).toBe("*BAX DIA 1 PARALISIA Sem restrição:*\n\n*Rotação:*\n\n- *Wanda:*\n_Abertura_\n1c2\n\n3c4\n\nLoop");
   });
 });

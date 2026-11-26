@@ -134,6 +134,8 @@ export interface MetaTeam {
   mode: DayMode | null;
   dayNumber: number | null;
   isPrimary: boolean;
+  /** Dobradinha (marcada pelo admin): aparece na equipe, no dia e na mensagem do dia. */
+  isDuo: boolean;
   label: string | null;
   labelEn: string | null;
   notes: string | null;

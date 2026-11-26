@@ -7,6 +7,7 @@ type DbMetaTeam = {
   id: string;
   scope: string;
   isPrimary: boolean;
+  isDuo: boolean;
   position: number;
   label: string | null;
   labelEn: string | null;
@@ -34,6 +35,7 @@ export function toMetaTeam(t: DbMetaTeam): MetaTeam {
     mode: (t.battleDay?.mode as DayMode) ?? null,
     dayNumber: t.battleDay?.number ?? null,
     isPrimary: t.isPrimary,
+    isDuo: t.isDuo,
     position: t.position,
     label: t.label,
     labelEn: t.labelEn,

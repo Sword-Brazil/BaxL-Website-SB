@@ -56,6 +56,7 @@
     "updatedAt": "Updated {{date}}",
     "unavailable": "Unavailable",
     "video": "Video",
+    "duo": "Duo",
     "slots": {
       "SOLO": "Leader",
       "SUPPORT_1": "Left",

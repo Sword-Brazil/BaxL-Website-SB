@@ -21,11 +21,12 @@ import type { UserTeam } from "@/models/schemas/selections";
 import { pick, teamLabel } from "@/models/rules/localize";
 import { useContentLang } from "@/viewmodels/useContentLang";
 import { useCycleViewModel, type CycleViewModel, type WeekFilter } from "@/viewmodels/useCycleViewModel";
+import { useAuthViewModel } from "@/viewmodels/useAuthViewModel";
 import { useDayMessageViewModel } from "@/viewmodels/useDayMessageViewModel";
 import { useMetaUpdatesNotice } from "@/viewmodels/useMetaUpdatesNotice";
 import { useTeamsExportViewModel } from "@/viewmodels/useTeamsExportViewModel";
 import { HelpHint } from "@/views/layout/HelpHint";
-import { TeamStrip as SharedTeamStrip, type StripMember, type TeamTone } from "@/views/shared/TeamStrip";
+import { DuoBadge, TeamStrip as SharedTeamStrip, type StripMember, type TeamTone } from "@/views/shared/TeamStrip";
 import { QueryState } from "@/views/shared/QueryState";
 import { MODE_VISUALS } from "@/views/shared/modeVisuals";
 import { ResetTeamsOptions } from "@/views/shared/ResetTeamsOptions";
@@ -45,6 +46,7 @@ function TeamStrip(props: {
   effect?: BossEffect;
   mode?: Mode;
   videoUrl?: string | null;
+  duo?: boolean;
 }) {
   const { vm } = props;
   return (
@@ -57,6 +59,7 @@ function TeamStrip(props: {
       effect={props.effect}
       mode={props.mode}
       videoUrl={props.videoUrl}
+      duo={props.duo}
     />
   );
 }
@@ -109,6 +112,8 @@ function ModePanel({
   const look = MODE_VISUALS[mode];
   const effect = vm.cycle?.season[mode];
   const message = useDayMessageViewModel(vm.catalog);
+  // Mensagem do dia para o grupo: só administradores copiam.
+  const { isAdmin } = useAuthViewModel();
   return (
     // Faixa e fundo na cor do modo (BAX azul, BAL laranja), como no jogo.
     <div className={cn("flex min-w-0 flex-col gap-2 border-t-2 p-3", look.accentBar, look.tint)}>
@@ -120,17 +125,18 @@ function ModePanel({
           {updated && <MetaUpdatedBadge short />}
         </span>
         <span className="flex flex-wrap items-center gap-1">
+          {data?.metaTeams.some((team) => team.isDuo) && <DuoBadge className="h-6 px-2 text-xs" />}
           {effect && <BossEffectBadge effect={effect} season />}
           <RestrictionBadges criteria={data?.criteria ?? []} />
         </span>
       </div>
       {meta ? (
-        <TeamStrip label={t("cycle:meta")} tone="meta" team={teamMembers(meta)} vm={vm} effect={effect} mode={mode} videoUrl={meta.videoUrl} />
+        <TeamStrip label={t("cycle:meta")} tone="meta" team={teamMembers(meta)} vm={vm} effect={effect} mode={mode} videoUrl={meta.videoUrl} duo={meta.isDuo} />
       ) : (
         <p className="rounded-md border border-dashed p-3 text-center text-xs text-muted-foreground">{t("cycle:noTeam")}</p>
       )}
       {alts.map((alt) => (
-        <TeamStrip key={alt.id} label={teamLabel(alt.label, alt.labelEn, lang) ?? t("cycle:alternative")} tone="alt" team={teamMembers(alt)} vm={vm} effect={effect} mode={mode} videoUrl={alt.videoUrl} />
+        <TeamStrip key={alt.id} label={teamLabel(alt.label, alt.labelEn, lang) ?? t("cycle:alternative")} tone="alt" team={teamMembers(alt)} vm={vm} effect={effect} mode={mode} videoUrl={alt.videoUrl} duo={alt.isDuo} />
       ))}
       {mine.length > 0 && <TeamStrip label={t("cycle:mine")} tone="mine" team={mine} vm={vm} effect={effect} />}
       <div className="flex flex-wrap items-center gap-2">
@@ -138,8 +144,8 @@ function ModePanel({
           {mine.length ? <PencilIcon data-icon="inline-start" /> : <PlusIcon data-icon="inline-start" />}
           {mine.length ? t("cycle:edit") : t("cycle:build")}
         </Button>
-        {meta && data && (
-          <Button variant="ghost" size="sm" onClick={() => message.copy(mode, data, vm.cycle?.season ?? null)}>
+        {isAdmin && meta && data && (
+          <Button variant="ghost" size="sm" onClick={() => message.copy(mode, day, data, vm.cycle?.season ?? null)}>
             <ClipboardCopyIcon data-icon="inline-start" />
             {t("cycle:message.button")}
           </Button>
@@ -178,12 +184,12 @@ function BaiPanel({ day, vm }: { day: number; vm: Vm }) {
       </div>
       <div className="grid gap-2 md:grid-cols-2">
         {meta ? (
-          <TeamStrip label={t("cycle:meta")} tone="meta" team={teamMembers(meta)} vm={vm} mode="BAI" videoUrl={meta.videoUrl} />
+          <TeamStrip label={t("cycle:meta")} tone="meta" team={teamMembers(meta)} vm={vm} mode="BAI" videoUrl={meta.videoUrl} duo={meta.isDuo} />
         ) : (
           <p className="rounded-md border border-dashed p-3 text-center text-xs text-muted-foreground">{t("cycle:noTeam")}</p>
         )}
         {alts.map((alt) => (
-          <TeamStrip key={alt.id} label={teamLabel(alt.label, alt.labelEn, lang) ?? t("cycle:alternative")} tone="alt" team={teamMembers(alt)} vm={vm} mode="BAI" videoUrl={alt.videoUrl} />
+          <TeamStrip key={alt.id} label={teamLabel(alt.label, alt.labelEn, lang) ?? t("cycle:alternative")} tone="alt" team={teamMembers(alt)} vm={vm} mode="BAI" videoUrl={alt.videoUrl} duo={alt.isDuo} />
         ))}
         {mine.length > 0 && <TeamStrip label={t("cycle:mine")} tone="mine" team={mine} vm={vm} />}
       </div>
