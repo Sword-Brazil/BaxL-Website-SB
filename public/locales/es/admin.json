@@ -50,7 +50,7 @@
     "help": "Elige un valor por atributo. Deja \"Cualquiera\" para no restringir ese atributo. Los días de BAI (3, 10, 17, 24) no aparecen aquí.",
     "season": {
       "title": "Temporada actual",
-      "help": "Par de efectos que aturde al jefe en esta temporada (28 días): el primero en la BAX, el segundo en la BAL. Vale para todos los días del modo; cámbialo cuando cambie la temporada."
+      "help": "Par de efectos que aturde al jefe en esta temporada (28 días): el primero en BAX, el segundo en BAL. Cambia solo el Día 1 de cada ciclo, en el orden Parálisis y Choque → Quemadura y Fractura → Silencio y Trampa. Solo cámbiala aquí si está mal; las siguientes siguen el orden a partir de ella."
     }
   },
   "metas": {
@@ -65,6 +65,7 @@
     "newTeam": "Nuevo equipo",
     "editTeam": "Editar equipo",
     "isPrimary": "Equipo principal",
+    "isDuo": "Dúo (aparece en el sitio y en el mensaje del día)",
     "label": "Etiqueta (ej.: alternativa sin uniforme X)",
     "notes": "Observaciones",
     "pickAgent": "Elegir agente…",
@@ -99,6 +100,12 @@
     "pickStriker": "Elegir Striker",
     "removeStriker": "Quitar Striker",
     "strikerHelp": "Apoyo desbloqueado en Trascendencia 4: entra en la partida y usa una sola habilidad para daño extra.",
+    "seasonStrikersHelp": "Striker por temporada (opcional): sin el de la temporada, vale el de arriba.",
+    "currentSeason": "actual",
+    "video": "Video del equipo",
+    "videoPlaceholder": "https://youtu.be/...",
+    "videoHelp": "YouTube o .mp4/.webm. Cada equipo tiene el suyo (solo, dúo...) y va en el mensaje del día. Abajo, opcional, el video de cada temporada; vacío usa este. Sin video del equipo, vale el de la rotación del causante de daño.",
+    "videoSeasonPlaceholder": "Vacío: usa el video de arriba",
     "order": {
       "button": "Ordenar alternativas",
       "title": "Orden de las alternativas",

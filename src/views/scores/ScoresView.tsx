@@ -3,8 +3,19 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next/pages";
 import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts";
-import { LockIcon, TrendingDownIcon, TrendingUpIcon, TrophyIcon } from "lucide-react";
+import { LockIcon, Trash2Icon, TrendingDownIcon, TrendingUpIcon, TrophyIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,7 +26,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { WEEKDAYS, weekdayOf, type SeasonId } from "@/models/domain/enums";
-import { addDays, parsePoints, type Comparison } from "@/models/rules/scores";
+import { SCORE_MODES, addDays, parsePoints, type Comparison } from "@/models/rules/scores";
+import { useResetScoresViewModel, type ResetScoresScope } from "@/viewmodels/useResetScoresViewModel";
 import { useScoresViewModel, type ScoresViewModel } from "@/viewmodels/useScoresViewModel";
 import { HelpHint } from "@/views/layout/HelpHint";
 import { MODE_VISUALS } from "@/views/shared/modeVisuals";
@@ -666,6 +678,48 @@ function HistoryCard({ vm }: { vm: ScoresViewModel }) {
   );
 }
 
+const RESET_SCOPES: ResetScoresScope[] = ["ALL", ...SCORE_MODES];
+
+/** Apagar as pontuações (todas ou de um modo), cada botão com confirmação, como o "Limpar equipes". */
+function ResetScoresCard() {
+  const { t } = useTranslation(["scores", "common"]);
+  const vm = useResetScoresViewModel();
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{t("scores:reset.title")}</CardTitle>
+        <CardDescription>{t("scores:reset.text")}</CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-wrap gap-2">
+        {RESET_SCOPES.map((scope) => (
+          <AlertDialog key={scope}>
+            <AlertDialogTrigger asChild>
+              <Button variant={scope === "ALL" ? "destructive" : "outline"} size="sm" disabled={!vm.hasScores(scope)}>
+                {scope === "ALL" && <Trash2Icon data-icon="inline-start" />}
+                {scope === "ALL" ? t("scores:reset.all") : scope}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{t("scores:reset.title")}</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {scope === "ALL" ? t("scores:reset.confirmAll") : t("scores:reset.confirmMode", { mode: scope })}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{t("common:actions.cancel")}</AlertDialogCancel>
+                <AlertDialogAction variant="destructive" onClick={() => vm.reset(scope)}>
+                  {t("common:actions.confirm")}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
+
 export function ScoresView() {
   const { t } = useTranslation("scores");
   const vm = useScoresViewModel();
@@ -695,6 +749,7 @@ export function ScoresView() {
             <EntryCard vm={vm} />
             <PerformanceCard vm={vm} />
             <HistoryCard vm={vm} />
+            <ResetScoresCard />
           </>
         )}
       </QueryState>

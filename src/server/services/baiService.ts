@@ -4,6 +4,8 @@ import type { BaiBossesInput } from "@/models/schemas/admin";
 import { prisma } from "@/server/db";
 import { metaTeamRepository } from "@/server/repositories/metaTeamRepository";
 import { toMetaTeam } from "./mappers";
+import { getSeason } from "./seasonService";
+import { teamForSeason } from "@/models/rules/teamSeason";
 import { effectivePriority } from "@/models/rules/priority";
 import { getPriority } from "./priorityService";
 import { getSettings } from "./settingsService";
@@ -34,12 +36,13 @@ export async function saveBosses(input: BaiBossesInput): Promise<BaiBoss[]> {
 
 /** Conteúdo público da BAI: chefes, equipes recomendadas, prioridade e início da próxima BAI. */
 export async function getPublicBai(now = new Date()): Promise<BaiContent> {
-  const [bosses, teams, reserves, settings] = await Promise.all([
+  const [bosses, teams, reserves, settings, season] = await Promise.all([
     listBosses(),
     metaTeamRepository.listByScope("BAI"),
     getPriority({ scope: "BAI" }),
     getSettings(),
+    getSeason(),
   ]);
-  const metaTeams = teams.map(toMetaTeam);
+  const metaTeams = teams.map((t) => teamForSeason(toMetaTeam(t), season.id));
   return { bosses, metaTeams, priority: effectivePriority(metaTeams, reserves), nextStart: getBattleClock(now, settings).nextBaiStart };
 }

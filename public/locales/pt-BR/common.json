@@ -55,6 +55,8 @@
     "alternative": "Alternativa",
     "updatedAt": "Atualizado em {{date}}",
     "unavailable": "Indisponível",
+    "video": "Vídeo",
+    "duo": "Dobradinha",
     "slots": {
       "SOLO": "Líder",
       "SUPPORT_1": "Esquerda",

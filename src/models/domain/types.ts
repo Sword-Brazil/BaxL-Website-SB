@@ -85,8 +85,13 @@ export interface MetaTeamMember {
   ctpSlot: 1 | 2 | null;
   /** Causador de Dano (qualquer posição): leva às rotações do personagem. */
   isDamageDealer: boolean;
-  /** Striker meta (apoio da Transcendência 4) do Causador de Dano; null = não indicado. */
+  /**
+   * Striker meta (apoio da Transcendência 4) do Causador de Dano; null = não indicado. Nas telas
+   * públicas já é o da temporada atual (quando cadastrado).
+   */
   strikerUniformId: string | null;
+  /** Striker de cada temporada; sem o da temporada, vale `strikerUniformId`. */
+  seasonStrikers: Partial<Record<SeasonId, string>>;
 }
 
 /** Rotação de um personagem, em texto livre. `uniformId` null = vale para todos os trajes. */
@@ -129,9 +134,18 @@ export interface MetaTeam {
   mode: DayMode | null;
   dayNumber: number | null;
   isPrimary: boolean;
+  /** Dobradinha (marcada pelo admin): aparece na equipe, no dia e na mensagem do dia. */
+  isDuo: boolean;
   label: string | null;
   labelEn: string | null;
   notes: string | null;
+  /**
+   * Vídeo da equipe (solo, dobradinha...). Nas telas públicas já é o da temporada atual
+   * (quando cadastrado); senão, o geral.
+   */
+  videoUrl: string | null;
+  /** Vídeo de cada temporada; sem o da temporada, vale `videoUrl`. */
+  seasonVideos: Partial<Record<SeasonId, string>>;
   members: MetaTeamMember[];
   /** Ordem entre as alternativas do mesmo dia (a principal vem sempre primeiro). */
   position: number;

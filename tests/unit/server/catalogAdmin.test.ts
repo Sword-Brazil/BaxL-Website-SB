@@ -104,4 +104,24 @@ describe("temporada", () => {
     expect(await setSeason({ id: "BURN_FRACTURE" })).toEqual({ id: "BURN_FRACTURE", BAX: "BURN", BAL: "FRACTURE" });
     expect(await setSeason({ id: "SILENCE_TRAP" })).toEqual({ id: "SILENCE_TRAP", BAX: "SILENCE", BAL: "TRAP" });
   });
+
+  it("muda sozinha no Dia 1 de cada ciclo (12h), na ordem Paralisia → Queimadura → Silêncio → Paralisia", async () => {
+    // Dia 1 numa quinta, 12h de Brasília (15h UTC).
+    await prisma.settings.create({ data: { id: 1, cycleAnchor: new Date("2026-10-22T15:00:00Z") } });
+    const at = (iso: string) => getSeason(new Date(iso)).then((s) => s.id);
+    await setSeason({ id: "PARALYSIS_SHOCK" }, new Date("2026-10-30T12:00:00Z"));
+    expect(await at("2026-11-19T14:59:00Z")).toBe("PARALYSIS_SHOCK"); // Dia 28, antes da virada
+    expect(await at("2026-11-19T15:00:00Z")).toBe("BURN_FRACTURE"); // Dia 1 do ciclo seguinte
+    expect(await at("2026-12-17T15:00:00Z")).toBe("SILENCE_TRAP");
+    expect(await at("2027-01-14T15:00:00Z")).toBe("PARALYSIS_SHOCK");
+    // Corrigir no meio do ciclo: as próximas seguem a partir da escolhida.
+    await setSeason({ id: "SILENCE_TRAP" }, new Date("2026-11-25T12:00:00Z"));
+    expect(await at("2026-12-17T15:00:00Z")).toBe("PARALYSIS_SHOCK");
+  });
+
+  it("temporada salva antes da troca automática vale para o ciclo atual", async () => {
+    await prisma.settings.create({ data: { id: 1, cycleAnchor: new Date("2026-10-22T15:00:00Z"), season: "BURN_FRACTURE" } });
+    expect((await getSeason(new Date("2026-11-26T12:00:00Z"))).id).toBe("BURN_FRACTURE");
+    expect((await getSeason(new Date("2026-12-17T15:00:00Z"))).id).toBe("SILENCE_TRAP");
+  });
 });

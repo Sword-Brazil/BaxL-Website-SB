@@ -33,6 +33,17 @@
   "cycleDays": "Días del ciclo",
   "metaUpdated": "Meta actualizada",
   "metaUpdatedShort": "Actualizada",
+  "message": {
+    "button": "Copiar mensaje del día",
+    "copied": "Mensaje copiado: solo pégalo en el grupo",
+    "copyFailed": "No se pudo copiar el mensaje",
+    "bestTeams": "Mejores equipos",
+    "rotation": "Rotación",
+    "leader": "Líder",
+    "and": "y",
+    "striker": "{{striker}} striker en {{target}}",
+    "striker_female": "{{striker}} striker en {{target}}"
+  },
   "export": {
     "button": "Exportar tabla (HTML)",
     "title": "Equipos de la Batalla de Alianza",
