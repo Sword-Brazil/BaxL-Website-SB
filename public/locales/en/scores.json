@@ -22,7 +22,8 @@
     "seasonFooter_other": "{{count}} days filled · since {{date}}",
     "best": "Best day",
     "bestFooter": "Day {{day}} · {{date}}",
-    "bestNone": "No day filled yet"
+    "bestNone": "No day filled yet",
+    "lastWeek": "Last week: {{value}}"
   },
   "entry": {
     "title": "Log score",
@@ -53,7 +54,12 @@
     "empty": "Log a day's score to see the charts.",
     "partial": "partial",
     "season": "Season",
-    "seasonOption": "Season {{range}}"
+    "seasonOption": "Season {{range}}",
+    "total": "Season total",
+    "part": {
+      "pre": "12:00",
+      "post": "22:00"
+    }
   },
   "compare": {
     "current": "This season",
@@ -76,5 +82,14 @@
     "team": "Team",
     "preReset": "before reset",
     "normal": "+ {{value}} normal BA"
+  },
+  "reset": {
+    "title": "Clear scores",
+    "text": "Deletes the scores you logged: all at once or just one mode. Your teams and roster stay.",
+    "all": "All scores",
+    "confirmAll": "Delete all your BAX, BAL and BAI scores?",
+    "confirmMode": "Delete your {{mode}} scores?",
+    "doneAll": "All your scores were deleted",
+    "doneMode": "{{mode}} scores deleted"
   }
 }

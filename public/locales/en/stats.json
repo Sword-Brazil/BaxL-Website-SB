@@ -22,7 +22,17 @@
     "days_one": "{{count}} day",
     "days_other": "{{count}} days",
     "export": "Export (HTML)",
-    "noCtp": "No CTP"
+    "noCtp": "No CTP",
+    "role": "Role",
+    "roles": {
+      "DAMAGE": "Damage Dealers",
+      "SUPPORT": "Supports / Leaders"
+    },
+    "roleHintMine": "In your teams, the Damage Dealer is whoever has a Striker picked.",
+    "rolesShort": {
+      "DAMAGE": "Damage",
+      "SUPPORT": "Support / Leader"
+    }
   },
   "ctp": {
     "title": "My equipped CTPs",

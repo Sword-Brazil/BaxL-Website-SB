@@ -22,7 +22,17 @@
     "days_one": "{{count}} día",
     "days_other": "{{count}} días",
     "export": "Exportar (HTML)",
-    "noCtp": "Sin CTP"
+    "noCtp": "Sin CTP",
+    "role": "Rol",
+    "roles": {
+      "DAMAGE": "Causantes de Daño",
+      "SUPPORT": "Soportes / Líderes"
+    },
+    "roleHintMine": "En tus equipos, el Causante de Daño es quien tiene un Striker elegido.",
+    "rolesShort": {
+      "DAMAGE": "Daño",
+      "SUPPORT": "Soporte / Líder"
+    }
   },
   "ctp": {
     "title": "Mis CTPs equipados",

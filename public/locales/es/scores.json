@@ -22,7 +22,8 @@
     "seasonFooter_other": "{{count}} días completados · desde {{date}}",
     "best": "Mejor día",
     "bestFooter": "Día {{day}} · {{date}}",
-    "bestNone": "Ningún día completado aún"
+    "bestNone": "Ningún día completado aún",
+    "lastWeek": "Semana anterior: {{value}}"
   },
   "entry": {
     "title": "Anotar puntuación",
@@ -53,7 +54,12 @@
     "empty": "Anota la puntuación de un día para ver los gráficos.",
     "partial": "parcial",
     "season": "Temporada",
-    "seasonOption": "Temporada {{range}}"
+    "seasonOption": "Temporada {{range}}",
+    "total": "Total de la temporada",
+    "part": {
+      "pre": "12h",
+      "post": "22h"
+    }
   },
   "compare": {
     "current": "Esta temporada",
@@ -76,5 +82,14 @@
     "team": "Equipo",
     "preReset": "antes del reset",
     "normal": "+ {{value}} BA normal"
+  },
+  "reset": {
+    "title": "Borrar puntuaciones",
+    "text": "Borra las puntuaciones que anotaste: todas a la vez o solo de un modo. Tus equipos y tu plantel se quedan.",
+    "all": "Todas las puntuaciones",
+    "confirmAll": "¿Borrar todas tus puntuaciones de BAX, BAL y BAI?",
+    "confirmMode": "¿Borrar tus puntuaciones de {{mode}}?",
+    "doneAll": "Todas tus puntuaciones fueron borradas",
+    "doneMode": "Puntuaciones de {{mode}} borradas"
   }
 }

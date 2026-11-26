@@ -29,5 +29,5 @@ export function useBattleClockViewModel() {
     [query.data, tick, offsetMs],
   );
 
-  return { clock, settings: query.data?.settings ?? null, isLoading: query.isLoading, isError: query.isError, refetch: query.refetch };
+  return { clock, settings: query.data?.settings ?? null, season: query.data?.season ?? null, isLoading: query.isLoading, isError: query.isError, refetch: query.refetch };
 }

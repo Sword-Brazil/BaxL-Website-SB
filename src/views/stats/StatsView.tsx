@@ -23,7 +23,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { CTP_QUALITIES } from "@/models/domain/enums";
-import { ctpsOfUses, type AgentUse, type CtpUsage, type StatsMode } from "@/models/rules/stats";
+import { ctpsOfUses, type AgentUse, type CtpUsage, type StatsMode, type StatsRole } from "@/models/rules/stats";
 import { useStatsViewModel, type RepetitionSource } from "@/viewmodels/useStatsViewModel";
 import { HelpHint } from "@/views/layout/HelpHint";
 import { CtpBadge } from "@/views/shared/CtpBadge";
@@ -156,6 +156,21 @@ function RepetitionChart({ vm }: { vm: StatsVm }) {
               </ToggleGroupItem>
             ))}
           </ToggleGroup>
+          {/* Papel: só Causadores de Dano, ou só Suportes/Líderes (vale também para a exportação). */}
+          <ToggleGroup
+            type="single"
+            size="sm"
+            variant="outline"
+            value={vm.role}
+            onValueChange={(v) => v && vm.setRole(v as StatsRole)}
+            aria-label={t("stats:repetition.role")}
+          >
+            {(["ALL", "DAMAGE", "SUPPORT"] as const).map((r) => (
+              <ToggleGroupItem key={r} value={r} className="px-2.5" title={r === "ALL" ? undefined : t(`stats:repetition.roles.${r}`)}>
+                {r === "ALL" ? t("cycle:all") : t(`stats:repetition.rolesShort.${r}`)}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
           {vm.source === "META" && (
             <Field orientation="horizontal" className="w-auto">
               <Switch id="with-alt" checked={vm.includeAlternatives} onCheckedChange={vm.setIncludeAlternatives} />
@@ -168,6 +183,7 @@ function RepetitionChart({ vm }: { vm: StatsVm }) {
             {t("stats:repetition.export")}
           </Button>
         </div>
+        {vm.source === "MINE" && vm.role !== "ALL" && <p className="text-xs text-muted-foreground">{t("stats:repetition.roleHintMine")}</p>}
         {data.length === 0 ? (
           <EmptyMine text={t("stats:repetition.emptyMine")} />
         ) : (

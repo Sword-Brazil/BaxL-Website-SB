@@ -18,6 +18,12 @@ describe("UserSelectionsSchema", () => {
     expect(UserSelectionsSchema.safeParse(d).success).toBe(true);
   });
 
+  it("temporada do jogo por ciclo: data do Dia 1 e uma das 3 temporadas", () => {
+    expect(UserSelectionsSchema.safeParse(doc({ scoreSeasons: { "2026-10-01": "PARALYSIS_SHOCK" } })).success).toBe(true);
+    expect(UserSelectionsSchema.safeParse(doc({ scoreSeasons: { "2026-10-01": "FIRE" } as never })).success).toBe(false);
+    expect(UserSelectionsSchema.safeParse(doc({ scoreSeasons: { "01/10": "PARALYSIS_SHOCK" } })).success).toBe(false);
+  });
+
   it("exige version 1", () => {
     expect(UserSelectionsSchema.safeParse({ ...doc(), version: 2 }).success).toBe(false);
   });

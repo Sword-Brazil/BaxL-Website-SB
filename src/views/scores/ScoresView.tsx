@@ -3,8 +3,19 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next/pages";
 import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts";
-import { LockIcon, TrendingDownIcon, TrendingUpIcon, TrophyIcon } from "lucide-react";
+import { LockIcon, Trash2Icon, TrendingDownIcon, TrendingUpIcon, TrophyIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,8 +25,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { WEEKDAYS, weekdayOf } from "@/models/domain/enums";
-import { addDays, parsePoints, type Comparison } from "@/models/rules/scores";
+import { WEEKDAYS, weekdayOf, type SeasonId } from "@/models/domain/enums";
+import { SCORE_MODES, addDays, parsePoints, type Comparison } from "@/models/rules/scores";
+import { useResetScoresViewModel, type ResetScoresScope } from "@/viewmodels/useResetScoresViewModel";
 import { useScoresViewModel, type ScoresViewModel } from "@/viewmodels/useScoresViewModel";
 import { HelpHint } from "@/views/layout/HelpHint";
 import { MODE_VISUALS } from "@/views/shared/modeVisuals";
@@ -44,6 +56,12 @@ function useFormat() {
     pct: (v: number) => `${v > 0 ? "+" : ""}${percent.format(v)}`,
     date: (d: string) => date.format(new Date(`${d}T00:00:00Z`)),
   };
+}
+
+/** "Temporada · Paralisia e Choque" (só o rótulo, sem a temporada do jogo conhecida). */
+function useSeasonName() {
+  const { t } = useTranslation("common");
+  return (id: SeasonId | null, label: string) => (id ? `${label} · ${t(`seasons.${id}`)}` : label);
 }
 
 /** Antes do reset das 22h: cadeado e contagem regressiva. */
@@ -84,7 +102,7 @@ function GrowthBadge({ cmp, className }: { cmp: Comparison; className?: string }
 }
 
 /** Cartão de número com crescimento, no estilo dos "section cards" do dashboard do shadcn. */
-function StatCard({ label, cmp, footer }: { label: string; cmp: Comparison; footer?: string }) {
+function StatCard({ label, cmp, footer, note }: { label: string; cmp: Comparison; footer?: string; note?: string }) {
   const { t } = useTranslation("scores");
   const f = useFormat();
   return (
@@ -108,6 +126,7 @@ function StatCard({ label, cmp, footer }: { label: string; cmp: Comparison; foot
           </span>
         )}
         {footer && <span>{footer}</span>}
+        {note && <span className="font-medium text-foreground">{note}</span>}
       </CardFooter>
     </Card>
   );
@@ -115,17 +134,24 @@ function StatCard({ label, cmp, footer }: { label: string; cmp: Comparison; foot
 
 function SummaryCards({ vm }: { vm: ScoresViewModel }) {
   const { t } = useTranslation("scores");
+  const seasonName = useSeasonName();
   const f = useFormat();
   const s = vm.summary;
-  if (!s || !vm.current) return null;
+  if (!s) return null;
   return (
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       <StatCard label={t("cards.today")} cmp={s.today} footer={t("cards.todayFooter")} />
-      <StatCard label={t("cards.week", { n: vm.current.week })} cmp={s.week} footer={t("cards.weekFooter")} />
+      {/* No dia do reset, antes das 22h, ainda é a semana (e a temporada) que acaba. */}
       <StatCard
-        label={t("cards.season")}
+        label={t("cards.week", { n: s.counted.week })}
+        cmp={s.week}
+        footer={t("cards.weekFooter")}
+        note={s.lastWeek === null ? undefined : t("cards.lastWeek", { value: f.n(s.lastWeek) })}
+      />
+      <StatCard
+        label={seasonName(vm.gameSeasonOf(s.counted.seasonStart), t("cards.season"))}
         cmp={s.season}
-        footer={t("cards.seasonFooter", { count: s.seasonDays, date: f.date(vm.current.seasonStart) })}
+        footer={t("cards.seasonFooter", { count: s.seasonDays, date: f.date(s.counted.seasonStart) })}
       />
       <Card className="bg-linear-to-t from-energy/5 to-card">
         <CardHeader>
@@ -133,7 +159,9 @@ function SummaryCards({ vm }: { vm: ScoresViewModel }) {
           <CardTitle className="font-heading text-2xl font-bold tabular-nums sm:text-3xl">{s.best ? f.n(s.best.total) : "—"}</CardTitle>
         </CardHeader>
         <CardFooter className="text-xs text-muted-foreground">
-          {s.best ? t("cards.bestFooter", { day: vm.dayOf(s.best.date)?.cycleDay, date: f.date(s.best.date) }) : t("cards.bestNone")}
+          {s.best
+            ? `${t("cards.bestFooter", { day: vm.dayOf(s.best.date)?.cycleDay, date: f.date(s.best.date) })}${s.best.split ? ` · ${t(`entry.phase.${s.best.phase}`)}` : ""}`
+            : t("cards.bestNone")}
         </CardFooter>
       </Card>
     </div>
@@ -309,6 +337,10 @@ function CompareTooltip({ active, payload }: { active?: boolean; payload?: { pay
   );
 }
 
+/** Traço dos gráficos de pontuação: verde-escuro (esta temporada / ganho), vermelho-escuro (mês anterior / perda). */
+const LINE_GAIN = "#166534";
+const LINE_LOSS = "#991b1b";
+
 /**
  * Esta temporada (área forte) contra o mês anterior (área clara e tracejada), no estilo do "Area
  * Chart - Interactive" do shadcn.
@@ -317,8 +349,8 @@ function CompareArea({ id, data }: { id: string; data: CompareRow[] }) {
   const { t } = useTranslation("scores");
   const f = useFormat();
   const config = {
-    previous: { label: t("compare.previous"), color: "var(--ramp3-1)" },
-    current: { label: t("compare.current"), color: "var(--ramp3-3)" },
+    previous: { label: t("compare.previous"), color: LINE_LOSS },
+    current: { label: t("compare.current"), color: LINE_GAIN },
   } satisfies ChartConfig;
   const single = data.filter((d) => d.current !== null).length <= 1;
   return (
@@ -383,8 +415,8 @@ function GrowthArea({ id, data }: { id: string; data: CompareRow[] }) {
             <stop offset={1} stopColor="var(--loss)" stopOpacity={0.4} />
           </linearGradient>
           <linearGradient id={`${id}-line`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset={zero} stopColor="var(--gain)" />
-            <stop offset={zero} stopColor="var(--loss)" />
+            <stop offset={zero} stopColor={LINE_GAIN} />
+            <stop offset={zero} stopColor={LINE_LOSS} />
           </linearGradient>
         </defs>
         <CartesianGrid vertical={false} strokeOpacity={0.5} />
@@ -399,7 +431,7 @@ function GrowthArea({ id, data }: { id: string; data: CompareRow[] }) {
           connectNulls
           fill={`url(#${id}-fill)`}
           // Degradê no traço só com ganho e perda juntos: numa linha reta (um sinal só) ele fica sem cor.
-          stroke={max > 0 && min < 0 ? `url(#${id}-line)` : min < 0 ? "var(--loss)" : "var(--gain)"}
+          stroke={max > 0 && min < 0 ? `url(#${id}-line)` : min < 0 ? LINE_LOSS : LINE_GAIN}
           strokeWidth={2}
           dot={
             single
@@ -407,7 +439,7 @@ function GrowthArea({ id, data }: { id: string; data: CompareRow[] }) {
                   p.payload?.delta === null || p.payload?.delta === undefined ? (
                     <g key={p.index} />
                   ) : (
-                    <circle key={p.index} cx={p.cx} cy={p.cy} r={4} fill={p.payload.delta >= 0 ? "var(--gain)" : "var(--loss)"} />
+                    <circle key={p.index} cx={p.cx} cy={p.cy} r={4} fill={p.payload.delta >= 0 ? LINE_GAIN : LINE_LOSS} />
                   )
               : false
           }
@@ -474,11 +506,13 @@ function CompareTable({ rows, unit }: { rows: CompareRow[]; unit: string }) {
 function PerformanceCard({ vm }: { vm: ScoresViewModel }) {
   const { t } = useTranslation(["scores", "common"]);
   const f = useFormat();
-  const seasonLabel = (start: string) => `${f.date(start)} – ${f.date(addDays(start, 27))}`;
+  const seasonName = useSeasonName();
+  const seasonLabel = (start: string) => seasonName(vm.gameSeasonOf(start), `${f.date(start)} – ${f.date(addDays(start, 27))}`);
+  // O dia do reset aparece em duas partes: 12h–22h (fecha a semana) e 22h–12h (abre a nova).
   const days: CompareRow[] = vm.days.map((d) => ({
     ...d,
-    label: `D${d.cycleDay}`,
-    detail: `${t(`common:weekdays.${weekdayOf(d.cycleDay)}`)} ${f.date(d.date)}${d.isBai ? " · BAI" : ""}`,
+    label: `D${d.cycleDay}${d.split ? ` ${t(`scores:chart.part.${d.phase}`)}` : ""}`,
+    detail: `${t(`common:weekdays.${weekdayOf(d.cycleDay)}`)} ${f.date(d.date)}${d.isBai ? " · BAI" : ""}${d.split ? ` · ${t(`scores:entry.phase.${d.phase}`)}` : ""}`,
   }));
   const weeks: CompareRow[] = vm.weeks.map((w) => ({
     ...w,
@@ -514,6 +548,17 @@ function PerformanceCard({ vm }: { vm: ScoresViewModel }) {
                 ))}
               </SelectContent>
             </Select>
+          )}
+          {/* Total da temporada escolhida (soma das semanas), contra o mês anterior até o mesmo ponto. */}
+          {vm.total.current !== null && (
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border bg-energy/5 px-3 py-2">
+              <span className="text-xs text-muted-foreground">{vm.season ? seasonName(vm.gameSeasonOf(vm.season), t("scores:chart.total")) : t("scores:chart.total")}</span>
+              <span className="font-heading text-xl font-bold tabular-nums">{f.n(vm.total.current)}</span>
+              <GrowthBadge cmp={vm.total} />
+              {vm.total.previous !== null && (
+                <span className="text-xs text-muted-foreground">{t("scores:compare.previousWas", { value: f.n(vm.total.previous) })}</span>
+              )}
+            </div>
           )}
           {empty && (
             <p className="absolute inset-x-6 top-1/3 z-10 rounded-md border border-dashed bg-card/90 p-6 text-center text-sm text-muted-foreground">
@@ -633,6 +678,48 @@ function HistoryCard({ vm }: { vm: ScoresViewModel }) {
   );
 }
 
+const RESET_SCOPES: ResetScoresScope[] = ["ALL", ...SCORE_MODES];
+
+/** Apagar as pontuações (todas ou de um modo), cada botão com confirmação, como o "Limpar equipes". */
+function ResetScoresCard() {
+  const { t } = useTranslation(["scores", "common"]);
+  const vm = useResetScoresViewModel();
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{t("scores:reset.title")}</CardTitle>
+        <CardDescription>{t("scores:reset.text")}</CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-wrap gap-2">
+        {RESET_SCOPES.map((scope) => (
+          <AlertDialog key={scope}>
+            <AlertDialogTrigger asChild>
+              <Button variant={scope === "ALL" ? "destructive" : "outline"} size="sm" disabled={!vm.hasScores(scope)}>
+                {scope === "ALL" && <Trash2Icon data-icon="inline-start" />}
+                {scope === "ALL" ? t("scores:reset.all") : scope}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{t("scores:reset.title")}</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {scope === "ALL" ? t("scores:reset.confirmAll") : t("scores:reset.confirmMode", { mode: scope })}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{t("common:actions.cancel")}</AlertDialogCancel>
+                <AlertDialogAction variant="destructive" onClick={() => vm.reset(scope)}>
+                  {t("common:actions.confirm")}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
+
 export function ScoresView() {
   const { t } = useTranslation("scores");
   const vm = useScoresViewModel();
@@ -662,6 +749,7 @@ export function ScoresView() {
             <EntryCard vm={vm} />
             <PerformanceCard vm={vm} />
             <HistoryCard vm={vm} />
+            <ResetScoresCard />
           </>
         )}
       </QueryState>

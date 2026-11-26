@@ -3,6 +3,11 @@ import type { CycleOverview, MetaTeam } from "@/models/domain/types";
 import { TEAM_KEY_RE, type UserTeam } from "@/models/schemas/selections";
 
 export type StatsMode = "ALL" | "BAX" | "BAL" | "BAI";
+/** Papel na equipe: Causador de Dano, ou Suporte/Líder (quem não é o Causador de Dano). */
+export type StatsRole = "ALL" | "DAMAGE" | "SUPPORT";
+
+/** Se a aparição entra no filtro de papel. */
+const roleMatches = (role: StatsRole, damageDealer: boolean) => role === "ALL" || (role === "DAMAGE") === damageDealer;
 
 /** Uma aparição do personagem: modo, dia do ciclo e o CTP que ele usa nela. */
 export interface AgentUse {
@@ -41,12 +46,13 @@ export function ctpsOfUses(uses: AgentUse[]): { ctpId: string; count: number }[]
 
 /**
  * Quantas vezes cada personagem aparece nas equipes do ciclo de 28 dias, por semana.
- * Conta uma aparição por equipe em que o personagem está (Meta e, se pedido, Alternativas).
+ * Conta uma aparição por equipe em que o personagem está (Meta e, se pedido, Alternativas). Com
+ * `role`, só as aparições como Causador de Dano (ou só como Suporte/Líder).
  */
 export function agentRepetition(
   cycle: CycleOverview,
   agentOf: (uniformId: string) => { id: string; name: string } | undefined,
-  opts: { mode: StatsMode; includeAlternatives: boolean },
+  opts: { mode: StatsMode; includeAlternatives: boolean; role?: StatsRole },
 ): AgentRepetition[] {
   const rows = new Map<string, AgentRepetition>();
   const count = (teams: MetaTeam[], where: { mode: AgentUse["mode"]; day: number; week: number }) => {
@@ -54,7 +60,7 @@ export function agentRepetition(
     for (const team of pool) {
       for (const m of team.members) {
         const agent = agentOf(m.uniformId);
-        if (!agent) continue;
+        if (!agent || !roleMatches(opts.role ?? "ALL", m.isDamageDealer)) continue;
         const row = rows.get(agent.id) ?? newRow(agent);
         row.weeks[where.week - 1]++;
         row.total++;
@@ -95,20 +101,22 @@ const filledTeams = (teams: Record<string, UserTeam>, mode: StatsMode) =>
 /**
  * Como agentRepetition, mas nas equipes montadas pelo usuário. A equipe da BAI vale para os quatro
  * dias de BAI do ciclo (uma aparição por semana), igual à contagem das Metas. `ctpOf` dá o CTP que
- * o personagem usa na equipe (o do slot escolhido no dia).
+ * o personagem usa na equipe (o do slot escolhido no dia). Nas equipes do usuário, o Causador de
+ * Dano é quem tem Striker escolhido (o único sinal que a equipe salva tem).
  */
 export function myAgentRepetition(
   teams: Record<string, UserTeam>,
   agentOf: AgentOf,
   mode: StatsMode,
   ctpOf: (pick: NonNullable<UserTeam[Slot]>, agentId: string) => string | null = (pick) => pick.ctpId ?? null,
+  role: StatsRole = "ALL",
 ): AgentRepetition[] {
   const rows = new Map<string, AgentRepetition>();
   for (const team of filledTeams(teams, mode)) {
     const days = team.day ? [team.day] : [...BAI_DAYS];
     for (const m of team.members) {
       const agent = agentOf(m.uniformId);
-      if (!agent) continue;
+      if (!agent || !roleMatches(role, !!m.pick.strikerUniformId)) continue;
       const row = rows.get(agent.id) ?? newRow(agent);
       const ctpId = ctpOf(m.pick, agent.id);
       for (const day of days) {
