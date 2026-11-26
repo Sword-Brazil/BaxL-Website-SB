@@ -8,6 +8,9 @@ import { changeRole, createUser as createAccount, deleteUser, listUsers } from "
 import { createAgent, createMetaTeam, createUser, ctpId, dayId, seedBase } from "./fixtures";
 import { deleteCtp, saveCtp } from "@/server/services/catalogAdminService";
 import { setFreeDaysSync } from "@/server/services/freeDaysService";
+import { getDay } from "@/server/services/daysService";
+import { setSeason } from "@/server/services/seasonService";
+import { MetaTeamSchema } from "@/models/schemas/admin";
 
 const status = (s: number) => (e: unknown) => e instanceof HttpError && e.status === s;
 
@@ -120,6 +123,47 @@ describe("curadoria", () => {
     }
   });
 
+
+  it("Striker e vídeo por temporada: o editor recebe tudo; o site, o da temporada atual (ou o geral)", async () => {
+    const other = (await createAgent("m2", { gender: "MALE", species: "MUTANT" })).uniform.id;
+    const base = team(fem);
+    const saved = await saveMetaTeam(
+      {
+        ...base,
+        videoUrl: "https://youtu.be/vcZ3Mp2aW48?t=189",
+        seasonVideos: { BURN_FRACTURE: "https://youtu.be/R_mgXn3Qh9I", SILENCE_TRAP: "" },
+        members: base.members.map((m) =>
+          m.slot === "SOLO" ? { ...m, isDamageDealer: true, strikerUniformId: maleMutant, seasonStrikers: { BURN_FRACTURE: other } } : m,
+        ),
+      },
+      curatorId,
+    );
+    expect(saved.seasonVideos).toEqual({ BURN_FRACTURE: "https://youtu.be/R_mgXn3Qh9I" });
+    expect(saved.members.find((m) => m.slot === "SOLO")).toMatchObject({ strikerUniformId: maleMutant, seasonStrikers: { BURN_FRACTURE: other } });
+
+    const publicSolo = async () => (await getDay("BAX", 6)).metaTeams[0];
+    await prisma.settings.create({ data: { id: 1, cycleAnchor: new Date() } });
+    await setSeason({ id: "PARALYSIS_SHOCK" });
+    let t = await publicSolo();
+    expect(t.videoUrl).toBe("https://youtu.be/vcZ3Mp2aW48?t=189");
+    expect(t.members.find((m) => m.slot === "SOLO")?.strikerUniformId).toBe(maleMutant);
+    await setSeason({ id: "BURN_FRACTURE" });
+    t = await publicSolo();
+    expect(t.videoUrl).toBe("https://youtu.be/R_mgXn3Qh9I");
+    expect(t.members.find((m) => m.slot === "SOLO")?.strikerUniformId).toBe(other);
+  });
+
+  it("recusa Striker da temporada do próprio personagem e vídeo de equipe que não é YouTube/.mp4", async () => {
+    const base = team(fem);
+    const err = await saveMetaTeam(
+      { ...base, members: base.members.map((m) => (m.slot === "SOLO" ? { ...m, isDamageDealer: true, seasonStrikers: { SILENCE_TRAP: fem[0] } } : m)) },
+      curatorId,
+    ).catch((e) => e);
+    expect(err).toBeInstanceOf(HttpError);
+    expect(err.status).toBe(400);
+    expect(MetaTeamSchema.safeParse({ ...base, videoUrl: "https://exemplo.com/video" }).success).toBe(false);
+    expect(MetaTeamSchema.safeParse({ ...base, seasonVideos: { BURN_FRACTURE: "http://youtu.be/vcZ3Mp2aW48" } }).success).toBe(false);
+  });
 
   it("publicar com agente fora da restrição gera 422 RESTRICTION_VIOLATION", async () => {
     const err = await saveMetaTeam(team([maleMutant, fem[1], fem[2]]), curatorId).catch((e) => e);

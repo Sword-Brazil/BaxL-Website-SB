@@ -22,12 +22,12 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Toggle } from "@/components/ui/toggle";
 import { Textarea } from "@/components/ui/textarea";
-import { DISPLAY_SLOTS } from "@/models/domain/enums";
+import { DISPLAY_SLOTS, SEASONS, type SeasonId } from "@/models/domain/enums";
 import type { Agent } from "@/models/domain/types";
 import { hasMetaStrikerTags, metaStrikerOptions } from "@/models/rules/striker";
 import type { CatalogViewModel, UniformRef } from "@/viewmodels/useCatalogViewModel";
 import type { MetaScopeViewModel } from "@/viewmodels/admin/useMetaScopeViewModel";
-import { useMetaTeamEditorViewModel, type MemberDraft } from "@/viewmodels/admin/useMetaTeamEditorViewModel";
+import { useMetaTeamEditorViewModel, type MemberDraft, type TeamDraft } from "@/viewmodels/admin/useMetaTeamEditorViewModel";
 import { useRotationsViewModel } from "@/viewmodels/useRotationsViewModel";
 import { AlternativesOrder } from "./AlternativesOrder";
 import { MetaCycleBoard } from "./MetaCycleBoard";
@@ -39,6 +39,7 @@ import { CtpSlotSwitch } from "@/views/shared/CtpSlotSwitch";
 import { EmptyTeam } from "@/views/shared/EmptyTeam";
 import { QueryState } from "@/views/shared/QueryState";
 import { RestrictionBadges } from "@/views/shared/RestrictionBadges";
+import { SeasonLabel } from "@/views/shared/BossEffect";
 import { UniformPicker } from "@/views/shared/UniformPicker";
 
 /** Strikers possíveis para um Causador de Dano: trajes ativos dos outros personagens marcados como Striker meta. */
@@ -56,18 +57,25 @@ function StrikerPicker({
   agent,
   value,
   onChange,
+  label,
 }: {
   catalog: CatalogViewModel;
   agent: Agent;
   value: string | null;
   onChange: (uniformId: string | null) => void;
+  /** Rótulo no lugar de "Striker meta de X" (o Striker de uma temporada). */
+  label?: React.ReactNode;
 }) {
   const { t } = useTranslation("admin");
   return (
     <div className="flex flex-col gap-1">
       <span className="flex items-center gap-1 text-xs font-medium text-spark">
-        <ZapIcon className="size-3.5" />
-        {t("metas.striker", { name: agent.name })}
+        {label ?? (
+          <>
+            <ZapIcon className="size-3.5" />
+            {t("metas.striker", { name: agent.name })}
+          </>
+        )}
       </span>
       <div className="flex items-center gap-1">
         <div className="min-w-0 flex-1">
@@ -87,8 +95,95 @@ function StrikerPicker({
           </Button>
         )}
       </div>
-      <p className="text-xs text-muted-foreground">{t("metas.strikerHelp")}</p>
+      {!label && <p className="text-xs text-muted-foreground">{t("metas.strikerHelp")}</p>}
     </div>
+  );
+}
+
+/** Striker de cada temporada (opcional): sem ele, vale o Striker de cima. */
+function SeasonStrikers({
+  catalog,
+  agent,
+  value,
+  current,
+  onChange,
+}: {
+  catalog: CatalogViewModel;
+  agent: Agent;
+  value: Partial<Record<SeasonId, string>>;
+  current: SeasonId | undefined;
+  onChange: (value: Partial<Record<SeasonId, string>>) => void;
+}) {
+  const { t } = useTranslation("admin");
+  return (
+    <div className="flex flex-col gap-2 rounded-md border border-dashed border-spark/30 p-2">
+      <p className="text-xs text-muted-foreground">{t("metas.seasonStrikersHelp")}</p>
+      {SEASONS.map((season) => (
+        <StrikerPicker
+          key={season}
+          catalog={catalog}
+          agent={agent}
+          value={value[season] ?? null}
+          // Tirar o Striker da temporada tira a chave (volta a valer o de cima).
+          onChange={(uniformId) =>
+            onChange(Object.fromEntries(Object.entries({ ...value, [season]: uniformId }).filter(([, id]) => !!id)))
+          }
+          label={
+            <span className="flex min-w-0 flex-wrap items-center gap-1 [&_svg]:size-3.5">
+              <SeasonLabel season={season} />
+              {season === current && <span className="text-muted-foreground">· {t("metas.currentSeason")}</span>}
+            </span>
+          }
+        />
+      ))}
+    </div>
+  );
+}
+
+/** Vídeo da equipe: o geral e, opcional, o de cada temporada. */
+function TeamVideoFields({
+  draft,
+  current,
+  onChange,
+}: {
+  draft: TeamDraft;
+  current: SeasonId | undefined;
+  onChange: (patch: Partial<TeamDraft>) => void;
+}) {
+  const { t } = useTranslation("admin");
+  return (
+    <Field>
+      <FieldLabel htmlFor="team-video">{t("metas.video")}</FieldLabel>
+      <Input
+        id="team-video"
+        type="url"
+        inputMode="url"
+        maxLength={300}
+        placeholder={t("metas.videoPlaceholder")}
+        value={draft.videoUrl}
+        onChange={(e) => onChange({ videoUrl: e.target.value })}
+      />
+      <FieldDescription>{t("metas.videoHelp")}</FieldDescription>
+      <div className="mt-1 grid gap-2">
+        {SEASONS.map((season) => (
+          <div key={season} className="flex flex-col gap-1">
+            <label htmlFor={`team-video-${season}`} className="flex flex-wrap items-center gap-1 text-xs font-medium [&_svg]:size-3.5">
+              <SeasonLabel season={season} />
+              {season === current && <span className="text-muted-foreground">· {t("metas.currentSeason")}</span>}
+            </label>
+            <Input
+              id={`team-video-${season}`}
+              type="url"
+              inputMode="url"
+              maxLength={300}
+              placeholder={t("metas.videoSeasonPlaceholder")}
+              value={draft.seasonVideos[season] ?? ""}
+              onChange={(e) => onChange({ seasonVideos: { ...draft.seasonVideos, [season]: e.target.value } })}
+            />
+          </div>
+        ))}
+      </div>
+    </Field>
   );
 }
 
@@ -341,12 +436,21 @@ export function MetaTeamEditorView({ scopeVm, freeSync = false }: { scopeVm: Met
                         }
                         striker={
                           member.uniformId && catalog.uniformById(member.uniformId) ? (
-                            <StrikerPicker
-                              catalog={catalog}
-                              agent={catalog.uniformById(member.uniformId)!.agent}
-                              value={member.strikerUniformId}
-                              onChange={(strikerUniformId) => vm.setMember(slot, { strikerUniformId })}
-                            />
+                            <>
+                              <StrikerPicker
+                                catalog={catalog}
+                                agent={catalog.uniformById(member.uniformId)!.agent}
+                                value={member.strikerUniformId}
+                                onChange={(strikerUniformId) => vm.setMember(slot, { strikerUniformId })}
+                              />
+                              <SeasonStrikers
+                                catalog={catalog}
+                                agent={catalog.uniformById(member.uniformId)!.agent}
+                                value={member.seasonStrikers}
+                                current={scopeVm.cycle.data?.season.id}
+                                onChange={(seasonStrikers) => vm.setMember(slot, { seasonStrikers })}
+                              />
+                            </>
                           ) : null
                         }
                       />
@@ -375,6 +479,7 @@ export function MetaTeamEditorView({ scopeVm, freeSync = false }: { scopeVm: Met
                     onChange={(e) => vm.update({ labelEn: e.target.value })}
                   />
                 </Field>
+                <TeamVideoFields draft={vm.draft} current={scopeVm.cycle.data?.season.id} onChange={vm.update} />
                 <Field>
                   <FieldLabel htmlFor="notes">{t("admin:metas.notes")}</FieldLabel>
                   <Textarea id="notes" maxLength={500} value={vm.draft.notes} onChange={(e) => vm.update({ notes: e.target.value })} />

@@ -55,6 +55,7 @@
     "alternative": "Alternativa",
     "updatedAt": "Atualizado em {{date}}",
     "unavailable": "Indisponível",
+    "video": "Vídeo",
     "slots": {
       "SOLO": "Líder",
       "SUPPORT_1": "Esquerda",

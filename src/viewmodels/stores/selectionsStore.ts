@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { SLOTS, type Mode, type SeasonId, type Slot } from "@/models/domain/enums";
 import { equipCtp, type CtpSlot } from "@/models/rules/ctpAssign";
-import { scoreKey, type ScoreMode, type ScorePhase } from "@/models/rules/scores";
+import { scoreKey, withoutScores, type ScoreMode, type ScorePhase } from "@/models/rules/scores";
 import { emptySelections } from "@/models/rules/selections";
 import type { TeamKey, UserSelections, UserTeam } from "@/models/schemas/selections";
 
@@ -43,6 +43,8 @@ interface SelectionsState {
   setScore: (date: string, mode: ScoreMode, points: number | null, phase?: ScorePhase) => void;
   /** Temporada do jogo que valeu no ciclo que começa em `seasonStart` (Dia 1). */
   setScoreSeason: (seasonStart: string, season: SeasonId) => void;
+  /** Apaga as pontuações de um modo ou todas (com as temporadas anotadas). */
+  resetScores: (mode?: ScoreMode) => void;
   resetMode: (mode: Mode) => void;
   /** Apaga todas as equipes montadas (BAX, BAL e BAI); elenco, CTPs e nome ficam. */
   resetAllTeams: () => void;
@@ -160,6 +162,11 @@ export const useSelectionsStore = create<SelectionsState>()(
         set(({ doc }) =>
           doc.scoreSeasons?.[seasonStart] === season ? {} : { doc: touch(doc, { scoreSeasons: { ...doc.scoreSeasons, [seasonStart]: season } }) },
         ),
+
+      resetScores: (mode) =>
+        set(({ doc }) => ({
+          doc: touch(doc, mode ? { scores: withoutScores(doc.scores ?? {}, mode) } : { scores: {}, scoreSeasons: {} }),
+        })),
 
       resetMode: (mode) =>
         set(({ doc }) => ({

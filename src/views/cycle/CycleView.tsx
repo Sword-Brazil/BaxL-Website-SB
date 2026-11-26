@@ -1,5 +1,5 @@
 import { useTranslation } from "next-i18next/pages";
-import { CalendarClockIcon, ChevronDownIcon, FileDownIcon, InfinityIcon, PencilIcon, PlusIcon, SparklesIcon, SwordsIcon, TimerResetIcon, Trash2Icon } from "lucide-react";
+import { CalendarClockIcon, ChevronDownIcon, ClipboardCopyIcon, FileDownIcon, InfinityIcon, PencilIcon, PlusIcon, SparklesIcon, SwordsIcon, TimerResetIcon, Trash2Icon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +21,7 @@ import type { UserTeam } from "@/models/schemas/selections";
 import { pick, teamLabel } from "@/models/rules/localize";
 import { useContentLang } from "@/viewmodels/useContentLang";
 import { useCycleViewModel, type CycleViewModel, type WeekFilter } from "@/viewmodels/useCycleViewModel";
+import { useDayMessageViewModel } from "@/viewmodels/useDayMessageViewModel";
 import { useMetaUpdatesNotice } from "@/viewmodels/useMetaUpdatesNotice";
 import { useTeamsExportViewModel } from "@/viewmodels/useTeamsExportViewModel";
 import { HelpHint } from "@/views/layout/HelpHint";
@@ -43,6 +44,7 @@ function TeamStrip(props: {
   vm: Vm;
   effect?: BossEffect;
   mode?: Mode;
+  videoUrl?: string | null;
 }) {
   const { vm } = props;
   return (
@@ -54,6 +56,7 @@ function TeamStrip(props: {
       isOwned={vm.hasRoster ? vm.isOwned : undefined}
       effect={props.effect}
       mode={props.mode}
+      videoUrl={props.videoUrl}
     />
   );
 }
@@ -105,6 +108,7 @@ function ModePanel({
   const mine = userMembers(vm.userTeam(mode, day), vm);
   const look = MODE_VISUALS[mode];
   const effect = vm.cycle?.season[mode];
+  const message = useDayMessageViewModel(vm.catalog);
   return (
     // Faixa e fundo na cor do modo (BAX azul, BAL laranja), como no jogo.
     <div className={cn("flex min-w-0 flex-col gap-2 border-t-2 p-3", look.accentBar, look.tint)}>
@@ -121,18 +125,26 @@ function ModePanel({
         </span>
       </div>
       {meta ? (
-        <TeamStrip label={t("cycle:meta")} tone="meta" team={teamMembers(meta)} vm={vm} effect={effect} mode={mode} />
+        <TeamStrip label={t("cycle:meta")} tone="meta" team={teamMembers(meta)} vm={vm} effect={effect} mode={mode} videoUrl={meta.videoUrl} />
       ) : (
         <p className="rounded-md border border-dashed p-3 text-center text-xs text-muted-foreground">{t("cycle:noTeam")}</p>
       )}
       {alts.map((alt) => (
-        <TeamStrip key={alt.id} label={teamLabel(alt.label, alt.labelEn, lang) ?? t("cycle:alternative")} tone="alt" team={teamMembers(alt)} vm={vm} effect={effect} mode={mode} />
+        <TeamStrip key={alt.id} label={teamLabel(alt.label, alt.labelEn, lang) ?? t("cycle:alternative")} tone="alt" team={teamMembers(alt)} vm={vm} effect={effect} mode={mode} videoUrl={alt.videoUrl} />
       ))}
       {mine.length > 0 && <TeamStrip label={t("cycle:mine")} tone="mine" team={mine} vm={vm} effect={effect} />}
-      <Button variant={mine.length ? "ghost" : "outline"} size="sm" className="self-start" onClick={() => vm.openBuilder(mode, day)}>
-        {mine.length ? <PencilIcon data-icon="inline-start" /> : <PlusIcon data-icon="inline-start" />}
-        {mine.length ? t("cycle:edit") : t("cycle:build")}
-      </Button>
+      <div className="flex flex-wrap items-center gap-2">
+        <Button variant={mine.length ? "ghost" : "outline"} size="sm" onClick={() => vm.openBuilder(mode, day)}>
+          {mine.length ? <PencilIcon data-icon="inline-start" /> : <PlusIcon data-icon="inline-start" />}
+          {mine.length ? t("cycle:edit") : t("cycle:build")}
+        </Button>
+        {meta && data && (
+          <Button variant="ghost" size="sm" onClick={() => message.copy(mode, data, vm.cycle?.season ?? null)}>
+            <ClipboardCopyIcon data-icon="inline-start" />
+            {t("cycle:message.button")}
+          </Button>
+        )}
+      </div>
     </div>
   );
 }
@@ -166,12 +178,12 @@ function BaiPanel({ day, vm }: { day: number; vm: Vm }) {
       </div>
       <div className="grid gap-2 md:grid-cols-2">
         {meta ? (
-          <TeamStrip label={t("cycle:meta")} tone="meta" team={teamMembers(meta)} vm={vm} mode="BAI" />
+          <TeamStrip label={t("cycle:meta")} tone="meta" team={teamMembers(meta)} vm={vm} mode="BAI" videoUrl={meta.videoUrl} />
         ) : (
           <p className="rounded-md border border-dashed p-3 text-center text-xs text-muted-foreground">{t("cycle:noTeam")}</p>
         )}
         {alts.map((alt) => (
-          <TeamStrip key={alt.id} label={teamLabel(alt.label, alt.labelEn, lang) ?? t("cycle:alternative")} tone="alt" team={teamMembers(alt)} vm={vm} mode="BAI" />
+          <TeamStrip key={alt.id} label={teamLabel(alt.label, alt.labelEn, lang) ?? t("cycle:alternative")} tone="alt" team={teamMembers(alt)} vm={vm} mode="BAI" videoUrl={alt.videoUrl} />
         ))}
         {mine.length > 0 && <TeamStrip label={t("cycle:mine")} tone="mine" team={mine} vm={vm} />}
       </div>

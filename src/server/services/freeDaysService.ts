@@ -1,3 +1,4 @@
+import { toSeasonMap } from "@/models/rules/teamSeason";
 import { prisma } from "@/server/db";
 
 /** Lugar de equipes e reservas: um dia de BAX/BAL (pelo id) ou a BAI. */
@@ -54,6 +55,8 @@ export async function mirrorFreePlace(source: TeamPlace): Promise<number> {
             label: t.label,
             labelEn: t.labelEn,
             notes: t.notes,
+            videoUrl: t.videoUrl,
+            seasonVideos: toSeasonMap(t.seasonVideos),
             updatedById: t.updatedById,
             members: {
               create: t.members.map((m) => ({
@@ -63,6 +66,7 @@ export async function mirrorFreePlace(source: TeamPlace): Promise<number> {
                 ctpSlot: m.ctpSlot,
                 isDamageDealer: m.isDamageDealer,
                 strikerUniformId: m.strikerUniformId,
+                seasonStrikers: toSeasonMap(m.seasonStrikers),
               })),
             },
           },

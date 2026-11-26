@@ -37,6 +37,10 @@ export function parseScoreKey(key: string): { date: string; mode: ScoreMode; pha
   return m ? { date: m[1], mode: m[2] as ScoreMode, phase: m[3] ? "pre" : "post" } : null;
 }
 
+/** Pontuações sem as de um modo (ou sem nenhuma, sem modo). */
+export const withoutScores = (scores: Record<string, number>, mode?: ScoreMode): Record<string, number> =>
+  mode ? Object.fromEntries(Object.entries(scores).filter(([key]) => parseScoreKey(key)?.mode !== mode)) : {};
+
 const DAY_MS = 86_400_000;
 const toUtc = (date: string) => Date.parse(`${date}T00:00:00Z`);
 const mod = (n: number, m: number) => ((n % m) + m) % m;

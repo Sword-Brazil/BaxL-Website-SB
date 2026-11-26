@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "next-i18next/pages";
+import { CirclePlayIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DISPLAY_SLOTS, type BossEffect, type Mode, type Slot } from "@/models/domain/enums";
 import type { MetaTeamMember } from "@/models/domain/types";
@@ -29,6 +30,7 @@ export function TeamStrip({
   effect,
   mode,
   action,
+  videoUrl,
 }: {
   label: string;
   tone: TeamTone;
@@ -41,6 +43,8 @@ export function TeamStrip({
   /** Modo da equipe (BAX, BAL ou BAI): a tela de rotações abre no vídeo desse modo. */
   mode?: Mode;
   action?: ReactNode;
+  /** Vídeo da equipe (o da temporada atual, quando cadastrado): abre em outra aba. */
+  videoUrl?: string | null;
 }) {
   const { t } = useTranslation("common");
   const isMine = tone === "mine";
@@ -63,7 +67,22 @@ export function TeamStrip({
           <span aria-hidden className="h-3 w-0.5 shrink-0 rounded-full bg-current" />
           <span className="truncate">{label}</span>
         </p>
-        {action && <div className="flex shrink-0 items-center gap-1">{action}</div>}
+        {(action || videoUrl) && (
+          <div className="flex shrink-0 items-center gap-1">
+            {videoUrl && (
+              <a
+                href={videoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-xs font-medium text-energy hover:bg-energy/10 hover:underline"
+              >
+                <CirclePlayIcon className="size-3.5" aria-hidden />
+                {t("team.video")}
+              </a>
+            )}
+            {action}
+          </div>
+        )}
       </div>
       <ul className="mt-3.5 grid grid-cols-3 items-stretch gap-1.5 sm:gap-2">
         {DISPLAY_SLOTS.map((slot) => {

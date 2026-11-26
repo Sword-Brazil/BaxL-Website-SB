@@ -99,6 +99,12 @@
     "pickStriker": "Escolher Striker",
     "removeStriker": "Tirar Striker",
     "strikerHelp": "Apoio liberado na Transcendência 4: entra na partida e usa uma única skill para dar dano extra.",
+    "seasonStrikersHelp": "Striker por temporada (opcional): sem o da temporada, vale o de cima.",
+    "currentSeason": "atual",
+    "video": "Vídeo da equipe",
+    "videoPlaceholder": "https://youtu.be/...",
+    "videoHelp": "YouTube ou .mp4/.webm. Cada equipe tem o seu (solo, dobradinha...) e ele vai na mensagem do dia. Abaixo, opcional, o vídeo de cada temporada; vazio usa este. Sem vídeo da equipe, vale o da rotação do Causador de Dano.",
+    "videoSeasonPlaceholder": "Vazio: usa o vídeo de cima",
     "order": {
       "button": "Ordenar alternativas",
       "title": "Ordem das alternativas",

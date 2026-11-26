@@ -99,6 +99,12 @@
     "pickStriker": "Elegir Striker",
     "removeStriker": "Quitar Striker",
     "strikerHelp": "Apoyo desbloqueado en Trascendencia 4: entra en la partida y usa una sola habilidad para daño extra.",
+    "seasonStrikersHelp": "Striker por temporada (opcional): sin el de la temporada, vale el de arriba.",
+    "currentSeason": "actual",
+    "video": "Video del equipo",
+    "videoPlaceholder": "https://youtu.be/...",
+    "videoHelp": "YouTube o .mp4/.webm. Cada equipo tiene el suyo (solo, dúo...) y va en el mensaje del día. Abajo, opcional, el video de cada temporada; vacío usa este. Sin video del equipo, vale el de la rotación del causante de daño.",
+    "videoSeasonPlaceholder": "Vacío: usa el video de arriba",
     "order": {
       "button": "Ordenar alternativas",
       "title": "Orden de las alternativas",

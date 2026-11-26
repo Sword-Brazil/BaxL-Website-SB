@@ -43,6 +43,15 @@ export const ReorderMetaTeamsSchema = z.object({
     .refine((ids) => new Set(ids).size === ids.length),
 });
 
+/** Vídeo de rotação ou de equipe: YouTube ou .mp4/.webm externo (vazio = sem vídeo). */
+const videoSchema = z
+  .string()
+  .trim()
+  .max(300)
+  .refine((v) => !v || !!parseRotationVideo(v), { message: VALIDATION.rotationVideo })
+  .optional()
+  .nullable();
+
 export const MetaTeamMemberSchema = z.object({
   slot: slotSchema,
   uniformId: idSchema,
@@ -60,6 +69,8 @@ export const MetaTeamMemberSchema = z.object({
   isDamageDealer: z.boolean().optional(),
   /** Striker meta do Causador de Dano (ignorado em quem não é Causador de Dano). */
   strikerUniformId: idSchema.nullable().optional(),
+  /** Striker de cada temporada (vazio = vale o de cima). */
+  seasonStrikers: z.partialRecord(z.enum(SEASONS), idSchema).optional(),
 });
 
 export const MetaTeamSchema = z
@@ -71,6 +82,9 @@ export const MetaTeamSchema = z
     label: z.string().trim().max(60).optional().nullable(),
     labelEn: z.string().trim().max(60).optional().nullable(),
     notes: z.string().trim().max(500).optional().nullable(),
+    /** Vídeo da equipe em qualquer temporada e o de cada temporada (vazio = usa o geral). */
+    videoUrl: videoSchema,
+    seasonVideos: z.partialRecord(z.enum(SEASONS), videoSchema).optional(),
     members: z
       .array(MetaTeamMemberSchema)
       .length(SLOTS.length, { message: VALIDATION.teamSize })
@@ -183,15 +197,6 @@ export const AssetUploadSchema = z.object({
   base64: z.string().min(4).max(Math.ceil((ASSET_MAX_BYTES * 4) / 3) + 8),
 });
 export type AssetUploadInput = z.infer<typeof AssetUploadSchema>;
-
-/** Vídeo de rotação: YouTube ou .mp4/.webm externo (vazio = sem vídeo). */
-const videoSchema = z
-  .string()
-  .trim()
-  .max(300)
-  .refine((v) => !v || !!parseRotationVideo(v), { message: VALIDATION.rotationVideo })
-  .optional()
-  .nullable();
 
 /** Rotação em texto livre (sem formato obrigatório); o vídeo precisa ser YouTube ou .mp4/.webm. */
 export const RotationInputSchema = z.object({

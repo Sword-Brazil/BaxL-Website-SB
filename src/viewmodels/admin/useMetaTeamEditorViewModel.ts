@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useNotifyError } from "@/viewmodels/useNotify";
 import { adminApi } from "@/models/api/admin";
 import { ApiError } from "@/models/api/client";
-import { SLOTS, type Slot } from "@/models/domain/enums";
+import { SLOTS, type SeasonId, type Slot } from "@/models/domain/enums";
 import type { MetaTeam } from "@/models/domain/types";
 import type { CtpSlot } from "@/models/rules/ctpAssign";
 import type { CatalogViewModel } from "@/viewmodels/useCatalogViewModel";
@@ -24,6 +24,8 @@ export interface MemberDraft {
   isDamageDealer: boolean;
   /** Striker meta do Causador de Dano. */
   strikerUniformId: string | null;
+  /** Striker de cada temporada (sem o da temporada, vale o de cima). */
+  seasonStrikers: Partial<Record<SeasonId, string>>;
 }
 
 export interface TeamDraft {
@@ -32,6 +34,9 @@ export interface TeamDraft {
   label: string;
   labelEn: string;
   notes: string;
+  /** Vídeo da equipe em qualquer temporada e o de cada temporada. */
+  videoUrl: string;
+  seasonVideos: Partial<Record<SeasonId, string>>;
   members: Record<Slot, MemberDraft>;
 }
 
@@ -43,6 +48,7 @@ const emptyMember = (): MemberDraft => ({
   agentCtp2Id: null,
   isDamageDealer: false,
   strikerUniformId: null,
+  seasonStrikers: {},
 });
 
 /** CTPs da Meta do personagem do traje, como estão no catálogo. */
@@ -57,7 +63,7 @@ const agentCtps = (catalog: CatalogViewModel, uniformId: string | null) => {
  * administrador escolher um slot.
  */
 function memberDraft(catalog: CatalogViewModel, m: MetaTeam["members"][number]): MemberDraft {
-  const base = { uniformId: m.uniformId, isDamageDealer: m.isDamageDealer, strikerUniformId: m.strikerUniformId, ...agentCtps(catalog, m.uniformId) };
+  const base = { uniformId: m.uniformId, isDamageDealer: m.isDamageDealer, strikerUniformId: m.strikerUniformId, seasonStrikers: m.seasonStrikers, ...agentCtps(catalog, m.uniformId) };
   if (m.ctpSlot || !m.ctpId) return { ...base, ctpId: null, ctpSlot: m.ctpSlot ?? 1 };
   if (!base.agentCtp1Id || base.agentCtp1Id === m.ctpId) return { ...base, agentCtp1Id: m.ctpId, ctpId: null, ctpSlot: 1 };
   if (!base.agentCtp2Id || base.agentCtp2Id === m.ctpId) return { ...base, agentCtp2Id: m.ctpId, ctpId: null, ctpSlot: 2 };
@@ -69,6 +75,8 @@ const emptyDraft = (isPrimary: boolean): TeamDraft => ({
   label: "",
   labelEn: "",
   notes: "",
+  videoUrl: "",
+  seasonVideos: {},
   members: Object.fromEntries(SLOTS.map((s) => [s, emptyMember()])) as TeamDraft["members"],
 });
 
@@ -78,6 +86,8 @@ const fromTeam = (catalog: CatalogViewModel, t: MetaTeam): TeamDraft => ({
   label: t.label ?? "",
   labelEn: t.labelEn ?? "",
   notes: t.notes ?? "",
+  videoUrl: t.videoUrl ?? "",
+  seasonVideos: t.seasonVideos,
   members: Object.fromEntries(t.members.map((m) => [m.slot, memberDraft(catalog, m)])) as TeamDraft["members"],
 });
 
@@ -115,6 +125,8 @@ export function useMetaTeamEditorViewModel(scopeVm: MetaScopeViewModel, messages
         label: d.label || null,
         labelEn: d.labelEn || null,
         notes: d.notes || null,
+        videoUrl: d.videoUrl || null,
+        seasonVideos: d.seasonVideos,
         members: SLOTS.map((slot) => {
           const m = d.members[slot];
           return {
@@ -125,6 +137,7 @@ export function useMetaTeamEditorViewModel(scopeVm: MetaScopeViewModel, messages
             ...(m.uniformId ? { agentCtp1Id: m.agentCtp1Id, agentCtp2Id: m.agentCtp2Id } : {}),
             isDamageDealer: m.isDamageDealer,
             strikerUniformId: m.isDamageDealer ? m.strikerUniformId : null,
+            seasonStrikers: m.isDamageDealer ? m.seasonStrikers : {},
           };
         }),
       };

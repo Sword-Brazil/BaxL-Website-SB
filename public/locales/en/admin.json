@@ -99,6 +99,12 @@
     "pickStriker": "Pick a Striker",
     "removeStriker": "Remove Striker",
     "strikerHelp": "Support unlocked at Transcendence 4: joins the fight and uses a single skill for extra damage.",
+    "seasonStrikersHelp": "Striker per season (optional): without the season's one, the one above applies.",
+    "currentSeason": "current",
+    "video": "Team video",
+    "videoPlaceholder": "https://youtu.be/...",
+    "videoHelp": "YouTube or .mp4/.webm. Each team has its own (solo, duo...) and it goes in the day message. Below, optionally, the video for each season; empty uses this one. Without a team video, the damage dealer's rotation video applies.",
+    "videoSeasonPlaceholder": "Empty: uses the video above",
     "order": {
       "button": "Order alternatives",
       "title": "Alternatives order",

@@ -4,6 +4,7 @@ import { daysRepository } from "@/server/repositories/daysRepository";
 import { metaTeamRepository } from "@/server/repositories/metaTeamRepository";
 import { listBosses } from "./baiService";
 import { effectivePriority } from "@/models/rules/priority";
+import { teamForSeason } from "@/models/rules/teamSeason";
 import { toCriteria, toMetaTeam, toPriority } from "./mappers";
 import { getPriority } from "./priorityService";
 import { getSeason } from "./seasonService";
@@ -24,7 +25,7 @@ export async function getCycle(): Promise<CycleOverview> {
   const modeDay = (mode: DayMode, number: number): CycleModeDay | null => {
     const row = modes[mode].get(number);
     if (!row) return null;
-    const metaTeams = row.metaTeams.map(toMetaTeam);
+    const metaTeams = row.metaTeams.map((t) => teamForSeason(toMetaTeam(t), season.id));
     const reserves = toPriority(row.priorityEntries);
     return { criteria: toCriteria(row.criteria), metaTeams, priority: effectivePriority(metaTeams, reserves), reserves };
   };
@@ -42,7 +43,7 @@ export async function getCycle(): Promise<CycleOverview> {
     };
   });
 
-  const baiMetaTeams = baiTeams.map(toMetaTeam);
+  const baiMetaTeams = baiTeams.map((t) => teamForSeason(toMetaTeam(t), season.id));
   return {
     season,
     days,

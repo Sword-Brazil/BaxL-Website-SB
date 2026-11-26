@@ -1,6 +1,7 @@
 import type { CriterionAttribute, DayMode, Slot, TeamScope } from "@/models/domain/enums";
 import { SLOTS } from "@/models/domain/enums";
 import type { Criterion, MetaTeam, PriorityLists } from "@/models/domain/types";
+import { toSeasonMap } from "@/models/rules/teamSeason";
 
 type DbMetaTeam = {
   id: string;
@@ -10,6 +11,8 @@ type DbMetaTeam = {
   label: string | null;
   labelEn: string | null;
   notes: string | null;
+  videoUrl: string | null;
+  seasonVideos: unknown;
   updatedAt: Date;
   battleDay: { mode: string; number: number } | null;
   updatedBy: { nickname: string | null } | null;
@@ -20,6 +23,7 @@ type DbMetaTeam = {
     ctpSlot: number | null;
     isDamageDealer: boolean;
     strikerUniformId: string | null;
+    seasonStrikers: unknown;
   }[];
 };
 
@@ -34,6 +38,8 @@ export function toMetaTeam(t: DbMetaTeam): MetaTeam {
     label: t.label,
     labelEn: t.labelEn,
     notes: t.notes,
+    videoUrl: t.videoUrl,
+    seasonVideos: toSeasonMap(t.seasonVideos),
     members: [...t.members]
       .sort((a, b) => SLOTS.indexOf(a.slot as Slot) - SLOTS.indexOf(b.slot as Slot))
       .map((m) => ({
@@ -43,6 +49,7 @@ export function toMetaTeam(t: DbMetaTeam): MetaTeam {
         ctpSlot: m.ctpSlot === 1 || m.ctpSlot === 2 ? m.ctpSlot : null,
         isDamageDealer: m.isDamageDealer,
         strikerUniformId: m.strikerUniformId,
+        seasonStrikers: toSeasonMap(m.seasonStrikers),
       })),
     updatedAt: t.updatedAt.toISOString(),
     updatedBy: t.updatedBy?.nickname ?? null,

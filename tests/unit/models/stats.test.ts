@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { CycleOverview, MetaTeam } from "@/models/domain/types";
 
-const NO_ROTATION = { isDamageDealer: false, strikerUniformId: null, ctpSlot: null, rotation: null, rotationNotes: null, rotationVideoUrl: null };
+const NO_ROTATION = { isDamageDealer: false, strikerUniformId: null, seasonStrikers: {}, ctpSlot: null, rotation: null, rotationNotes: null, rotationVideoUrl: null };
 import { agentRepetition, ctpsOfUses, ctpUsage, myAgentRepetition, myTeamCompositions } from "@/models/rules/stats";
 
 const team = (isPrimary: boolean, uniforms: [string, string, string]): MetaTeam => ({
@@ -12,6 +12,8 @@ const team = (isPrimary: boolean, uniforms: [string, string, string]): MetaTeam 
   isPrimary,
   label: null,
   labelEn: null,
+  videoUrl: null,
+  seasonVideos: {},
   notes: null,
   position: 0,
   updatedAt: "",

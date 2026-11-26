@@ -123,22 +123,26 @@ model RestrictionCriterion {
 // ---------- Equipes curadas ----------
 
 model MetaTeam {
-  id          String           @id @default(cuid())
-  scope       String
-  battleDayId String?
-  battleDay   BattleDay?       @relation(fields: [battleDayId], references: [id])
-  isPrimary   Boolean          @default(false)
+  id           String           @id @default(cuid())
+  scope        String
+  battleDayId  String?
+  battleDay    BattleDay?       @relation(fields: [battleDayId], references: [id])
+  isPrimary    Boolean          @default(false)
   // Ordem das alternativas no dia (o ADMIN reordena); a principal vem sempre primeiro.
-  position    Int              @default(0)
-  label       String?
-  notes       String?
+  position     Int              @default(0)
+  label        String?
+  notes        String?
   // Rótulo em inglês (vazio = mostra o português; "Alternativa N" é traduzido sozinho).
-  labelEn     String?
-  members     MetaTeamMember[]
-  updatedById String?
-  updatedBy   User?            @relation(fields: [updatedById], references: [id])
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  labelEn      String?
+  // Vídeo da equipe (YouTube ou .mp4/.webm externo): cada combinação (solo, dobradinha) tem o seu.
+  // videoUrl vale em qualquer temporada; seasonVideos ({ "BURN_FRACTURE": url, ... }) troca por temporada.
+  videoUrl     String?
+  seasonVideos Json             @default("{}")
+  members      MetaTeamMember[]
+  updatedById  String?
+  updatedBy    User?            @relation(fields: [updatedById], references: [id])
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
 
   @@index([scope, battleDayId])
 }
@@ -159,6 +163,8 @@ model MetaTeamMember {
   // Striker meta (apoio da Transcendência 4) do Causador de Dano nesta equipe.
   strikerUniformId String?
   striker          Uniform? @relation("MemberStriker", fields: [strikerUniformId], references: [id], onDelete: SetNull)
+  // Striker de cada temporada ({ "BURN_FRACTURE": uniformId, ... }); sem o da temporada, vale o de cima.
+  seasonStrikers   Json     @default("{}")
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 

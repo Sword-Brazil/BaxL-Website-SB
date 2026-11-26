@@ -82,5 +82,14 @@
     "team": "Equipo",
     "preReset": "antes del reset",
     "normal": "+ {{value}} BA normal"
+  },
+  "reset": {
+    "title": "Borrar puntuaciones",
+    "text": "Borra las puntuaciones que anotaste: todas a la vez o solo de un modo. Tus equipos y tu plantel se quedan.",
+    "all": "Todas las puntuaciones",
+    "confirmAll": "¿Borrar todas tus puntuaciones de BAX, BAL y BAI?",
+    "confirmMode": "¿Borrar tus puntuaciones de {{mode}}?",
+    "doneAll": "Todas tus puntuaciones fueron borradas",
+    "doneMode": "Puntuaciones de {{mode}} borradas"
   }
 }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { MetaTeam } from "@/models/domain/types";
 
-const NO_ROTATION = { isDamageDealer: false, strikerUniformId: null, ctpSlot: null, rotation: null, rotationNotes: null, rotationVideoUrl: null };
+const NO_ROTATION = { isDamageDealer: false, strikerUniformId: null, seasonStrikers: {}, ctpSlot: null, rotation: null, rotationNotes: null, rotationVideoUrl: null };
 import { effectivePriority } from "@/models/rules/priority";
 
 const team = (isPrimary: boolean, [solo, s1, s2]: string[]): MetaTeam => ({
@@ -12,6 +12,8 @@ const team = (isPrimary: boolean, [solo, s1, s2]: string[]): MetaTeam => ({
   isPrimary,
   label: null,
   labelEn: null,
+  videoUrl: null,
+  seasonVideos: {},
   notes: null,
   position: 0,
   updatedAt: "",

@@ -1,6 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import type { MetaTeam } from "@/models/domain/types";
 import { slotCtpId } from "@/models/rules/ctpAssign";
+import { toSeasonMap } from "@/models/rules/teamSeason";
 import type { MetaTeamInput } from "@/models/schemas/admin";
 import { prisma } from "@/server/db";
 import { HttpError } from "@/server/http";
@@ -11,14 +12,16 @@ import { toMetaTeam } from "./mappers";
 
 /** Strikers dos Causadores de Dano: trajes ativos do catálogo, de um personagem diferente do próprio. */
 async function assertStrikers(members: MetaTeamInput["members"], uniforms: { id: string; agentId: string }[]) {
-  const picks = members.filter((m) => m.isDamageDealer && m.strikerUniformId);
+  const picks = members
+    .filter((m) => m.isDamageDealer)
+    .flatMap((m) => [m.strikerUniformId, ...Object.values(m.seasonStrikers ?? {})].filter((id): id is string => !!id).map((id) => ({ ...m, id })));
   if (!picks.length) return;
   const strikers = await prisma.uniform.findMany({
-    where: { id: { in: picks.map((m) => m.strikerUniformId!) }, active: true, agent: { active: true } },
+    where: { id: { in: picks.map((m) => m.id) }, active: true, agent: { active: true } },
     select: { id: true, agentId: true },
   });
   for (const m of picks) {
-    const striker = strikers.find((s) => s.id === m.strikerUniformId);
+    const striker = strikers.find((s) => s.id === m.id);
     if (!striker) throw new HttpError(400, "VALIDATION_ERROR", "Striker não encontrado no catálogo");
     if (striker.agentId === uniforms.find((u) => u.id === m.uniformId)?.agentId) {
       throw new HttpError(400, "VALIDATION_ERROR", "O Striker precisa ser outro personagem");
@@ -60,6 +63,8 @@ export async function saveMetaTeam(input: MetaTeamInput, userId: string, id?: st
     label: input.label || null,
     labelEn: input.labelEn || null,
     notes: input.notes || null,
+    videoUrl: input.videoUrl || null,
+    seasonVideos: toSeasonMap(input.seasonVideos),
     updatedById: userId,
   };
   const agentIdOf = (uniformId: string) => uniforms.find((u) => u.id === uniformId)!.agentId;
@@ -83,6 +88,7 @@ export async function saveMetaTeam(input: MetaTeamInput, userId: string, id?: st
       isDamageDealer: !!m.isDamageDealer,
       // Só o Causador de Dano tem Striker.
       strikerUniformId: m.isDamageDealer ? (m.strikerUniformId ?? null) : null,
+      seasonStrikers: m.isDamageDealer ? toSeasonMap(m.seasonStrikers) : {},
     }));
 
     if (input.isPrimary) {

@@ -33,6 +33,17 @@
   "cycleDays": "Cycle days",
   "metaUpdated": "Meta updated",
   "metaUpdatedShort": "Updated",
+  "message": {
+    "button": "Copy day message",
+    "copied": "Message copied: just paste it in the group",
+    "copyFailed": "Could not copy the message",
+    "bestTeams": "Best teams",
+    "rotation": "Rotation",
+    "leader": "Leader",
+    "and": "and",
+    "striker": "{{striker}} striker on {{target}}",
+    "striker_female": "{{striker}} striker on {{target}}"
+  },
   "export": {
     "button": "Export table (HTML)",
     "title": "Alliance Battle teams",
