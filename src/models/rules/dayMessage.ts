@@ -58,6 +58,19 @@ export interface DayMessageInput {
 export const memberName = (agent: string, uniform: string) =>
   uniform.trim().toLowerCase() === agent.trim().toLowerCase() ? agent : `${agent} (${uniform})`;
 
+/**
+ * Sequência sem os marcadores do site (| fim, / próxima, * recomeça): no WhatsApp o * vira negrito.
+ * Fim e próxima rotação viram quebra de linha; o recomeço só sai.
+ */
+export const plainSequence = (sequence: string) =>
+  sequence
+    .replace(/[|/]/g, "\n")
+    .replace(/\*/g, "")
+    .split("\n")
+    .map((line) => line.replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+    .join("\n");
+
 /** "A, B e C". */
 const joinNames = (names: string[], and: string) =>
   names.length < 2 ? (names[0] ?? "") : `${names.slice(0, -1).join(", ")} ${and} ${names[names.length - 1]}`;
@@ -96,7 +109,7 @@ export function buildDayMessage({ mode, day, effect, criteria, teams, rotations,
     blocks.push(`*${labels.rotation}:*`);
     for (const r of withRotations) {
       const body = r.rotations.map((rot) =>
-        [[rot.title ? `_${rot.title.trim()}_` : null, rot.sequence.trim()].filter(Boolean).join("\n"), rot.description?.trim()]
+        [[rot.title ? `_${rot.title.trim()}_` : null, plainSequence(rot.sequence)].filter(Boolean).join("\n"), rot.description?.trim()]
           .filter(Boolean)
           .join("\n\n"),
       );

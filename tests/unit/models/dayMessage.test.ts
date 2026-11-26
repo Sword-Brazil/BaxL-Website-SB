@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildDayMessage, memberName, type DayMessageLabels } from "@/models/rules/dayMessage";
+import { buildDayMessage, memberName, plainSequence, type DayMessageLabels } from "@/models/rules/dayMessage";
 
 const labels: DayMessageLabels = {
   bestTeams: "Melhores times",
@@ -119,5 +119,11 @@ Skill 1: use quando a Wanda começar a descer em direção ao chão durante a an
       rotations: [{ name: "Wanda", rotations: [{ title: "Abertura", sequence: "1c2", description: null }, { title: null, sequence: "3c4", description: "Loop" }] }],
     });
     expect(text).toBe("*BAX DIA 1 PARALISIA Sem restrição:*\n\n*Rotação:*\n\n- *Wanda:*\n_Abertura_\n1c2\n\n3c4\n\nLoop");
+  });
+
+  it("tira os marcadores do site das rotações: | e / quebram a linha, * sai", () => {
+    expect(plainSequence("1 2c (3dc 4) 7 | 5 6 *")).toBe("1 2c (3dc 4) 7\n5 6");
+    expect(plainSequence("1c2 / 3dc5 *\n6dc4|*")).toBe("1c2\n3dc5\n6dc4");
+    expect(plainSequence("2c3c4c1dc5 1 (repeat)")).toBe("2c3c4c1dc5 1 (repeat)");
   });
 });
