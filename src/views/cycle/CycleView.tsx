@@ -26,7 +26,7 @@ import { useDayMessageViewModel } from "@/viewmodels/useDayMessageViewModel";
 import { useMetaUpdatesNotice } from "@/viewmodels/useMetaUpdatesNotice";
 import { useTeamsExportViewModel } from "@/viewmodels/useTeamsExportViewModel";
 import { HelpHint } from "@/views/layout/HelpHint";
-import { DuoBadge, TeamStrip as SharedTeamStrip, type StripMember, type TeamTone } from "@/views/shared/TeamStrip";
+import { TeamStrip as SharedTeamStrip, type StripMember, type TeamTone } from "@/views/shared/TeamStrip";
 import { QueryState } from "@/views/shared/QueryState";
 import { MODE_VISUALS } from "@/views/shared/modeVisuals";
 import { ResetTeamsOptions } from "@/views/shared/ResetTeamsOptions";
@@ -80,6 +80,15 @@ function userMembers(team: UserTeam | null, vm: Vm) {
     : [];
 }
 
+/** A equipe do jogador é uma dobradinha do dia: os mesmos personagens de uma equipe marcada como dobradinha. */
+function isDuoOfDay(mine: { uniformId: string }[], teams: MetaTeam[]) {
+  const ids = new Set(mine.map((m) => m.uniformId));
+  return (
+    ids.size > 0 &&
+    teams.some((t) => t.isDuo && t.members.length === ids.size && t.members.every((m) => ids.has(m.uniformId)))
+  );
+}
+
 /** Coluna de um modo (BAX ou BAL) dentro de um dia. */
 /** Selo de Meta alterada desde a última visita (mesmo estilo do selo "Hoje"). */
 function MetaUpdatedBadge({ short = false, className }: { short?: boolean; className?: string }) {
@@ -125,7 +134,6 @@ function ModePanel({
           {updated && <MetaUpdatedBadge short />}
         </span>
         <span className="flex flex-wrap items-center gap-1">
-          {data?.metaTeams.some((team) => team.isDuo) && <DuoBadge className="h-6 px-2 text-xs" />}
           {effect && <BossEffectBadge effect={effect} season />}
           <RestrictionBadges criteria={data?.criteria ?? []} />
         </span>
@@ -138,7 +146,9 @@ function ModePanel({
       {alts.map((alt) => (
         <TeamStrip key={alt.id} label={teamLabel(alt.label, alt.labelEn, lang) ?? t("cycle:alternative")} tone="alt" team={teamMembers(alt)} vm={vm} effect={effect} mode={mode} videoUrl={alt.videoUrl} duo={alt.isDuo} />
       ))}
-      {mine.length > 0 && <TeamStrip label={t("cycle:mine")} tone="mine" team={mine} vm={vm} effect={effect} />}
+      {mine.length > 0 && (
+        <TeamStrip label={t("cycle:mine")} tone="mine" team={mine} vm={vm} effect={effect} duo={isDuoOfDay(mine, data?.metaTeams ?? [])} />
+      )}
       <div className="flex flex-wrap items-center gap-2">
         <Button variant={mine.length ? "ghost" : "outline"} size="sm" onClick={() => vm.openBuilder(mode, day)}>
           {mine.length ? <PencilIcon data-icon="inline-start" /> : <PlusIcon data-icon="inline-start" />}
@@ -191,7 +201,7 @@ function BaiPanel({ day, vm }: { day: number; vm: Vm }) {
         {alts.map((alt) => (
           <TeamStrip key={alt.id} label={teamLabel(alt.label, alt.labelEn, lang) ?? t("cycle:alternative")} tone="alt" team={teamMembers(alt)} vm={vm} mode="BAI" videoUrl={alt.videoUrl} duo={alt.isDuo} />
         ))}
-        {mine.length > 0 && <TeamStrip label={t("cycle:mine")} tone="mine" team={mine} vm={vm} />}
+        {mine.length > 0 && <TeamStrip label={t("cycle:mine")} tone="mine" team={mine} vm={vm} duo={isDuoOfDay(mine, vm.bai?.metaTeams ?? [])} />}
       </div>
       <Button variant={mine.length ? "ghost" : "outline"} size="sm" className="self-start" onClick={() => vm.openBuilder("BAI", day)}>
         {mine.length ? <PencilIcon data-icon="inline-start" /> : <PlusIcon data-icon="inline-start" />}

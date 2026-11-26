@@ -52,12 +52,13 @@ export function BossEffectBadge({ effect, season, className }: { effect: BossEff
     <span
       title={season ? t("season.stunHint", { effect: name }) : name}
       className={cn(
-        "inline-flex h-6 shrink-0 items-center gap-1 rounded-full border px-2 pl-1 font-heading text-xs tracking-wider text-foreground uppercase",
+        // Cantos pouco arredondados: o ícone do jogo é quadrado e fica encostado na borda.
+        "inline-flex h-6 shrink-0 items-center gap-1.5 rounded-md border py-0.5 pr-2 pl-0.5 font-heading text-xs tracking-wider text-foreground uppercase",
         className,
       )}
       style={bossEffectTint(effect)}
     >
-      <BossEffectIcon effect={effect} />
+      <BossEffectIcon effect={effect} className="size-[1.125rem]" />
       {name}
     </span>
   );

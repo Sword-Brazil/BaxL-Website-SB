@@ -164,10 +164,10 @@ export function MemberChip({
         {stunEffect && (
           <Hint label={t("season.stuns", { effect: t(`effects.${stunEffect}`) })}>
             <span
-              className="absolute -bottom-1 -left-1.5 flex size-5 items-center justify-center rounded-full bg-card ring-2 ring-card"
+              className="absolute -bottom-1 -left-1.5 flex size-5 overflow-hidden rounded-[4px] bg-card ring-2 ring-card"
               aria-label={t("season.stuns", { effect: t(`effects.${stunEffect}`) })}
             >
-              <BossEffectIcon effect={stunEffect} className="size-3.5" />
+              <BossEffectIcon effect={stunEffect} className="size-5 rounded-none" />
             </span>
           </Hint>
         )}
